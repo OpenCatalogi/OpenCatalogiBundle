@@ -1,16 +1,16 @@
 <?php
 
-namespace CommonGateway\PetStoreBundle\ActionHandler;
+namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
-use CommonGateway\PetStoreBundle\Service\PetStoreService;
+use CommonGateway\OpenCatalogiBundle\Service\OpenCatalogiService;
 
-class PetStoreHandler
+class OpenCatalogiHandler
 {
-    private PetStoreService $petStoreService;
+    private OpenCatalogiService $openCatalogiService;
 
-    public function __construct(PetStoreService $petStoreService)
+    public function __construct(OpenCatalogiService $openCatalogiService)
     {
-        $this->petStoreService = $petStoreService;
+        $this->openCatalogiService = $openCatalogiService;
     }
 
     /**
@@ -23,7 +23,7 @@ class PetStoreHandler
         return [
             '$id'         => 'https://example.com/person.schema.json',
             '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
-            'title'       => 'PetStore Action',
+            'title'       => 'OpenCatalogi Action',
             'description' => 'This handler returns a welcoming string',
             'required'    => [],
             'properties'  => [],
@@ -45,6 +45,6 @@ class PetStoreHandler
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->petStoreService->petStoreHandler($data, $configuration);
+        return $this->openCatalogiService->openCatalogiHandler($data, $configuration);
     }
 }

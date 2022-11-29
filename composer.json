@@ -1,5 +1,5 @@
 {
-    "name": "common-gateway/pet-store-bundle",
+    "name": "common-gateway/open-catalogi-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
     "type" : "symfony-bundle",
 	
@@ -22,7 +22,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"CommonGateway\\PetStoreBundle\\" : ""
+			"CommonGateway\\OpenCatalogiBundle\\" : ""
 		}
 	}
 }
