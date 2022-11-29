@@ -1,0 +1,20 @@
+{
+  "title": "Dependency",
+  "x-stoplight": {
+    "id": "9i3us044e6i0o"
+  },
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    }
+  },
+  "x-tags": [
+    "dependency"
+  ],
+  "examples": [
+    {
+      "id": "string"
+    }
+  ]
+}

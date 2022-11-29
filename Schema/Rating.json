@@ -1,0 +1,24 @@
+{
+  "title": "Rating",
+  "x-stoplight": {
+    "id": "jx42f4gh3wm7u"
+  },
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer"
+    },
+    "maxRating": {
+      "type": "integer"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

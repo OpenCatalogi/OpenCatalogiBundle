@@ -1,0 +1,148 @@
+{
+  "title": "Catalogi",
+  "x-stoplight": {
+    "id": "lvyd1ecf535j4"
+  },
+  "type": "object",
+  "properties": {
+    "source": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        }
+      }
+    },
+    "organisation": {
+      "$ref": "#/definitions/Organisation"
+    },
+    "rsin": {
+      "type": "string"
+    },
+    "pki": {
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Organisation": {
+      "title": "Organisation",
+      "x-stoplight": {
+        "id": "n9bmvlkld52vx"
+      },
+      "type": "object",
+      "description": "[extension of the publiccode standard] [extension of  the klanten API organisatie object] ",
+      "examples": [
+        {
+          "id": "string",
+          "name": "string",
+          "description": "string",
+          "logo": "http://example.com",
+          "supports": [
+            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
+          ],
+          "owns": [
+            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
+          ],
+          "uses": [
+            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
+          ],
+          "token": "string",
+          "github": "string",
+          "gitlab": "string",
+          "website": "string",
+          "phone": "string",
+          "email": "string"
+        }
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "logo": {
+          "type": "string",
+          "format": "uri",
+          "description": "The logo of this organisation"
+        },
+        "supports": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "A list of  components supported by this organisation",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "owns": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "A list of  components supported by this organisation",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "uses": {
+          "type": "array",
+          "uniqueItems": true,
+          "description": "A list of  components supported by this organisation",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "token": {
+          "type": "string",
+          "description": "An optional NL-Design token that contains the organisations style"
+        },
+        "github": {
+          "type": "string",
+          "format": "url",
+          "description": "A link the the organisations github "
+        },
+        "gitlab": {
+          "type": "string",
+          "format": "url",
+          "description": "A link to the organisations gitlab"
+        },
+        "website": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private",
+            "unkown"
+          ],
+          "example": "public",
+          "description": "The type of this organisation"
+        },
+        "catalogusAPI": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

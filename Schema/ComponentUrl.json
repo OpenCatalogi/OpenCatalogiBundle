@@ -1,0 +1,12 @@
+{
+  "title": "ComponentUrl",
+  "x-stoplight": {
+    "id": "yw083kveb0cc0"
+  },
+  "type": "object",
+  "properties": {
+    "repositoryUrl": {
+      "type": "string"
+    }
+  }
+}

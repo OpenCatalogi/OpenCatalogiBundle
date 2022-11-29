@@ -1,0 +1,77 @@
+{
+  "title": "Application",
+  "x-stoplight": {
+    "id": "rxtjerlhpkxnm"
+  },
+  "type": "object",
+  "description": "",
+  "x-tags": [
+    "application"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "shortDescription": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "detailPageImageUrl": {
+      "type": "string"
+    },
+    "documentationUrl": {
+      "type": "string"
+    },
+    "demoUrl": {
+      "type": "string"
+    },
+    "bpmnProcessUrl": {
+      "type": "string"
+    },
+    "isPublished": {
+      "type": "boolean"
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "pictureUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ComponentUrl"
+      }
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "definitions": {
+    "ComponentUrl": {
+      "title": "ComponentUrl",
+      "x-stoplight": {
+        "id": "yw083kveb0cc0"
+      },
+      "type": "object",
+      "properties": {
+        "repositoryUrl": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
