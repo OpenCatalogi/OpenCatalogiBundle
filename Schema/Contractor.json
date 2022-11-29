@@ -1,8 +1,9 @@
 {
   "title": "Contractor",
   "x-stoplight": {
-    "id": "wmxrj9lq1v5y2"
+    "id": "https://opencatalogi.nl/contractor.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "x-tags": [
     "contractor"

@@ -1,8 +1,9 @@
 {
   "title": "Contact",
   "x-stoplight": {
-    "id": "bspcro7twxzw5"
+    "id": "https://opencatalogi.nl/contact.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "examples": [
     {

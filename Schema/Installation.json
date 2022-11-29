@@ -1,8 +1,9 @@
 {
   "title": "Installation",
   "x-stoplight": {
-    "id": "b1uf5qso41veg"
+    "id": "https://opencatalogi.nl/installation.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "description": "[extension of the publiccode standard] This object defines an installation of a given component within an environement",
   "properties": {

@@ -1,8 +1,9 @@
 {
   "title": "Dependency",
   "x-stoplight": {
-    "id": "9i3us044e6i0o"
+    "id": "https://opencatalogi.nl/dependency.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "properties": {
     "id": {

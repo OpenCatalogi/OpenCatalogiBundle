@@ -1,8 +1,9 @@
 {
   "title": "Organisation",
   "x-stoplight": {
-    "id": "n9bmvlkld52vx"
+    "id": "https://opencatalogi.nl/organisation.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "description": "[extension of the publiccode standard] [extension of  the klanten API organisatie object] ",
   "examples": [

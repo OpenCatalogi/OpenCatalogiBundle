@@ -1,8 +1,9 @@
 {
   "title": "Rating",
   "x-stoplight": {
-    "id": "jx42f4gh3wm7u"
+    "id": "https://opencatalogi.nl/rating.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "properties": {
     "id": {

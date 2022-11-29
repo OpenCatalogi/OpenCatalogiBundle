@@ -1,8 +1,9 @@
 {
   "title": "ComponentUrl",
   "x-stoplight": {
-    "id": "yw083kveb0cc0"
+    "id": "https://opencatalogi.nl/componenturl.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "properties": {
     "repositoryUrl": {

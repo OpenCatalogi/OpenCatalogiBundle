@@ -1,8 +1,9 @@
 {
   "title": "Catalogi",
   "x-stoplight": {
-    "id": "lvyd1ecf535j4"
+    "id": "https://opencatalogi.nl/catalogi.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "properties": {
     "source": {

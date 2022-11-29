@@ -1,8 +1,9 @@
 {
   "title": "Application",
   "x-stoplight": {
-    "id": "rxtjerlhpkxnm"
+    "id": "https://opencatalogi.nl/application.schema.json"
   },
+  "version": "0.1.0",
   "type": "object",
   "description": "",
   "x-tags": [
