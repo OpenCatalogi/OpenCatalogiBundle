@@ -1,5 +1,5 @@
 <?php
-namespace OpenCatalogi\OpenCatalogi\DependencyInjection;
+namespace OpenCatalogi\OpenCatalogiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
