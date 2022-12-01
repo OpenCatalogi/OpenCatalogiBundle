@@ -1,5 +1,7 @@
 {
   "title": "Installation",
+  "$id": "https://opencatalogi.nl/installation.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "x-stoplight": {
     "id": "https://opencatalogi.nl/installation.schema.json"
   },

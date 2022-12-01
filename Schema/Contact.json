@@ -1,5 +1,7 @@
 {
   "title": "Contact",
+  "$id": "https://opencatalogi.nl/contact.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "x-stoplight": {
     "id": "https://opencatalogi.nl/contact.schema.json"
   },
