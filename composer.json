@@ -28,8 +28,8 @@
 		}
 	},
 	"scripts": {
-		"post-package-install": "bin/console open-catalogi/open-catalogi-bundle",
-		"post-package-update": "bin/console open-catalogi/open-catalogi-bundle",
-		"post-package-uninstall": "bin/console open-catalogi/open-catalogi-bundle"
+		"post-package-install-cmd": "bin/console open-catalogi/open-catalogi-bundle",
+		"post-package-update-cmd": "bin/console open-catalogi/open-catalogi-bundle",
+		"post-package-uninstall-cmd": "bin/console open-catalogi/open-catalogi-bundle"
 	}
 }
