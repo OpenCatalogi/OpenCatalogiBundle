@@ -4,7 +4,7 @@ namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
 
-class PubliccodeRatingHandler implements ActionHandlerInterface
+class PubliccodeRatingHandler
 {
     private PubliccodeService $publiccodeService;
 

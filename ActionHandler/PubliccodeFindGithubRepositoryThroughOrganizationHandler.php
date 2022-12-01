@@ -4,7 +4,7 @@ namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
 
-class PubliccodeFindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
+class PubliccodeFindGithubRepositoryThroughOrganizationHandler
 {
     private PubliccodeService $publiccodeService;
 

@@ -4,7 +4,7 @@ namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
 
-class PubliccodeCheckRepositoriesForPubliccodeHandler implements ActionHandlerInterface
+class PubliccodeCheckRepositoriesForPubliccodeHandler
 {
     private PubliccodeService $publiccodeService;
 
