@@ -1,5 +1,5 @@
 {
-    "name": "common-gateway/open-catalogi-bundle",
+    "name": "open-catalogi/open-catalogi-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
     "type" : "symfony-bundle",
 	
@@ -27,8 +27,8 @@
 		}
 	},
 	"scripts": {
-		"post-package-install": "bin/console common-gateway/open-catalogi-bundle",
-		"post-package-update": "bin/console common-gateway/open-catalogi-bundle",
-		"post-package-uninstall": "bin/console common-gateway/open-catalogi-bundle"
+		"post-package-install": "bin/console open-catalogi/open-catalogi-bundle",
+		"post-package-update": "bin/console open-catalogi/open-catalogi-bundle",
+		"post-package-uninstall": "bin/console open-catalogi/open-catalogi-bundle"
 	}
 }
