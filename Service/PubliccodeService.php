@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace CommonGateway\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\ObjectEntity;

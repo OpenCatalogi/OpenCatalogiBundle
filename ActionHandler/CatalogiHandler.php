@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ActionHandler;
+namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
-use App\Service\CatalogiService;
+use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
 
 class CatalogiHandler implements ActionHandlerInterface
 {

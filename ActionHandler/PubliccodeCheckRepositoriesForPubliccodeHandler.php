@@ -1,8 +1,8 @@
 <?php
 
-namespace App\ActionHandler;
+namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
 
-use App\Service\PubliccodeService;
+use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
 
 class PubliccodeCheckRepositoriesForPubliccodeHandler implements ActionHandlerInterface
 {
