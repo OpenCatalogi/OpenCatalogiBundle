@@ -1,6 +1,6 @@
 <?php
 
-namespace CommonGateway\OpenCatalogiBundle\Service;
+namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\CollectionEntity;
 use Doctrine\ORM\EntityManagerInterface;

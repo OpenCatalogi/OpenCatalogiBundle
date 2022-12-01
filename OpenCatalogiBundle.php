@@ -1,6 +1,6 @@
 <?php
-// src/OpenCatalogiBundle.php
-namespace CommonGateway\OpenCatalogiBundle;
+// src/OpenCatalogiExtension.php
+namespace OpenCatalogi\OpenCatalogiBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

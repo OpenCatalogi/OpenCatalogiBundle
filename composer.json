@@ -9,7 +9,8 @@
 		"gateway",
 		"conduction",
 		"symfony",
-		"common-gateway-plugin"
+		"common-gateway-plugin",
+		"open catalogi"
 	],
 	"homepage" : "https://commongatway.nl",
     "license": "EUPL-1.2",
@@ -23,7 +24,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"CommonGateway\\OpenCatalogiBundle\\" : ""
+			"OpenCatalogi\\OpenCatalogiBundle\\" : ""
 		}
 	},
 	"scripts": {

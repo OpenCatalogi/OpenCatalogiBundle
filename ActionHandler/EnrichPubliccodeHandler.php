@@ -1,8 +1,8 @@
 <?php
 
-namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
+namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  CommonGateway\OpenCatalogiBundle\Service\PubliccodeService;
+use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 
 class EnrichPubliccodeHandler
 {

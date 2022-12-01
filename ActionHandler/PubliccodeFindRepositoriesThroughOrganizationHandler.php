@@ -1,8 +1,8 @@
 <?php
 
-namespace CommonGateway\OpenCatalogiBundle\ActionHandler;
+namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use CommonGateway\OpenCatalogiBundle\Service\CatalogiService;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 
 class PubliccodeFindRepositoriesThroughOrganizationHandler
 {
