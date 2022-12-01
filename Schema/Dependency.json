@@ -2,22 +2,11 @@
   "title": "Dependency",
   "$id": "https://opencatalogi.nl/dependency.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/dependency.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     }
-  },
-  "x-tags": [
-    "dependency"
-  ],
-  "examples": [
-    {
-      "id": "string"
-    }
-  ]
+  }
 }

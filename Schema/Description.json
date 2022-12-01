@@ -2,14 +2,8 @@
   "title": "Description",
   "$id": "https://opencatalogi.nl/description.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/description.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
-  "x-tags": [
-    "description"
-  ],
   "properties": {
     "id": {
       "type": "string",

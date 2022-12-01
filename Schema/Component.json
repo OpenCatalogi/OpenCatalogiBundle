@@ -2,63 +2,10 @@
   "title": "Component",
   "$id": "https://opencatalogi.nl/component.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/component.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "description": "Based on the [top level component](https://yml.publiccode.tools/schema.core.html#top-level-keys-and-sections) of public code. represent a pease of software that may iether be  standalone or part of a larger application.\n\n**The PublicCode standard has been extenden for this API in te following way's**\n- To the `type` property the following enums where added\n- - Api\n- - Schema\n- - Data\n- The `inputType` property was used (its depracticed in PublicCode)\n- The `outputType` property was uses (its depracticed in PublicCode)\n- The `nl` country exenstion was added in line with the [PublicCode country extensions](https://yml.publiccode.tools/country.html) guidelines\n- applicationId was added for the codebase repository (like a github repository id).",
-  "examples": [
-    {
-      "id": "497f6eca-6276-4993-bfeb-53cbbbba6f08",
-      "name": "Medusa",
-      "applicationSuite": {
-        "id": "string",
-        "name": "string"
-      },
-      "url": "https://example.com/italia/medusa.git",
-      "landingURL": "https://example.com/italia/medusa",
-      "isBasedOn": "https://github.com/italia/otello.git",
-      "softwareVersion": "1.0",
-      "logo": "https://avatars0.githubusercontent.com/u/34739001?s=280&v=4",
-      "releaseDate": "2022-01-01",
-      "platforms": "web",
-      "categories": [
-        "Acounting"
-      ],
-      "usedBy": [
-        "City of Amsterdam"
-      ],
-      "roadmap": "https://vng.nl/agenda",
-      "developmentStatus": "concept",
-      "softwareType": "standalone/web",
-      "layerType": "interface",
-      "installationType": "self",
-      "intendedAudience": {
-        "countries": [
-          "nl"
-        ],
-        "unsupportedCountries": [
-          "de"
-        ],
-        "scope": [
-          "agriculture",
-          "culture"
-        ]
-      },
-      "description": {
-        "NL": {}
-      }
-    }
-  ],
-  "x-tags": [
-    "component"
-  ],
   "properties": {
-    "id": {
-      "type": "string",
-      "format": "uuid"
-    },
     "applicationId": {
       "type": "string",
       "example": "487842915"

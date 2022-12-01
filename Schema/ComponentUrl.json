@@ -2,9 +2,6 @@
   "title": "ComponentUrl",
   "$id": "https://opencatalogi.nl/componenturl.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/componenturl.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "properties": {

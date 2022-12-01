@@ -2,19 +2,10 @@
   "title": "Application",
   "$id": "https://opencatalogi.nl/application.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/application.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "description": "",
-  "x-tags": [
-    "application"
-  ],
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "name": {
       "type": "string"
     },
@@ -52,29 +43,9 @@
           "type": "string"
         }
       }
-    },
-    "components": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/ComponentUrl"
-      }
     }
   },
   "required": [
     "name"
-  ],
-  "definitions": {
-    "ComponentUrl": {
-      "title": "ComponentUrl",
-      "x-stoplight": {
-        "id": "yw083kveb0cc0"
-      },
-      "type": "object",
-      "properties": {
-        "repositoryUrl": {
-          "type": "string"
-        }
-      }
-    }
-  }
+  ]
 }

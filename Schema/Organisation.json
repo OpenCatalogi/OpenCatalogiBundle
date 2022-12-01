@@ -2,39 +2,10 @@
   "title": "Organisation",
   "$id": "https://opencatalogi.nl/organisation.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/organisation.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
-  "description": "[extension of the publiccode standard] [extension of  the klanten API organisatie object] ",
-  "examples": [
-    {
-      "id": "string",
-      "name": "string",
-      "description": "string",
-      "logo": "http://example.com",
-      "supports": [
-        "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-      ],
-      "owns": [
-        "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-      ],
-      "uses": [
-        "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-      ],
-      "token": "string",
-      "github": "string",
-      "gitlab": "string",
-      "website": "string",
-      "phone": "string",
-      "email": "string"
-    }
-  ],
+  "description": "extension of the publiccode standard ",
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "name": {
       "type": "string"
     },
@@ -49,29 +20,17 @@
     "supports": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
-      "items": {
-        "type": "string",
-        "format": "uuid"
-      }
+      "description": "A list of  components supported by this organisation"
     },
     "owns": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
-      "items": {
-        "type": "string",
-        "format": "uuid"
-      }
+      "description": "A list of  components supported by this organisation"
     },
     "uses": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
-      "items": {
-        "type": "string",
-        "format": "uuid"
-      }
+      "description": "A list of  components supported by this organisation"
     },
     "token": {
       "type": "string",
@@ -107,10 +66,7 @@
       "description": "The type of this organisation"
     },
     "catalogusAPI": {
-      "type": [
-        "string",
-        "null"
-      ],
+      "type": "string",
       "format": "uri"
     }
   }

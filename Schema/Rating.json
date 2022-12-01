@@ -2,15 +2,9 @@
   "title": "Rating",
   "$id": "https://opencatalogi.nl/rating.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/rating.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "rating": {
       "type": "integer"
     },
@@ -18,10 +12,7 @@
       "type": "integer"
     },
     "results": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "type": "array"
     }
   }
 }

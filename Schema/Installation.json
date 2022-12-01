@@ -2,16 +2,10 @@
   "title": "Installation",
   "$id": "https://opencatalogi.nl/installation.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "x-stoplight": {
-    "id": "https://opencatalogi.nl/installation.schema.json"
-  },
   "version": "0.1.0",
   "type": "object",
   "description": "[extension of the publiccode standard] This object defines an installation of a given component within an environement",
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "organization": {
       "type": "string",
       "format": "uuid",
