@@ -58,15 +58,26 @@ class InstallationService implements InstallerInterface
             if(
                !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
-                $dashboardCard = New DashboardCard();
-                $dashboardCard->setType('schema');
-                $dashboardCard->setEntity('App:Entity');
-                $dashboardCard->setObject('App:Entity');
-                $dashboardCard->setName($entity->getName());
-                $dashboardCard->setDescription($entity->getDescription());
-                $dashboardCard->setEntityId($entity->getId());
-                $dashboardCard->setOrdering(1);
+                $dashboardCardArray = [
+                    'name' => $entity->getName(),
+                    'description' => $entity->getDescription(),
+                    'type' => 'schema',
+                    'entity' => 'App:Entity',
+                    'object' => 'App:Entity',
+                    'entityId' => $entity->getId(),
+                    'ordering' => 1
+                ];
+                $dashboardCard = New DashboardCard($dashboardCardArray);
+//                $dashboardCard->setType('schema');
+//                $dashboardCard->setEntity('App:Entity');
+//                $dashboardCard->setObject('App:Entity');
+//                $dashboardCard->setName($entity->getName());
+//                $dashboardCard->setDescription($entity->getDescription());
+//                $dashboardCard->setEntityId($entity->getId());
+//                $dashboardCard->setOrdering(1);
                 $this->entityManager->persist($dashboardCard);
+
+                var_dump($dashboardCard->getName());
                 (isset($this->io) ?$this->io->writeln('Dashboard card created'):'');
                 continue;
             }
@@ -115,10 +126,18 @@ class InstallationService implements InstallerInterface
 
             var_dump($actionHandler->getConfig());
 
-            $action = new Action();
-            $action->setName('Test action' . $handler);
-            $action->setClass($handler);
-            $action->setConfig($actionHandler->getConfig());
+            $actionArray = [
+                'name' => 'Test action' . $handler,
+                'description' => 'The action for the actionHandler: '. $handler,
+                'class' => $handler,
+                'defaultConfiguration' => $actionHandler->getDefaultConfiguration(),
+                'configuration' => $actionHandler->getConfig(),
+            ];
+
+            $action = new Action($actionArray);
+//            $action->setName('Test action' . $handler);
+//            $action->setClass($handler);
+//            $action->setConfig($actionHandler->getConfig());
             $this->entityManager->persist($action);
 
             var_dump($action->getName());
