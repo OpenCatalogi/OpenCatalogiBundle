@@ -209,12 +209,12 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln('Endpoint found'):'');
         }
 
-        $this->entityManager->flush();
 
         // Lets see if there is a generic search endpoint
 
         // aanmaken van actions met een cronjob
         $this->addActions();
+        $this->entityManager->flush();
 
         /** Aanmaken actions
         1. array van action classes
