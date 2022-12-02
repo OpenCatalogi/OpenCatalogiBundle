@@ -139,7 +139,7 @@ class InstallationService implements InstallerInterface
                 'Test action' . $handler,
                 'The action for the actionHandler: '. $handler,
                 $handler,
-                $actionHandler->getConfig(),
+                $actionHandler->getConfiguration(),
                 $defaultConfig
             );
 //            $action->setName('Test action' . $handler);
