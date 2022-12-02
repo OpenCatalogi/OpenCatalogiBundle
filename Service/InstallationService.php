@@ -56,7 +56,7 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln('Looking for a dashboard card for: '.$object):'');
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$object]);
             if(
-               !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
+               $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
                 $dashboardCard = new DashboardCard(
                     $entity->getName(),
@@ -67,23 +67,6 @@ class InstallationService implements InstallerInterface
                     $entity->getId(),
                     1
                 );
-//                $dashboardCardArray = [
-//                    'name' => $entity->getName(),
-//                    'description' => $entity->getDescription(),
-//                    'type' => 'schema',
-//                    'entity' => 'App:Entity',
-//                    'object' => 'App:Entity',
-//                    'entityId' => $entity->getId(),
-//                    'ordering' => 1
-//                ];
-//                $dashboardCard = new DashboardCard();
-//                $dashboardCard->setType('schema');
-//                $dashboardCard->setEntity('App:Entity');
-//                $dashboardCard->setObject('App:Entity');
-//                $dashboardCard->setName($entity->getName());
-//                $dashboardCard->setDescription($entity->getDescription());
-//                $dashboardCard->setEntityId($entity->getId());
-//                $dashboardCard->setOrdering(1);
                 $this->entityManager->persist($dashboardCard);
 
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
@@ -136,21 +119,28 @@ class InstallationService implements InstallerInterface
 
             var_dump($actionHandler->getConfiguration());
 
-            if ($actionHandler->getConfig()) {
-                foreach ($actionHandler->getConfig()['properties'] as $key => $value) {
-
+            $defaultConfig = [];
+            if ($actionHandler->getConfiguration()) {
+                foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
+                    $defaultConfig[$key] = $value;
                 }
             }
 
-            $actionArray = [
-                'name' => 'Test action' . $handler,
-                'description' => 'The action for the actionHandler: '. $handler,
-                'class' => $handler,
-                'defaultConfiguration' => $actionHandler->getDefaultConfiguration(),
-                'configuration' => $actionHandler->getConfig(),
-            ];
+//            $actionArray = [
+//                'name' => 'Test action' . $handler,
+//                'description' => 'The action for the actionHandler: '. $handler,
+//                'class' => $handler,
+//                'defaultConfiguration' => $defaultConfig,
+//                'configuration' => $actionHandler->getConfig(),
+//            ];
 
-            $action = new Action($actionArray);
+            $action = new Action(
+                'Test action' . $handler,
+                'The action for the actionHandler: '. $handler,
+                $handler,
+                $actionHandler->getConfig(),
+                $defaultConfig
+            );
 //            $action->setName('Test action' . $handler);
 //            $action->setClass($handler);
 //            $action->setConfig($actionHandler->getConfig());
