@@ -67,17 +67,16 @@ class InstallationService implements InstallerInterface
                     'entityId' => $entity->getId(),
                     'ordering' => 1
                 ];
-                $dashboardCard = New DashboardCard($dashboardCardArray);
-//                $dashboardCard->setType('schema');
-//                $dashboardCard->setEntity('App:Entity');
-//                $dashboardCard->setObject('App:Entity');
-//                $dashboardCard->setName($entity->getName());
-//                $dashboardCard->setDescription($entity->getDescription());
-//                $dashboardCard->setEntityId($entity->getId());
-//                $dashboardCard->setOrdering(1);
+                $dashboardCard = new DashboardCard();
+                $dashboardCard->setType('schema');
+                $dashboardCard->setEntity('App:Entity');
+                $dashboardCard->setObject('App:Entity');
+                $dashboardCard->setName($entity->getName());
+                $dashboardCard->setDescription($entity->getDescription());
+                $dashboardCard->setEntityId($entity->getId());
+                $dashboardCard->setOrdering(1);
                 $this->entityManager->persist($dashboardCard);
 
-                var_dump($dashboardCard->getName());
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
                 continue;
             }
