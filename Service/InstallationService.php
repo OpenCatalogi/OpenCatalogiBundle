@@ -48,6 +48,97 @@ class InstallationService implements InstallerInterface
         // Do some cleanup
     }
 
+    /**
+     * The actionHandlers in OpenCatalogi
+     *
+     * @return array
+     */
+    public function actionHandlers(): array
+    {
+        return [
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
+        ];
+    }
+
+    /**
+     * This function creates default configuration for the action
+     *
+     * @param $actionHandler The actionHandler for witch the default configuration is set
+     * @return array
+     */
+    public function addActionConfiguration($actionHandler): array
+    {
+        $defaultConfig = [];
+        foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
+
+            switch ($value['type']) {
+                case 'string':
+                case 'array':
+                    $defaultConfig[$key] = $value['example'];
+                    break;
+                case 'object':
+                    break;
+                case 'uuid':
+                    if (in_array('$ref', $value)) {
+                        var_dump($value['$ref']);
+
+                        if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
+                            $defaultConfig[$key] = $entity->getId()->toString();
+
+                        }
+                    }
+                    break;
+                default:
+                    // throw error
+            }
+        }
+        return $defaultConfig;
+    }
+
+    /**
+     * This function creates actions for all the actionHandlers in OpenCatalogi
+     *
+     * @return void
+     */
+    public function addActions(): void
+    {
+        $actionHandlers = $this->actionHandlers();
+
+        foreach ($actionHandlers as $handler) {
+            (isset($this->io)?$this->io->writeln($handler):'');
+
+            $actionHandler = $this->container->get($handler);
+
+            if ($this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
+                continue;
+            }
+
+            if (!$actionHandler->getConfiguration()) {
+                continue;
+            }
+
+            $defaultConfig = $this->addActionConfiguration($actionHandler);
+            var_dump($defaultConfig);
+
+            $action = new Action(
+                $actionHandler->getConfiguration()['title'],
+                $actionHandler->getConfiguration()['description'] ?? null,
+                $handler,
+                $defaultConfig,
+                $defaultConfig
+            );
+            $this->entityManager->persist($action);
+
+            var_dump($action->getName());
+        }
+    }
+
     public function checkDataConsistency(){
 
         // Lets create some genneric dashboard cards
@@ -98,66 +189,10 @@ class InstallationService implements InstallerInterface
 
         // Lets see if there is a generic search endpoint
 
-        $actionHandlers = [
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
-            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
-        ];
+        // aanmaken van actions
+        $this->addActions();
 
-        foreach ($actionHandlers as $handler) {
-            (isset($this->io)?$this->io->writeln($handler):'');
 
-            $actionHandler = $this->container->get($handler);
-
-            if ($this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
-                continue;
-            }
-
-            $defaultConfig = [];
-            if ($actionHandler->getConfiguration()) {
-                foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
-
-                    switch ($value['type']) {
-                        case 'string':
-                        case 'array':
-                            $defaultConfig[$key] = $value['example'];
-                            break;
-                        case 'object':
-                            break;
-                        case 'uuid':
-                            if (in_array('$ref', $value)) {
-                                var_dump($value['$ref']);
-
-                                if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
-                                    $defaultConfig[$key] = $entity->getId()->toString();
-
-                                }
-                            }
-                            break;
-                        default:
-                            // throw error
-                    }
-//                    $defaultConfig[$key] = $value;
-                }
-            }
-
-            var_dump($defaultConfig);
-
-            $action = new Action(
-                $actionHandler->getConfiguration()['title'],
-                $actionHandler->getConfiguration()['description'] ?? null,
-                $handler,
-                $actionHandler->getConfiguration(),
-                $defaultConfig
-            );
-            $this->entityManager->persist($action);
-
-            var_dump($action->getName());
-        }
 
         /** Aanmaken actions
         1. array van action classes
