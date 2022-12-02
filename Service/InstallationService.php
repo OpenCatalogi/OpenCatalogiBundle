@@ -128,7 +128,7 @@ class InstallationService implements InstallerInterface
 
             $action = new Action(
                 $actionHandler->getConfiguration()['title'],
-                $actionHandler->getConfiguration()['description'],
+                $actionHandler->getConfiguration()['description'] ?? null,
                 $handler,
                 $actionHandler->getConfiguration(),
                 $defaultConfig
