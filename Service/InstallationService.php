@@ -126,7 +126,7 @@ class InstallationService implements InstallerInterface
                 continue;
             }
 
-            var_dump($actionHandler->getConfig());
+            var_dump($actionHandler->getConfiguration());
 
             $actionArray = [
                 'name' => 'Test action' . $handler,
