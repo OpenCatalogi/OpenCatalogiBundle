@@ -118,6 +118,7 @@ class InstallationService implements InstallerInterface
             $cronjob->setThrows($action->getListens());
             $cronjob->setData([]);
             $this->entityManager->persist($cronjob);
+            var_dump('cronojb: ' . $cronjob->getName());
         }
     }
 
