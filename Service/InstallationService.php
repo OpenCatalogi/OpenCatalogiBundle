@@ -120,7 +120,21 @@ class InstallationService implements InstallerInterface
             $defaultConfig = [];
             if ($actionHandler->getConfiguration()) {
                 foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
-                    $defaultConfig[$key] = $value;
+
+                    switch ($value['type']) {
+                        case 'string':
+                        case 'array':
+                            $defaultConfig[$key] = $value['example'];
+                            break;
+                        case 'object':
+                            break;
+                        case 'uuid':
+                            var_dump($value['type']);
+                            break;
+                        default:
+                            // throw error
+                    }
+//                    $defaultConfig[$key] = $value;
                 }
             }
 
