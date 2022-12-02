@@ -113,12 +113,9 @@ class InstallationService implements InstallerInterface
 
             $actionHandler = $this->container->get($handler);
 
-            if ($action = $this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
-                var_dump($action->getName());
+            if ($this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
                 continue;
             }
-
-            var_dump($actionHandler->getConfiguration());
 
             $defaultConfig = [];
             if ($actionHandler->getConfiguration()) {
@@ -127,24 +124,15 @@ class InstallationService implements InstallerInterface
                 }
             }
 
-//            $actionArray = [
-//                'name' => 'Test action' . $handler,
-//                'description' => 'The action for the actionHandler: '. $handler,
-//                'class' => $handler,
-//                'defaultConfiguration' => $defaultConfig,
-//                'configuration' => $actionHandler->getConfig(),
-//            ];
+            var_dump($defaultConfig);
 
             $action = new Action(
-                'Test action' . $handler,
-                'The action for the actionHandler: '. $handler,
+                $actionHandler->getConfiguration()['title'],
+                $actionHandler->getConfiguration()['description'],
                 $handler,
                 $actionHandler->getConfiguration(),
                 $defaultConfig
             );
-//            $action->setName('Test action' . $handler);
-//            $action->setClass($handler);
-//            $action->setConfig($actionHandler->getConfig());
             $this->entityManager->persist($action);
 
             var_dump($action->getName());
