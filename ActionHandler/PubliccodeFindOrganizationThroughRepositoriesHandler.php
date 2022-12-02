@@ -2,7 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
 class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
