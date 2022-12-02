@@ -6,17 +6,20 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class InstallationService implements InstallerInterface
 {
     private EntityManagerInterface $entityManager;
+    private ContainerInterface $container;
     private SymfonyStyle $io;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container)
     {
         $this->entityManager = $entityManager;
+        $this->container = $container;
     }
 
     /**
@@ -92,6 +95,35 @@ class InstallationService implements InstallerInterface
 
         // Lets see if there is a generic search endpoint
 
+        $actionHandlers = [
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/CatalogiHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/EnrichPubliccodeHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeCheckRepositoriesForPubliccodeHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindOrganizationThroughRepositoriesHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeRatingHandler'
+        ];
+
+        foreach ($actionHandlers as $handler) {
+            $actionHandler = $this->container->get($handler);
+
+            if ($action = $this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
+                var_dump($action->getName());
+                continue;
+            }
+
+            var_dump($actionHandler->getConfig());
+
+            $action = new Action();
+            $action->setName('Test action' . $handler);
+            $action->setClass($handler);
+            $action->setConfig($actionHandler->getConfig());
+            $this->entityManager->persist($action);
+
+            var_dump($action->getName());
+        }
+
         /** Aanmaken actions
         1. array van action classes
          * 2. daar doorheen lopen per item kijke is er een action met die class, zo ja contie
@@ -99,6 +131,8 @@ class InstallationService implements InstallerInterface
          * 4. Daarvoor is loopje nodig op action handlers om default config aan te leveren
         *.
         // Aanmaken 1 cronjob (indien nodig)
+         *
+         **/
 
 
     }
