@@ -28,12 +28,14 @@ class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHand
                     'description' => 'The uuid of the repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/repository.schema.json'
                 ],
                 'organisationEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the organisation entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/organisation.schema.json'
                 ],
             ],
         ];

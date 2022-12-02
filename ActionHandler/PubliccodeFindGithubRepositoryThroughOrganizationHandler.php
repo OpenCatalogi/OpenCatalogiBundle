@@ -28,6 +28,7 @@ class PubliccodeFindGithubRepositoryThroughOrganizationHandler implements Action
                     'description' => 'The uuid of the organisation entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/organisation.schema.json'
                 ],
             ],
         ];

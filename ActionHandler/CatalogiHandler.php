@@ -32,6 +32,7 @@ class CatalogiHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the Catalogi entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
                 ],
                 'location' => [
                     'type'        => 'string',
@@ -44,6 +45,7 @@ class CatalogiHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the Component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/component.schema.json'
                 ],
                 'componentsLocation' => [
                     'type'        => 'string',
