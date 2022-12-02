@@ -86,13 +86,9 @@ class InstallationService implements InstallerInterface
                 case 'object':
                     break;
                 case 'uuid':
-                    if (in_array('$ref', $value)) {
-                        var_dump($value['$ref']);
-
-                        if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
-                            $defaultConfig[$key] = $entity->getId()->toString();
-
-                        }
+                    if (in_array('$ref', $value) &&
+                        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
+                        $defaultConfig[$key] = $entity->getId()->toString();
                     }
                     break;
                 default:
@@ -154,13 +150,10 @@ class InstallationService implements InstallerInterface
                 $handler,
                 1,
                 $defaultConfig,
-                $defaultConfig
             );
             $this->entityManager->persist($action);
 
             $this->addCronjobForAction($action);
-
-            var_dump($action->getName());
         }
     }
 
@@ -210,23 +203,10 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln('Endpoint found'):'');
         }
 
-
         // Lets see if there is a generic search endpoint
 
         // aanmaken van actions met een cronjob
         $this->addActions();
         $this->entityManager->flush();
-
-        /** Aanmaken actions
-        1. array van action classes
-         * 2. daar doorheen lopen per item kijke is er een action met die class, zo ja contie
-         * 3 bij nee action aanmaken via actie($actionhandler)
-         * 4. Daarvoor is loopje nodig op action handlers om default config aan te leveren
-        *.
-        // Aanmaken 1 cronjob (indien nodig)
-         *
-         **/
-
-
     }
 }
