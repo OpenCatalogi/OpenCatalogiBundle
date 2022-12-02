@@ -117,6 +117,8 @@ class InstallationService implements InstallerInterface
         ];
 
         foreach ($actionHandlers as $handler) {
+            (isset($this->io)?$this->io->writeln($handler):'');
+
             $actionHandler = $this->container->get($handler);
 
             if ($action = $this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
