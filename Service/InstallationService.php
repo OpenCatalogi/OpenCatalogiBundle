@@ -92,6 +92,14 @@ class InstallationService implements InstallerInterface
 
         // Lets see if there is a generic search endpoint
 
+        /** Aanmaken actions
+        1. array van action classes
+         * 2. daar doorheen lopen per item kijke is er een action met die class, zo ja contie
+         * 3 bij nee action aanmaken via actie($actionhandler)
+         * 4. Daarvoor is loopje nodig op action handlers om default config aan te leveren
+        *.
+        // Aanmaken 1 cronjob (indien nodig)
+
 
     }
 }
