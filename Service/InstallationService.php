@@ -5,6 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Action;
 use App\Entity\DashboardCard;
+use App\Entity\Cronjob;
 use App\Entity\Endpoint;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -102,6 +103,25 @@ class InstallationService implements InstallerInterface
     }
 
     /**
+     * This function creates a cronjob for all an action
+     *
+     * @param Action $action The action for witch the cronjob is set
+     * @return void
+     */
+    public function addCronjobForAction(Action $action): void
+    {
+        if (!$this->entityManager->getRepository('App:Cronjob')->findOneBy(['throws'=>$action->getListens()])) {
+            $cronjob = new Cronjob();
+            $cronjob->setName($action->getName());
+            $cronjob->setDescription($action->getDescription() ?? null);
+            $cronjob->setCrontab('*/1 * * * *');
+            $cronjob->setThrows($action->getListens());
+            $cronjob->setData([]);
+            $this->entityManager->persist($cronjob);
+        }
+    }
+
+    /**
      * This function creates actions for all the actionHandlers in OpenCatalogi
      *
      * @return void
@@ -129,11 +149,14 @@ class InstallationService implements InstallerInterface
             $action = new Action(
                 $actionHandler->getConfiguration()['title'],
                 $actionHandler->getConfiguration()['description'] ?? null,
+                ['opencatalogi.default.listens'],
                 $handler,
                 $defaultConfig,
                 $defaultConfig
             );
             $this->entityManager->persist($action);
+
+            $this->addCronjobForAction($action);
 
             var_dump($action->getName());
         }
@@ -189,10 +212,8 @@ class InstallationService implements InstallerInterface
 
         // Lets see if there is a generic search endpoint
 
-        // aanmaken van actions
+        // aanmaken van actions met een cronjob
         $this->addActions();
-
-
 
         /** Aanmaken actions
         1. array van action classes
