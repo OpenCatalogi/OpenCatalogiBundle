@@ -3,8 +3,9 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeFindRepositoriesThroughOrganizationHandler
+class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
 

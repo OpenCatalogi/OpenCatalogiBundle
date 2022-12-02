@@ -3,8 +3,9 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class EnrichPubliccodeHandler
+class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
 
