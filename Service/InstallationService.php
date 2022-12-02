@@ -152,6 +152,7 @@ class InstallationService implements InstallerInterface
                 $actionHandler->getConfiguration()['description'] ?? null,
                 ['opencatalogi.default.listens'],
                 $handler,
+                1,
                 $defaultConfig,
                 $defaultConfig
             );
