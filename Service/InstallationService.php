@@ -58,23 +58,32 @@ class InstallationService implements InstallerInterface
             if(
                !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
-                $dashboardCardArray = [
-                    'name' => $entity->getName(),
-                    'description' => $entity->getDescription(),
-                    'type' => 'schema',
-                    'entity' => 'App:Entity',
-                    'object' => 'App:Entity',
-                    'entityId' => $entity->getId(),
-                    'ordering' => 1
-                ];
-                $dashboardCard = new DashboardCard();
-                $dashboardCard->setType('schema');
-                $dashboardCard->setEntity('App:Entity');
-                $dashboardCard->setObject('App:Entity');
-                $dashboardCard->setName($entity->getName());
-                $dashboardCard->setDescription($entity->getDescription());
-                $dashboardCard->setEntityId($entity->getId());
-                $dashboardCard->setOrdering(1);
+                $dashboardCard = new DashboardCard(
+                    $entity->getName(),
+                    $entity->getDescription(),
+                    'schema',
+                    'App:Entity',
+                    'App:Entity',
+                    $entity->getId(),
+                    1
+                );
+//                $dashboardCardArray = [
+//                    'name' => $entity->getName(),
+//                    'description' => $entity->getDescription(),
+//                    'type' => 'schema',
+//                    'entity' => 'App:Entity',
+//                    'object' => 'App:Entity',
+//                    'entityId' => $entity->getId(),
+//                    'ordering' => 1
+//                ];
+//                $dashboardCard = new DashboardCard();
+//                $dashboardCard->setType('schema');
+//                $dashboardCard->setEntity('App:Entity');
+//                $dashboardCard->setObject('App:Entity');
+//                $dashboardCard->setName($entity->getName());
+//                $dashboardCard->setDescription($entity->getDescription());
+//                $dashboardCard->setEntityId($entity->getId());
+//                $dashboardCard->setOrdering(1);
                 $this->entityManager->persist($dashboardCard);
 
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
@@ -126,6 +135,12 @@ class InstallationService implements InstallerInterface
             }
 
             var_dump($actionHandler->getConfiguration());
+
+            if ($actionHandler->getConfig()) {
+                foreach ($actionHandler->getConfig()['properties'] as $key => $value) {
+
+                }
+            }
 
             $actionArray = [
                 'name' => 'Test action' . $handler,
