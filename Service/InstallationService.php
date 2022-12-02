@@ -3,6 +3,7 @@
 // src/Service/LarpingService.php
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
+use App\Entity\Action;
 use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
