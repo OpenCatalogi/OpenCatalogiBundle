@@ -132,8 +132,10 @@ class InstallationService implements InstallerInterface
                             if (in_array('$ref', $value)) {
                                 var_dump($value['$ref']);
 
-                                $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']]);
-                                $defaultConfig[$key] = $entity->getId()->toString();
+                                if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
+                                    $defaultConfig[$key] = $entity->getId()->toString();
+
+                                }
                             }
                             break;
                         default:
