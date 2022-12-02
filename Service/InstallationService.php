@@ -107,13 +107,13 @@ class InstallationService implements InstallerInterface
         // Lets see if there is a generic search endpoint
 
         $actionHandlers = [
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//CatalogiHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//EnrichPubliccodeHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeCheckRepositoriesForPubliccodeHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindGithubRepositoryThroughOrganizationHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindOrganizationThroughRepositoriesHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindRepositoriesThroughOrganizationHandler',
-            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeRatingHandler'
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
         ];
 
         foreach ($actionHandlers as $handler) {
