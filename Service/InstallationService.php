@@ -78,7 +78,7 @@ class InstallationService implements InstallerInterface
                 $this->entityManager->persist($dashboardCard);
 
                 var_dump($dashboardCard->getName());
-                (isset($this->io) ?$this->io->writeln('Dashboard card created'):'');
+                (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
                 continue;
             }
             (isset($this->io)?$this->io->writeln('Dashboard card found'):'');
@@ -96,7 +96,7 @@ class InstallationService implements InstallerInterface
             ){
                 $endpoint = New Endpoint($entity);
                 $this->entityManager->persist($endpoint);
-                (isset($this->io)?$this->io->writeln('Endpoint created'):'');
+                (isset($this->io)?$this->io->writeln('Endpoint created: ' . $endpoint->getName()):'');
                 continue;
             }
             (isset($this->io)?$this->io->writeln('Endpoint found'):'');
@@ -107,13 +107,13 @@ class InstallationService implements InstallerInterface
         // Lets see if there is a generic search endpoint
 
         $actionHandlers = [
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/CatalogiHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/EnrichPubliccodeHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeCheckRepositoriesForPubliccodeHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindGithubRepositoryThroughOrganizationHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindOrganizationThroughRepositoriesHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeFindRepositoriesThroughOrganizationHandler',
-            'OpenCatalogi/OpenCatalogiBundle/ActionHandler/PubliccodeRatingHandler'
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//CatalogiHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//EnrichPubliccodeHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeCheckRepositoriesForPubliccodeHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindOrganizationThroughRepositoriesHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'OpenCatalogi//OpenCatalogiBundle//ActionHandler//PubliccodeRatingHandler'
         ];
 
         foreach ($actionHandlers as $handler) {
