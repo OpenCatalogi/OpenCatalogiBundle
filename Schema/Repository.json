@@ -1,9 +1,10 @@
 {
-    "$id": "https://opencatalogi.nl/respository.schema.json",
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "version": "0.1",
   "title": "Repository",
+  "$id": "https://opencatalogi.nl/respository.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "0.1.0",
   "type": "object",
+  "description": "",
   "properties": {
     "source": {
       "type": "string",
@@ -37,10 +38,10 @@
       "type": "number"
     },
     "programming_languages": {
-      "type": "array",
+      "type": "array"
     },
     "topics": {
-      "type": "array",
+      "type": "array"
     },
     "content": {
       "type": "string"

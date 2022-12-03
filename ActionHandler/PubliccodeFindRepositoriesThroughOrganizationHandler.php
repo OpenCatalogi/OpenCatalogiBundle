@@ -2,9 +2,10 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeFindRepositoriesThroughOrganizationHandler
+class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
 
@@ -27,6 +28,7 @@ class PubliccodeFindRepositoriesThroughOrganizationHandler
                     'description' => 'The uuid of the repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/repository.schema.json'
                 ],
             ],
         ];

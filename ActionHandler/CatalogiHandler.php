@@ -3,8 +3,9 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class CatalogiHandler
+class CatalogiHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
 
@@ -31,6 +32,7 @@ class CatalogiHandler
                     'description' => 'The uuid of the Catalogi entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
                 ],
                 'location' => [
                     'type'        => 'string',
@@ -43,6 +45,7 @@ class CatalogiHandler
                     'description' => 'The uuid of the Component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/component.schema.json'
                 ],
                 'componentsLocation' => [
                     'type'        => 'string',

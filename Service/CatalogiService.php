@@ -5,6 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\Gateway;
 use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
+use App\Service\SynchronizationService;
 use App\Exception\GatewayException;
 use CommonGateway\CoreBundle\Service\CallService;
 use Conduction\CommonGroundBundle\Service\CommonGroundService;

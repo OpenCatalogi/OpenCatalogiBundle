@@ -2,9 +2,10 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeRatingHandler
+class PubliccodeRatingHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
 
@@ -27,12 +28,14 @@ class PubliccodeRatingHandler
                     'description' => 'The uuid of the component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
                 ],
                 'ratingEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the rating entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/rating.schema.json'
                 ],
             ],
         ];
