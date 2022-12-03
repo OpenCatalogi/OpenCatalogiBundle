@@ -1,18 +1,17 @@
 {
     "name": "open-catalogi/open-catalogi-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
-    "type" : "symfony-bundle",
-	
-	"keywords" : [
-		"commongateway",
-		"common",
-		"gateway",
-		"conduction",
-		"symfony",
-		"common-gateway-plugin",
-		"open catalogi"
-	],
-	"homepage" : "https://commongatway.nl",
+    "type" : "symfony-bundle",	
+"keywords" : [
+	"commongateway",
+	"common",
+	"gateway",
+	"conduction",
+	"symfony",
+	"common-gateway-plugin",
+	"open catalogi"
+],
+"homepage" : "https://commongatway.nl",
     "license": "EUPL-1.2",
     "minimum-stability" : "dev",
     "require": {
