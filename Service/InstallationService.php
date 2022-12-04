@@ -126,34 +126,30 @@ class InstallationService implements InstallerInterface
     public function addActions(): void
     {
         $actionHandlers = $this->actionHandlers();
+        (isset($this->io)?$this->io->writeln(['','<info>Looking for actions</info>']):'');
 
         foreach ($actionHandlers as $handler) {
-            (isset($this->io)?$this->io->writeln($handler):'');
-
             $actionHandler = $this->container->get($handler);
 
             if ($this->entityManager->getRepository('App:Action')->findOneBy(['class'=> get_class($actionHandler)])) {
+
+                (isset($this->io)?$this->io->writeln(['Action found for '.$handler]):'');
                 continue;
             }
 
-            if (!$actionHandler->getConfiguration()) {
+            if (!$schema = $actionHandler->getConfiguration()) {
                 continue;
             }
 
             $defaultConfig = $this->addActionConfiguration($actionHandler);
-            var_dump($defaultConfig);
 
-            $action = new Action(
-                $actionHandler->getConfiguration()['title'],
-                $actionHandler->getConfiguration()['description'] ?? null,
-                ['opencatalogi.default.listens'],
-                $handler,
-                1,
-                $defaultConfig,
-            );
+            $action = new Action($actionHandler);
+            $action->setListens(['opencatalogi.default.listens']);
+            $action->setConfiguration($defaultConfig);
+
             $this->entityManager->persist($action);
 
-            $this->addCronjobForAction($action);
+            (isset($this->io)?$this->io->writeln(['Action created for '.$handler]):'');
         }
     }
 
@@ -161,9 +157,9 @@ class InstallationService implements InstallerInterface
 
         // Lets create some genneric dashboard cards
         $objectsThatShouldHaveCards = ['https://opencatalogi.nl/component.schema.json'];
+        (isset($this->io)?$this->io->writeln(['','<info>Looking for cards</info>']):'');
 
         foreach($objectsThatShouldHaveCards as $object){
-            (isset($this->io)?$this->io->writeln('Looking for a dashboard card for: '.$object):'');
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$object]);
             if(
                $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
@@ -182,14 +178,15 @@ class InstallationService implements InstallerInterface
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
                 continue;
             }
-            (isset($this->io)?$this->io->writeln('Dashboard card found'):'');
+            (isset($this->io)?$this->io->writeln('Dashboard card found  for: '.$object):'');
         }
 
         // Let create some endpoints
+        (isset($this->io)?$this->io->writeln(''):'');
         $objectsThatShouldHaveEndpoints = ['https://opencatalogi.nl/component.schema.json'];
+        (isset($this->io)?$this->io->writeln(['','<info>Looking for endpoints</info>']):'');
 
         foreach($objectsThatShouldHaveEndpoints as $object){
-            (isset($this->io)?$this->io->writeln('Looking for a endpoint for: '.$object):'');
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$object]);
 
             if(
@@ -197,16 +194,36 @@ class InstallationService implements InstallerInterface
             ){
                 $endpoint = New Endpoint($entity);
                 $this->entityManager->persist($endpoint);
-                (isset($this->io)?$this->io->writeln('Endpoint created: ' . $endpoint->getName()):'');
+                (isset($this->io)?$this->io->writeln('Endpoint created for: ' . $object):'');
                 continue;
             }
-            (isset($this->io)?$this->io->writeln('Endpoint found'):'');
+            (isset($this->io)?$this->io->writeln('Endpoint found for: '.$object):'');
         }
 
         // Lets see if there is a generic search endpoint
 
         // aanmaken van actions met een cronjob
         $this->addActions();
+
+        (isset($this->io)?$this->io->writeln(['','<info>Looking for cronjobs</info>']):'');
+        // We only need 1 cronjob so lets set that
+        if(!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name'=>'Open Catalogi']))
+        {
+            $cronjob = new Cronjob();
+            $cronjob->setName('Open Catalogi');
+            $cronjob->setDescription("This cronjob fires all the open catalogi actions ever 5 minutes");
+            $cronjob->setThrows(['opencatalogi.default.listens']);
+
+            $this->entityManager->persist($cronjob);
+
+            (isset($this->io)?$this->io->writeln(['','Created a cronjob for Open Catalogi']):'');
+        }
+        else{
+
+            (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
+        }
+
+
         $this->entityManager->flush();
     }
 }
