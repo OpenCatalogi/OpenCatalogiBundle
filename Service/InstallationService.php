@@ -68,57 +68,6 @@ class InstallationService implements InstallerInterface
     }
 
     /**
-     * This function creates default configuration for the action
-     *
-     * @param $actionHandler The actionHandler for witch the default configuration is set
-     * @return array
-     */
-    public function addActionConfiguration($actionHandler): array
-    {
-        $defaultConfig = [];
-        foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
-
-            switch ($value['type']) {
-                case 'string':
-                case 'array':
-                    $defaultConfig[$key] = $value['example'];
-                    break;
-                case 'object':
-                    break;
-                case 'uuid':
-                    if (in_array('$ref', $value) &&
-                        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
-                        $defaultConfig[$key] = $entity->getId()->toString();
-                    }
-                    break;
-                default:
-                    // throw error
-            }
-        }
-        return $defaultConfig;
-    }
-
-    /**
-     * This function creates a cronjob for all an action
-     *
-     * @param Action $action The action for witch the cronjob is set
-     * @return void
-     */
-    public function addCronjobForAction(Action $action): void
-    {
-        if (!$this->entityManager->getRepository('App:Cronjob')->findOneBy(['throws'=>$action->getListens()])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName($action->getName());
-            $cronjob->setDescription($action->getDescription() ?? null);
-            $cronjob->setCrontab('*/1 * * * *');
-            $cronjob->setThrows($action->getListens());
-            $cronjob->setData([]);
-            $this->entityManager->persist($cronjob);
-            var_dump('cronojb: ' . $cronjob->getName());
-        }
-    }
-
-    /**
      * This function creates actions for all the actionHandlers in OpenCatalogi
      *
      * @return void
@@ -145,7 +94,6 @@ class InstallationService implements InstallerInterface
 
             $action = new Action($actionHandler);
             $action->setListens(['opencatalogi.default.listens']);
-            $action->setConfiguration($defaultConfig);
 
             $this->entityManager->persist($action);
 
@@ -156,7 +104,12 @@ class InstallationService implements InstallerInterface
     public function checkDataConsistency(){
 
         // Lets create some genneric dashboard cards
-        $objectsThatShouldHaveCards = ['https://opencatalogi.nl/component.schema.json'];
+        $objectsThatShouldHaveCards = [
+            'https://opencatalogi.nl/component.schema.json',
+            'https://opencatalogi.nl/application.schema.json',
+            'https://opencatalogi.nl/catalogi.schema.json'
+        ];
+
         (isset($this->io)?$this->io->writeln(['','<info>Looking for cards</info>']):'');
 
         foreach($objectsThatShouldHaveCards as $object){
@@ -164,15 +117,7 @@ class InstallationService implements InstallerInterface
             if(
                $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
-                $dashboardCard = new DashboardCard(
-                    $entity->getName(),
-                    $entity->getDescription(),
-                    'schema',
-                    'App:Entity',
-                    'App:Entity',
-                    $entity->getId(),
-                    1
-                );
+                $dashboardCard = new DashboardCard($object);
                 $this->entityManager->persist($dashboardCard);
 
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
@@ -180,10 +125,23 @@ class InstallationService implements InstallerInterface
             }
             (isset($this->io)?$this->io->writeln('Dashboard card found  for: '.$object):'');
         }
+        // Lets see if there is a generic search endpoint
+        if(!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex'=>'^search'])){
+            $searchEnpoint = New Endpoint();
+            $searchEnpoint->setName('Search');
+            $searchEnpoint->setDescription('Generic Search Endpoint');
+            $this->entityManager->persist($searchEnpoint);
+        }
+
 
         // Let create some endpoints
-        (isset($this->io)?$this->io->writeln(''):'');
-        $objectsThatShouldHaveEndpoints = ['https://opencatalogi.nl/component.schema.json'];
+        $objectsThatShouldHaveEndpoints = [
+            'https://opencatalogi.nl/component.schema.json',
+            'https://opencatalogi.nl/application.schema.json',
+            'https://opencatalogi.nl/organisation.schema.json',
+            'https://opencatalogi.nl/catalogi.schema.json'
+        ];
+
         (isset($this->io)?$this->io->writeln(['','<info>Looking for endpoints</info>']):'');
 
         foreach($objectsThatShouldHaveEndpoints as $object){
@@ -194,13 +152,13 @@ class InstallationService implements InstallerInterface
             ){
                 $endpoint = New Endpoint($entity);
                 $this->entityManager->persist($endpoint);
+                $entity->addEndpoint($searchEnpoint); // Also make the entity available trough the generic search endpoint
                 (isset($this->io)?$this->io->writeln('Endpoint created for: ' . $object):'');
                 continue;
             }
             (isset($this->io)?$this->io->writeln('Endpoint found for: '.$object):'');
         }
 
-        // Lets see if there is a generic search endpoint
 
         // aanmaken van actions met een cronjob
         $this->addActions();
