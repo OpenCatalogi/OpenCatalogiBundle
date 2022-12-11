@@ -75,19 +75,39 @@ class CatalogiService
     public function readCatalogi(ObjectEntity $catalogus):void{{
         (isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
 
+        // Lets grap ALL the objects for an external source
         $objects = $this->callService->call($catalogus->getSource(), 'api/search', 'GET', ['query'=>['_limit'=>10000]])->getResponce()['results'];
 
+        // Now we can check if any objects where removed
+        if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus['location']])){
+            $source = New Source;
+            $source->setName($catalogus->getValue('name'));
+            $source->setDescription($catalogus->getValue('description'));
+            $source->setLocation($catalogus->getValue('location'));
+        }
+
+        $synchonizedObjects = [];
         // Handle new objects
         foreach($objects as $object){
                 // Lets make sure we have a reference
                 (!isset($object['_self']['schema']['reference'])? continue : '');
                 $synchonization = $this->handleObject($object);
+                $synchonizedObjects[] = $synchonization->getExternalId();
                 $this->entityManager->persist($synchonization);
             }
         }
 
         $this->entityManager->flush();
 
+        // Now we can check if any objects where removed
+        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['source' =>$source]);
+        foreach ($synchonizations as $synchonization){
+            if(!in_array($synchonization->getExternalId, $synchonizedObjects)){
+                $this->entityManager->remove($synchonization->getObject());
+            }
+        }
+
+        $this->entityManager->flush();
     }
 
     /**
@@ -128,8 +148,8 @@ class CatalogiService
             $baseSync =  $object['_self']['synchronisations'][0]
             $externalId = $baseSync['id'];
 
-            // Check for soucr
-            if(!$source = $this->entityManager->getRepository('App:Entity')->findBy(['externalId' =>$externalId])){
+            // Check for source
+            if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$baseSync['source']['location']])){
                 $source =  new Source();
                 $source->setName($baseSync['source']['name']);
                 $source->setDescription($baseSync['source']['description']);
