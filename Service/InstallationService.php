@@ -8,6 +8,7 @@ use App\Entity\DashboardCard;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
 use App\Entity\Gateway as Source;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,11 +19,13 @@ class InstallationService implements InstallerInterface
     private EntityManagerInterface $entityManager;
     private ContainerInterface $container;
     private SymfonyStyle $io;
+    private CatalogiService $catalogiService;
 
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container)
+    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
     {
         $this->entityManager = $entityManager;
         $this->container = $container;
+        $this->catalogiService = $catalogiService;
     }
 
     /**
@@ -187,10 +190,12 @@ class InstallationService implements InstallerInterface
 
         // Setup Github and make a dashboard card
         if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://api.github.com'])){
+            (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
             $github = New Source();
             $github->setName('GitHub');
             $github->setDescription('A place where repositories of code live');
             $github->setUrl('https://api.github.com');
+            $github->setAauth('none');
             $this->entityManager->persist($github);
             $dashboardCard = New DashboardCard($github);
             $this->entityManager->persist($dashboardCard);
@@ -198,17 +203,27 @@ class InstallationService implements InstallerInterface
 
         // Lets find the federation  and make a dashboard card
         if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://opencatalogi.nl/api'])){
+            (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
             $opencatalogi = New Source();
             $opencatalogi->setName('OpenCatalogi.nl');
             $opencatalogi->setDescription('The open catalogi federated netwerk');
             $opencatalogi->setUrl('https://opencatalogi.nl/api');
-            $this->entityManager->persist($searchEnpoint);
+            $github->setAauth('none');
+            $this->entityManager->persist($opencatalogi);
             $dashboardCard = New DashboardCard($opencatalogi);
             $this->entityManager->persist($dashboardCard);
+
+            $opencatalogiCatalog = New ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', $opencatalogi);
+            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+            $this->entityManager->persist($opencatalogiCatalog);
         }
 
-
-        /*@todo start a frist federation setup*/
+        // Now we kan do a first federation
+        $this->catalogiService->setStyle($this->getStyle());
+        $this->catalogiService->readCatalogi($opencatalogiCatalog);
 
         /*@todo register this catalogi to the federation*/
 

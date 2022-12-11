@@ -32,6 +32,13 @@ class CatalogiService
     private array $configuration;
     private SymfonyStyle $io;
 
+    // Lets prevent unnesecery database calls
+    private ObjectEntity $catalogusEntity;
+    private ObjectEntity $componentEntity;
+    private ObjectEntity $organisationEntity;
+    private ObjectEntity $applicationEntity;
+
+
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,
@@ -44,6 +51,123 @@ class CatalogiService
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
+    }
+
+    /**
+     * Set symfony style in order to output to the console
+     *
+     * @param SymfonyStyle $io
+     * @return self
+     */
+    public function setStyle(SymfonyStyle $io):self
+    {
+        $this->io = $io;
+
+        return $this;
+    }
+
+    /**
+     * Get and handle oll the objects of a catalogi
+     *
+     * @param ObjectEntity $catalogus
+     * @return void
+     */
+    public function readCatalogi(ObjectEntity $catalogus):void{{
+        (isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
+
+        $objects = $this->callService->call($catalogus->getSource(), 'api/search', 'GET', ['query'=>['_limit'=>10000]])->getResponce()['results'];
+
+        // Handle new objects
+        foreach($objects as $object){
+                // Lets make sure we have a reference
+                (!isset($object['_self']['schema']['reference'])? continue : '');
+                $synchonization = $this->handleObject($object);
+                $this->entityManager->persist($synchonization);
+            }
+        }
+
+        $this->entityManager->flush();
+
+    }
+
+    /**
+     * @param array $object
+     * @return void
+     */
+    public function handleObject(array $object):Synchronization{
+        // Lets make sure we have a reference, just in case this function gets ussed seperatly
+        (!isset($object['_self']['schema']['reference'])? return : '');
+
+        // Get The entities
+        $this->prebObjectEntities();
+
+        // Do our Magic
+        $reference = $object['_self']['schema']['reference'];
+
+        switch ($reference) {
+            case "https://opencatalogi.nl/catalogi.schema.json":
+                $entity = $this->catalogusEntity;
+                break;
+            case "https://opencatalogi.nl/organisation.schema.json":
+                $entity = $this->organisationEntity;
+                break;
+            case "https://opencatalogi.nl/component.schema.json":
+                $entity = $this->componentEntity;
+                break;
+            case "https://opencatalogi.nl/application.schema.json":
+                $entity = $this->applicationEntity;
+                break;
+            default:
+                // Unknown type, lets output something to IO
+                return;
+        }
+
+        // Lets handle whatever we found
+        if($object['_self']['synchronisations'] and count($object['_self']['synchronisations']) != 0){
+            // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
+            $baseSync =  $object['_self']['synchronisations'][0]
+            $externalId = $baseSync['id'];
+
+            // Check for soucr
+            if(!$source = $this->entityManager->getRepository('App:Entity')->findBy(['externalId' =>$externalId])){
+                $source =  new Source();
+                $source->setName($baseSync['source']['name']);
+                $source->setDescription($baseSync['source']['description']);
+                $source->setLocation($baseSync['source']['location']);
+                }
+        }
+        else{
+            // This catalogi is teh source so lets roll
+            $externalId = $object['id'];
+        }
+
+        // Lets se if we already have an synchronisation
+        if($synchonization = $this->entityManager->getRepository('App:Entity')->findBy(['externalId' =>$externalId])){
+            $synchonization = New Synchronization($source, $entity);
+        }
+
+        // Lets sync
+        return $this->synchronizationService->handleSync($synchonization, $object);
+    }
+
+    /**
+     * Makes sure that we have the object entities that we need
+     *
+     * @return void
+     */
+    public function prebObjectEntities():void{
+        if(!isset($this->catalogusEntity)){
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
+        }
+        if(!isset($this->componentEntity)){
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
+        }
+        if(!isset($this->organisationEntity)){
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
+        }
+        if(!isset($this->applicationEntity)){
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
+        }
     }
 
     /**
