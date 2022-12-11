@@ -7,6 +7,7 @@ use App\Entity\Action;
 use App\Entity\DashboardCard;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
+use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -160,7 +161,7 @@ class InstallationService implements InstallerInterface
         }
 
 
-        // aanmaken van actions met een cronjob
+        // aanmaken van Actions
         $this->addActions();
 
         (isset($this->io)?$this->io->writeln(['','<info>Looking for cronjobs</info>']):'');
@@ -180,6 +181,36 @@ class InstallationService implements InstallerInterface
 
             (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
         }
+
+        // Lets grap the catalogi entity
+        $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/catalogi.schema.json']);
+
+        // Setup Github and make a dashboard card
+        if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://api.github.com'])){
+            $github = New Source();
+            $github->setName('GitHub');
+            $github->setDescription('A place where repositories of code live');
+            $github->setUrl('https://api.github.com');
+            $this->entityManager->persist($github);
+            $dashboardCard = New DashboardCard($github);
+            $this->entityManager->persist($dashboardCard);
+        }
+
+        // Lets find the federation  and make a dashboard card
+        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://opencatalogi.nl/api'])){
+            $opencatalogi = New Source();
+            $opencatalogi->setName('OpenCatalogi.nl');
+            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setUrl('https://opencatalogi.nl/api');
+            $this->entityManager->persist($searchEnpoint);
+            $dashboardCard = New DashboardCard($opencatalogi);
+            $this->entityManager->persist($dashboardCard);
+        }
+
+
+        /*@todo start a frist federation setup*/
+
+        /*@todo register this catalogi to the federation*/
 
 
         $this->entityManager->flush();
