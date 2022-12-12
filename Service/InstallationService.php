@@ -224,10 +224,11 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
             $github = new Source();
             $github->setName('GitHub');
-//            $github->setDescription('A place where repositories of code live');
+            $github->setDescription('A place where repositories of code live');
             $github->setLocation('https://api.github.com');
             $github->setAuth('none');
             $this->entityManager->persist($github);
+            
             $dashboardCard = new DashboardCard($github);
             $this->entityManager->persist($dashboardCard);
         }
@@ -240,7 +241,8 @@ class InstallationService implements InstallerInterface
             $opencatalogi->setDescription('The open catalogi federated netwerk');
             $opencatalogi->setLocation('https://opencatalogi.nl/api');
             $opencatalogi->setAuth('none');
-            $opencatalogi = $this->entityManager->persist($opencatalogi);
+            $this->entityManager->persist($opencatalogi);
+
             $dashboardCard = new DashboardCard($opencatalogi);
             $this->entityManager->persist($dashboardCard);
 
