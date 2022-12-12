@@ -7,7 +7,10 @@ use App\Entity\Action;
 use App\Entity\DashboardCard;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
+use App\Entity\Gateway as Source;
+use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -17,11 +20,13 @@ class InstallationService implements InstallerInterface
     private EntityManagerInterface $entityManager;
     private ContainerInterface $container;
     private SymfonyStyle $io;
+    private CatalogiService $catalogiService;
 
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container)
+    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
     {
         $this->entityManager = $entityManager;
         $this->container = $container;
+        $this->catalogiService = $catalogiService;
     }
 
     /**
@@ -67,12 +72,6 @@ class InstallationService implements InstallerInterface
         ];
     }
 
-    /**
-     * This function creates default configuration for the action
-     *
-     * @param $actionHandler The actionHandler for witch the default configuration is set
-     * @return array
-     */
     public function addActionConfiguration($actionHandler): array
     {
         $defaultConfig = [];
@@ -96,26 +95,6 @@ class InstallationService implements InstallerInterface
             }
         }
         return $defaultConfig;
-    }
-
-    /**
-     * This function creates a cronjob for all an action
-     *
-     * @param Action $action The action for witch the cronjob is set
-     * @return void
-     */
-    public function addCronjobForAction(Action $action): void
-    {
-        if (!$this->entityManager->getRepository('App:Cronjob')->findOneBy(['throws'=>$action->getListens()])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName($action->getName());
-            $cronjob->setDescription($action->getDescription() ?? null);
-            $cronjob->setCrontab('*/1 * * * *');
-            $cronjob->setThrows($action->getListens());
-            $cronjob->setData([]);
-            $this->entityManager->persist($cronjob);
-            var_dump('cronojb: ' . $cronjob->getName());
-        }
     }
 
     /**
@@ -145,7 +124,6 @@ class InstallationService implements InstallerInterface
 
             $action = new Action($actionHandler);
             $action->setListens(['opencatalogi.default.listens']);
-            $action->setConfiguration($defaultConfig);
 
             $this->entityManager->persist($action);
 
@@ -156,23 +134,20 @@ class InstallationService implements InstallerInterface
     public function checkDataConsistency(){
 
         // Lets create some genneric dashboard cards
-        $objectsThatShouldHaveCards = ['https://opencatalogi.nl/component.schema.json'];
+        $objectsThatShouldHaveCards = [
+            'https://opencatalogi.nl/component.schema.json',
+            'https://opencatalogi.nl/application.schema.json',
+            'https://opencatalogi.nl/catalogi.schema.json'
+        ];
+
         (isset($this->io)?$this->io->writeln(['','<info>Looking for cards</info>']):'');
 
         foreach($objectsThatShouldHaveCards as $object){
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$object]);
             if(
-               $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
+                $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
-                $dashboardCard = new DashboardCard(
-                    $entity->getName(),
-                    $entity->getDescription(),
-                    'schema',
-                    'App:Entity',
-                    'App:Entity',
-                    $entity->getId(),
-                    1
-                );
+                $dashboardCard = new DashboardCard($object);
                 $this->entityManager->persist($dashboardCard);
 
                 (isset($this->io) ?$this->io->writeln('Dashboard card created: ' . $dashboardCard->getName()):'');
@@ -180,10 +155,27 @@ class InstallationService implements InstallerInterface
             }
             (isset($this->io)?$this->io->writeln('Dashboard card found  for: '.$object):'');
         }
+        // Lets see if there is a generic search endpoint
+        if(!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex'=>'^search'])){
+            $searchEnpoint = new Endpoint();
+            $searchEnpoint->setName('Search');
+            $searchEnpoint->setDescription('Generic Search Endpoint');
+            $searchEnpoint->setPathRegex('^search');
+            $searchEnpoint->setMethod('GET');
+            $searchEnpoint->setMethods(['GET']);
+            $searchEnpoint->setOperationType('collection');
+            $this->entityManager->persist($searchEnpoint);
+        }
+
 
         // Let create some endpoints
-        (isset($this->io)?$this->io->writeln(''):'');
-        $objectsThatShouldHaveEndpoints = ['https://opencatalogi.nl/component.schema.json'];
+        $objectsThatShouldHaveEndpoints = [
+            'https://opencatalogi.nl/component.schema.json',
+            'https://opencatalogi.nl/application.schema.json',
+            'https://opencatalogi.nl/organisation.schema.json',
+            'https://opencatalogi.nl/catalogi.schema.json'
+        ];
+
         (isset($this->io)?$this->io->writeln(['','<info>Looking for endpoints</info>']):'');
 
         foreach($objectsThatShouldHaveEndpoints as $object){
@@ -192,17 +184,17 @@ class InstallationService implements InstallerInterface
             if(
                 count($entity->getEndpoints()) == 0
             ){
-                $endpoint = New Endpoint($entity);
+                $endpoint = new Endpoint($entity);
                 $this->entityManager->persist($endpoint);
+                $entity->addEndpoint($searchEnpoint); // Also make the entity available trough the generic search endpoint
                 (isset($this->io)?$this->io->writeln('Endpoint created for: ' . $object):'');
                 continue;
             }
             (isset($this->io)?$this->io->writeln('Endpoint found for: '.$object):'');
         }
 
-        // Lets see if there is a generic search endpoint
 
-        // aanmaken van actions met een cronjob
+        // aanmaken van Actions
         $this->addActions();
 
         (isset($this->io)?$this->io->writeln(['','<info>Looking for cronjobs</info>']):'');
@@ -222,6 +214,57 @@ class InstallationService implements InstallerInterface
 
             (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
         }
+
+
+        // Lets grap the catalogi entity
+        $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/catalogi.schema.json']);
+
+        // Setup Github and make a dashboard card
+        if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://api.github.com'])){
+            (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
+            $github = new Source();
+            $github->setName('GitHub');
+//            $github->setDescription('A place where repositories of code live');
+            $github->setLocation('https://api.github.com');
+            $github->setAuth('none');
+            $this->entityManager->persist($github);
+            $dashboardCard = new DashboardCard($github);
+            $this->entityManager->persist($dashboardCard);
+        }
+
+        // Lets find the federation  and make a dashboard card
+        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://opencatalogi.nl/api'])){
+            (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
+            $opencatalogi = new Source();
+            $opencatalogi->setName('OpenCatalogi.nl');
+            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setLocation('https://opencatalogi.nl/api');
+            $opencatalogi->setAuth('none');
+            $opencatalogi = $this->entityManager->persist($opencatalogi);
+            $dashboardCard = new DashboardCard($opencatalogi);
+            $this->entityManager->persist($dashboardCard);
+
+            $this->entityManager->flush();
+
+            /*
+            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
+            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+            $this->entityManager->persist($opencatalogiCatalog);
+            */
+        }
+        else {
+
+        }
+
+        // Now we kan do a first federation
+        $this->catalogiService->setStyle($this->io);
+        //$this->catalogiService->readCatalogi($opencatalogiCatalog);
+
+        /*@todo register this catalogi to the federation*/
+        // This requers a post to a pre set webhook
 
 
         $this->entityManager->flush();
