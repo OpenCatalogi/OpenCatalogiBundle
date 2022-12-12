@@ -77,7 +77,12 @@ class CatalogiService
         var_dump('hello darkness my old friend');
 
         // Lets grap ALL the objects for an external source
-        $objects = $this->callService->call($this->entityManager->find('App:Gateway', $catalogus->getValue('source')), 'api/search', 'GET', ['query'=>['_limit'=>10000]])->getResponce()['results'];
+        $objects = $this->callService->call(
+            $this->entityManager->find('App:Gateway', $catalogus->getValue('source')),
+            '/search',
+            'GET',
+            ['query'=>['_limit'=>10000]]
+        )->getResponce()['results'];
 
         // Now we can check if any objects where removed
         if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
@@ -86,6 +91,7 @@ class CatalogiService
             $source->setDescription($catalogus->getValue('description'));
             $source->setLocation($catalogus->getValue('location'));
         }
+
         $synchonizedObjects = [];
         // Handle new objects
         foreach($objects as $object){

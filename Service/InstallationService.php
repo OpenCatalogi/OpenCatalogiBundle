@@ -160,6 +160,10 @@ class InstallationService implements InstallerInterface
             $searchEnpoint = new Endpoint();
             $searchEnpoint->setName('Search');
             $searchEnpoint->setDescription('Generic Search Endpoint');
+            $searchEnpoint->setPathRegex('^search');
+            $searchEnpoint->setMethod('GET');
+            $searchEnpoint->setMethods(['GET']);
+            $searchEnpoint->setOperationType('collection');
             $this->entityManager->persist($searchEnpoint);
         }
 
@@ -233,26 +237,34 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
             $opencatalogi = new Source();
             $opencatalogi->setName('OpenCatalogi.nl');
-//            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setDescription('The open catalogi federated netwerk');
             $opencatalogi->setLocation('https://opencatalogi.nl/api');
             $opencatalogi->setAuth('none');
-            $this->entityManager->persist($opencatalogi);
+            $opencatalogi = $this->entityManager->persist($opencatalogi);
             $dashboardCard = new DashboardCard($opencatalogi);
             $this->entityManager->persist($dashboardCard);
 
+            $this->entityManager->flush();
+
+            /*
             $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
-            $opencatalogiCatalog->setValue('source', $opencatalogi->getId()->toString());
+            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
             $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
-//            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
             $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
             $this->entityManager->persist($opencatalogiCatalog);
+            */
+        }
+        else {
+
         }
 
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
-        $this->catalogiService->readCatalogi($opencatalogiCatalog);
+        //$this->catalogiService->readCatalogi($opencatalogiCatalog);
 
         /*@todo register this catalogi to the federation*/
+        // This requers a post to a pre set webhook
 
 
         $this->entityManager->flush();
