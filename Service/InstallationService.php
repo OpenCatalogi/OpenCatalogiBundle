@@ -8,8 +8,9 @@ use App\Entity\DashboardCard;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
 use App\Entity\Gateway as Source;
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
+use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -71,6 +72,31 @@ class InstallationService implements InstallerInterface
         ];
     }
 
+    public function addActionConfiguration($actionHandler): array
+    {
+        $defaultConfig = [];
+        foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
+
+            switch ($value['type']) {
+                case 'string':
+                case 'array':
+                    $defaultConfig[$key] = $value['example'];
+                    break;
+                case 'object':
+                    break;
+                case 'uuid':
+                    if (in_array('$ref', $value) &&
+                        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
+                        $defaultConfig[$key] = $entity->getId()->toString();
+                    }
+                    break;
+                default:
+                    // throw error
+            }
+        }
+        return $defaultConfig;
+    }
+
     /**
      * This function creates actions for all the actionHandlers in OpenCatalogi
      *
@@ -119,7 +145,7 @@ class InstallationService implements InstallerInterface
         foreach($objectsThatShouldHaveCards as $object){
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$object]);
             if(
-               $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
+                $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId'=>$entity->getId()])
             ){
                 $dashboardCard = new DashboardCard($object);
                 $this->entityManager->persist($dashboardCard);
@@ -131,7 +157,7 @@ class InstallationService implements InstallerInterface
         }
         // Lets see if there is a generic search endpoint
         if(!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex'=>'^search'])){
-            $searchEnpoint = New Endpoint();
+            $searchEnpoint = new Endpoint();
             $searchEnpoint->setName('Search');
             $searchEnpoint->setDescription('Generic Search Endpoint');
             $this->entityManager->persist($searchEnpoint);
@@ -154,7 +180,7 @@ class InstallationService implements InstallerInterface
             if(
                 count($entity->getEndpoints()) == 0
             ){
-                $endpoint = New Endpoint($entity);
+                $endpoint = new Endpoint($entity);
                 $this->entityManager->persist($endpoint);
                 $entity->addEndpoint($searchEnpoint); // Also make the entity available trough the generic search endpoint
                 (isset($this->io)?$this->io->writeln('Endpoint created for: ' . $object):'');
@@ -185,44 +211,45 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
         }
 
+
         // Lets grap the catalogi entity
         $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/catalogi.schema.json']);
 
         // Setup Github and make a dashboard card
-        if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://api.github.com'])){
+        if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://api.github.com'])){
             (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
-            $github = New Source();
+            $github = new Source();
             $github->setName('GitHub');
-            $github->setDescription('A place where repositories of code live');
-            $github->setUrl('https://api.github.com');
-            $github->setAauth('none');
+//            $github->setDescription('A place where repositories of code live');
+            $github->setLocation('https://api.github.com');
+            $github->setAuth('none');
             $this->entityManager->persist($github);
-            $dashboardCard = New DashboardCard($github);
+            $dashboardCard = new DashboardCard($github);
             $this->entityManager->persist($dashboardCard);
         }
 
         // Lets find the federation  and make a dashboard card
-        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['url'=>'https://opencatalogi.nl/api'])){
-            (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
-            $opencatalogi = New Source();
+        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://opencatalogi.nl/api'])){
+            (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
+            $opencatalogi = new Source();
             $opencatalogi->setName('OpenCatalogi.nl');
-            $opencatalogi->setDescription('The open catalogi federated netwerk');
-            $opencatalogi->setUrl('https://opencatalogi.nl/api');
-            $github->setAauth('none');
+//            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setLocation('https://opencatalogi.nl/api');
+            $opencatalogi->setAuth('none');
             $this->entityManager->persist($opencatalogi);
-            $dashboardCard = New DashboardCard($opencatalogi);
+            $dashboardCard = new DashboardCard($opencatalogi);
             $this->entityManager->persist($dashboardCard);
 
-            $opencatalogiCatalog = New ObjectEntity($catalogiEntity);
-            $opencatalogiCatalog->setValue('source', $opencatalogi);
+            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', $opencatalogi->getId()->toString());
             $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
-            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+//            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
             $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
             $this->entityManager->persist($opencatalogiCatalog);
         }
 
         // Now we kan do a first federation
-        $this->catalogiService->setStyle($this->getStyle());
+        $this->catalogiService->setStyle($this->io);
         $this->catalogiService->readCatalogi($opencatalogiCatalog);
 
         /*@todo register this catalogi to the federation*/

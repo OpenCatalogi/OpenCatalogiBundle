@@ -74,28 +74,30 @@ class CatalogiService
      */
     public function readCatalogi(ObjectEntity $catalogus):void{{
         (isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
+        var_dump('hello darkness my old friend');
 
         // Lets grap ALL the objects for an external source
-        $objects = $this->callService->call($catalogus->getSource(), 'api/search', 'GET', ['query'=>['_limit'=>10000]])->getResponce()['results'];
+        $objects = $this->callService->call($this->entityManager->find('App:Gateway', $catalogus->getValue('source')), 'api/search', 'GET', ['query'=>['_limit'=>10000]])->getResponce()['results'];
 
         // Now we can check if any objects where removed
-        if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus['location']])){
+        if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
             $source = New Source;
             $source->setName($catalogus->getValue('name'));
             $source->setDescription($catalogus->getValue('description'));
             $source->setLocation($catalogus->getValue('location'));
         }
-
         $synchonizedObjects = [];
         // Handle new objects
         foreach($objects as $object){
-                // Lets make sure we have a reference
-                (!isset($object['_self']['schema']['reference'])? continue : '');
-                $synchonization = $this->handleObject($object);
-                $synchonizedObjects[] = $synchonization->getExternalId();
-                $this->entityManager->persist($synchonization);
+            // Lets make sure we have a reference
+            if (!isset($object['_self']['schema']['reference'])) {
+                continue;
             }
+            $synchonization = $this->handleObject($object);
+            $synchonizedObjects[] = $synchonization->getExternalId();
+            $this->entityManager->persist($synchonization);
         }
+    }
 
         $this->entityManager->flush();
 
@@ -114,9 +116,12 @@ class CatalogiService
      * @param array $object
      * @return void
      */
-    public function handleObject(array $object):Synchronization{
+    public function handleObject(array $object): ?Synchronization
+    {
         // Lets make sure we have a reference, just in case this function gets ussed seperatly
-        (!isset($object['_self']['schema']['reference'])? return : '');
+        if(!isset($object['_self']['schema']['reference'])) {
+            return null;
+        }
 
         // Get The entities
         $this->prebObjectEntities();
@@ -139,13 +144,13 @@ class CatalogiService
                 break;
             default:
                 // Unknown type, lets output something to IO
-                return;
+                return null;
         }
 
         // Lets handle whatever we found
         if($object['_self']['synchronisations'] and count($object['_self']['synchronisations']) != 0){
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
-            $baseSync =  $object['_self']['synchronisations'][0]
+            $baseSync =  $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
 
             // Check for source
@@ -154,7 +159,7 @@ class CatalogiService
                 $source->setName($baseSync['source']['name']);
                 $source->setDescription($baseSync['source']['description']);
                 $source->setLocation($baseSync['source']['location']);
-                }
+            }
         }
         else{
             // This catalogi is teh source so lets roll
@@ -163,7 +168,7 @@ class CatalogiService
 
         // Lets se if we already have an synchronisation
         if($synchonization = $this->entityManager->getRepository('App:Entity')->findBy(['externalId' =>$externalId])){
-            $synchonization = New Synchronization($source, $entity);
+            $synchonization = new Synchronization($source, $entity);
         }
 
         // Lets sync
@@ -838,13 +843,13 @@ class CatalogiService
         $synchronization->setLastSynced($now);
         $synchronization->setSourcelastChanged(
             isset($componentSync['sourceLastChanged']) ?
-            new DateTime($componentSync['sourceLastChanged']) :
-            (
-                // When getting the Components from other Catalogi we extend metadata.dateModified
+                new DateTime($componentSync['sourceLastChanged']) :
+                (
+                    // When getting the Components from other Catalogi we extend metadata.dateModified
                 isset($componentMetaData['dateModified']) ?
-                new DateTime($componentMetaData['dateModified']) :
-                $now
-            )
+                    new DateTime($componentMetaData['dateModified']) :
+                    $now
+                )
         );
         // Note that we hash here with the x-commongateway-metadata fields (synchronizations, self and dateModified)
         $synchronization->setHash(hash('sha384', serialize($addComponent)));
