@@ -72,48 +72,49 @@ class CatalogiService
      * @param ObjectEntity $catalogus
      * @return void
      */
-    public function readCatalogi(ObjectEntity $catalogus):void{{
-        (isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
-        var_dump('hello darkness my old friend');
+    public function readCatalogi(Gateway $source):void {
+        //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
+        // var_dump('hello darkness my old friend');
 
         // Lets grap ALL the objects for an external source
-        $objects = $this->callService->call(
-            $this->entityManager->find('App:Gateway', $catalogus->getValue('source')),
-            '/search',
+        $objects = json_decode($this->callService->call(
+            $source,
+            '/search/',
             'GET',
             ['query'=>['_limit'=>10000]]
-        )->getResponce()['results'];
+        )->getBody()->getContents(), true)['results'];
 
         // Now we can check if any objects where removed
-        if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
-            $source = New Source;
-            $source->setName($catalogus->getValue('name'));
-            $source->setDescription($catalogus->getValue('description'));
-            $source->setLocation($catalogus->getValue('location'));
-        }
+        //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
+        //    $source = New Source;
+        //    $source->setName($catalogus->getValue('name'));
+        //    $source->setDescription($catalogus->getValue('description'));
+        //    $source->setLocation($catalogus->getValue('location'));
+        //}
 
         $synchonizedObjects = [];
         // Handle new objects
         foreach($objects as $object){
             // Lets make sure we have a reference
-            if (!isset($object['_self']['schema']['reference'])) {
+            if (!isset($object['_self']['schema']['ref'])) {
                 continue;
             }
             $synchonization = $this->handleObject($object);
             $synchonizedObjects[] = $synchonization->getExternalId();
             $this->entityManager->persist($synchonization);
         }
-    }
 
         $this->entityManager->flush();
 
         // Now we can check if any objects where removed
+        /*
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['source' =>$source]);
         foreach ($synchonizations as $synchonization){
             if(!in_array($synchonization->getExternalId, $synchonizedObjects)){
                 $this->entityManager->remove($synchonization->getObject());
             }
         }
+        */
 
         $this->entityManager->flush();
     }
