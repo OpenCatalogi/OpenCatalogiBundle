@@ -228,7 +228,7 @@ class InstallationService implements InstallerInterface
             $github->setLocation('https://api.github.com');
             $github->setAuth('none');
             $this->entityManager->persist($github);
-            
+
             $dashboardCard = new DashboardCard($github);
             $this->entityManager->persist($dashboardCard);
         }

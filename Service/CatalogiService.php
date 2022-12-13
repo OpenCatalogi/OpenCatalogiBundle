@@ -77,15 +77,14 @@ class CatalogiService
         //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
         // var_dump('hello darkness my old friend');
 
-        (isset($this->io)?$this->io->writeln(['','Looking a '.$source->getName().'(@:'.$source->getLocation().')']):'');
+        (isset($this->io)?$this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')'):'');
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
             $source,
             '/search/',
             'GET',
-            ['query'=>['_limit'=>10000]]
+            ['query'=>['limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
-
 
         (isset($this->io)?$this->io->writeln(['Found '.count($objects).' objects']):'');
 
@@ -98,31 +97,45 @@ class CatalogiService
         //}
 
         $synchonizedObjects = [];
+
+        (isset($this->io)? $this->io->progressStart(count($objects)):'');
         // Handle new objects
+        $counter = 0;
         foreach($objects as $key => $object){
+            $counter++;
             // Lets make sure we have a reference
             if (!isset($object['_self']['schema']['ref'])) {
-                (isset($this->io)?$this->io->writeln(['Object '.$key.' dosn\'t have a schema']):'');
                 continue;
             }
             $synchonization = $this->handleObject($object, $source);
-            //$synchonizedObjects[] = $synchonization->getExternalId();
-            //$this->entityManager->persist($synchonization);
+
+            $synchonizedObjects[] = $synchonization->getSourceId();
+            $this->entityManager->persist($synchonization);
+
+            if($counter >= 100){
+                $this->entityManager->flush();
+            }
+
+            (isset($this->io)? $this->io->progressAdvance():'');
         }
+
+        (isset($this->io)? $this->io->progressFinish():'');
 
         $this->entityManager->flush();
 
+
+        (isset($this->io)?$this->io->writeln(['','Looking for objects to remove']):'');
         // Now we can check if any objects where removed
-        /*
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['source' =>$source]);
         foreach ($synchonizations as $synchonization){
-            if(!in_array($synchonization->getExternalId, $synchonizedObjects)){
+            if(!in_array($synchonization->getSourceId(), $synchonizedObjects)){
                 $this->entityManager->remove($synchonization->getObject());
+
+                (isset($this->io)?$this->io->writeln(['Removed '.$synchonization->getSourceId()]):'');
             }
         }
-        */
 
-        $this->entityManager->flush();
+        //$this->entityManager->flush();
     }
 
     /**
@@ -141,9 +154,6 @@ class CatalogiService
 
         // Do our Magic
         $reference = $object['_self']['schema']['ref'];
-
-
-        (isset($this->io)?$this->io->writeln(['Handling object for schema '.$reference]):'');
 
         switch ($reference) {
             case "https://opencatalogi.nl/catalogi.schema.json":
@@ -185,7 +195,10 @@ class CatalogiService
         // Lets se if we already have an synchronisation
         if(!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])){
             $synchonization = new Synchronization($source, $entity);
+            $synchonization->setSourceId($object['id']);
         }
+
+        if(isset($object['_self'])){ unset($object['_self']);}
 
         // Lets sync
         return $this->synchronizationService->handleSync($synchonization, $object);
