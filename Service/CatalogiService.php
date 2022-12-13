@@ -3,6 +3,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Gateway;
+use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
@@ -33,10 +34,10 @@ class CatalogiService
     private SymfonyStyle $io;
 
     // Lets prevent unnesecery database calls
-    private ObjectEntity $catalogusEntity;
-    private ObjectEntity $componentEntity;
-    private ObjectEntity $organisationEntity;
-    private ObjectEntity $applicationEntity;
+    private Entity $catalogusEntity;
+    private Entity $componentEntity;
+    private Entity $organisationEntity;
+    private Entity $applicationEntity;
 
 
     public function __construct(
@@ -76,6 +77,7 @@ class CatalogiService
         //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
         // var_dump('hello darkness my old friend');
 
+        (isset($this->io)?$this->io->writeln(['','Looking a '.$source->getName().'(@:'.$source->getLocation().')']):'');
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
             $source,
@@ -83,6 +85,9 @@ class CatalogiService
             'GET',
             ['query'=>['_limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
+
+
+        (isset($this->io)?$this->io->writeln(['Found '.count($objects).' objects']):'');
 
         // Now we can check if any objects where removed
         //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
@@ -94,14 +99,15 @@ class CatalogiService
 
         $synchonizedObjects = [];
         // Handle new objects
-        foreach($objects as $object){
+        foreach($objects as $key => $object){
             // Lets make sure we have a reference
             if (!isset($object['_self']['schema']['ref'])) {
+                (isset($this->io)?$this->io->writeln(['Object '.$key.' dosn\'t have a schema']):'');
                 continue;
             }
-            $synchonization = $this->handleObject($object);
-            $synchonizedObjects[] = $synchonization->getExternalId();
-            $this->entityManager->persist($synchonization);
+            $synchonization = $this->handleObject($object, $source);
+            //$synchonizedObjects[] = $synchonization->getExternalId();
+            //$this->entityManager->persist($synchonization);
         }
 
         $this->entityManager->flush();
@@ -123,10 +129,10 @@ class CatalogiService
      * @param array $object
      * @return void
      */
-    public function handleObject(array $object): ?Synchronization
+    public function handleObject(array $object, Gateway $source): ?Synchronization
     {
         // Lets make sure we have a reference, just in case this function gets ussed seperatly
-        if(!isset($object['_self']['schema']['reference'])) {
+        if(!isset($object['_self']['schema']['ref'])) {
             return null;
         }
 
@@ -134,7 +140,10 @@ class CatalogiService
         $this->prebObjectEntities();
 
         // Do our Magic
-        $reference = $object['_self']['schema']['reference'];
+        $reference = $object['_self']['schema']['ref'];
+
+
+        (isset($this->io)?$this->io->writeln(['Handling object for schema '.$reference]):'');
 
         switch ($reference) {
             case "https://opencatalogi.nl/catalogi.schema.json":
@@ -155,7 +164,7 @@ class CatalogiService
         }
 
         // Lets handle whatever we found
-        if($object['_self']['synchronisations'] and count($object['_self']['synchronisations']) != 0){
+        if(isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0){
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
             $baseSync =  $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
@@ -174,7 +183,7 @@ class CatalogiService
         }
 
         // Lets se if we already have an synchronisation
-        if($synchonization = $this->entityManager->getRepository('App:Entity')->findBy(['externalId' =>$externalId])){
+        if(!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])){
             $synchonization = new Synchronization($source, $entity);
         }
 
@@ -189,16 +198,16 @@ class CatalogiService
      */
     public function prebObjectEntities():void{
         if(!isset($this->catalogusEntity)){
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
         }
         if(!isset($this->componentEntity)){
-            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
         }
         if(!isset($this->organisationEntity)){
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
         }
         if(!isset($this->applicationEntity)){
-            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
         }
     }
 
