@@ -228,7 +228,7 @@ class InstallationService implements InstallerInterface
             $github->setLocation('https://api.github.com');
             $github->setAuth('none');
             $this->entityManager->persist($github);
-            
+
             $dashboardCard = new DashboardCard($github);
             $this->entityManager->persist($dashboardCard);
         }
@@ -263,7 +263,7 @@ class InstallationService implements InstallerInterface
 
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
-        //$this->catalogiService->readCatalogi($opencatalogiCatalog);
+        $this->catalogiService->readCatalogi($opencatalogi);
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook
