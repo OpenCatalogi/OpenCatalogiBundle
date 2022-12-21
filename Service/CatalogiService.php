@@ -108,7 +108,6 @@ class CatalogiService
                 continue;
             }
             $synchonization = $this->handleObject($object, $source);
-
             $synchonizedObjects[] = $synchonization->getSourceId();
             $this->entityManager->persist($synchonization);
 
@@ -128,7 +127,7 @@ class CatalogiService
 
         (isset($this->io)?$this->io->writeln(['','Looking for objects to remove']):'');
         // Now we can check if any objects where removed
-        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['source' =>$source]);
+        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
         (isset($this->io)?$this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']):'');
         $counter=0;
@@ -155,6 +154,7 @@ class CatalogiService
         if(!isset($object['_self']['schema']['ref'])) {
             return null;
         }
+
 
         // Get The entities
         $this->prebObjectEntities();
