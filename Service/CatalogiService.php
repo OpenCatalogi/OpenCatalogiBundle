@@ -2,8 +2,10 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
+use App\Entity\DashboardCard;
 use App\Entity\Gateway;
 use App\Entity\Entity;
+use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
@@ -108,7 +110,6 @@ class CatalogiService
                 continue;
             }
             $synchonization = $this->handleObject($object, $source);
-
             $synchonizedObjects[] = $synchonization->getSourceId();
             $this->entityManager->persist($synchonization);
 
@@ -128,7 +129,7 @@ class CatalogiService
 
         (isset($this->io)?$this->io->writeln(['','Looking for objects to remove']):'');
         // Now we can check if any objects where removed
-        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['source' =>$source]);
+        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
         (isset($this->io)?$this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']):'');
         $counter=0;
@@ -155,6 +156,7 @@ class CatalogiService
         if(!isset($object['_self']['schema']['ref'])) {
             return null;
         }
+
 
         // Get The entities
         $this->prebObjectEntities();
@@ -243,6 +245,39 @@ class CatalogiService
      */
     public function catalogiHandler(array $data, array $configuration): array
     {
+        // Fail save
+
+        // Lets find the federation  and make a dashboard card
+        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://opencatalogi.nl/api'])){
+            (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
+            $opencatalogi = new Source();
+            $opencatalogi->setName('OpenCatalogi.nl');
+            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setLocation('https://opencatalogi.nl/api');
+            $opencatalogi->setAuth('none');
+            $this->entityManager->persist($opencatalogi);
+
+            $dashboardCard = new DashboardCard($opencatalogi);
+            $this->entityManager->persist($dashboardCard);
+
+            $this->entityManager->flush();
+
+            /*
+            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
+            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+            $this->entityManager->persist($opencatalogiCatalog);
+            */
+        }
+        else {
+
+        }
+
+        $this->catalogiService->readCatalogi($opencatalogi);
+
+        /*
         // Failsafe
         if (!Uuid::isValid($configuration['entity']) || !Uuid::isValid($configuration['componentsEntity'])) {
             return $data;
@@ -251,6 +286,8 @@ class CatalogiService
         $this->data = $data;
         $this->configuration = $configuration;
         $this->synchronizationService->configuration = $configuration;
+
+
         if ($this->session->get('io')) {
             $this->io = $this->session->get('io');
             $this->io->note('CatalogiService->catalogiHandler()');
@@ -267,6 +304,7 @@ class CatalogiService
         }
         // Get all Components from all known Catalogi and compare them to our known Components. Add unknown ones.
         $newComponents = $this->pullComponents();
+           */
 
         return $data;
     }

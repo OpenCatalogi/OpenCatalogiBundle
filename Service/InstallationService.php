@@ -75,6 +75,12 @@ class InstallationService implements InstallerInterface
     public function addActionConfiguration($actionHandler): array
     {
         $defaultConfig = [];
+
+        // What if there are no properties?
+        if(!isset($actionHandler->getConfiguration()['properties'])){
+            return $defaultConfig;
+        }
+
         foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
 
             switch ($value['type']) {
@@ -131,7 +137,8 @@ class InstallationService implements InstallerInterface
         }
     }
 
-    public function checkDataConsistency(){
+    public function
+    checkDataConsistency(){
 
         // Lets create some genneric dashboard cards
         $objectsThatShouldHaveCards = [
@@ -205,6 +212,7 @@ class InstallationService implements InstallerInterface
             $cronjob->setName('Open Catalogi');
             $cronjob->setDescription("This cronjob fires all the open catalogi actions ever 5 minutes");
             $cronjob->setThrows(['opencatalogi.default.listens']);
+            $cronjob->setIsEnabled(true);
 
             $this->entityManager->persist($cronjob);
 
@@ -215,13 +223,49 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
         }
 
+        if(!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name'=>'Github scrapper']))
+        {
+            $cronjob = new Cronjob();
+            $cronjob->setName('Github scrapper');
+            $cronjob->setDescription("This cronjob fires all the open catalogi github actions ever 5 minutes");
+            $cronjob->setThrows(['opencatalogi.github']);
+            $cronjob->setIsEnabled(true);
+
+            $this->entityManager->persist($cronjob);
+
+            (isset($this->io)?$this->io->writeln(['','Created a cronjob for Github']):'');
+        }
+        else{
+
+            (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Open Catalogi']):'');
+        }
+
+        if(!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name'=>'Federation']))
+        {
+            $cronjob = new Cronjob();
+            $cronjob->setName('Federation');
+            $cronjob->setDescription("This cronjob fires all the open catalogi federation actions ever 5 minutes");
+            $cronjob->setThrows(['opencatalogi.federation']);
+            $cronjob->setIsEnabled(true);
+
+            $this->entityManager->persist($cronjob);
+
+            (isset($this->io)?$this->io->writeln(['','Created a cronjob for Federation
+            ']):'');
+        }
+        else{
+
+            (isset($this->io)?$this->io->writeln(['','There is alreade a cronjob for Federation']):'');
+        }
+
+
 
         // Lets grap the catalogi entity
         $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/catalogi.schema.json']);
 
         // Setup Github and make a dashboard card
         if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://api.github.com'])){
-            (isset($this->io)?$this->io->writeln(['Creating GithUB Source']):'');
+            (isset($this->io)?$this->io->writeln(['Creating GitHub Source']):'');
             $github = new Source();
             $github->setName('GitHub');
             $github->setDescription('A place where repositories of code live');
@@ -233,37 +277,10 @@ class InstallationService implements InstallerInterface
             $this->entityManager->persist($dashboardCard);
         }
 
-        // Lets find the federation  and make a dashboard card
-        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://opencatalogi.nl/api'])){
-            (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
-            $opencatalogi = new Source();
-            $opencatalogi->setName('OpenCatalogi.nl');
-            $opencatalogi->setDescription('The open catalogi federated netwerk');
-            $opencatalogi->setLocation('https://opencatalogi.nl/api');
-            $opencatalogi->setAuth('none');
-            $this->entityManager->persist($opencatalogi);
-
-            $dashboardCard = new DashboardCard($opencatalogi);
-            $this->entityManager->persist($dashboardCard);
-
-            $this->entityManager->flush();
-
-            /*
-            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
-            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
-            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
-            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
-            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
-            $this->entityManager->persist($opencatalogiCatalog);
-            */
-        }
-        else {
-
-        }
 
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
-        $this->catalogiService->readCatalogi($opencatalogi);
+        //$this->catalogiService->readCatalogi($opencatalogi);
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook

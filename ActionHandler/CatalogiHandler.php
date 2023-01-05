@@ -21,6 +21,16 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function getConfiguration(): array
     {
+
+        return [
+            '$id'        => 'https://example.com/person.schema.json',
+            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            'title'      => 'CatalogiHandler'
+            ];
+
+        // We don't need all of this
+
+        /*
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
@@ -55,6 +65,8 @@ class CatalogiHandler implements ActionHandlerInterface
                 ],
             ],
         ];
+
+        */
     }
 
     /**
