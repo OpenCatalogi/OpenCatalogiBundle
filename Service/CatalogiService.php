@@ -41,6 +41,8 @@ class CatalogiService
     private Entity $organisationEntity;
     private Entity $applicationEntity;
 
+    private $entityRepo;
+
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -54,6 +56,8 @@ class CatalogiService
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
+
+        $this->entityRepo = $entityManager->getRepository('App:Entity');
     }
 
     /**
@@ -935,5 +939,24 @@ class CatalogiService
         }
 
         return $synchronization;
+    }
+
+    public function syncedApplicationToGatewayHandler (array $data, array $configuration) {
+        // var_dump('syncedApplicationToGatewayHandler triggered');
+        $this->data = $data['response'];
+        $this->configuration = $configuration;
+
+        $applicationSchema = $this->entityRepo->find($configuration['entities']['Application']);
+
+        if (!$applicationSchema instanceof Entity) {
+            throw new \Exception('Application schema could not be found, action configuration could be wrong');
+        }
+        // 1. Bestaat de applicatie al aan de hand external id, zo ja die gebruiken
+
+        // 2. Loop door componenten, check of er al een object met repoUrl bestaat
+        // sws koppelen aan applicatie
+        // component opnieuw ophalen en vullen in andere actie
+
+        // 3. Niet zeker of dit nodig is: Zoek koppelobject voor die component, zo niet maak aan met sync object
     }
 }
