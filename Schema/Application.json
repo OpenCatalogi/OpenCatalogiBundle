@@ -43,6 +43,12 @@
           "type": "string"
         }
       }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+          "$ref": "#/definitions/ComponentUrl"
+      }
     }
   },
   "required": [
