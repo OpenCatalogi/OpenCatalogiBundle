@@ -9,6 +9,7 @@ use App\Entity\Cronjob;
 use App\Entity\Endpoint;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
+use App\Entity\CollectionEntity;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use Symfony\Component\DependencyInjection\ContainerInterface;
