@@ -23,6 +23,8 @@ use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Event\ActionEvent;
 
 class CatalogiService
 {
@@ -34,6 +36,7 @@ class CatalogiService
     private array $data;
     private array $configuration;
     private SymfonyStyle $io;
+    private EventDispatcherInterface $eventDispatcher;
 
     // Lets prevent unnesecery database calls
     private Entity $catalogusEntity;
@@ -42,6 +45,7 @@ class CatalogiService
     private Entity $applicationEntity;
 
     private $entityRepo;
+    private $objectRepo;
 
 
     public function __construct(
@@ -49,15 +53,18 @@ class CatalogiService
         SessionInterface $session,
         CommonGroundService $commonGroundService,
         CallService $callService,
-        SynchronizationService $synchronizationService
+        SynchronizationService $synchronizationService,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->entityManager = $entityManager;
         $this->session = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
+        $this->eventDispatcher = $eventDispatcher;
 
         $this->entityRepo = $entityManager->getRepository('App:Entity');
+        $this->entityRepo = $entityManager->getRepository('App:ObjectEntity');
     }
 
     /**
@@ -66,7 +73,7 @@ class CatalogiService
      * @param SymfonyStyle $io
      * @return self
      */
-    public function setStyle(SymfonyStyle $io):self
+    public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
 
@@ -79,20 +86,21 @@ class CatalogiService
      * @param ObjectEntity $catalogus
      * @return void
      */
-    public function readCatalogi(Gateway $source):void {
+    public function readCatalogi(Gateway $source): void
+    {
         //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
         // var_dump('hello darkness my old friend');
 
-        (isset($this->io)?$this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')'):'');
+        (isset($this->io) ? $this->io->info('Looking at ' . $source->getName() . '(@:' . $source->getLocation() . ')') : '');
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
             $source,
             '/search/',
             'GET',
-            ['query'=>['limit'=>10000]]
+            ['query' => ['limit' => 10000]]
         )->getBody()->getContents(), true)['results'];
 
-        (isset($this->io)?$this->io->writeln(['Found '.count($objects).' objects']):'');
+        (isset($this->io) ? $this->io->writeln(['Found ' . count($objects) . ' objects']) : '');
 
         // Now we can check if any objects where removed
         //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
@@ -104,10 +112,10 @@ class CatalogiService
 
         $synchonizedObjects = [];
 
-        (isset($this->io)? $this->io->progressStart(count($objects)):'');
+        (isset($this->io) ? $this->io->progressStart(count($objects)) : '');
         // Handle new objects
         $counter = 0;
-        foreach($objects as $key => $object){
+        foreach ($objects as $key => $object) {
             $counter++;
             // Lets make sure we have a reference
             if (!isset($object['_self']['schema']['ref'])) {
@@ -118,34 +126,34 @@ class CatalogiService
             $this->entityManager->persist($synchonization);
 
             // Lets save every so ofthen
-            if($counter >= 100){
+            if ($counter >= 100) {
                 $counter = 0;
                 $this->entityManager->flush();
             }
 
-            (isset($this->io)? $this->io->progressAdvance():'');
+            (isset($this->io) ? $this->io->progressAdvance() : '');
         }
 
-        (isset($this->io)? $this->io->progressFinish():'');
+        (isset($this->io) ? $this->io->progressFinish() : '');
 
         $this->entityManager->flush();
 
 
-        (isset($this->io)?$this->io->writeln(['','Looking for objects to remove']):'');
+        (isset($this->io) ? $this->io->writeln(['', 'Looking for objects to remove']) : '');
         // Now we can check if any objects where removed
-        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
+        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' => $source]);
 
-        (isset($this->io)?$this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']):'');
-        $counter=0;
-        foreach ($synchonizations as $synchonization){
-            if(!in_array($synchonization->getSourceId(), $synchonizedObjects)){
+        (isset($this->io) ? $this->io->writeln(['Currently ' . count($synchonizations) . ' object attached to this source']) : '');
+        $counter = 0;
+        foreach ($synchonizations as $synchonization) {
+            if (!in_array($synchonization->getSourceId(), $synchonizedObjects)) {
                 $this->entityManager->remove($synchonization->getObject());
 
-                (isset($this->io)?$this->io->writeln(['Removed '.$synchonization->getSourceId()]):'');
+                (isset($this->io) ? $this->io->writeln(['Removed ' . $synchonization->getSourceId()]) : '');
                 $counter++;
             }
         }
-        (isset($this->io)?$this->io->writeln(['Removed '.$counter.' object attached to this source']):'');
+        (isset($this->io) ? $this->io->writeln(['Removed ' . $counter . ' object attached to this source']) : '');
 
         $this->entityManager->flush();
     }
@@ -157,7 +165,7 @@ class CatalogiService
     public function handleObject(array $object, Gateway $source): ?Synchronization
     {
         // Lets make sure we have a reference, just in case this function gets ussed seperatly
-        if(!isset($object['_self']['schema']['ref'])) {
+        if (!isset($object['_self']['schema']['ref'])) {
             return null;
         }
 
@@ -187,31 +195,32 @@ class CatalogiService
         }
 
         // Lets handle whatever we found
-        if(isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0){
+        if (isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0) {
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
             $baseSync =  $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
 
             // Check for source
-            if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$baseSync['source']['location']])){
+            if (!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $baseSync['source']['location']])) {
                 $source =  new Source();
                 $source->setName($baseSync['source']['name']);
                 $source->setDescription($baseSync['source']['description']);
                 $source->setLocation($baseSync['source']['location']);
             }
-        }
-        else{
+        } else {
             // This catalogi is teh source so lets roll
             $externalId = $object['id'];
         }
 
         // Lets se if we already have an synchronisation
-        if(!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])){
+        if (!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' => $externalId])) {
             $synchonization = new Synchronization($source, $entity);
             $synchonization->setSourceId($object['id']);
         }
 
-        if(isset($object['_self'])){ unset($object['_self']);}
+        if (isset($object['_self'])) {
+            unset($object['_self']);
+        }
 
         // Lets sync
         return $this->synchronizationService->handleSync($synchonization, $object);
@@ -222,18 +231,19 @@ class CatalogiService
      *
      * @return void
      */
-    public function prebObjectEntities():void{
-        if(!isset($this->catalogusEntity)){
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
+    public function prebObjectEntities(): void
+    {
+        if (!isset($this->catalogusEntity)) {
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/catalogi.schema.json']);
         }
-        if(!isset($this->componentEntity)){
-            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
+        if (!isset($this->componentEntity)) {
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/component.schema.json']);
         }
-        if(!isset($this->organisationEntity)){
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
+        if (!isset($this->organisationEntity)) {
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/organisation.schema.json']);
         }
-        if(!isset($this->applicationEntity)){
-            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
+        if (!isset($this->applicationEntity)) {
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/application.schema.json']);
         }
     }
 
@@ -252,8 +262,8 @@ class CatalogiService
         // Fail save
 
         // Lets find the federation  and make a dashboard card
-        if(!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://opencatalogi.nl/api'])){
-            (isset($this->io)?$this->io->writeln(['Creating Opencatalogi Source']):'');
+        if (!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://opencatalogi.nl/api'])) {
+            (isset($this->io) ? $this->io->writeln(['Creating Opencatalogi Source']) : '');
             $opencatalogi = new Source();
             $opencatalogi->setName('OpenCatalogi.nl');
             $opencatalogi->setDescription('The open catalogi federated netwerk');
@@ -274,12 +284,10 @@ class CatalogiService
             $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
             $this->entityManager->persist($opencatalogiCatalog);
             */
-        }
-        else {
-
+        } else {
         }
 
-        $this->catalogiService->readCatalogi($opencatalogi);
+        $this->readCatalogi($opencatalogi);
 
         /*
         // Failsafe
@@ -440,7 +448,7 @@ class CatalogiService
     private function getDataFromCatalogi(array $catalogi, string $type): array
     {
         $location = $type === 'Catalogi' ? $this->configuration['location'] : $this->configuration['componentsLocation'];
-        $url = $catalogi['source']['location'].$location;
+        $url = $catalogi['source']['location'] . $location;
         if (isset($this->io)) {
             $this->io->text("Get $type from (known Catalogi: {$catalogi['source']['name']}) \"$url\"");
         }
@@ -489,9 +497,10 @@ class CatalogiService
                 'name'     => "Source for Catalogi {$catalogi['source']['name']}",
                 'location' => $catalogi['source']['location'],
             ]);
-            $response = $this->callService->call($source, $config['location'], 'GET', ['query' => array_merge($config['query'], $page !== 1 ? ['page' => $page] : []),
+            $response = $this->callService->call($source, $config['location'], 'GET', [
+                'query' => array_merge($config['query'], $page !== 1 ? ['page' => $page] : []),
             ]);
-        } catch (Exception|GuzzleException $exception) {
+        } catch (Exception | GuzzleException $exception) {
             $this->synchronizationService->ioCatchException($exception, ['trace', 'line', 'file', 'message' => [
                 'type'       => 'error',
                 'preMessage' => "Error while doing getUnknown{$config['type']} for Catalogi: ({$catalogi['source']['name']}) \"{$config['url']}\" (Page: $page): ",
@@ -585,8 +594,10 @@ class CatalogiService
         // Check if these extern Catalogi know any Catalogi we don't know yet
         foreach ($externCatalogi as $checkCatalogi) {
             // We dont want to add to $unknownCatalogi if it is already in there. Use $unknownCatalogiLocations to check for this.
-            if (!in_array($checkCatalogi['embedded']['source']['location'], $unknownCatalogiLocations) &&
-                !$this->checkIfCatalogiExists($knownCatalogi, $checkCatalogi)) {
+            if (
+                !in_array($checkCatalogi['embedded']['source']['location'], $unknownCatalogiLocations) &&
+                !$this->checkIfCatalogiExists($knownCatalogi, $checkCatalogi)
+            ) {
                 $unknownCatalogi[] = $checkCatalogi;
                 // Make sure to also add this to $unknownCatalogiLocations
                 $unknownCatalogiLocations[] = $checkCatalogi['embedded']['source']['location'];
@@ -706,12 +717,12 @@ class CatalogiService
 
         if (isset($this->io)) {
             $totalKnownComponents = is_countable($knownComponents) ? count($knownComponents) : 0;
-            $this->io->section("Found $totalKnownComponents known Component".($totalKnownComponents !== 1 ? 's' : ''));
+            $this->io->section("Found $totalKnownComponents known Component" . ($totalKnownComponents !== 1 ? 's' : ''));
             $this->io->block('Converting all known Components to readable/usable arrays...');
         }
 
         // Convert ObjectEntities to useable arrays
-        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://localhost';
+        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://' . $_SERVER['HTTP_HOST'] : 'http://localhost';
         foreach ($knownComponents as &$component) {
             // We only need the metadata and/or id in this specific case to get the ComponentLocation.
             $component = $component->toArray(1, ['id', 'synchronizations', 'self'], true);
@@ -740,17 +751,21 @@ class CatalogiService
             $componentSync = $component['x-commongateway-metadata']['synchronizations'][0];
 
             // Endpoint could be set to "" or null. Isset() won't pass this check so use array_key_exists!
-            if (isset($componentSync['gateway']['location']) && isset($componentSync['sourceId']) &&
-                array_key_exists('endpoint', $componentSync)) {
-                return $componentSync['gateway']['location'].$componentSync['endpoint'].'/'.$componentSync['sourceId'];
+            if (
+                isset($componentSync['gateway']['location']) && isset($componentSync['sourceId']) &&
+                array_key_exists('endpoint', $componentSync)
+            ) {
+                return $componentSync['gateway']['location'] . $componentSync['endpoint'] . '/' . $componentSync['sourceId'];
             }
         }
-        if (isset($component['x-commongateway-metadata']['self']) &&
-            str_contains($component['x-commongateway-metadata']['self'], $this->configuration['componentsLocation'])) {
-            return $catalogiLocation.$component['x-commongateway-metadata']['self'];
+        if (
+            isset($component['x-commongateway-metadata']['self']) &&
+            str_contains($component['x-commongateway-metadata']['self'], $this->configuration['componentsLocation'])
+        ) {
+            return $catalogiLocation . $component['x-commongateway-metadata']['self'];
         }
 
-        return $catalogiLocation.$this->configuration['componentsLocation'].'/'.$component['id'];
+        return $catalogiLocation . $this->configuration['componentsLocation'] . '/' . $component['id'];
     }
 
     /**
@@ -817,8 +832,10 @@ class CatalogiService
             $checkComponentLocation = $this->getComponentLocation($checkComponent, $catalogi['source']['location']);
 
             // We dont want to add to $unknownComponents if it is already in there. Use $unknownComponentsLocations to check for this.
-            if (!in_array($checkComponentLocation, $unknownComponentsLocations) &&
-                !in_array($checkComponentLocation, $knownComponentLocations)) {
+            if (
+                !in_array($checkComponentLocation, $unknownComponentsLocations) &&
+                !in_array($checkComponentLocation, $knownComponentLocations)
+            ) {
                 // If $checkComponent has no synchronizations, add the catalogi source as synchronization gateway...
                 // ...for when we are going to add a Synchronization (for a new Component) later.
                 if (!isset($checkComponent['x-commongateway-metadata']['synchronizations'][0])) {
@@ -832,9 +849,9 @@ class CatalogiService
                     $this->io->text("Found an unknown Component: ({$checkComponent['name']}) \"$checkComponentLocation\"");
                 }
             }
-//            elseif (isset($this->io)) {
-//                $this->io->text("Already known Component (or already on 'to-add list'): ({$checkComponent['name']}) \"$checkComponentLocation\"");
-//            }
+            //            elseif (isset($this->io)) {
+            //                $this->io->text("Already known Component (or already on 'to-add list'): ({$checkComponent['name']}) \"$checkComponentLocation\"");
+            //            }
         }
 
         return $unknownComponents;
@@ -853,7 +870,7 @@ class CatalogiService
     {
         $totalUnknownComponents = is_countable($unknownComponents) ? count($unknownComponents) : 0;
         if (isset($this->io) && $totalUnknownComponents > 0) {
-            $this->io->block("Found $totalUnknownComponents unknown Component".($totalUnknownComponents !== 1 ? 's' : '').', start adding them...');
+            $this->io->block("Found $totalUnknownComponents unknown Component" . ($totalUnknownComponents !== 1 ? 's' : '') . ', start adding them...');
         }
 
         $addedComponents = [];
@@ -921,10 +938,9 @@ class CatalogiService
         $synchronization->setLastSynced($now);
         $synchronization->setSourcelastChanged(
             isset($componentSync['sourceLastChanged']) ?
-                new DateTime($componentSync['sourceLastChanged']) :
-                (
+                new DateTime($componentSync['sourceLastChanged']) : (
                     // When getting the Components from other Catalogi we extend metadata.dateModified
-                isset($componentMetaData['dateModified']) ?
+                    isset($componentMetaData['dateModified']) ?
                     new DateTime($componentMetaData['dateModified']) :
                     $now
                 )
@@ -941,21 +957,54 @@ class CatalogiService
         return $synchronization;
     }
 
-    public function syncedApplicationToGatewayHandler (array $data, array $configuration) {
+    public function createUpdateComponentHandler(array $data, array $configuration)
+    {
+        // var_dump('createUpdateComponentHandler triggered');
+        $this->data = $data['response'];
+        $this->configuration = $configuration;
+    }
+
+    public function syncedApplicationToGatewayHandler(array $data, array $configuration)
+    {
         // var_dump('syncedApplicationToGatewayHandler triggered');
         $this->data = $data['response'];
         $this->configuration = $configuration;
+
+        $applicationSyncObjectArray = $this->data;
+        $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
 
         $applicationSchema = $this->entityRepo->find($configuration['entities']['Application']);
 
         if (!$applicationSchema instanceof Entity) {
             throw new \Exception('Application schema could not be found, action configuration could be wrong');
         }
+
         // 1. Bestaat de applicatie al aan de hand external id, zo ja die gebruiken
+        if (!$applicationObject = $this->objectRepo->findBy(['externalId' => $applicationSyncObject->getExternalId()])) {
+            $applicationObject = new ObjectEntity($applicationSchema);
+        }
+        // Set same externalId from sync object on normal application object
+        $applicationObject->setExternalId($applicationSyncObject->getExternalId());
+
+        // Set and unset values
+        $applicationObjectArray = $applicationSyncObjectArray;
+        unset($applicationObjectArray['_self']);
+        $applicationObjectArray['components'] = [];
 
         // 2. Loop door componenten, check of er al een object met repoUrl bestaat
-        // sws koppelen aan applicatie
-        // component opnieuw ophalen en vullen in andere actie
+        foreach ($applicationSyncObjectArray['components'] as $component) {
+            // throw event that triggers creating or updating component
+            $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.component.check');
+            $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+            $updatedComponentObjectArray = $event->getData()['response'];
+            $applicationObjectArray[] = $updatedComponentObjectArray['_self']['id'];
+        }
+
+        $applicationObject->hydrate($applicationObjectArray);
+        $this->entityManager->persist($applicationObject);
+        $this->entityManager->flush();
+
+
 
         // 3. Niet zeker of dit nodig is: Zoek koppelobject voor die component, zo niet maak aan met sync object
     }
