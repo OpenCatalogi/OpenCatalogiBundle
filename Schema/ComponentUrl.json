@@ -1,6 +1,6 @@
 {
   "title": "ComponentUrl",
-  "$id": "https://opencatalogi.nl/componenturl.schema.json",
+  "$id": "https://opencatalogi.nl/oc.componenturl.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",

@@ -1,6 +1,6 @@
 {
   "title": "Catalogi",
-  "$id": "https://opencatalogi.nl/catalogi.schema.json",
+  "$id": "https://opencatalogi.nl/oc.catalogi.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",

@@ -1,6 +1,6 @@
 {
   "title": "Repository",
-  "$id": "https://opencatalogi.nl/respository.schema.json",
+  "$id": "https://opencatalogi.nl/oc.respository.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",

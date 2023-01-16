@@ -1,6 +1,6 @@
 {
   "title": "Contractor",
-  "$id": "https://opencatalogi.nl/contractor.schema.json",
+  "$id": "https://opencatalogi.nl/oc.contractor.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object"

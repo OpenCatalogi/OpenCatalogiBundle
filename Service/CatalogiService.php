@@ -165,16 +165,16 @@ class CatalogiService
         $reference = $object['_self']['schema']['ref'];
 
         switch ($reference) {
-            case "https://opencatalogi.nl/catalogi.schema.json":
+            case "https://opencatalogi.nl/oc.catalogi.schema.json":
                 $entity = $this->catalogusEntity;
                 break;
-            case "https://opencatalogi.nl/organisation.schema.json":
+            case "https://opencatalogi.nl/oc.organisation.schema.json":
                 $entity = $this->organisationEntity;
                 break;
-            case "https://opencatalogi.nl/component.schema.json":
+            case "https://opencatalogi.nl/oc.component.schema.json":
                 $entity = $this->componentEntity;
                 break;
-            case "https://opencatalogi.nl/application.schema.json":
+            case "https://opencatalogi.nl/oc.application.schema.json":
                 $entity = $this->applicationEntity;
                 break;
             default:
@@ -220,16 +220,16 @@ class CatalogiService
      */
     public function prebObjectEntities():void{
         if(!isset($this->catalogusEntity)){
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.catalogi.schema.json']);
         }
         if(!isset($this->componentEntity)){
-            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.component.schema.json']);
         }
         if(!isset($this->organisationEntity)){
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.organisation.schema.json']);
         }
         if(!isset($this->applicationEntity)){
-            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
         }
     }
 

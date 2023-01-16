@@ -136,15 +136,46 @@ class InstallationService implements InstallerInterface
             (isset($this->io)?$this->io->writeln(['Action created for '.$handler]):'');
         }
     }
+    
+    private function addSchemasToCollection(CollectionEntity $collection, string $schemaPrefix): CollectionEntity
+    {
+        $entities = $this->entityManager->getRepository('App:Entity')->findByReferencePrefix($schemaPrefix);
+        foreach($entities as $entity) {
+            $entity->addCollection($collection);
+        }
+        return $collection;
+    }
+    
+    private function createCollections(): array
+    {
+        $collectionConfigs = [
+            ['name' => 'OpenCatalogi',  'prefix' => 'oc', 'schemaPrefix' => 'https://opencatalogi.nl'],
+        ];
+        $collections = [];
+        foreach($collectionConfigs as $collectionConfig) {
+            $collectionsFromEntityManager = $this->entityManager->getRepository('App:CollectionEntity')->findBy(['name' => $collectionConfig['name']]);
+            if(count($collectionsFromEntityManager) == 0){
+                $collection = new CollectionEntity($collectionConfig['name'], $collectionConfig['prefix'], 'OpenCatalogiBundle');
+            } else {
+                $collection = $collectionsFromEntityManager[0];
+            }
+            $collection = $this->addSchemasToCollection($collection, $collectionConfig['schemaPrefix']);
+            $this->entityManager->persist($collection);
+            $this->entityManager->flush();
+            $collections[$collectionConfig['name']] = $collection;
+        }
+        (isset($this->io) ? $this->io->writeln(count($collections).' Collections Created'): '');
+        return $collections;
+    }
 
     public function
     checkDataConsistency(){
 
         // Lets create some genneric dashboard cards
         $objectsThatShouldHaveCards = [
-            'https://opencatalogi.nl/component.schema.json',
-            'https://opencatalogi.nl/application.schema.json',
-            'https://opencatalogi.nl/catalogi.schema.json'
+            'https://opencatalogi.nl/oc.component.schema.json',
+            'https://opencatalogi.nl/oc.application.schema.json',
+            'https://opencatalogi.nl/oc.catalogi.schema.json'
         ];
 
         (isset($this->io)?$this->io->writeln(['','<info>Looking for cards</info>']):'');
@@ -162,6 +193,9 @@ class InstallationService implements InstallerInterface
             }
             (isset($this->io)?$this->io->writeln('Dashboard card found  for: '.$object):'');
         }
+    
+        $this->createCollections();
+        
         // Lets see if there is a generic search endpoint
         if(!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex'=>'^search'])){
             $searchEnpoint = new Endpoint();
@@ -177,10 +211,10 @@ class InstallationService implements InstallerInterface
 
         // Let create some endpoints
         $objectsThatShouldHaveEndpoints = [
-            'https://opencatalogi.nl/component.schema.json',
-            'https://opencatalogi.nl/application.schema.json',
-            'https://opencatalogi.nl/organisation.schema.json',
-            'https://opencatalogi.nl/catalogi.schema.json'
+            'https://opencatalogi.nl/oc.component.schema.json',
+            'https://opencatalogi.nl/oc.application.schema.json',
+            'https://opencatalogi.nl/oc.organisation.schema.json',
+            'https://opencatalogi.nl/oc.catalogi.schema.json'
         ];
 
         (isset($this->io)?$this->io->writeln(['','<info>Looking for endpoints</info>']):'');
@@ -261,7 +295,7 @@ class InstallationService implements InstallerInterface
 
 
         // Lets grap the catalogi entity
-        $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/catalogi.schema.json']);
+        $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.catalogi.schema.json']);
 
         // Setup Github and make a dashboard card
         if(!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://api.github.com'])){

@@ -1,6 +1,6 @@
 {
   "title": "Contact",
-  "$id": "https://opencatalogi.nl/contact.schema.json",
+  "$id": "https://opencatalogi.nl/oc.contact.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
