@@ -258,8 +258,6 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for Federation']) : '');
         }
 
-
-
         // Lets grap the catalogi entity
         $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/catalogi.schema.json']);
 
@@ -284,14 +282,50 @@ class InstallationService implements InstallerInterface
         $applicationSchema = $schemaRepository->findOneBy(['name' => 'Application']);
         $applicationSchemaID = $applicationSchema ? $applicationSchema->getId()->toString() : '';
 
+        $applicationSyncSchema = $schemaRepository->findOneBy(['name' => 'ApplicationSync']);
+        $applicationSyncSchemaID = $applicationSyncSchema ? $applicationSyncSchema->getId()->toString() : '';
+
+        $componentSchema = $schemaRepository->findOneBy(['name' => 'Component']);
+        $componentSchemaID = $componentSchema ? $componentSchema->getId()->toString() : '';
+
+        $repositorySchema = $schemaRepository->findOneBy(['name' => 'Repository']);
+        $repositorySchemaID = $repositorySchema ? $repositorySchema->getId()->toString() : '';
+
+        // Make ApplicationSync.components and owner a 
+        foreach ($applicationSyncSchema->getAttributes() as $attr) {
+            if ($attr->getName() == 'components' || $attr->getName() == 'owner') {
+                $attr->setType('array');
+                $attr->setMultiple(false);
+                $this->entityManager->persist($attr);
+            }
+        }
+
         // componentencatalogus
-        $source = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
-        $source->setName('componentencatalogus');
-        $source->setAuth('none');
-        $source->setLocation('https://componentencatalogus.commonground.nl/api');
-        $source->setIsEnabled(true);
-        $this->entityManager->persist($source);
+        $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
+        $componentenCatalogusSource->setName('componentencatalogus');
+        $componentenCatalogusSource->setAuth('none');
+        $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
+        $componentenCatalogusSource->setIsEnabled(true);
+        $this->entityManager->persist($componentenCatalogusSource);
         isset($this->io) && $this->io->writeln('Gateway: \'componentencatalogus\' created');
+
+        // GitHub API
+        $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
+        $gitHubAPI->setName('GitHub API');
+        $gitHubAPI->setAuth('jwt');
+        $gitHubAPI->setLocation('https://api.github.com');
+        $gitHubAPI->setIsEnabled(true);
+        $this->entityManager->persist($gitHubAPI);
+        isset($this->io) && $this->io->writeln('Gateway: \'GitHub API\' created');
+
+        // GitHub usercontent
+        $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
+        $gitHubUserContentSource->setName('GitHub usercontent');
+        $gitHubUserContentSource->setAuth('none');
+        $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
+        $gitHubUserContentSource->setIsEnabled(true);
+        $this->entityManager->persist($gitHubUserContentSource);
+        isset($this->io) && $this->io->writeln('Gateway: \'GitHub usercontent\' created');
 
         // SyncZakenCollectionAction
         $action = $actionRepository->findOneBy(['name' => 'SyncApplicationCollectionAction']) ?? new Action();
@@ -301,8 +335,8 @@ class InstallationService implements InstallerInterface
         $action->setListens(['opencatalogi.default.listens']);
         $action->setConditions(['==' => [1, 1]]);
         $action->setConfiguration([
-            'entity'    => $applicationSchemaID,
-            'source'    => $source->getId()->toString(),
+            'entity'    => $applicationSyncSchemaID,
+            'source'    => $componentenCatalogusSource->getId()->toString(),
             'location'  => '/products?limit=1',
             'apiSource' => [
                 'location'        => [
@@ -333,16 +367,38 @@ class InstallationService implements InstallerInterface
         $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
         $action->setConditions(['==' => [
             ['var' => 'entity'],
-            $applicationSchemaID,
+            $applicationSyncSchemaID,
         ]]);
         $action->setConfiguration([
-            'source'    => $source->getId()->toString()
+            'source'    => $componentenCatalogusSource->getId()->toString(),
+            'entities'  => [
+                'Application' => $applicationSchemaID
+            ]
         ]);
         $action->setAsync(true);
         $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler');
         $action->setIsEnabled(true);
         $this->entityManager->persist($action);
         isset($this->io) && $this->io->writeln('Action: \'MapZaakAction\' created');
+
+        // CreateUpdateComponentAction
+        $action = $actionRepository->findOneBy(['name' => 'CreateUpdateComponentAction']) ?? new Action();
+        $action->setName('CreateUpdateComponentAction');
+        $action->setDescription('This is a action to create or update a component.');
+        $action->setListens(['opencatalogi.component.check']);
+        $action->setConditions([[1 => 1]]);
+        $action->setConfiguration([
+            'source'    => $gitHubAPI->getId()->toString(),
+            'entities'  => [
+                'Component' => $componentSchemaID,
+                'Repository' => $repositorySchemaID
+            ]
+        ]);
+        $action->setAsync(true);
+        $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler');
+        $action->setIsEnabled(true);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: \'CreateUpdateComponentAction\' created');
 
 
         // Now we kan do a first federation
