@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Event\ActionEvent;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 class CatalogiService
 {
@@ -37,6 +38,7 @@ class CatalogiService
     private array $configuration;
     private SymfonyStyle $io;
     private EventDispatcherInterface $eventDispatcher;
+    private GithubApiService $githubApiService;
 
     // Lets prevent unnesecery database calls
     private Entity $catalogusEntity;
@@ -46,6 +48,8 @@ class CatalogiService
 
     private $entityRepo;
     private $objectRepo;
+    private $sourceRepo;
+    private $valueRepo;
 
 
     public function __construct(
@@ -54,7 +58,8 @@ class CatalogiService
         CommonGroundService $commonGroundService,
         CallService $callService,
         SynchronizationService $synchronizationService,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager = $entityManager;
         $this->session = $session;
@@ -62,9 +67,12 @@ class CatalogiService
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->eventDispatcher = $eventDispatcher;
+        $this->githubApiService = $githubApiService;
 
         $this->entityRepo = $entityManager->getRepository('App:Entity');
-        $this->entityRepo = $entityManager->getRepository('App:ObjectEntity');
+        $this->objectRepo = $entityManager->getRepository('App:ObjectEntity');
+        $this->sourceRepo = $entityManager->getRepository('App:Gateway');
+        $this->valueRepo = $entityManager->getRepository('App:Value');
     }
 
     /**
@@ -957,18 +965,63 @@ class CatalogiService
         return $synchronization;
     }
 
-    public function createUpdateComponentHandler(array $data, array $configuration)
+    public function createUpdateComponentHandler(array $data, array $configuration): array
     {
-        // var_dump('createUpdateComponentHandler triggered');
+        var_dump('createUpdateComponentHandler triggered');
         $this->data = $data['response'];
         $this->configuration = $configuration;
+        $componentNonUnriched = $this->data;
+
+
+        if (!isset($this->data['repositoryUrl']) || strpos($this->data['repositoryUrl'], 'gitlab.com')) {
+            // Log error with monolog
+            return ['response' => false];
+        }
+        if (!isset($this->configuration['source']) && !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
+            // Log error with monolog
+            throw new \Exception('GitHub source could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['entities']['Component']) && !$componentSchema = $this->entityRepo->find($this->configuration['entities']['Component'])) {
+            // Log error with monolog
+            throw new \Exception('Component schema could not be found, action configuration could be wrong');
+        }
+
+        // Find existing component through repositoryUrl
+        $possibleComponentObjects = $this->valueRepo->findBy(['stringValue' => $componentNonUnriched['repositoryUrl']]);
+        foreach ($possibleComponentObjects as $possibleComponentObject) {
+            if ($possibleComponentObject->getAttribute()->getEntity()->getId() == $this->configuration['entities']['Component']) {
+                $componentObject = $possibleComponentObject;
+                break;
+            }
+        }
+
+        // @TODO Create/update basic component
+
+        !isset($componentObject) && $componentObject = new ObjectEntity($componentSchema);
+
+
+        // @TODO Create sync and use syncservice
+        $endpoint = 'repos/' . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+        try {
+            $response = $this->callService->call($githubSource, $endpoint, 'GET');
+        } catch (\Exception $e) {
+            // Log error with monolog
+        }
+
+        $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
+
+        // $component = $this->githubApiService->getRepositoryFromUrl($endpoint);
+        var_dump('Component created/updated');
+
+        return ['response' => $this->data];
     }
 
     public function syncedApplicationToGatewayHandler(array $data, array $configuration)
     {
-        // var_dump('syncedApplicationToGatewayHandler triggered');
+        var_dump('syncedApplicationToGatewayHandler triggered');
         $this->data = $data['response'];
         $this->configuration = $configuration;
+
 
         $applicationSyncObjectArray = $this->data;
         $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
@@ -976,14 +1029,15 @@ class CatalogiService
         $applicationSchema = $this->entityRepo->find($configuration['entities']['Application']);
 
         if (!$applicationSchema instanceof Entity) {
+            // Set monolog error
             throw new \Exception('Application schema could not be found, action configuration could be wrong');
         }
 
         // 1. Bestaat de applicatie al aan de hand external id, zo ja die gebruiken
-        if (!$applicationObject = $this->objectRepo->findBy(['externalId' => $applicationSyncObject->getExternalId()])) {
+        if (!$applicationObject = $this->objectRepo->findOneBy(['externalId' => $applicationSyncObject->getExternalId(), 'entity' => $applicationSchema])) {
             $applicationObject = new ObjectEntity($applicationSchema);
         }
-        // Set same externalId from sync object on normal application object
+        // Set same externalId from sync application object on normal application object
         $applicationObject->setExternalId($applicationSyncObject->getExternalId());
 
         // Set and unset values
@@ -994,18 +1048,20 @@ class CatalogiService
         // 2. Loop door componenten, check of er al een object met repoUrl bestaat
         foreach ($applicationSyncObjectArray['components'] as $component) {
             // throw event that triggers creating or updating component
+            var_dump('dispatch event for component');
             $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.component.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-            $updatedComponentObjectArray = $event->getData()['response'];
-            $applicationObjectArray[] = $updatedComponentObjectArray['_self']['id'];
+            $updatedComponentObjectArray = $event->getData()['request'];
+            if (isset($updatedComponentObjectArray) && $updatedComponentObjectArray) {
+                $applicationObjectArray[] = $updatedComponentObjectArray['_self']['id'];
+            }
         }
 
         $applicationObject->hydrate($applicationObjectArray);
         $this->entityManager->persist($applicationObject);
         $this->entityManager->flush();
-
-
-
-        // 3. Niet zeker of dit nodig is: Zoek koppelobject voor die component, zo niet maak aan met sync object
+        var_dump('Application created/updated');
+        
+        return ['response' => $applicationObject->toArray()];
     }
 }
