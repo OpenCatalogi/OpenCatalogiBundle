@@ -968,16 +968,24 @@ class CatalogiService
     public function createUpdateComponentHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateComponentHandler triggered');
-        $this->data = $data['response'];
+        $this->data = $data['request'];
         $this->configuration = $configuration;
         $componentNonUnriched = $this->data;
+        
+        $componentSchema = $this->entityRepo->find($configuration['entities']['Component']);
+
+        if (!$componentSchema instanceof Entity) {
+            // Set monolog error
+            throw new \Exception('Application schema could not be found, action configuration could be wrong');
+        }
 
 
         if (!isset($this->data['repositoryUrl']) || strpos($this->data['repositoryUrl'], 'gitlab.com')) {
             // Log error with monolog
+            var_dump('Does this trigger');
             return ['response' => false];
         }
-        if (!isset($this->configuration['source']) && !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
+        if (!isset($this->configuration['source']) || !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
             // Log error with monolog
             throw new \Exception('GitHub source could not be found, action configuration could be wrong');
         }
@@ -1001,11 +1009,13 @@ class CatalogiService
 
 
         // @TODO Create sync and use syncservice
-        $endpoint = 'repos/' . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+        $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
         try {
             $response = $this->callService->call($githubSource, $endpoint, 'GET');
         } catch (\Exception $e) {
             // Log error with monolog
+            throw new \Exception($e->getMessage());
+        
         }
 
         $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
@@ -1013,7 +1023,7 @@ class CatalogiService
         // $component = $this->githubApiService->getRepositoryFromUrl($endpoint);
         var_dump('Component created/updated');
 
-        return ['response' => $this->data];
+        return ['response' => $enrichedComponent];
     }
 
     public function syncedApplicationToGatewayHandler(array $data, array $configuration)
@@ -1051,8 +1061,9 @@ class CatalogiService
             var_dump('dispatch event for component');
             $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.component.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-            $updatedComponentObjectArray = $event->getData()['request'];
+            $updatedComponentObjectArray = $event->getData()['response'];
             if (isset($updatedComponentObjectArray) && $updatedComponentObjectArray) {
+                dump($updatedComponentObjectArray);
                 $applicationObjectArray[] = $updatedComponentObjectArray['_self']['id'];
             }
         }
@@ -1061,7 +1072,7 @@ class CatalogiService
         $this->entityManager->persist($applicationObject);
         $this->entityManager->flush();
         var_dump('Application created/updated');
-        
+
         return ['response' => $applicationObject->toArray()];
     }
 }
