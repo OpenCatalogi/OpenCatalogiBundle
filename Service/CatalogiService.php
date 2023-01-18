@@ -967,27 +967,86 @@ class CatalogiService
         return $synchronization;
     }
 
-    public function createUpdateRepositoryHandler(array $data, array $configuration): array
+    private function fetchPublicCode(Gateway $githubUserContentSource, string $publicCodeRepoName, ?int $tryCount = 0)
+    {
+        $fileNamesToTry = [
+            0 => '/main/publiccode.yaml',
+            1 => '/master/publiccode.yaml',
+            2 => '/main/publiccode.yml',
+            3 => '/master/publiccode.yml'
+        ];
+
+        try {
+            var_dump($tryCount);
+            var_dump($publicCodeRepoName . $fileNamesToTry[$tryCount]);
+            $response = $this->callService->call($githubUserContentSource, $publicCodeRepoName . $fileNamesToTry[$tryCount]);
+        } catch (\Exception $e) {
+            if ($tryCount == 3) {
+                return false;
+            } else {
+                var_dump($tryCount++);
+                return $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName, $tryCount++);
+            }
+        }
+
+        var_dump('try to decode');
+        return $this->callService->decodeResponse($githubUserContentSource, $response);
+    }
+
+    public function createUpdateComponentHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateComponentHandler triggered');
+        $this->configuration = $configuration;
+        $publicCodeRepoName = $data['request'];
+
+        // Remove domain (already known in Source)
+        $publicCodeRepoName = str_replace('https://github.com', '', $publicCodeRepoName);
+
+        // Log errors with monolog
+        if (!isset($publicCodeRepoName)) {
+            return ['response' => false];
+        }
+        if (!isset($this->configuration['source']) || !$githubUserContentSource = $this->sourceRepo->find($this->configuration['source'])) {
+            throw new \Exception('GitHub usercontent source could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['entities']['Component']) || !$componentSchema = $this->entityRepo->find($this->configuration['entities']['Component'])) {
+            throw new \Exception('Component schema could not be found, action configuration could be wrong');
+        }
+
+        $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
+        $componentObjectEntity->setExternalId($publicCodeRepoName);
+
+        $publicCodeParsed = $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName);
+
+        dump($publicCodeParsed);
+        // PublicCodeParsed could be false if publiccode could not be fetched
+        if ($publicCodeParsed !== false) {
+            $componentObjectArray = [];
+            $componentObjectEntity->hydrate($componentObjectArray);
+        }
+
+        $this->entityManager->persist($componentObjectEntity);
+        $this->entityManager->flush();
+        var_dump('Component created/updated');
+        return ['response' => $componentObjectEntity->getId()->toString()];
+    }
+
+    public function createUpdateRepositoryHandler(array $data, array $configuration): array
+    {
+        var_dump('createUpdateRepositoryHandler triggered');
         $this->data = $data['request'];
         $this->configuration = $configuration;
         $repositoryNonUnriched = $this->data;
 
+
+        // Log errors with monolog
         if (!isset($this->data['repositoryUrl']) || strpos($this->data['repositoryUrl'], 'gitlab.com')) {
-            // Log error with monolog
             return ['response' => false];
         }
         if (!isset($this->configuration['source']) || !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
-            // Log error with monolog
             throw new \Exception('GitHub source could not be found, action configuration could be wrong');
         }
-        if (!isset($this->configuration['entities']['Repository']) && !$repositorySchema = $this->entityRepo->find($this->configuration['entities']['Repository'])) {
-            // Log error with monolog
-            throw new \Exception('Repository schema could not be found, action configuration could be wrong');
-        }
-        if (!isset($this->configuration['actions']['SyncOneRepositoryAction']) && !$syncOneRepositoryAction = $this->actionRepo->find($this->configuration['actions']['SyncOneRepositoryAction'])) {
-            // Log error with monolog
+        if (!isset($this->configuration['entities']['Repository']) || !$repositorySchema = $this->entityRepo->find($this->configuration['entities']['Repository'])) {
             throw new \Exception('Repository schema could not be found, action configuration could be wrong');
         }
 
@@ -1000,44 +1059,56 @@ class CatalogiService
             }
         }
 
-        // @TODO Create/update basic repository
-
-        // Create new object if we didnt find one
+        // Create new repository object if we didnt find one
         !isset($repositoryObject) && $repositoryObject = new ObjectEntity($repositorySchema);
+        $repositoryObject->setExternalId($repositoryNonUnriched['id']);
 
-        // Get sync or create new
-        count($repositoryObject->getSynchronizations()) > 0 ? $repositorySync = $repositoryObject->getSynchronizations()->first() : $repositorySync = new Synchronization($githubSource);
+        // Fetch repository info
+        $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+        try {
+            dump($githubSource->getHeaders());
+            $response = $this->callService->call($githubSource, $endpoint, 'GET');
+        } catch (\Exception $e) {
+            // Log error with monolog
+            throw new \Exception($e->getMessage());
+        }
 
-        $repositorySync->setObject($repositoryObject);
-        // $synchronization->setSourceId($zaakTypeId);
-        $repositorySync->setEntity($repositorySchema);
-        $repositorySync->setAction($syncOneRepositoryAction);
-        $repositorySync->setEndpoint("/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/'));
-        $this->entityManager->persist($repositorySync);
-        $repositorySync = $this->synchronizationService->handleSync($repositorySync, [], $syncOneRepositoryAction->getConfiguration());
+        $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
 
-        $this->entityManager->persist($repositorySync);
+        $repositoryObjectArray = [
+            'source'                  => 'github',
+            'name'                    => $enrichedComponent['name'],
+            'url'                     => $enrichedComponent['html_url'],
+            'avatar_url'              => $enrichedComponent['owner']['avatar_url'],
+            'last_change'             => $enrichedComponent['updated_at'],
+            'stars'                   => $enrichedComponent['stargazers_count'],
+            'fork_count'              => $enrichedComponent['forks_count'],
+            'issue_open_count'        => $enrichedComponent['open_issues_count'],
+            //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
+            // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
+            // 'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->githubApiService->getGithubOwnerInfo($enrichedComponent) : null,
+            //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
+            //                'related_apis' => //
+        ];
+
+        // Throw event for component action
+        if (isset($repositoryObjectArray['url'])) {
+            $event = new ActionEvent('commongateway.action.event', ['request' => $repositoryObjectArray['url']], 'opencatalogi.component.check');
+            $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+            $componentId = $event->getData()['response'];
+            if (isset($componentId) && $componentId) {
+                dump($componentId);
+                $repositoryObjectArray['component'] = $componentId;
+            }
+        }
+
+        $repositoryObject->hydrate($repositoryObjectArray);
+        $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
 
-        $fetchedRepository = $repositorySync->getObject()->toArray();
+        var_dump('Repository created/updated');
 
-
-        // @TODO Create sync and use syncservice
-        // $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
-        // try {
-        //     $response = $this->callService->call($githubSource, $endpoint, 'GET');
-        // } catch (\Exception $e) {
-        //     // Log error with monolog
-        //     throw new \Exception($e->getMessage());
-        
-        // }
-
-        // $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
-
-        // $component = $this->githubApiService->getRepositoryFromUrl($endpoint);
-        var_dump('Component created/updated');
-
-        return ['response' => $fetchedRepository];
+        return ['response' => $repositoryObject->getId()->toString()];
     }
 
     public function syncedApplicationToGatewayHandler(array $data, array $configuration)
@@ -1071,14 +1142,14 @@ class CatalogiService
 
         // 2. Loop door componenten, check of er al een object met repoUrl bestaat
         foreach ($applicationSyncObjectArray['components'] as $component) {
-            // throw event that triggers creating or updating component
-            var_dump('dispatch event for component');
+            // throw event that triggers creating or updating repository
+            var_dump('dispatch event for repository');
             $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.repository.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-            $updatedRepositoryObjectArray = $event->getData()['response'];
-            if (isset($updatedRepositoryObjectArray) && $updatedRepositoryObjectArray) {
-                dump($updatedRepositoryObjectArray);
-                $applicationObjectArray['components'][] = $updatedRepositoryObjectArray['_self']['id'];
+            $updatedRepositoryId = $event->getData()['response'];
+            if (isset($updatedRepositoryId) && $updatedRepositoryId) {
+                dump($updatedRepositoryId);
+                $applicationObjectArray['components'][] = $updatedRepositoryId;
             }
         }
 
