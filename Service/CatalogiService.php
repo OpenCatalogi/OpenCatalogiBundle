@@ -275,7 +275,7 @@ class CatalogiService
 
         }
 
-        $this->catalogiService->readCatalogi($opencatalogi);
+        $this->readCatalogi($opencatalogi);
 
         /*
         // Failsafe

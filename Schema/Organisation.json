@@ -20,17 +20,29 @@
     "supports": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "owns": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "uses": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "token": {
       "type": "string",
@@ -67,7 +79,8 @@
     },
     "catalogusAPI": {
       "type": "string",
-      "format": "uri"
+      "format": "uri",
+      "nullable": true
     }
   }
 }

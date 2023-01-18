@@ -40,7 +40,8 @@
       "type": "array",
       "items": {
         "type": "string"
-      }
+      },
+      "required": true
     },
     "screenshots": {
       "type": "array",

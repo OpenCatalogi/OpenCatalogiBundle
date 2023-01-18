@@ -7,7 +7,8 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "This key contains the full name of one of the technical contacts. It must be a real person; do NOT populate this key with generic contact information, company departments, associations, etc."
+      "description": "This key contains the full name of one of the technical contacts. It must be a real person; do NOT populate this key with generic contact information, company departments, associations, etc.",
+      "required": true
     },
     "email": {
       "type": "string",

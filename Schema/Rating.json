@@ -12,7 +12,10 @@
       "type": "integer"
     },
     "results": {
-      "type": "array"
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   }
 }

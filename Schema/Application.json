@@ -7,7 +7,8 @@
   "description": "",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "shortDescription": {
       "type": "string"
@@ -42,6 +43,12 @@
         "pictureUrl": {
           "type": "string"
         }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
     }
   },
