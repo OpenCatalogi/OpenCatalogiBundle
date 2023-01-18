@@ -261,20 +261,6 @@ class InstallationService implements InstallerInterface
         // Lets grap the catalogi entity
         $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/catalogi.schema.json']);
 
-        // Setup Github and make a dashboard card
-        if (!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-            (isset($this->io) ? $this->io->writeln(['Creating GitHub Source']) : '');
-            $github = new Source();
-            $github->setName('GitHub');
-            $github->setDescription('A place where repositories of code live');
-            $github->setLocation('https://api.github.com');
-            $github->setAuth('none');
-            $this->entityManager->persist($github);
-
-            $dashboardCard = new DashboardCard($github);
-            $this->entityManager->persist($dashboardCard);
-        }
-
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
         $actionRepository = $this->entityManager->getRepository('App:Action');
         $schemaRepository = $this->entityManager->getRepository('App:Entity');
@@ -312,10 +298,12 @@ class InstallationService implements InstallerInterface
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
         $gitHubAPI->setName('GitHub API');
-        $gitHubAPI->setAuth('jwt');
+        $gitHubAPI->setAuth('none');
         $gitHubAPI->setLocation('https://api.github.com');
         $gitHubAPI->setIsEnabled(true);
         $this->entityManager->persist($gitHubAPI);
+        $dashboardCard = new DashboardCard($gitHubAPI);
+        $this->entityManager->persist($dashboardCard);
         isset($this->io) && $this->io->writeln('Gateway: \'GitHub API\' created');
 
         // GitHub usercontent
@@ -375,17 +363,17 @@ class InstallationService implements InstallerInterface
                 'Application' => $applicationSchemaID
             ]
         ]);
-        $action->setAsync(true);
+        $action->setAsync(false);
         $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler');
         $action->setIsEnabled(true);
         $this->entityManager->persist($action);
         isset($this->io) && $this->io->writeln('Action: \'MapZaakAction\' created');
 
-        // CreateUpdateComponentAction
-        $action = $actionRepository->findOneBy(['name' => 'CreateUpdateComponentAction']) ?? new Action();
-        $action->setName('CreateUpdateComponentAction');
+        // CreateUpdateRepositoryAction
+        $action = $actionRepository->findOneBy(['name' => 'CreateUpdateRepositoryAction']) ?? new Action();
+        $action->setName('CreateUpdateRepositoryAction');
         $action->setDescription('This is a action to create or update a component.');
-        $action->setListens(['opencatalogi.component.check']);
+        $action->setListens(['opencatalogi.repository.check']);
         $action->setConditions([[1 => 1]]);
         $action->setConfiguration([
             'source'    => $gitHubAPI->getId()->toString(),
@@ -394,7 +382,25 @@ class InstallationService implements InstallerInterface
                 'Repository' => $repositorySchemaID
             ]
         ]);
-        $action->setAsync(true);
+        $action->setAsync(false);
+        $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler');
+        $action->setIsEnabled(true);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: \'CreateUpdateRepositoryAction\' created');
+
+        // CreateUpdateComponentAction
+        $action = $actionRepository->findOneBy(['name' => 'CreateUpdateComponentAction']) ?? new Action();
+        $action->setName('CreateUpdateComponentAction');
+        $action->setDescription('This is a action to create or update a component.');
+        $action->setListens(['opencatalogi.component.check']);
+        $action->setConditions([[1 => 1]]);
+        $action->setConfiguration([
+            'source'    => $gitHubUserContentSource->getId()->toString(),
+            'entities'  => [
+                'Component' => $componentSchemaID
+            ]
+        ]);
+        $action->setAsync(false);
         $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler');
         $action->setIsEnabled(true);
         $this->entityManager->persist($action);
