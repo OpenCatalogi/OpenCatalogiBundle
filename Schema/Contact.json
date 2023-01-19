@@ -1,13 +1,14 @@
 {
   "title": "Contact",
-  "$id": "https://opencatalogi.nl/contact.schema.json",
+  "$id": "https://opencatalogi.nl/oc.contact.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
   "properties": {
     "name": {
       "type": "string",
-      "description": "This key contains the full name of one of the technical contacts. It must be a real person; do NOT populate this key with generic contact information, company departments, associations, etc."
+      "description": "This key contains the full name of one of the technical contacts. It must be a real person; do NOT populate this key with generic contact information, company departments, associations, etc.",
+      "required": true
     },
     "email": {
       "type": "string",

@@ -23,26 +23,23 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
     {
 
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.component.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler'
-            ];
-
-        // We don't need all of this
-
-        /*
-        return [
-            '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler',
-            'required'   => ['entity', 'location', 'componentsEntity', 'componentsLocation'],
+            'title'      => 'CreateUpdateComponentHandler',
+            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'componentsLocation'],
             'properties' => [
+                'source' => [
+                    'type'        => 'uuid',
+                    'description' => 'The uuid of the github usercontent source',
+                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
+                    'required'    => true,
+                ],
                 'entity' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the Catalogi entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.catalogi.schema.json'
                 ],
                 'location' => [
                     'type'        => 'string',
@@ -52,21 +49,19 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
                 ],
                 'componentsEntity' => [
                     'type'        => 'uuid',
-                    'description' => 'The uuid of the Repository entity',
+                    'description' => 'The uuid of the Component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/component.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json'
                 ],
                 'componentsLocation' => [
                     'type'        => 'string',
-                    'description' => 'The location where we can find Repositories',
+                    'description' => 'The location where we can find Component',
                     'example'     => '/api/oc/components',
                     'required'    => true,
                 ],
-            ],
+            ]
         ];
-
-        */
     }
 
     /**

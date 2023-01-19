@@ -23,54 +23,30 @@ class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
     {
 
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.application.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler'
-            ];
-
-        // We don't need all of this
-
-        /*
-        return [
-            '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler',
-            'required'   => ['entity', 'location', 'componentsEntity', 'componentsLocation'],
+            'title'      => 'SyncedApplicationToGatewayHandler',
+            'required'   => ['source', 'applicationEntity'],
             'properties' => [
-                'entity' => [
+                'source' => [
                     'type'        => 'uuid',
-                    'description' => 'The uuid of the Catalogi entity',
+                    'description' => 'The uuid of the componenten catalogus source',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
                 ],
-                'location' => [
-                    'type'        => 'string',
-                    'description' => 'The location where we can find Catalogi',
-                    'example'     => '/api/oc/catalogi',
-                    'required'    => true,
-                ],
-                'componentsEntity' => [
+                'applicationEntity' => [
                     'type'        => 'uuid',
-                    'description' => 'The uuid of the Component entity',
+                    'description' => 'The uuid of the Application entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/component.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.application.schema.json'
                 ],
-                'componentsLocation' => [
-                    'type'        => 'string',
-                    'description' => 'The location where we can find Components',
-                    'example'     => '/api/oc/components',
-                    'required'    => true,
-                ],
-            ],
+            ]
         ];
-
-        */
     }
 
     /**
-     * This function runs the email service plugin.
+     * This function runs the application to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -79,7 +55,6 @@ class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        var_dump('test run');
         return $this->catalogiService->syncedApplicationToGatewayHandler($data, $configuration);
     }
 }

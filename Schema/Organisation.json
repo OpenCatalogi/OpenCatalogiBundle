@@ -1,6 +1,6 @@
 {
   "title": "Organisation",
-  "$id": "https://opencatalogi.nl/organisation.schema.json",
+  "$id": "https://opencatalogi.nl/oc.organisation.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
@@ -20,17 +20,29 @@
     "supports": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "owns": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "uses": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation"
+      "description": "A list of  components supported by this organisation",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
     },
     "token": {
       "type": "string",
@@ -67,7 +79,8 @@
     },
     "catalogusAPI": {
       "type": "string",
-      "format": "uri"
+      "format": "uri",
+      "nullable": true
     }
   }
 }
