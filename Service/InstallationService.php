@@ -298,7 +298,9 @@ class InstallationService implements InstallerInterface
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
         $gitHubAPI->setName('GitHub API');
-        $gitHubAPI->setAuth('none');
+        $gitHubAPI->setAuth('apikey');
+        $gitHubAPI->setAuthorizationHeader('Authorization');
+        $gitHubAPI->setAuthorizationPassthroughMethod('header');
         $gitHubAPI->setLocation('https://api.github.com');
         $gitHubAPI->setIsEnabled(true);
         $this->entityManager->persist($gitHubAPI);
