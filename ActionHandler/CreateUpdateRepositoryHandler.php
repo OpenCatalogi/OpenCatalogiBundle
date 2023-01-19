@@ -5,7 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class CreateUpdateComponentHandler implements ActionHandlerInterface
+class CreateUpdateRepositoryHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
 
@@ -23,14 +23,14 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
     {
 
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.component.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.repository.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CreateUpdateComponentHandler',
-            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'componentsLocation'],
+            'title'      => 'CreateUpdateRepositoryHandler',
+            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'repositoryEntity'],
             'properties' => [
                 'source' => [
                     'type'        => 'uuid',
-                    'description' => 'The uuid of the github usercontent source',
+                    'description' => 'The uuid of the github api source',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
                 ],
@@ -54,11 +54,12 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
                     'required'    => true,
                     '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json'
                 ],
-                'componentsLocation' => [
-                    'type'        => 'string',
-                    'description' => 'The location where we can find Component',
-                    'example'     => '/api/oc/components',
+                'repositoryEntity' => [
+                    'type'        => 'uuid',
+                    'description' => 'The uuid of the Repository entity',
+                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
                 ],
             ]
         ];
@@ -74,6 +75,6 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->catalogiService->createUpdateComponentHandler($data, $configuration);
+        return $this->catalogiService->createUpdateRepositoryHandler($data, $configuration);
     }
 }

@@ -150,8 +150,8 @@ class InstallationService implements InstallerInterface
                 $action->setConditions(["==" => [1, 1]]);
 
                 // set source to the defaultConfig array
-                $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
-                $defaultConfig['source'] = $gitHubAPI->getId()->toString();
+                $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']);
+                $defaultConfig['source'] = $gitHubUserContentSource->getId()->toString();
             } elseif($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
                 $action->setName('SyncedApplicationToGatewayAction');
                 $action->setDescription('This is a action to create objects from the fetched application.');
@@ -167,13 +167,22 @@ class InstallationService implements InstallerInterface
                 // set source to the defaultConfig array
                 $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
                 $defaultConfig['source'] = $componentenCatalogusSource->getId()->toString();
-            } else {
+            } elseif($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
+                $action->setName('CreateUpdateRepositoryAction');
+                $action->setDescription('This is a action to create or update a component.');
+                $action->setListens(['opencatalogi.repository.check']);
+                $action->setConditions([[1 => 1]]);
+
+                // set source to the defaultConfig array
+                $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
+                $defaultConfig['source'] = $gitHubAPI->getId()->toString();
+            }else {
                 $action->setListens(['opencatalogi.default.listens']);
             }
 
             // set the configuration of the action
             $action->setConfiguration($defaultConfig);
-            $action->setAsync(true);
+            $action->setAsync(false);
 
             $this->entityManager->persist($action);
 
@@ -307,20 +316,6 @@ class InstallationService implements InstallerInterface
 
     public function createSources()
     {
-        // Setup Github and make a dashboard card
-        if (!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-            (isset($this->io) ? $this->io->writeln(['Creating GitHub Source']) : '');
-            $github = new Source();
-            $github->setName('GitHub');
-            $github->setDescription('A place where repositories of code live');
-            $github->setLocation('https://api.github.com');
-            $github->setAuth('none');
-            $this->entityManager->persist($github);
-
-            $dashboardCard = new DashboardCard($github);
-            $this->entityManager->persist($dashboardCard);
-        }
-
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
 
         // componentencatalogus
@@ -335,11 +330,13 @@ class InstallationService implements InstallerInterface
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
         $gitHubAPI->setName('GitHub API');
-        $gitHubAPI->setAuth('jwt');
+        $gitHubAPI->setAuth('none');
         $gitHubAPI->setLocation('https://api.github.com');
         $gitHubAPI->setIsEnabled(true);
         $this->entityManager->persist($gitHubAPI);
-        isset($this->io) && $this->io->writeln('Gateway: \'GitHub API\' created');
+        $dashboardCard = new DashboardCard($gitHubAPI);
+        $this->entityManager->persist($dashboardCard);
+        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubAPI->getName().' created');
 
         // GitHub usercontent
         $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
