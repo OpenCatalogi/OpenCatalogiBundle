@@ -39,12 +39,14 @@ class InstallationService implements InstallerInterface
 
     public const ACTION_HANDLERS = [
         //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler"
     ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
@@ -101,13 +103,14 @@ class InstallationService implements InstallerInterface
                 case 'object':
                     break;
                 case 'uuid':
-                    if (in_array('$ref', $value) &&
-                        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>$value['$ref']])) {
-                        $defaultConfig[$key] = $entity->getId()->toString();
+                    if (key_exists('$ref', $value)) {
+                        if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=> $value['$ref']])) {
+                            $defaultConfig[$key] = $entity->getId()->toString();
+                        }
                     }
                     break;
                 default:
-                    // throw error
+                    return $defaultConfig;
             }
         }
         return $defaultConfig;
@@ -120,6 +123,8 @@ class InstallationService implements InstallerInterface
      */
     public function addActions(): void
     {
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+
         $actionHandlers = $this::ACTION_HANDLERS;
         (isset($this->io)?$this->io->writeln(['','<info>Looking for actions</info>']):'');
 
@@ -127,7 +132,6 @@ class InstallationService implements InstallerInterface
             $actionHandler = $this->container->get($handler);
 
             if ($this->entityManager->getRepository('App:Action')->findOneBy(['class' => get_class($actionHandler)])) {
-
                 (isset($this->io) ? $this->io->writeln(['Action found for ' . $handler]) : '');
                 continue;
             }
@@ -137,12 +141,39 @@ class InstallationService implements InstallerInterface
             }
 
             $defaultConfig = $this->addActionConfiguration($actionHandler);
-
-
-
             $action = new Action($actionHandler);
-            $action->setListens(['opencatalogi.default.listens']);
+
+            if($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
+                $action->setName('CreateUpdateComponentAction');
+                $action->setDescription('This is a action to create or update a component.');
+                $action->setListens(['opencatalogi.component.check']);
+                $action->setConditions(["==" => [1, 1]]);
+
+                // set source to the defaultConfig array
+                $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
+                $defaultConfig['source'] = $gitHubAPI->getId()->toString();
+            } elseif($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
+                $action->setName('SyncedApplicationToGatewayAction');
+                $action->setDescription('This is a action to create objects from the fetched application.');
+                $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
+
+                $applicationSyncSchemaID = $this->setApplicationSchemaId();
+                $action->setConditions(['==' => [
+                    ['var' => 'entity'],
+                    $applicationSyncSchemaID,
+                ]]);
+
+
+                // set source to the defaultConfig array
+                $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
+                $defaultConfig['source'] = $componentenCatalogusSource->getId()->toString();
+            } else {
+                $action->setListens(['opencatalogi.default.listens']);
+            }
+
+            // set the configuration of the action
             $action->setConfiguration($defaultConfig);
+            $action->setAsync(true);
 
             $this->entityManager->persist($action);
 
@@ -224,31 +255,8 @@ class InstallationService implements InstallerInterface
         }
     }
 
-    public function
-    checkDataConsistency()
+    public function createCronjobs()
     {
-        // Lets create some genneric dashboard cards
-        $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
-
-        $this->createCollections();
-
-        $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
-
-        // Lets see if there is a generic search endpoint
-        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^search'])) {
-            // $searchEnpoint = new Endpoint();
-            // $searchEnpoint->setName('Search');
-            // $searchEnpoint->setDescription('Generic Search Endpoint');
-            // $searchEnpoint->setPathRegex('^search');
-            // $searchEnpoint->setMethod('GET');
-            // $searchEnpoint->setMethods(['GET']);
-            // $searchEnpoint->setOperationType('collection');
-            // $this->entityManager->persist($searchEnpoint);
-        }
-
-        // aanmaken van Actions
-//         $this->addActions();
-
         (isset($this->io) ? $this->io->writeln(['', '<info>Looking for cronjobs</info>']) : '');
         // We only need 1 cronjob so lets set that
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi'])) {
@@ -260,10 +268,10 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for Open Catalogi']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
         } else {
 
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for Open Catalogi']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
@@ -275,10 +283,10 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for Github']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
         } else {
 
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for Open Catalogi']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation'])) {
@@ -290,16 +298,15 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for Federation
-            ']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
         } else {
 
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for Federation']) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
         }
+    }
 
-        // Lets grap the catalogi entity
-        $catalogiEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.catalogi.schema.json']);
-
+    public function createSources()
+    {
         // Setup Github and make a dashboard card
         if (!$github = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             (isset($this->io) ? $this->io->writeln(['Creating GitHub Source']) : '');
@@ -315,29 +322,6 @@ class InstallationService implements InstallerInterface
         }
 
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
-        $actionRepository = $this->entityManager->getRepository('App:Action');
-        $schemaRepository = $this->entityManager->getRepository('App:Entity');
-
-        $applicationSchema = $schemaRepository->findOneBy(['name' => 'Application']);
-        $applicationSchemaID = $applicationSchema ? $applicationSchema->getId()->toString() : '';
-
-        $applicationSyncSchema = $schemaRepository->findOneBy(['name' => 'ApplicationSync']);
-        $applicationSyncSchemaID = $applicationSyncSchema ? $applicationSyncSchema->getId()->toString() : '';
-
-        $componentSchema = $schemaRepository->findOneBy(['name' => 'Component']);
-        $componentSchemaID = $componentSchema ? $componentSchema->getId()->toString() : '';
-
-        $repositorySchema = $schemaRepository->findOneBy(['name' => 'Repository']);
-        $repositorySchemaID = $repositorySchema ? $repositorySchema->getId()->toString() : '';
-
-        // Make ApplicationSync.components and owner a 
-        foreach ($applicationSyncSchema->getAttributes() as $attr) {
-            if ($attr->getName() == 'components' || $attr->getName() == 'owner') {
-                $attr->setType('array');
-                $attr->setMultiple(false);
-                $this->entityManager->persist($attr);
-            }
-        }
 
         // componentencatalogus
         $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
@@ -346,7 +330,7 @@ class InstallationService implements InstallerInterface
         $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
         $componentenCatalogusSource->setIsEnabled(true);
         $this->entityManager->persist($componentenCatalogusSource);
-        isset($this->io) && $this->io->writeln('Gateway: \'componentencatalogus\' created');
+        isset($this->io) && $this->io->writeln('Gateway: '. $componentenCatalogusSource->getName().' created');
 
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
@@ -364,7 +348,19 @@ class InstallationService implements InstallerInterface
         $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
         $gitHubUserContentSource->setIsEnabled(true);
         $this->entityManager->persist($gitHubUserContentSource);
-        isset($this->io) && $this->io->writeln('Gateway: \'GitHub usercontent\' created');
+        isset($this->io) && $this->io->writeln('Gateway: '. $gitHubUserContentSource->getName().' created');
+
+        // flush the sources before adding actions via the addActions function
+        // we need the id of the sources
+        $this->entityManager->flush();
+    }
+
+    public function createSyncCollectionAction()
+    {
+        $actionRepository = $this->entityManager->getRepository('App:Action');
+        $applicationSyncSchemaID = $this->setApplicationSchemaId();
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+        $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
 
         // SyncZakenCollectionAction
         $action = $actionRepository->findOneBy(['name' => 'SyncApplicationCollectionAction']) ?? new Action();
@@ -395,50 +391,64 @@ class InstallationService implements InstallerInterface
         ]);
         $action->setAsync(false);
         $action->setClass('App\ActionHandler\SynchronizationCollectionHandler');
-        $action->setIsEnabled(true);
         $this->entityManager->persist($action);
-        isset($this->io) && $this->io->writeln('Action: \'SyncZakenCollectionAction\' created');
+        isset($this->io) && $this->io->writeln('Action: '. $action->getName().' created');
+    }
 
-        // SyncedApplicationToGatewayAction
-        $action = $actionRepository->findOneBy(['name' => 'SyncedApplicationToGatewayAction']) ?? new Action();
-        $action->setName('SyncedApplicationToGatewayAction');
-        $action->setDescription('This is a action to create objects from the fetched application.');
-        $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
-        $action->setConditions(['==' => [
-            ['var' => 'entity'],
-            $applicationSyncSchemaID,
-        ]]);
-        $action->setConfiguration([
-            'source'    => $componentenCatalogusSource->getId()->toString(),
-            'entities'  => [
-                'Application' => $applicationSchemaID
-            ]
-        ]);
-        $action->setAsync(true);
-        $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler');
-        $action->setIsEnabled(true);
-        $this->entityManager->persist($action);
-        isset($this->io) && $this->io->writeln('Action: \'MapZaakAction\' created');
+    public function
+    setApplicationSchemaId()
+    {
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
 
-        // CreateUpdateComponentAction
-        $action = $actionRepository->findOneBy(['name' => 'CreateUpdateComponentAction']) ?? new Action();
-        $action->setName('CreateUpdateComponentAction');
-        $action->setDescription('This is a action to create or update a component.');
-        $action->setListens(['opencatalogi.component.check']);
-        $action->setConditions([[1 => 1]]);
-        $action->setConfiguration([
-            'source'    => $gitHubAPI->getId()->toString(),
-            'entities'  => [
-                'Component' => $componentSchemaID,
-                'Repository' => $repositorySchemaID
-            ]
-        ]);
-        $action->setAsync(true);
-        $action->setClass('OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler');
-        $action->setIsEnabled(true);
-        $this->entityManager->persist($action);
-        isset($this->io) && $this->io->writeln('Action: \'CreateUpdateComponentAction\' created');
+        $applicationSyncSchema = $schemaRepository->findOneBy(['name' => 'ApplicationSync']);
+        $applicationSyncSchemaID = $applicationSyncSchema ? $applicationSyncSchema->getId()->toString() : '';
 
+        // Make ApplicationSync.components and owner a
+        foreach ($applicationSyncSchema->getAttributes() as $attr) {
+            if ($attr->getName() == 'components' || $attr->getName() == 'owner') {
+                $attr->setType('array');
+                $attr->setMultiple(false);
+                $this->entityManager->persist($attr);
+            }
+        }
+
+        return $applicationSyncSchemaID;
+    }
+
+    public function
+    checkDataConsistency()
+    {
+        // Lets create some genneric dashboard cards
+        $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
+
+        // create collection prefix
+        $this->createCollections();
+
+        // cretae endpoints
+        $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
+
+        // Lets see if there is a generic search endpoint
+        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^search'])) {
+            // $searchEnpoint = new Endpoint();
+            // $searchEnpoint->setName('Search');
+            // $searchEnpoint->setDescription('Generic Search Endpoint');
+            // $searchEnpoint->setPathRegex('^search');
+            // $searchEnpoint->setMethod('GET');
+            // $searchEnpoint->setMethods(['GET']);
+            // $searchEnpoint->setOperationType('collection');
+            // $this->entityManager->persist($searchEnpoint);
+        }
+
+        // create cronjobs
+        $this->createCronjobs();
+
+        // create sources
+        $this->createSources();
+
+        // create sync collection action
+        $this->createSyncCollectionAction();
+        // create actions from the given actionHandlers
+        $this->addActions();
 
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
@@ -446,7 +456,6 @@ class InstallationService implements InstallerInterface
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook
-
 
         $this->entityManager->flush();
     }
