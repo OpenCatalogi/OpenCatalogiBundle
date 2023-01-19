@@ -5,7 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class CreateUpdateComponentHandler implements ActionHandlerInterface
+class CreateUpdateRepositoryHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
 
@@ -79,6 +79,6 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->catalogiService->createUpdateComponentHandler($data, $configuration);
+        return $this->catalogiService->createUpdateRepositoryHandler($data, $configuration);
     }
 }
