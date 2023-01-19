@@ -1,13 +1,14 @@
 {
   "title": "Application",
-  "$id": "https://opencatalogi.nl/application.schema.json",
+  "$id": "https://opencatalogi.nl/oc.application.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
   "description": "",
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "shortDescription": {
       "type": "string"
@@ -47,7 +48,7 @@
     "components": {
       "type": "array",
       "items": {
-          "$ref": "#/definitions/ComponentUrl"
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
     }
   },

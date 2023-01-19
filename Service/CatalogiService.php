@@ -187,16 +187,16 @@ class CatalogiService
         $reference = $object['_self']['schema']['ref'];
 
         switch ($reference) {
-            case "https://opencatalogi.nl/catalogi.schema.json":
+            case "https://opencatalogi.nl/oc.catalogi.schema.json":
                 $entity = $this->catalogusEntity;
                 break;
-            case "https://opencatalogi.nl/organisation.schema.json":
+            case "https://opencatalogi.nl/oc.organisation.schema.json":
                 $entity = $this->organisationEntity;
                 break;
-            case "https://opencatalogi.nl/component.schema.json":
+            case "https://opencatalogi.nl/oc.component.schema.json":
                 $entity = $this->componentEntity;
                 break;
-            case "https://opencatalogi.nl/application.schema.json":
+            case "https://opencatalogi.nl/oc.application.schema.json":
                 $entity = $this->applicationEntity;
                 break;
             default:
@@ -241,19 +241,18 @@ class CatalogiService
      *
      * @return void
      */
-    public function prebObjectEntities(): void
-    {
-        if (!isset($this->catalogusEntity)) {
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/catalogi.schema.json']);
+    public function prebObjectEntities():void{
+        if(!isset($this->catalogusEntity)){
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.catalogi.schema.json']);
         }
-        if (!isset($this->componentEntity)) {
-            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/component.schema.json']);
+        if(!isset($this->componentEntity)){
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.component.schema.json']);
         }
-        if (!isset($this->organisationEntity)) {
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/organisation.schema.json']);
+        if(!isset($this->organisationEntity)){
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.organisation.schema.json']);
         }
-        if (!isset($this->applicationEntity)) {
-            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/application.schema.json']);
+        if(!isset($this->applicationEntity)){
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
         }
     }
 
@@ -1009,7 +1008,7 @@ class CatalogiService
         if (!isset($this->configuration['source']) || !$githubUserContentSource = $this->sourceRepo->find($this->configuration['source'])) {
             throw new \Exception('GitHub usercontent source could not be found, action configuration could be wrong');
         }
-        if (!isset($this->configuration['entities']['Component']) || !$componentSchema = $this->entityRepo->find($this->configuration['entities']['Component'])) {
+        if (!isset($this->configuration['componentsEntity']) || !$componentSchema = $this->entityRepo->find($this->configuration['componentsEntity'])) {
             throw new \Exception('Component schema could not be found, action configuration could be wrong');
         }
 
@@ -1046,14 +1045,14 @@ class CatalogiService
         if (!isset($this->configuration['source']) || !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
             throw new \Exception('GitHub source could not be found, action configuration could be wrong');
         }
-        if (!isset($this->configuration['entities']['Repository']) || !$repositorySchema = $this->entityRepo->find($this->configuration['entities']['Repository'])) {
+        if (!isset($this->configuration['repositoryEntity']) || !$repositorySchema = $this->entityRepo->find($this->configuration['repositoryEntity'])) {
             throw new \Exception('Repository schema could not be found, action configuration could be wrong');
         }
 
         // Find existing repository object through repositoryUrl
         $possibleRepositoryObjects = $this->valueRepo->findBy(['stringValue' => $repositoryNonUnriched['repositoryUrl']]);
         foreach ($possibleRepositoryObjects as $possibleRepositoryObject) {
-            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId() == $this->configuration['entities']['Repository']) {
+            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId() == $this->configuration['repositoryEntity']) {
                 $repositoryObject = $possibleRepositoryObject;
                 break;
             }
@@ -1121,7 +1120,7 @@ class CatalogiService
         $applicationSyncObjectArray = $this->data;
         $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
 
-        $applicationSchema = $this->entityRepo->find($configuration['entities']['Application']);
+        $applicationSchema = $this->entityRepo->find($configuration['applicationEntity']);
 
         if (!$applicationSchema instanceof Entity) {
             // Set monolog error
