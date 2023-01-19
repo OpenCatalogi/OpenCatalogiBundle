@@ -46,6 +46,7 @@ class InstallationService implements InstallerInterface
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler"
     ];
 
