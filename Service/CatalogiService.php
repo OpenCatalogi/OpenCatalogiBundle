@@ -966,7 +966,7 @@ class CatalogiService
         return $synchronization;
     }
 
-    public function createUpdateRepositoryHandler(array $data, array $configuration): array
+    public function createUpdateComponentHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateComponentHandler triggered');
         $this->data = $data['request'];
@@ -981,7 +981,7 @@ class CatalogiService
             // Log error with monolog
             throw new \Exception('GitHub source could not be found, action configuration could be wrong');
         }
-        if (!isset($this->configuration['entities']['Repository']) && !$repositorySchema = $this->entityRepo->find($this->configuration['entities']['Repository'])) {
+        if (!isset($this->configuration['repositoryEntity']) && !$repositorySchema = $this->entityRepo->find($this->configuration['repositoryEntity'])) {
             // Log error with monolog
             throw new \Exception('Repository schema could not be found, action configuration could be wrong');
         }
@@ -993,7 +993,7 @@ class CatalogiService
         // Find existing repository object through repositoryUrl
         $possibleRepositoryObjects = $this->valueRepo->findBy(['stringValue' => $repositoryNonUnriched['repositoryUrl']]);
         foreach ($possibleRepositoryObjects as $possibleRepositoryObject) {
-            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId() == $this->configuration['entities']['Repository']) {
+            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId() == $this->configuration['repositoryEntity']) {
                 $repositoryObject = $possibleRepositoryObject;
                 break;
             }
@@ -1049,7 +1049,7 @@ class CatalogiService
         $applicationSyncObjectArray = $this->data;
         $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
 
-        $applicationSchema = $this->entityRepo->find($configuration['entities']['Application']);
+        $applicationSchema = $this->entityRepo->find($configuration['applicationEntity']);
 
         if (!$applicationSchema instanceof Entity) {
             // Set monolog error
