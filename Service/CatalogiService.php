@@ -241,18 +241,19 @@ class CatalogiService
      *
      * @return void
      */
-    public function prebObjectEntities():void{
-        if(!isset($this->catalogusEntity)){
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.catalogi.schema.json']);
+    public function prebObjectEntities(): void
+    {
+        if (!isset($this->catalogusEntity)) {
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json']);
         }
-        if(!isset($this->componentEntity)){
-            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.component.schema.json']);
+        if (!isset($this->componentEntity)) {
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
         }
-        if(!isset($this->organisationEntity)){
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.organisation.schema.json']);
+        if (!isset($this->organisationEntity)) {
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         }
-        if(!isset($this->applicationEntity)){
-            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
+        if (!isset($this->applicationEntity)) {
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
         }
     }
 
@@ -989,13 +990,14 @@ class CatalogiService
         }
 
         var_dump('try to decode');
-        return $this->callService->decodeResponse($githubUserContentSource, $response);
+        return $this->callService->decodeResponse($githubUserContentSource, $response, 'text/x-yaml');
     }
 
     public function createUpdateComponentHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateComponentHandler triggered');
         $this->configuration = $configuration;
+        dump($data);
         $publicCodeRepoName = $data['request'];
 
         // Remove domain (already known in Source)
@@ -1020,7 +1022,24 @@ class CatalogiService
         dump($publicCodeParsed);
         // PublicCodeParsed could be false if publiccode could not be fetched
         if ($publicCodeParsed !== false) {
-            $componentObjectArray = [];
+            $componentObjectArray = [
+                'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
+                'name' => $publicCodeParsed['name'] ?? null,
+                'softwareType' => $publicCodeParsed['softwareType'] ?? null,
+                'inputTypes' => $publicCodeParsed['inputTypes'] ?? null,
+                'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
+                'platforms' => $publicCodeParsed['platforms'] ?? null,
+                'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
+                'categories' => $publicCodeParsed['categories'] ?? null,
+                'developmentStatus' => $publicCodeParsed['developmentStatus'] ?? null,
+                'url' => $publicCodeParsed['url'] ?? null,
+                'description' => [
+                    'shortDescription' => $publicCodeParsed['description']['nl']['shortDescription'] ?? $publiccode['description']['en']['shortDescription'] ?? null,
+                    'documentation' => $publicCodeParsed['description']['nl']['documentation'] ?? $publiccode['description']['en']['documentation'] ?? null,
+                    'apiDocumentation' => $publicCodeParsed['description']['nl']['apiDocumentation'] ?? $publiccode['description']['en']['apiDocumentation'] ?? null
+                ]
+            ];
+            // @todo set parent repository as url
             $componentObjectEntity->hydrate($componentObjectArray);
         }
 
@@ -1052,8 +1071,9 @@ class CatalogiService
         // Find existing repository object through repositoryUrl
         $possibleRepositoryObjects = $this->valueRepo->findBy(['stringValue' => $repositoryNonUnriched['repositoryUrl']]);
         foreach ($possibleRepositoryObjects as $possibleRepositoryObject) {
-            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId() == $this->configuration['repositoryEntity']) {
-                $repositoryObject = $possibleRepositoryObject;
+            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId()->toString() == $this->configuration['repositoryEntity']) {
+
+                $repositoryObject = $possibleRepositoryObject->getObjectEntity();
                 break;
             }
         }
@@ -1063,35 +1083,42 @@ class CatalogiService
         $repositoryObject->setExternalId($repositoryNonUnriched['id']);
 
         // Fetch repository info
-        $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
-        try {
-            dump($githubSource->getHeaders());
-            $response = $this->callService->call($githubSource, $endpoint, 'GET');
-        } catch (\Exception $e) {
-            // Log error with monolog
-            throw new \Exception($e->getMessage());
+        isset($this->data['repositoryUrl']) && strpos($this->data['repositoryUrl'], 'github.com') &&
+            $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+
+        if (isset($endpoint) && $endpoint !== "/repos/") {
+            try {
+                $response = $this->callService->call($githubSource, $endpoint, 'GET');
+            } catch (\Exception $e) {
+                // Log error with monolog
+                throw new \Exception($e->getMessage());
+            }
+
+            $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
+
+            $repositoryObjectArray = [
+                'source'                  => 'github',
+                'name'                    => $enrichedComponent['name'],
+                'url'                     => $enrichedComponent['html_url'],
+                'avatar_url'              => $enrichedComponent['owner']['avatar_url'],
+                'last_change'             => $enrichedComponent['updated_at'],
+                'stars'                   => $enrichedComponent['stargazers_count'],
+                'fork_count'              => $enrichedComponent['forks_count'],
+                'issue_open_count'        => $enrichedComponent['open_issues_count'],
+                //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
+                // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
+                'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->githubApiService->getGithubOwnerInfo($enrichedComponent) : null,
+                //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
+                //                'related_apis' => //
+            ];
+        } else {
+            // Set default values
+            $repositoryObjectArray = [];
         }
-
-        $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
-
-        $repositoryObjectArray = [
-            'source'                  => 'github',
-            'name'                    => $enrichedComponent['name'],
-            'url'                     => $enrichedComponent['html_url'],
-            'avatar_url'              => $enrichedComponent['owner']['avatar_url'],
-            'last_change'             => $enrichedComponent['updated_at'],
-            'stars'                   => $enrichedComponent['stargazers_count'],
-            'fork_count'              => $enrichedComponent['forks_count'],
-            'issue_open_count'        => $enrichedComponent['open_issues_count'],
-            //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
-            // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
-            // 'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->githubApiService->getGithubOwnerInfo($enrichedComponent) : null,
-            //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
-            //                'related_apis' => //
-        ];
 
         // Throw event for component action
         if (isset($repositoryObjectArray['url'])) {
+            dump($repositoryObjectArray['url']);
             $event = new ActionEvent('commongateway.action.event', ['request' => $repositoryObjectArray['url']], 'opencatalogi.component.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             $componentId = $event->getData()['response'];
@@ -1107,7 +1134,7 @@ class CatalogiService
 
         var_dump('Repository created/updated');
 
-        return ['response' => $repositoryObject->getId()->toString()];
+        return ['response' => $componentId ?? null];
     }
 
     public function syncedApplicationToGatewayHandler(array $data, array $configuration)
@@ -1119,6 +1146,10 @@ class CatalogiService
 
         $applicationSyncObjectArray = $this->data;
         $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
+        // var_dump($applicationSyncObject->getExternalId());
+        // if ($applicationSyncObject->getExternalId() != '56') {
+        //     return ['response' => $applicationSyncObject->toArray()];
+        // }
 
         $applicationSchema = $this->entityRepo->find($configuration['applicationEntity']);
 
