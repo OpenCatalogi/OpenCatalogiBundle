@@ -31,7 +31,7 @@ class InstallationService implements InstallerInterface
 
     public const SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS = [
         ['reference' => 'https://opencatalogi.nl/oc.component.schema.json',        'path' => '/components',        'methods' => []],
-        ['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json',     'path' => '/organisations',     'methods' => []],
+        ['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json',     'path' => '/organizations',     'methods' => []],
         ['reference' => 'https://opencatalogi.nl/oc.application.schema.json',      'path' => '/applications',      'methods' => []],
         ['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json',         'path' => '/catalogi',        'methods' => []],
         ['reference' => 'https://opencatalogi.nl/oc.repository.schema.json',       'path' => '/repositories',        'methods' => []],
@@ -144,7 +144,7 @@ class InstallationService implements InstallerInterface
             $defaultConfig = $this->addActionConfiguration($actionHandler);
             $action = new Action($actionHandler);
 
-            if($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
+            if ($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
                 $action->setName('CreateUpdateComponentAction');
                 $action->setDescription('This is a action to create or update a component.');
                 $action->setListens(['opencatalogi.component.check']);
@@ -153,7 +153,7 @@ class InstallationService implements InstallerInterface
                 // set source to the defaultConfig array
                 $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']);
                 $defaultConfig['source'] = $gitHubUserContentSource->getId()->toString();
-            } elseif($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
                 $action->setName('SyncedApplicationToGatewayAction');
                 $action->setDescription('This is a action to create objects from the fetched application.');
                 $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
@@ -168,7 +168,7 @@ class InstallationService implements InstallerInterface
                 // set source to the defaultConfig array
                 $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
                 $defaultConfig['source'] = $componentenCatalogusSource->getId()->toString();
-            } elseif($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
                 $action->setName('CreateUpdateRepositoryAction');
                 $action->setDescription('This is a action to create or update a component.');
                 $action->setListens(['opencatalogi.repository.check']);
@@ -177,7 +177,7 @@ class InstallationService implements InstallerInterface
                 // set source to the defaultConfig array
                 $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
                 $defaultConfig['source'] = $gitHubAPI->getId()->toString();
-            }else {
+            } else {
                 $action->setListens(['opencatalogi.default.listens']);
             }
 
@@ -222,7 +222,12 @@ class InstallationService implements InstallerInterface
     private function createCollections(): array
     {
         $collectionConfigs = [
-            ['name' => 'OpenCatalogi',  'prefix' => 'oc', 'schemaPrefix' => 'https://opencatalogi.nl'],
+            [
+                'name' => 'OpenCatalogi', 
+                //  Might be added later
+                // 'prefix' => 'oc', 
+                'prefix' => null, 
+                'schemaPrefix' => 'https://opencatalogi.nl'],
         ];
         $collections = [];
         foreach($collectionConfigs as $collectionConfig) {
@@ -285,11 +290,12 @@ class InstallationService implements InstallerInterface
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName('Github scrapper');
+            $cronjob = new Cronjob(); 
+            $cronjob->setName('Github scrapper');                       
             $cronjob->setDescription("This cronjob fires all the open catalogi github actions ever 5 minutes");
             $cronjob->setThrows(['opencatalogi.github']);
-            $cronjob->setIsEnabled(true);
+            // What does this do
+            $cronjob->setIsEnabled(false);
 
             $this->entityManager->persist($cronjob);
 
@@ -304,7 +310,8 @@ class InstallationService implements InstallerInterface
             $cronjob->setName('Federation');
             $cronjob->setDescription("This cronjob fires all the open catalogi federation actions ever 5 minutes");
             $cronjob->setThrows(['opencatalogi.federation']);
-            $cronjob->setIsEnabled(true);
+            // Doesn't work?
+            $cronjob->setIsEnabled(false);
 
             $this->entityManager->persist($cronjob);
 
@@ -428,15 +435,16 @@ class InstallationService implements InstallerInterface
         $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
 
         // Lets see if there is a generic search endpoint
-        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^search'])) {
-            // $searchEnpoint = new Endpoint();
-            // $searchEnpoint->setName('Search');
-            // $searchEnpoint->setDescription('Generic Search Endpoint');
-            // $searchEnpoint->setPathRegex('^search');
-            // $searchEnpoint->setMethod('GET');
-            // $searchEnpoint->setMethods(['GET']);
-            // $searchEnpoint->setOperationType('collection');
-            // $this->entityManager->persist($searchEnpoint);
+        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
+            $searchEnpoint = new Endpoint();
+            $searchEnpoint->setName('Search');
+            $searchEnpoint->setDescription('Generic Search Endpoint');
+            $searchEnpoint->setPath(['search']);
+            $searchEnpoint->setPathRegex('^(search)$');
+            $searchEnpoint->setMethod('GET');
+            $searchEnpoint->setMethods(['GET']);
+            $searchEnpoint->setOperationType('collection');
+            $this->entityManager->persist($searchEnpoint);
         }
 
         // create cronjobs
