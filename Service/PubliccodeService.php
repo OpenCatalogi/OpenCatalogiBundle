@@ -108,9 +108,9 @@ class PubliccodeService
             $component->setValue('developmentStatus', $publiccode['developmentStatus'] ?? null);
             $repository->setValue('url', $publiccode['url'] ?? null);
 
-//            $component->setValue('releaseDate', $publiccode['releaseDate']);
-//            $component->setValue('dependsOn', $publiccode['dependsOn']['open']['name']);
-//            $component->setValue('dependsOn', $publiccode['dependsOn']['open']['versionMin']);
+            //            $component->setValue('releaseDate', $publiccode['releaseDate']);
+            //            $component->setValue('dependsOn', $publiccode['dependsOn']['open']['name']);
+            //            $component->setValue('dependsOn', $publiccode['dependsOn']['open']['versionMin']);
 
             if (!$component->getValue('description')) {
                 $description = new ObjectEntity();
@@ -397,16 +397,31 @@ class PubliccodeService
         if ($this->githubService->getGithubRepoFromOrganization($organization->getValue('name'))) {
             if ($catalogi = $this->githubService->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
                 try {
-                    $organization->setValue('name', $catalogi['name']);
-                    $organization->setValue('description', $catalogi['description']);
-                    $organization->setValue('type', $catalogi['type']);
-                    $organization->setValue('telephone', $catalogi['telephone']);
-                    $organization->setValue('email', $catalogi['email']);
-                    $organization->setValue('website', $catalogi['website']);
-                    $organization->setValue('logo', $catalogi['logo']);
-                    $organization->setValue('catalogusAPI', $catalogi['catalogusAPI']);
-                    $organization->setValue('uses', $catalogi['uses']);
-                    $organization->setValue('supports', $catalogi['supports']);
+                    // Old
+                    // $organization->setValue('name', $catalogi['name']);
+                    // $organization->setValue('description', $catalogi['description']);
+                    // $organization->setValue('type', $catalogi['type']);
+                    // $organization->setValue('telephone', $catalogi['telephone']);
+                    // $organization->setValue('email', $catalogi['email']);
+                    // $organization->setValue('website', $catalogi['website']);
+                    // $organization->setValue('logo', $catalogi['logo']);
+                    // $organization->setValue('catalogusAPI', $catalogi['catalogusAPI']);
+                    // $organization->setValue('uses', $catalogi['uses']);
+                    // $organization->setValue('supports', $catalogi['supports']);
+
+                    // New 
+                    $organization->hydrate([
+                        'name' => $catalogi['name'],
+                        'description' => $catalogi['description'],
+                        'type' => $catalogi['type'],
+                        'telephone' => $catalogi['telephone'],
+                        'email' => $catalogi['email'],
+                        'website' => $catalogi['website'],
+                        'logo' => $catalogi['logo'],
+                        'catalogusAPI' => $catalogi['catalogusAPI'],
+                        'uses' => $catalogi['uses'],
+                        'supports' => $catalogi['supports']
+                    ]);
                 } catch (Exception $exception) {
                     var_dump("Data error for {$organization->getValue('name')}, {$exception->getMessage()}");
                 }
@@ -515,7 +530,7 @@ class PubliccodeService
         $description = [];
 
         if ($component->getValue('name') !== null) {
-            $description[] = 'The name: '.$component->getValue('name').' rated';
+            $description[] = 'The name: ' . $component->getValue('name') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the name because it is not set';
@@ -525,7 +540,7 @@ class PubliccodeService
         // @todo does not work yet
         if ($repository = $component->getValue('url')) {
             if ($repository->getValue('url') !== null) {
-                $description[] = 'The url: '.$repository->getValue('url').' rated';
+                $description[] = 'The url: ' . $repository->getValue('url') . ' rated';
                 $rating++;
 
                 if ($this->githubService->checkPublicRepository($repository->getValue('url'))) {
@@ -543,7 +558,7 @@ class PubliccodeService
         $maxRating = $maxRating + 2;
 
         if ($component->getValue('landingURL') !== null) {
-            $description[] = 'The landingURL: '.$component->getValue('landingURL').' rated';
+            $description[] = 'The landingURL: ' . $component->getValue('landingURL') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the landingURL because it is not set';
@@ -551,7 +566,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('softwareVersion') !== null) {
-            $description[] = 'The softwareVersion: '.$component->getValue('softwareVersion').' rated';
+            $description[] = 'The softwareVersion: ' . $component->getValue('softwareVersion') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the softwareVersion because it is not set';
@@ -559,7 +574,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('releaseDate') !== null) {
-            $description[] = 'The releaseDate: '.$component->getValue('releaseDate').' rated';
+            $description[] = 'The releaseDate: ' . $component->getValue('releaseDate') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the releaseDate because it is not set';
@@ -567,7 +582,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('logo') !== null) {
-            $description[] = 'The logo: '.$component->getValue('logo').' rated';
+            $description[] = 'The logo: ' . $component->getValue('logo') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the logo because it is not set';
@@ -575,7 +590,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('roadmap') !== null) {
-            $description[] = 'The roadmap: '.$component->getValue('roadmap').' rated';
+            $description[] = 'The roadmap: ' . $component->getValue('roadmap') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the roadmap because it is not set';
@@ -583,7 +598,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('developmentStatus') !== null) {
-            $description[] = 'The developmentStatus: '.$component->getValue('developmentStatus').' rated';
+            $description[] = 'The developmentStatus: ' . $component->getValue('developmentStatus') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the developmentStatus because it is not set';
@@ -591,7 +606,7 @@ class PubliccodeService
         $maxRating++;
 
         if ($component->getValue('softwareType') !== null) {
-            $description[] = 'The softwareType: '.$component->getValue('softwareType').' rated';
+            $description[] = 'The softwareType: ' . $component->getValue('softwareType') . ' rated';
             $rating++;
         } else {
             $description[] = 'Cannot rate the softwareType because it is not set';
@@ -616,7 +631,7 @@ class PubliccodeService
 
         if ($descriptionObject = $component->getValue('description')) {
             if ($descriptionObject->getValue('localisedName') !== null) {
-                $description[] = 'The localisedName: '.$descriptionObject->getValue('localisedName').' rated';
+                $description[] = 'The localisedName: ' . $descriptionObject->getValue('localisedName') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the localisedName because it is not set';
@@ -624,7 +639,7 @@ class PubliccodeService
             $maxRating++;
 
             if ($descriptionObject->getValue('shortDescription') !== null) {
-                $description[] = 'The shortDescription: '.$descriptionObject->getValue('shortDescription').' rated';
+                $description[] = 'The shortDescription: ' . $descriptionObject->getValue('shortDescription') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the shortDescription because it is not set';
@@ -632,7 +647,7 @@ class PubliccodeService
             $maxRating++;
 
             if ($descriptionObject->getValue('longDescription') !== null) {
-                $description[] = 'The longDescription: '.$descriptionObject->getValue('longDescription').' rated';
+                $description[] = 'The longDescription: ' . $descriptionObject->getValue('longDescription') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the longDescription because it is not set';
@@ -640,7 +655,7 @@ class PubliccodeService
             $maxRating++;
 
             if ($descriptionObject->getValue('apiDocumentation') !== null) {
-                $description[] = 'The apiDocumentation: '.$descriptionObject->getValue('apiDocumentation').' rated';
+                $description[] = 'The apiDocumentation: ' . $descriptionObject->getValue('apiDocumentation') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the apiDocumentation because it is not set';
@@ -677,7 +692,7 @@ class PubliccodeService
 
         if ($legalObject = $component->getValue('legal')) {
             if ($legalObject->getValue('license') !== null) {
-                $description[] = 'The license: '.$legalObject->getValue('license').' rated';
+                $description[] = 'The license: ' . $legalObject->getValue('license') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the license because it is not set';
@@ -686,7 +701,7 @@ class PubliccodeService
 
             if ($mainCopyrightOwnerObject = $legalObject->getValue('mainCopyrightOwner')) {
                 if ($mainCopyrightOwnerObject->getValue('mainCopyrightOwner') !== null) {
-                    $description[] = 'The mainCopyrightOwner: '.$mainCopyrightOwnerObject->getValue('name').' rated';
+                    $description[] = 'The mainCopyrightOwner: ' . $mainCopyrightOwnerObject->getValue('name') . ' rated';
                     $rating++;
                 } else {
                     $description[] = 'Cannot rate the mainCopyrightOwner because it is not set';
@@ -705,7 +720,7 @@ class PubliccodeService
             }
 
             if ($legalObject->getValue('authorsFile') !== null) {
-                $description[] = 'The authorsFile: '.$legalObject->getValue('authorsFile').' rated';
+                $description[] = 'The authorsFile: ' . $legalObject->getValue('authorsFile') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the authorsFile because it is not set';
@@ -718,7 +733,7 @@ class PubliccodeService
 
         if ($maintenanceObject = $component->getValue('maintenance')) {
             if ($maintenanceObject->getValue('type') !== null) {
-                $description[] = 'The type: '.$maintenanceObject->getValue('type').' rated';
+                $description[] = 'The type: ' . $maintenanceObject->getValue('type') . ' rated';
                 $rating++;
             } else {
                 $description[] = 'Cannot rate the type because it is not set';
