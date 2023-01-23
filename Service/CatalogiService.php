@@ -1176,10 +1176,10 @@ class CatalogiService
             var_dump('dispatch event for repository');
             $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.repository.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
-            $updatedRepositoryId = $event->getData()['response'];
-            if (isset($updatedRepositoryId) && $updatedRepositoryId) {
-                dump($updatedRepositoryId);
-                $applicationObjectArray['components'][] = $updatedRepositoryId;
+            $createdOrUpdatedComponentId = $event->getData()['response'];
+            if (isset($createdOrUpdatedComponentId) && $createdOrUpdatedComponentId) {
+                dump($createdOrUpdatedComponentId);
+                $applicationObjectArray['components'][] = $createdOrUpdatedComponentId;
             }
         }
 
