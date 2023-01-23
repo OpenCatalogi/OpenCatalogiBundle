@@ -169,7 +169,7 @@ class GithubApiService
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            // 'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,
