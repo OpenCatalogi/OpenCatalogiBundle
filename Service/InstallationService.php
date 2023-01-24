@@ -394,6 +394,7 @@ class InstallationService implements InstallerInterface
                 'translationsIn'        => [],
                 'translationsOut'       => [],
                 'skeletonIn'            => [],
+                'sourcePaginated'       => true
             ],
         ]);
         $action->setAsync(false);
