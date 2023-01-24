@@ -970,11 +970,12 @@ class CatalogiService
 
     private function fetchPublicCode(Gateway $githubUserContentSource, string $publicCodeRepoName, ?int $tryCount = 0)
     {
+        $tryCount += 1;
         $fileNamesToTry = [
-            0 => '/main/publiccode.yaml',
-            1 => '/master/publiccode.yaml',
-            2 => '/main/publiccode.yml',
-            3 => '/master/publiccode.yml'
+            1 => '/main/publiccode.yaml',
+            2 => '/master/publiccode.yaml',
+            3 => '/main/publiccode.yml',
+            4 => '/master/publiccode.yml'
         ];
 
         try {
@@ -986,7 +987,8 @@ class CatalogiService
                 return false;
             } else {
                 // var_dump($tryCount++);
-                return $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName, $tryCount++);
+                // var_dump('try again');
+                return $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName, $tryCount);
             }
         }
 
@@ -1015,6 +1017,7 @@ class CatalogiService
         }
 
         $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
+
         $componentObjectEntity->setExternalId($publicCodeRepoName);
 
         $publicCodeParsed = $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName);
@@ -1040,6 +1043,7 @@ class CatalogiService
                 ]
             ];
             // @todo set parent repository as url
+
             $componentObjectEntity->hydrate($componentObjectArray);
         }
 
@@ -1077,7 +1081,7 @@ class CatalogiService
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            //            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,
