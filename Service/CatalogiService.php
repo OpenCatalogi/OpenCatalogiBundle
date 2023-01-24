@@ -26,6 +26,7 @@ use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Event\ActionEvent;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
+use Symfony\Component\Yaml\Yaml;
 
 class CatalogiService
 {
@@ -949,11 +950,11 @@ class CatalogiService
         $synchronization->setSourcelastChanged(
             isset($componentSync['sourceLastChanged']) ?
                 new DateTime($componentSync['sourceLastChanged']) : (
-                    // When getting the Components from other Catalogi we extend metadata.dateModified
-                    isset($componentMetaData['dateModified']) ?
-                    new DateTime($componentMetaData['dateModified']) :
-                    $now
-                )
+                // When getting the Components from other Catalogi we extend metadata.dateModified
+            isset($componentMetaData['dateModified']) ?
+                new DateTime($componentMetaData['dateModified']) :
+                $now
+            )
         );
         // Note that we hash here with the x-commongateway-metadata fields (synchronizations, self and dateModified)
         $synchronization->setHash(hash('sha384', serialize($addComponent)));
@@ -1084,17 +1085,19 @@ class CatalogiService
 
         // Fetch repository info
         isset($this->data['repositoryUrl']) && strpos($this->data['repositoryUrl'], 'github.com') &&
-            $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+        $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
 
         if (isset($endpoint) && $endpoint !== "/repos/") {
             try {
                 $response = $this->callService->call($githubSource, $endpoint, 'GET');
             } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                return ['response' => false];
                 // Log error with monolog
-                throw new \Exception($e->getMessage());
+//                throw new \Exception($e->getMessage());
             }
 
-            $enrichedComponent = $this->callService->decodeResponse($githubSource, $response);
+            $enrichedComponent = $this->callService->decodeResponse($githubSource, $response, 'text/x-yaml');
 
             $repositoryObjectArray = [
                 'source'                  => 'github',
@@ -1105,7 +1108,7 @@ class CatalogiService
                 'stars'                   => $enrichedComponent['stargazers_count'],
                 'fork_count'              => $enrichedComponent['forks_count'],
                 'issue_open_count'        => $enrichedComponent['open_issues_count'],
-                //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
+                // 'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
                 // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
                 'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->githubApiService->getGithubOwnerInfo($enrichedComponent) : null,
                 //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
@@ -1151,7 +1154,7 @@ class CatalogiService
         //     return ['response' => $applicationSyncObject->toArray()];
         // }
 
-        $applicationSchema = $this->entityRepo->find($configuration['applicationEntity']);
+        $applicationSchema = $this->entityRepo->find($this->configuration['applicationEntity']);
 
         if (!$applicationSchema instanceof Entity) {
             // Set monolog error
