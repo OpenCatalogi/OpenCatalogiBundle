@@ -61,6 +61,13 @@ class CreateUpdateRepositoryHandler implements ActionHandlerInterface
                     'required'    => true,
                     '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
                 ],
+                'organizationEntity' => [
+                    'type'        => 'uuid',
+                    'description' => 'The uuid of the Repository entity',
+                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
+                    'required'    => true,
+                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json'
+                ],
             ]
         ];
     }
