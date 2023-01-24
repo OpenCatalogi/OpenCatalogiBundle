@@ -3,10 +3,12 @@
 // src/Service/LarpingService.php
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
+use Exception;
 use App\Entity\Action;
 use App\Entity\DashboardCard;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
+use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use App\Entity\CollectionEntity;
@@ -434,6 +436,24 @@ class InstallationService implements InstallerInterface
         // cretae endpoints
         $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
 
+        // Doesnt work so lets let search endpoint return all
+        $schemasToAddToSearchEndpoint = [
+            // 'https://opencatalogi.nl/oc.application.schema.json',
+            // 'https://opencatalogi.nl/oc.organisation.schema.json',
+            // 'https://opencatalogi.nl/oc.component.schema.json'
+        ];
+
+        $schemas = [];
+        foreach ($schemasToAddToSearchEndpoint as $schema) {
+            $foundSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $schema]);
+            if ($foundSchema instanceof Entity) {
+                $schemas[] = $foundSchema;
+            } else {
+                isset($this->io) && $this->io->writeln('Schema: '.$schema.' could not be found. Installation failed');
+                throw new Exception('Schema: '.$schema.' could not be found. Installation failed');
+            }
+        }
+
         // Lets see if there is a generic search endpoint
         if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
             $searchEnpoint = new Endpoint();
@@ -444,6 +464,9 @@ class InstallationService implements InstallerInterface
             $searchEnpoint->setMethod('GET');
             $searchEnpoint->setMethods(['GET']);
             $searchEnpoint->setOperationType('collection');
+            foreach ($schemas as $schema) {
+                $searchEnpoint->addEntity($schema);
+            }
             $this->entityManager->persist($searchEnpoint);
         }
 
