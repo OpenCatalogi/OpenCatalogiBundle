@@ -950,11 +950,11 @@ class CatalogiService
         $synchronization->setSourcelastChanged(
             isset($componentSync['sourceLastChanged']) ?
                 new DateTime($componentSync['sourceLastChanged']) : (
-                // When getting the Components from other Catalogi we extend metadata.dateModified
-            isset($componentMetaData['dateModified']) ?
-                new DateTime($componentMetaData['dateModified']) :
-                $now
-            )
+                    // When getting the Components from other Catalogi we extend metadata.dateModified
+                    isset($componentMetaData['dateModified']) ?
+                    new DateTime($componentMetaData['dateModified']) :
+                    $now
+                )
         );
         // Note that we hash here with the x-commongateway-metadata fields (synchronizations, self and dateModified)
         $synchronization->setHash(hash('sha384', serialize($addComponent)));
@@ -998,7 +998,6 @@ class CatalogiService
     {
         var_dump('createUpdateComponentHandler triggered');
         $this->configuration = $configuration;
-        dump($data);
         $publicCodeRepoName = $data['request'];
 
         // Remove domain (already known in Source)
@@ -1050,6 +1049,46 @@ class CatalogiService
         return ['response' => $componentObjectEntity->getId()->toString()];
     }
 
+    /**
+     * This function gets the github owner details.
+     *
+     * @param array $item a repository from github
+     *
+     * @throws GuzzleException
+     *
+     * @return array
+     */
+    public function getGithubOwnerInfo(array $item, Entity $organisationSchema)
+    {
+        // Prevent creating the same new organization
+        $values = $this->valueRepo->findBy(['stringValue' => $item['owner']['login']]);
+        foreach ($values as $value) {
+            if ($value->getAttribute()->getEntity()->getId()->toString() == $organisationSchema->getId()->toString()) {
+                $organizationObject = $value->getObjectEntity();
+                break;
+            }
+        }
+
+        // If no organization found create a new one
+        !isset($organizationObject) && $organizationObject = new ObjectEntity($organisationSchema);
+
+        $organizationObject->hydrate([
+            'id'          => $item['owner']['id'],
+            'name'        => $item['owner']['login'],
+            'description' => null,
+            'logo'        => $item['owner']['avatar_url'] ?? null,
+//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            'token'       => null,
+            'github'      => $item['owner']['html_url'] ?? null,
+            'website'     => null,
+            'phone'       => null,
+            'email'       => null
+        ]);
+        $this->entityManager->persist($organizationObject);
+
+        return $organizationObject->getId()->toString();
+    }
+
     public function createUpdateRepositoryHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateRepositoryHandler triggered');
@@ -1064,6 +1103,9 @@ class CatalogiService
         }
         if (!isset($this->configuration['source']) || !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
             throw new \Exception('GitHub source could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['organizationEntity']) || !$organizationSchema = $this->entityRepo->find($this->configuration['organizationEntity'])) {
+            throw new \Exception('Organization schema could not be found, action configuration could be wrong');
         }
         if (!isset($this->configuration['repositoryEntity']) || !$repositorySchema = $this->entityRepo->find($this->configuration['repositoryEntity'])) {
             throw new \Exception('Repository schema could not be found, action configuration could be wrong');
@@ -1085,7 +1127,7 @@ class CatalogiService
 
         // Fetch repository info
         isset($this->data['repositoryUrl']) && strpos($this->data['repositoryUrl'], 'github.com') &&
-        $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+            $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
 
         if (isset($endpoint) && $endpoint !== "/repos/") {
             try {
@@ -1094,10 +1136,16 @@ class CatalogiService
                 var_dump($e->getMessage());
                 return ['response' => false];
                 // Log error with monolog
-//                throw new \Exception($e->getMessage());
+                //                throw new \Exception($e->getMessage());
             }
 
             $enrichedComponent = $this->callService->decodeResponse($githubSource, $response, 'text/x-yaml');
+
+            if (is_string($enrichedComponent)) {
+                dump('ENRICHED COMPONENT STRING');
+                dump($enrichedComponent);
+                die;
+            }
 
             $repositoryObjectArray = [
                 'source'                  => 'github',
@@ -1110,7 +1158,7 @@ class CatalogiService
                 'issue_open_count'        => $enrichedComponent['open_issues_count'],
                 // 'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
                 // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
-                'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->githubApiService->getGithubOwnerInfo($enrichedComponent) : null,
+                'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($enrichedComponent, $organizationSchema) : null,
                 //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
                 //                'related_apis' => //
             ];
@@ -1162,9 +1210,12 @@ class CatalogiService
         }
 
         // 1. Bestaat de applicatie al aan de hand external id, zo ja die gebruiken
-        if (!$applicationObject = $this->objectRepo->findOneBy(['externalId' => $applicationSyncObject->getExternalId(), 'entity' => $applicationSchema])) {
+        if ($applicationObject = $this->objectRepo->findOneBy(['externalId' => $applicationSyncObject->getExternalId(), 'entity' => $applicationSchema])) {
+            $appAlreadyExists = true;
+        } else {
             $applicationObject = new ObjectEntity($applicationSchema);
         }
+
         // Set same externalId from sync application object on normal application object
         $applicationObject->setExternalId($applicationSyncObject->getExternalId());
 
@@ -1172,6 +1223,13 @@ class CatalogiService
         $applicationObjectArray = $applicationSyncObjectArray;
         unset($applicationObjectArray['_self']);
         $applicationObjectArray['components'] = [];
+
+        // Prevent duplicating relation
+        $componentIds = [];
+        foreach ($applicationObject->getValue('components') as $component) {
+            var_dump($component->getId()->toString());
+            $componentIds[] = $component->getId()->toString();
+        }
 
         // 2. Loop door componenten, check of er al een object met repoUrl bestaat
         foreach ($applicationSyncObjectArray['components'] as $component) {
@@ -1181,8 +1239,9 @@ class CatalogiService
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             $createdOrUpdatedComponentId = $event->getData()['response'];
             if (isset($createdOrUpdatedComponentId) && $createdOrUpdatedComponentId) {
-                dump($createdOrUpdatedComponentId);
-                $applicationObjectArray['components'][] = $createdOrUpdatedComponentId;
+                !in_array($createdOrUpdatedComponentId, $componentIds) && $applicationObjectArray['components'][] = $createdOrUpdatedComponentId;
+                $componentIds[] = $createdOrUpdatedComponentId;
+                var_dump($createdOrUpdatedComponentId);
             }
         }
 
