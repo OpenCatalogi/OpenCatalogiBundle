@@ -1014,14 +1014,14 @@ class CatalogiService
             throw new \Exception('Component schema could not be found, action configuration could be wrong');
         }
 
-        $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
-        $componentObjectEntity->setExternalId($publicCodeRepoName);
-
         $publicCodeParsed = $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName);
 
         dump($publicCodeParsed);
         // PublicCodeParsed could be false if publiccode could not be fetched
         if ($publicCodeParsed !== false) {
+            $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
+            $componentObjectEntity->setExternalId($publicCodeRepoName);
+
             $componentObjectArray = [
                 'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
                 'name' => $publicCodeParsed['name'] ?? null,
@@ -1041,12 +1041,13 @@ class CatalogiService
             ];
             // @todo set parent repository as url
             $componentObjectEntity->hydrate($componentObjectArray);
-        }
+            $this->entityManager->persist($componentObjectEntity);
+            $this->entityManager->flush();
+            var_dump('Component created/updated');
 
-        $this->entityManager->persist($componentObjectEntity);
-        $this->entityManager->flush();
-        var_dump('Component created/updated');
-        return ['response' => $componentObjectEntity->getId()->toString()];
+            return ['response' => $componentObjectEntity->getId()->toString()];
+        }
+        return ['response' => false];
     }
 
     /**
