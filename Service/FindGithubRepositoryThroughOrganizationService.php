@@ -193,6 +193,8 @@ class FindGithubRepositoryThroughOrganizationService
                 $this->getOrganizationCatalogi($organization);
             }
         }
+        
+        isset($this->io) && $this->io->success('findGithubRepositoryThroughOrganizationHandler finished');
 
         return $this->data;
     }
