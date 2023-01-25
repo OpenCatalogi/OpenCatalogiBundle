@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Komt te vervallen
+ */
 class CreateUpdateRepositoryHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;

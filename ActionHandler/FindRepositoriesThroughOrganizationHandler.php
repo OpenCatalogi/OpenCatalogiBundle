@@ -2,16 +2,19 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoriesThroughOrganizationService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
+/**
+ * Via de github organisatie de repro's vand eorganisatie ophalen
+ */
+class FindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
 {
-    private PubliccodeService $publiccodeService;
+    private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
 
-    public function __construct(PubliccodeService $publiccodeService)
+    public function __construct(FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService)
     {
-        $this->publiccodeService = $publiccodeService;
+        $this->findRepositoriesThroughOrganizationService = $findRepositoriesThroughOrganizationService;
     }
 
     public function getConfiguration()
@@ -19,7 +22,7 @@ class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHand
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'title'      => 'FindRepositoriesThroughOrganizationHandler',
             'description'=> 'This handler finds repositories through organizations',
             'required'   => ['repositoryEntityId'],
             'properties' => [
@@ -36,6 +39,6 @@ class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHand
 
     public function run(array $data, array $configuration): array
     {
-        return $this->publiccodeService->enrichOrganizationWithRepositoriesHandler($data, $configuration);
+        return $this->findRepositoriesThroughOrganizationService->enrichOrganizationWithRepositoriesHandler($data, $configuration);
     }
 }

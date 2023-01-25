@@ -4,14 +4,18 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 
+/**
+ * Handles the federalisation cron actions for open catalogi. e.g. getting data from other catalogi
+ */
 class CatalogiHandler implements ActionHandlerInterface
 {
-    private CatalogiService $catalogiService;
+    private FederalizationService $federalizationiService;
 
-    public function __construct(CatalogiService $catalogiService)
+    public function __construct(FederalizationService $federalizationiService)
     {
-        $this->catalogiService = $catalogiService;
+        $this->federalizationiService = $federalizationiService;
     }
 
     /**
@@ -25,7 +29,8 @@ class CatalogiHandler implements ActionHandlerInterface
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler'
+            'title'      => 'CatalogiHandler',
+            'description' => 'Syncs  all the know catalogi'
             ];
 
         // We don't need all of this
@@ -79,6 +84,6 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->catalogiService->catalogiHandler($data, $configuration);
+        return $this->federalizationiService->catalogiHandler($data, $configuration);
     }
 }

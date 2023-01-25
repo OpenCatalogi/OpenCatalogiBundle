@@ -16,6 +16,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -46,6 +47,7 @@ class CatalogiService
     private Entity $componentEntity;
     private Entity $organisationEntity;
     private Entity $applicationEntity;
+    private FederalizationService $federalizationService;
 
     private $entityRepo;
     private $objectRepo;
@@ -1075,9 +1077,9 @@ class CatalogiService
         if ($publicCodeParsed !== false && is_array($publicCodeParsed)) {
             $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
             $componentObjectEntity->setExternalId($publicCodeRepoName);
-            
+
             $dependsOn = $this->getDependsOn($publicCodeParsed);
-            
+
             $componentObjectArray = [
                 'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
                 'name' => $publicCodeParsed['name'] ?? null,

@@ -41,17 +41,17 @@ class InstallationService implements InstallerInterface
 
     public const ACTION_HANDLERS = [
 //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
 
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler",
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler'
     ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
