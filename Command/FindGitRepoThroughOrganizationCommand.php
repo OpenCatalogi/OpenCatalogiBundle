@@ -17,7 +17,7 @@ class FindGitRepoThroughOrganizationCommand extends Command
     private EntityManagerInterface $entityManager;
 
 
-    public function __construct(FederalizationService $findGitRepoThroughOrganizationService, EntityManagerInterface $entityManager)
+    public function __construct(FindGitRepoThroughOrganizationService $findGitRepoThroughOrganizationService, EntityManagerInterface $entityManager)
     {
         $this->findGitRepoThroughOrganizationService = $findGitRepoThroughOrganizationService;
         $this->entityManager = $entityManager;
@@ -28,7 +28,7 @@ class FindGitRepoThroughOrganizationCommand extends Command
     {
         $this
             ->setDescription('This command gets al or a single catalogi from the federalized network')
-            ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
+            ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin');
             // ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe catalogue by id or name');
 
     }
