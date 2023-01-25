@@ -37,13 +37,13 @@ class FederalizationCommand extends Command
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
         $io = new SymfonyStyle($input, $output);
-        $this->federalizationiService->setStyle($io);
+        $this->federalizationService->setStyle($io);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
         if(!$catalogusId){
-            $this->federalizationiService->catalogiHandler();
+            $this->federalizationService->catalogiHandler();
         }
         else{
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
@@ -55,7 +55,7 @@ class FederalizationCommand extends Command
                 $io->error('Could not find object entity by id or name ' . $catalogusId);
                 return 1;
             }
-            $this->federalizationiService->readCatalogus($catalogusObject);
+            $this->federalizationService->readCatalogus($catalogusObject);
         }
 
 

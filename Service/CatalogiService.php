@@ -50,7 +50,7 @@ class CatalogiService
     private Entity $componentEntity;
     private Entity $organisationEntity;
     private Entity $applicationEntity;
-    private FederalizationService $federalizationiService;
+    private FederalizationService $federalizationService;
 
     private $entityRepo;
     private $objectRepo;
