@@ -17,7 +17,7 @@ class PubliccodeRatingHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.rating.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'PubliccodeRatingHandler',
             'description'=> 'This handler sets the rating of a component',
@@ -28,14 +28,14 @@ class PubliccodeRatingHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json'
                 ],
                 'ratingEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the rating entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/rating.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.rating.schema.json'
                 ],
             ],
         ];

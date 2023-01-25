@@ -24,6 +24,10 @@ use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Event\ActionEvent;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
+use Symfony\Component\Yaml\Yaml;
 
 // Cleanup
 use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationiService;
@@ -38,6 +42,8 @@ class CatalogiService
     private array $data;
     private array $configuration;
     private SymfonyStyle $io;
+    private EventDispatcherInterface $eventDispatcher;
+    private GithubApiService $githubApiService;
 
     // Lets prevent unnesecery database calls
     private Entity $catalogusEntity;
@@ -46,6 +52,12 @@ class CatalogiService
     private Entity $applicationEntity;
     private FederalizationiService $federalizationiService;
 
+    private $entityRepo;
+    private $objectRepo;
+    private $sourceRepo;
+    private $valueRepo;
+    private $actionRepo;
+
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -53,14 +65,22 @@ class CatalogiService
         CommonGroundService $commonGroundService,
         CallService $callService,
         SynchronizationService $synchronizationService,
-        FederalizationiService $federalizationiService
+        EventDispatcherInterface $eventDispatcher,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager = $entityManager;
         $this->session = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
-        $this->federalizationiService = $federalizationiService;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->githubApiService = $githubApiService;
+
+        $this->entityRepo = $entityManager->getRepository('App:Entity');
+        $this->objectRepo = $entityManager->getRepository('App:ObjectEntity');
+        $this->sourceRepo = $entityManager->getRepository('App:Gateway');
+        $this->valueRepo = $entityManager->getRepository('App:Value');
+        $this->actionRepo = $entityManager->getRepository('App:Action');
     }
 
     /**
@@ -69,13 +89,253 @@ class CatalogiService
      * @param SymfonyStyle $io
      * @return self
      */
-    public function setStyle(SymfonyStyle $io):self
+    public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
 
         return $this;
     }
 
+    /**
+     * Get and handle oll the objects of a catalogi
+     *
+     * @param ObjectEntity $catalogus
+     * @return void
+     */
+    public function readCatalogi(Gateway $source): void
+    {
+        //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
+        // var_dump('hello darkness my old friend');
+
+        (isset($this->io) ? $this->io->info('Looking at ' . $source->getName() . '(@:' . $source->getLocation() . ')') : '');
+        // Lets grap ALL the objects for an external source
+        $objects = json_decode($this->callService->call(
+            $source,
+            '/search/',
+            'GET',
+            ['query' => ['limit' => 10000]]
+        )->getBody()->getContents(), true)['results'];
+
+        (isset($this->io) ? $this->io->writeln(['Found ' . count($objects) . ' objects']) : '');
+
+        // Now we can check if any objects where removed
+        //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
+        //    $source = New Source;
+        //    $source->setName($catalogus->getValue('name'));
+        //    $source->setDescription($catalogus->getValue('description'));
+        //    $source->setLocation($catalogus->getValue('location'));
+        //}
+
+        $synchonizedObjects = [];
+
+        (isset($this->io) ? $this->io->progressStart(count($objects)) : '');
+        // Handle new objects
+        $counter = 0;
+        foreach ($objects as $key => $object) {
+            $counter++;
+            // Lets make sure we have a reference
+            if (!isset($object['_self']['schema']['ref'])) {
+                continue;
+            }
+            $synchonization = $this->handleObject($object, $source);
+            $synchonizedObjects[] = $synchonization->getSourceId();
+            $this->entityManager->persist($synchonization);
+
+            // Lets save every so ofthen
+            if ($counter >= 100) {
+                $counter = 0;
+                $this->entityManager->flush();
+            }
+
+            (isset($this->io) ? $this->io->progressAdvance() : '');
+        }
+
+        (isset($this->io) ? $this->io->progressFinish() : '');
+
+        $this->entityManager->flush();
+
+
+        (isset($this->io) ? $this->io->writeln(['', 'Looking for objects to remove']) : '');
+        // Now we can check if any objects where removed
+        $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' => $source]);
+
+        (isset($this->io) ? $this->io->writeln(['Currently ' . count($synchonizations) . ' object attached to this source']) : '');
+        $counter = 0;
+        foreach ($synchonizations as $synchonization) {
+            if (!in_array($synchonization->getSourceId(), $synchonizedObjects)) {
+                $this->entityManager->remove($synchonization->getObject());
+
+                (isset($this->io) ? $this->io->writeln(['Removed ' . $synchonization->getSourceId()]) : '');
+                $counter++;
+            }
+        }
+        (isset($this->io) ? $this->io->writeln(['Removed ' . $counter . ' object attached to this source']) : '');
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param array $object
+     * @return void
+     */
+    public function handleObject(array $object, Gateway $source): ?Synchronization
+    {
+        // Lets make sure we have a reference, just in case this function gets ussed seperatly
+        if (!isset($object['_self']['schema']['ref'])) {
+            return null;
+        }
+
+
+        // Get The entities
+        $this->prebObjectEntities();
+
+        // Do our Magic
+        $reference = $object['_self']['schema']['ref'];
+
+        switch ($reference) {
+            case "https://opencatalogi.nl/oc.catalogi.schema.json":
+                $entity = $this->catalogusEntity;
+                break;
+            case "https://opencatalogi.nl/oc.organisation.schema.json":
+                $entity = $this->organisationEntity;
+                break;
+            case "https://opencatalogi.nl/oc.component.schema.json":
+                $entity = $this->componentEntity;
+                break;
+            case "https://opencatalogi.nl/oc.application.schema.json":
+                $entity = $this->applicationEntity;
+                break;
+            default:
+                // Unknown type, lets output something to IO
+                return null;
+        }
+
+        // Lets handle whatever we found
+        if (isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0) {
+            // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
+            $baseSync =  $object['_self']['synchronisations'][0];
+            $externalId = $baseSync['id'];
+
+            // Check for source
+            if (!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $baseSync['source']['location']])) {
+                $source =  new Source();
+                $source->setName($baseSync['source']['name']);
+                $source->setDescription($baseSync['source']['description']);
+                $source->setLocation($baseSync['source']['location']);
+            }
+        } else {
+            // This catalogi is teh source so lets roll
+            $externalId = $object['id'];
+        }
+
+        // Lets se if we already have an synchronisation
+        if (!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' => $externalId])) {
+            $synchonization = new Synchronization($source, $entity);
+            $synchonization->setSourceId($object['id']);
+        }
+
+        if (isset($object['_self'])) {
+            unset($object['_self']);
+        }
+
+        // Lets sync
+        return $this->synchronizationService->handleSync($synchonization, $object);
+    }
+
+    /**
+     * Makes sure that we have the object entities that we need
+     *
+     * @return void
+     */
+    public function prebObjectEntities(): void
+    {
+        if (!isset($this->catalogusEntity)) {
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json']);
+        }
+        if (!isset($this->componentEntity)) {
+            $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
+        }
+        if (!isset($this->organisationEntity)) {
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
+        }
+        if (!isset($this->applicationEntity)) {
+            $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
+        }
+    }
+
+    /**
+     * Handles finding and adding unknown Catalogi. (and for now also does the same for their Components).
+     *
+     * @param array $data
+     * @param array $configuration
+     *
+     * @throws CacheException|ComponentException|GatewayException|InvalidArgumentException
+     *
+     * @return array
+     */
+    public function catalogiHandler(array $data, array $configuration): array
+    {
+        // Fail save
+
+        // Lets find the federation  and make a dashboard card
+        if (!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://opencatalogi.nl/api'])) {
+            (isset($this->io) ? $this->io->writeln(['Creating Opencatalogi Source']) : '');
+            $opencatalogi = new Source();
+            $opencatalogi->setName('OpenCatalogi.nl');
+            $opencatalogi->setDescription('The open catalogi federated netwerk');
+            $opencatalogi->setLocation('https://opencatalogi.nl/api');
+            $opencatalogi->setAuth('none');
+            $this->entityManager->persist($opencatalogi);
+
+            $dashboardCard = new DashboardCard($opencatalogi);
+            $this->entityManager->persist($dashboardCard);
+
+            $this->entityManager->flush();
+
+            /*
+            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
+            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+            $this->entityManager->persist($opencatalogiCatalog);
+            */
+        } else {
+        }
+
+        $this->readCatalogi($opencatalogi);
+
+        /*
+        // Failsafe
+        if (!Uuid::isValid($configuration['entity']) || !Uuid::isValid($configuration['componentsEntity'])) {
+            return $data;
+        }
+
+        $this->data = $data;
+        $this->configuration = $configuration;
+        $this->synchronizationService->configuration = $configuration;
+
+
+        if ($this->session->get('io')) {
+            $this->io = $this->session->get('io');
+            $this->io->note('CatalogiService->catalogiHandler()');
+        }
+
+        // Get all Catalogi for new Catalogi.
+        // todo: how do we ever remove a Catalogi? If the existing Catalogi keep adding the removed Catalogi?
+        // todo: We also might want to check if existing Catalogi have been changed and update them if needed.
+        $newCatalogi = $this->pullCatalogi();
+
+        // We might want to move this to the componentsHandler() function, see docblock comment there!
+        if (isset($this->io)) {
+            $this->io->note('CatalogiService->pullComponents()');
+        }
+        // Get all Components from all known Catalogi and compare them to our known Components. Add unknown ones.
+        $newComponents = $this->pullComponents();
+           */
+
+        return $data;
+    }
 
     /**
      * For now we don't use this function, we could if we wanted to use a different cronjob/action to handle components than the CatalogiHandler.
@@ -204,7 +464,7 @@ class CatalogiService
     private function getDataFromCatalogi(array $catalogi, string $type): array
     {
         $location = $type === 'Catalogi' ? $this->configuration['location'] : $this->configuration['componentsLocation'];
-        $url = $catalogi['source']['location'].$location;
+        $url = $catalogi['source']['location'] . $location;
         if (isset($this->io)) {
             $this->io->text("Get $type from (known Catalogi: {$catalogi['source']['name']}) \"$url\"");
         }
@@ -253,9 +513,10 @@ class CatalogiService
                 'name'     => "Source for Catalogi {$catalogi['source']['name']}",
                 'location' => $catalogi['source']['location'],
             ]);
-            $response = $this->callService->call($source, $config['location'], 'GET', ['query' => array_merge($config['query'], $page !== 1 ? ['page' => $page] : []),
+            $response = $this->callService->call($source, $config['location'], 'GET', [
+                'query' => array_merge($config['query'], $page !== 1 ? ['page' => $page] : []),
             ]);
-        } catch (Exception|GuzzleException $exception) {
+        } catch (Exception | GuzzleException $exception) {
             $this->synchronizationService->ioCatchException($exception, ['trace', 'line', 'file', 'message' => [
                 'type'       => 'error',
                 'preMessage' => "Error while doing getUnknown{$config['type']} for Catalogi: ({$catalogi['source']['name']}) \"{$config['url']}\" (Page: $page): ",
@@ -349,8 +610,10 @@ class CatalogiService
         // Check if these extern Catalogi know any Catalogi we don't know yet
         foreach ($externCatalogi as $checkCatalogi) {
             // We dont want to add to $unknownCatalogi if it is already in there. Use $unknownCatalogiLocations to check for this.
-            if (!in_array($checkCatalogi['embedded']['source']['location'], $unknownCatalogiLocations) &&
-                !$this->checkIfCatalogiExists($knownCatalogi, $checkCatalogi)) {
+            if (
+                !in_array($checkCatalogi['embedded']['source']['location'], $unknownCatalogiLocations) &&
+                !$this->checkIfCatalogiExists($knownCatalogi, $checkCatalogi)
+            ) {
                 $unknownCatalogi[] = $checkCatalogi;
                 // Make sure to also add this to $unknownCatalogiLocations
                 $unknownCatalogiLocations[] = $checkCatalogi['embedded']['source']['location'];
@@ -470,12 +733,12 @@ class CatalogiService
 
         if (isset($this->io)) {
             $totalKnownComponents = is_countable($knownComponents) ? count($knownComponents) : 0;
-            $this->io->section("Found $totalKnownComponents known Component".($totalKnownComponents !== 1 ? 's' : ''));
+            $this->io->section("Found $totalKnownComponents known Component" . ($totalKnownComponents !== 1 ? 's' : ''));
             $this->io->block('Converting all known Components to readable/usable arrays...');
         }
 
         // Convert ObjectEntities to useable arrays
-        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://localhost';
+        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://' . $_SERVER['HTTP_HOST'] : 'http://localhost';
         foreach ($knownComponents as &$component) {
             // We only need the metadata and/or id in this specific case to get the ComponentLocation.
             $component = $component->toArray(1, ['id', 'synchronizations', 'self'], true);
@@ -504,17 +767,21 @@ class CatalogiService
             $componentSync = $component['x-commongateway-metadata']['synchronizations'][0];
 
             // Endpoint could be set to "" or null. Isset() won't pass this check so use array_key_exists!
-            if (isset($componentSync['gateway']['location']) && isset($componentSync['sourceId']) &&
-                array_key_exists('endpoint', $componentSync)) {
-                return $componentSync['gateway']['location'].$componentSync['endpoint'].'/'.$componentSync['sourceId'];
+            if (
+                isset($componentSync['gateway']['location']) && isset($componentSync['sourceId']) &&
+                array_key_exists('endpoint', $componentSync)
+            ) {
+                return $componentSync['gateway']['location'] . $componentSync['endpoint'] . '/' . $componentSync['sourceId'];
             }
         }
-        if (isset($component['x-commongateway-metadata']['self']) &&
-            str_contains($component['x-commongateway-metadata']['self'], $this->configuration['componentsLocation'])) {
-            return $catalogiLocation.$component['x-commongateway-metadata']['self'];
+        if (
+            isset($component['x-commongateway-metadata']['self']) &&
+            str_contains($component['x-commongateway-metadata']['self'], $this->configuration['componentsLocation'])
+        ) {
+            return $catalogiLocation . $component['x-commongateway-metadata']['self'];
         }
 
-        return $catalogiLocation.$this->configuration['componentsLocation'].'/'.$component['id'];
+        return $catalogiLocation . $this->configuration['componentsLocation'] . '/' . $component['id'];
     }
 
     /**
@@ -581,8 +848,10 @@ class CatalogiService
             $checkComponentLocation = $this->getComponentLocation($checkComponent, $catalogi['source']['location']);
 
             // We dont want to add to $unknownComponents if it is already in there. Use $unknownComponentsLocations to check for this.
-            if (!in_array($checkComponentLocation, $unknownComponentsLocations) &&
-                !in_array($checkComponentLocation, $knownComponentLocations)) {
+            if (
+                !in_array($checkComponentLocation, $unknownComponentsLocations) &&
+                !in_array($checkComponentLocation, $knownComponentLocations)
+            ) {
                 // If $checkComponent has no synchronizations, add the catalogi source as synchronization gateway...
                 // ...for when we are going to add a Synchronization (for a new Component) later.
                 if (!isset($checkComponent['x-commongateway-metadata']['synchronizations'][0])) {
@@ -596,9 +865,9 @@ class CatalogiService
                     $this->io->text("Found an unknown Component: ({$checkComponent['name']}) \"$checkComponentLocation\"");
                 }
             }
-//            elseif (isset($this->io)) {
-//                $this->io->text("Already known Component (or already on 'to-add list'): ({$checkComponent['name']}) \"$checkComponentLocation\"");
-//            }
+            //            elseif (isset($this->io)) {
+            //                $this->io->text("Already known Component (or already on 'to-add list'): ({$checkComponent['name']}) \"$checkComponentLocation\"");
+            //            }
         }
 
         return $unknownComponents;
@@ -617,7 +886,7 @@ class CatalogiService
     {
         $totalUnknownComponents = is_countable($unknownComponents) ? count($unknownComponents) : 0;
         if (isset($this->io) && $totalUnknownComponents > 0) {
-            $this->io->block("Found $totalUnknownComponents unknown Component".($totalUnknownComponents !== 1 ? 's' : '').', start adding them...');
+            $this->io->block("Found $totalUnknownComponents unknown Component" . ($totalUnknownComponents !== 1 ? 's' : '') . ', start adding them...');
         }
 
         $addedComponents = [];
@@ -685,10 +954,9 @@ class CatalogiService
         $synchronization->setLastSynced($now);
         $synchronization->setSourcelastChanged(
             isset($componentSync['sourceLastChanged']) ?
-                new DateTime($componentSync['sourceLastChanged']) :
-                (
+                new DateTime($componentSync['sourceLastChanged']) : (
                     // When getting the Components from other Catalogi we extend metadata.dateModified
-                isset($componentMetaData['dateModified']) ?
+                    isset($componentMetaData['dateModified']) ?
                     new DateTime($componentMetaData['dateModified']) :
                     $now
                 )
@@ -703,5 +971,352 @@ class CatalogiService
         }
 
         return $synchronization;
+    }
+
+    private function fetchPublicCode(Gateway $githubUserContentSource, string $publicCodeRepoName, ?int $tryCount = 0)
+    {
+        $tryCount += 1;
+        $fileNamesToTry = [
+            1 => '/main/publiccode.yaml',
+            2 => '/master/publiccode.yaml',
+            3 => '/main/publiccode.yml',
+            4 => '/master/publiccode.yml'
+        ];
+
+        try {
+            // var_dump($tryCount);
+            // var_dump($publicCodeRepoName . $fileNamesToTry[$tryCount]);
+            $response = $this->callService->call($githubUserContentSource, $publicCodeRepoName . $fileNamesToTry[$tryCount]);
+        } catch (\Exception $e) {
+            if ($tryCount == 3) {
+                return false;
+            } else {
+                // var_dump($tryCount++);
+                // var_dump('try again');
+                return $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName, $tryCount);
+            }
+        }
+
+        // var_dump('try to decode');
+        return $this->callService->decodeResponse($githubUserContentSource, $response, 'text/x-yaml');
+    }
+
+    public function getDependsOn(array $publicCodeParsed): array
+    {
+        $dependsOn = [
+            'open' => [],
+            'proprietary' => [],
+            'hardware' => []
+        ];
+
+        if (is_array($publicCodeParsed) && key_exists('dependsOn', $publicCodeParsed)) {
+            $open = [];
+            if (key_exists('open', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['open'] as $dependsOnOpen) {
+                    dump($dependsOnOpen);
+                    $dependsOn['open'][] = [
+                        'name' => $dependsOnOpen['name'] ?? null,
+                        'version' => $dependsOnOpen['version'] ?? null
+                    ];
+                }
+
+            }
+
+            dump($dependsOn);
+
+            $proprietary = [];
+            if (key_exists('proprietary', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['proprietary'] as $dependsOnProprietary) {
+                    $dependsOn['proprietary'][] = [
+                        'name' => $dependsOnProprietary['name'] ?? null,
+                        'version' => $dependsOnProprietary['version'] ?? null
+                    ];
+                }
+            }
+
+            dump($dependsOn);
+
+            $hardware = [];
+            if (key_exists('hardware', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['hardware'] as $dependsOnHardware) {
+                    $dependsOn['hardware'][] = [
+                        'name' => $dependsOnHardware['name'] ?? null,
+                        'version' => $dependsOnHardware['version'] ?? null
+                    ];
+                }
+            }
+
+            dump($dependsOn);
+        }
+
+        return $dependsOn;
+    }
+
+    public function createUpdateComponentHandler(array $data, array $configuration): array
+    {
+        var_dump('createUpdateComponentHandler triggered');
+        $this->configuration = $configuration;
+        dump($data);
+        $publicCodeRepoName = $data['request'];
+
+        // Remove domain (already known in Source)
+        $publicCodeRepoName = str_replace('https://github.com', '', $publicCodeRepoName);
+
+        // Log errors with monolog
+        if (!isset($publicCodeRepoName)) {
+            return ['response' => false];
+        }
+        if (!isset($this->configuration['source']) || !$githubUserContentSource = $this->sourceRepo->find($this->configuration['source'])) {
+            throw new \Exception('GitHub usercontent source could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['componentsEntity']) || !$componentSchema = $this->entityRepo->find($this->configuration['componentsEntity'])) {
+            throw new \Exception('Component schema could not be found, action configuration could be wrong');
+        }
+
+        $publicCodeParsed = $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName);
+
+        dump($publicCodeParsed);
+        // PublicCodeParsed could be false if publiccode could not be fetched
+        if ($publicCodeParsed !== false && is_array($publicCodeParsed)) {
+            $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
+            $componentObjectEntity->setExternalId($publicCodeRepoName);
+            
+            $dependsOn = $this->getDependsOn($publicCodeParsed);
+            
+            $componentObjectArray = [
+                'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
+                'name' => $publicCodeParsed['name'] ?? null,
+                'softwareType' => $publicCodeParsed['softwareType'] ?? null,
+                'inputTypes' => $publicCodeParsed['inputTypes'] ?? null,
+                'platforms' => $publicCodeParsed['platforms'] ?? null,
+                'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
+                'categories' => $publicCodeParsed['categories'] ?? null,
+                'developmentStatus' => $publicCodeParsed['developmentStatus'] ?? null,
+                'url' => $publicCodeParsed['url'] ?? null,
+                'description' => [
+                    'shortDescription' => $publicCodeParsed['description']['nl']['shortDescription'] ?? $publiccode['description']['en']['shortDescription'] ?? null,
+                    'documentation' => $publicCodeParsed['description']['nl']['documentation'] ?? $publiccode['description']['en']['documentation'] ?? null,
+                    'apiDocumentation' => $publicCodeParsed['description']['nl']['apiDocumentation'] ?? $publiccode['description']['en']['apiDocumentation'] ?? null
+                ],
+                'dependsOn' => $dependsOn  // @todo dependsOn is null after hydrate
+            ];
+            // @todo set parent repository as url
+            $componentObjectEntity->hydrate($componentObjectArray);
+            $this->entityManager->persist($componentObjectEntity);
+            $this->entityManager->flush();
+            var_dump('Component created/updated');
+
+            return ['response' => $componentObjectEntity->getId()->toString()];
+        }
+        return ['response' => false];
+    }
+
+    /**
+     * This function gets the github owner details.
+     *
+     * @param array $item a repository from github
+     *
+     * @throws GuzzleException
+     *
+     * @return array
+     */
+    public function getGithubOwnerInfo(array $item, Entity $organisationSchema)
+    {
+        // Prevent creating the same new organization
+        $values = $this->valueRepo->findBy(['stringValue' => $item['owner']['login']]);
+        foreach ($values as $value) {
+            if ($value->getAttribute()->getEntity()->getId()->toString() == $organisationSchema->getId()->toString()) {
+                $organizationObject = $value->getObjectEntity();
+                break;
+            }
+        }
+
+        // If no organization found create a new one
+        !isset($organizationObject) && $organizationObject = new ObjectEntity($organisationSchema);
+
+        $organizationObject->hydrate([
+            'id'          => $item['owner']['id'],
+            'name'        => $item['owner']['login'],
+            'description' => null,
+            'logo'        => $item['owner']['avatar_url'] ?? null,
+//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            'token'       => null,
+            'github'      => $item['owner']['html_url'] ?? null,
+            'website'     => null,
+            'phone'       => null,
+            'email'       => null
+        ]);
+        $this->entityManager->persist($organizationObject);
+
+        return $organizationObject->getId()->toString();
+    }
+
+    public function createUpdateRepositoryHandler(array $data, array $configuration): array
+    {
+        var_dump('createUpdateRepositoryHandler triggered');
+        $this->data = $data['request'];
+        $this->configuration = $configuration;
+        $repositoryNonUnriched = $this->data;
+
+
+        // Log errors with monolog
+        if (!isset($this->data['repositoryUrl']) || strpos($this->data['repositoryUrl'], 'gitlab.com')) {
+            return ['response' => false];
+        }
+        if (!isset($this->configuration['source']) || !$githubSource = $this->sourceRepo->find($this->configuration['source'])) {
+            throw new \Exception('GitHub source could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['organizationEntity']) || !$organizationSchema = $this->entityRepo->find($this->configuration['organizationEntity'])) {
+            throw new \Exception('Organization schema could not be found, action configuration could be wrong');
+        }
+        if (!isset($this->configuration['repositoryEntity']) || !$repositorySchema = $this->entityRepo->find($this->configuration['repositoryEntity'])) {
+            throw new \Exception('Repository schema could not be found, action configuration could be wrong');
+        }
+
+        // Find existing repository object through repositoryUrl
+        $possibleRepositoryObjects = $this->valueRepo->findBy(['stringValue' => $repositoryNonUnriched['repositoryUrl']]);
+        foreach ($possibleRepositoryObjects as $possibleRepositoryObject) {
+            if ($possibleRepositoryObject->getAttribute()->getEntity()->getId()->toString() == $this->configuration['repositoryEntity']) {
+
+                $repositoryObject = $possibleRepositoryObject->getObjectEntity();
+                break;
+            }
+        }
+
+        // Create new repository object if we didnt find one
+        !isset($repositoryObject) && $repositoryObject = new ObjectEntity($repositorySchema);
+        $repositoryObject->setExternalId($repositoryNonUnriched['id']);
+
+        // Fetch repository info
+        isset($this->data['repositoryUrl']) && strpos($this->data['repositoryUrl'], 'github.com') &&
+            $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+
+        if (isset($endpoint) && $endpoint !== "/repos/") {
+            try {
+                $response = $this->callService->call($githubSource, $endpoint, 'GET');
+            } catch (\Exception $e) {
+                var_dump($e->getMessage());
+                return ['response' => false];
+                // Log error with monolog
+//                throw new \Exception($e->getMessage());
+            }
+
+            $enrichedComponent = $this->callService->decodeResponse($githubSource, $response, 'text/x-yaml');
+
+            if (is_string($enrichedComponent)) {
+                dump('ENRICHED COMPONENT STRING');
+                dump($enrichedComponent);
+                die;
+            }
+
+            $repositoryObjectArray = [
+                'source'                  => 'github',
+                'name'                    => $enrichedComponent['name'],
+                'url'                     => $enrichedComponent['html_url'],
+                'avatar_url'              => $enrichedComponent['owner']['avatar_url'],
+                'last_change'             => $enrichedComponent['updated_at'],
+                'stars'                   => $enrichedComponent['stargazers_count'],
+                'fork_count'              => $enrichedComponent['forks_count'],
+                'issue_open_count'        => $enrichedComponent['open_issues_count'],
+                // 'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
+                // 'programming_languages'   => $this->githubApiService->requestFromUrl($enrichedComponent['languages_url']),
+                'organisation'            => $enrichedComponent['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($enrichedComponent, $organizationSchema) : null,
+                //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
+                //                'related_apis' => //
+            ];
+        } else {
+            // Set default values
+            $repositoryObjectArray = [];
+        }
+
+        // Throw event for component action
+        if (isset($repositoryObjectArray['url'])) {
+//            dump($repositoryObjectArray['url']);
+            $event = new ActionEvent('commongateway.action.event', ['request' => $repositoryObjectArray['url']], 'opencatalogi.component.check');
+            $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+            $componentId = $event->getData()['response'];
+            if (isset($componentId) && $componentId) {
+//                dump($componentId);
+                $repositoryObjectArray['component'] = $componentId;
+            }
+        }
+
+        $repositoryObject->hydrate($repositoryObjectArray);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->flush();
+
+        var_dump('Repository created/updated');
+
+        return ['response' => $componentId ?? null];
+    }
+
+    public function syncedApplicationToGatewayHandler(array $data, array $configuration)
+    {
+        var_dump('syncedApplicationToGatewayHandler triggered');
+        $this->data = $data['response'];
+        $this->configuration = $configuration;
+
+
+        $applicationSyncObjectArray = $this->data;
+        $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);
+        // var_dump($applicationSyncObject->getExternalId());
+        // if ($applicationSyncObject->getExternalId() != '56') {
+        //     return ['response' => $applicationSyncObject->toArray()];
+        // }
+
+        $applicationSchema = $this->entityRepo->find($this->configuration['applicationEntity']);
+
+        if (!$applicationSchema instanceof Entity) {
+            // Set monolog error
+            throw new \Exception('Application schema could not be found, action configuration could be wrong');
+        }
+
+        // 1. Bestaat de applicatie al aan de hand external id, zo ja die gebruiken
+        if ($applicationObject = $this->objectRepo->findOneBy(['externalId' => $applicationSyncObject->getExternalId(), 'entity' => $applicationSchema])) {
+            $appAlreadyExists = true;
+        } else {
+            $applicationObject = new ObjectEntity($applicationSchema);
+        }
+        // Set same externalId from sync application object on normal application object
+        $applicationObject->setExternalId($applicationSyncObject->getExternalId());
+
+        // Set and unset values
+        $applicationObjectArray = $applicationSyncObjectArray;
+        unset($applicationObjectArray['_self']);
+        $applicationObjectArray['components'] = [];
+
+        // Prevent duplicating relation
+        $componentIds = [];
+        foreach ($applicationObject->getValue('components') as $component) {
+            var_dump($component->getId()->toString());
+            $componentIds[] = $component->getId()->toString();
+        }
+
+        // 2. Loop door componenten, check of er al een object met repoUrl bestaat
+        foreach ($applicationSyncObjectArray['components'] as $component) {
+            // throw event that triggers creating or updating repository
+            var_dump('dispatch event for repository');
+            $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.repository.check');
+            $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+            $createdOrUpdatedComponentId = $event->getData()['response'];
+            if (isset($createdOrUpdatedComponentId) && $createdOrUpdatedComponentId) {
+                !in_array($createdOrUpdatedComponentId, $componentIds) && $applicationObjectArray['components'][] = $createdOrUpdatedComponentId;
+                $componentIds[] = $createdOrUpdatedComponentId;
+                var_dump($createdOrUpdatedComponentId);
+
+                $componentObject = $this->entityManager->getRepository('App:ObjectEntity')->find($createdOrUpdatedComponentId);
+
+                // trigger the rating handler
+                $event = new ActionEvent('commongateway.action.event', ['request' => $componentObject], 'opencatalogi.rating.handler');
+                $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
+            }
+        }
+
+        $applicationObject->hydrate($applicationObjectArray);
+        $this->entityManager->persist($applicationObject);
+        $this->entityManager->flush();
+        var_dump('Application created/updated');
+
+        return ['response' => $applicationObject->toArray()];
     }
 }

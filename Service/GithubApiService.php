@@ -9,19 +9,22 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use CommonGateway\CoreBundle\Service\CallService;
 
 class GithubApiService
 {
     private ParameterBagInterface $parameterBag;
-    private ?Client $github;
-    private ?Client $githubusercontent;
+    private ?Client $githubClient;
+    private ?Client $githubusercontentClient;
+    private CallService $callService;
 
     public function __construct(
-        ParameterBagInterface $parameterBag
+        ParameterBagInterface $parameterBag,
+        CallService $callService
     ) {
         $this->parameterBag = $parameterBag;
-        $this->github = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
-        $this->githubusercontent = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
+        $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
+        $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
     }
 
     /**
@@ -31,7 +34,7 @@ class GithubApiService
      */
     public function checkGithubKey(): ?Response
     {
-        if (!$this->github) {
+        if (!$this->githubClient) {
             return new Response(
                 'Missing github_key in env',
                 Response::HTTP_BAD_REQUEST,
@@ -59,7 +62,7 @@ class GithubApiService
             $url = str_replace([$path], '', $parse['path']);
         }
 
-        if ($response = $this->github->request('GET', $url)) {
+        if ($response = $this->githubClient->request('GET', $url)) {
             return json_decode($response->getBody()->getContents(), true);
         }
 
@@ -88,7 +91,7 @@ class GithubApiService
             'issue_open_count'        => $item['open_issues_count'],
             //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
             'programming_languages'   => $this->requestFromUrl($item['languages_url']),
-            'organisation'            => $item['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($item) : null,
+//            'organisation'            => $item['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($item) : null,
             //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
             //                'related_apis' => //
         ];
@@ -110,12 +113,20 @@ class GithubApiService
         }
 
         try {
-            $response = $this->github->request('GET', 'repos/'.$slug);
+            $response = $this->callService->call('GET', 'repos/'.$slug);
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
             return null;
         }
+
+        // try {
+        //     $response = $this->githubClient->request('GET', 'repos/'.$slug);
+        // } catch (ClientException $exception) {
+        //     var_dump($exception->getMessage());
+
+        //     return null;
+        // }
 
         $response = json_decode($response->getBody()->getContents(), true);
 
@@ -139,7 +150,7 @@ class GithubApiService
             $url = str_replace([$path], '', $parse['path']);
         }
 
-        if ($response = $this->github->request('GET', $url)) {
+        if ($response = $this->githubClient->request('GET', $url)) {
             $responses = json_decode($response->getBody()->getContents(), true);
 
             $urls = [];
@@ -164,12 +175,14 @@ class GithubApiService
      */
     public function getGithubOwnerInfo(array $item): array
     {
+        // @TODO
+
         return [
             'id'          => $item['owner']['id'],
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,
@@ -194,7 +207,7 @@ class GithubApiService
         }
 
         try {
-            $response = $this->github->request('GET', 'repos/'.$organizationName.'/.github');
+            $response = $this->githubClient->request('GET', 'repos/'.$organizationName.'/.github');
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
@@ -228,7 +241,7 @@ class GithubApiService
         }
 
         try {
-            $response = $this->githubusercontent->request('GET', $organizationName.'/.github/main/openCatalogi.yaml');
+            $response = $this->githubusercontentClient->request('GET', $organizationName.'/.github/main/openCatalogi.yaml');
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
@@ -237,7 +250,7 @@ class GithubApiService
 
         if ($response == null) {
             try {
-                $response = $this->githubusercontent->request('GET', $organizationName.'/.github/main/openCatalogi.yml');
+                $response = $this->githubusercontentClient->request('GET', $organizationName.'/.github/main/openCatalogi.yml');
             } catch (ClientException $exception) {
                 var_dump($exception->getMessage());
 
@@ -271,14 +284,14 @@ class GithubApiService
         $response = null;
 
         try {
-            $response = $this->githubusercontent->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yaml');
+            $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yaml');
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
         }
 
         if ($response == null) {
             try {
-                $response = $this->githubusercontent->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yaml');
+                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yaml');
             } catch (ClientException $exception) {
                 var_dump($exception->getMessage());
 
@@ -288,7 +301,7 @@ class GithubApiService
 
         if ($response == null) {
             try {
-                $response = $this->githubusercontent->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yml');
+                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yml');
             } catch (ClientException $exception) {
                 var_dump($exception->getMessage());
 
@@ -298,7 +311,7 @@ class GithubApiService
 
         if ($response == null) {
             try {
-                $response = $this->githubusercontent->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yml');
+                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yml');
             } catch (ClientException $exception) {
                 var_dump($exception->getMessage());
 
@@ -332,7 +345,7 @@ class GithubApiService
         $code = explode('/blob/', $parseUrl['path']);
 
         try {
-            $response = $this->githubusercontent->request('GET', $code[0].'/'.$code[1]);
+            $response = $this->githubusercontentClient->request('GET', $code[0].'/'.$code[1]);
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
@@ -366,7 +379,7 @@ class GithubApiService
         }
 
         try {
-            $response = $this->github->request('GET', 'repos/'.$slug);
+            $response = $this->githubClient->request('GET', 'repos/'.$slug);
         } catch (ClientException $exception) {
             return new Response(
                 $exception,

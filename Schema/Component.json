@@ -1,6 +1,6 @@
 {
   "title": "Component",
-  "$id": "https://opencatalogi.nl/component.schema.json",
+  "$id": "https://opencatalogi.nl/oc.component.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
@@ -13,13 +13,14 @@
     "name": {
       "type": "string",
       "description": "This key contains the name of the software. It contains the (short) public name of the product, which can be localised in the specific localisation section. It should be the name most people usually refer to the software. In case the software has both an internal “code” name and a commercial name, use the commercial name.",
-      "example": "Medusa"
+      "example": "Medusa",
+      "required": true
     },
     "applicationSuite": {
-      "$ref": "#/definitions/Application"
+      "$ref": "https://opencatalogi.nl/oc.application.schema.json"
     },
     "url": {
-      "$ref": "#/definitions/Repository"
+      "$ref": "https://opencatalogi.nl/oc.repository.schema.json"
     },
     "landingURL": {
       "type": "string",
@@ -51,17 +52,17 @@
     "platforms": {
       "type": "array",
       "description": "This key specifies which platform the software runs on. It is meant to describe the platforms that users will use to access and operate the software, rather than the platform the software itself runs on.\n\nUse the predefined values if possible. If the software runs on a platform for which a predefined value is not available, a different value can be used.",
-      "example": "web",
-      "enum": [
-        "web",
-        "windows",
-        "mac",
-        "linux",
-        "ios",
-        "android"
-      ],
       "items": {
-        "type": "string"
+        "type": "string",
+        "example": "web",
+        "enum": [
+          "web",
+          "windows",
+          "mac",
+          "linux",
+          "ios",
+          "android"
+        ]
       }
     },
     "categories": {
@@ -84,7 +85,7 @@
       "description": "A list of the names of prominent public administrations (that will serve as “testimonials”) that are currently known to the software maintainer to be using this software.\n\nParsers are encouraged to enhance this list also with other information that can obtain independently; for instance, a fork of a software, owned by an administration, could be used as a signal of usage of the software.",
       "type": "array",
       "items": {
-        "$ref": "#/definitions/Organisation"
+        "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
       }
     },
     "roadmap": {
@@ -178,7 +179,7 @@
       }
     },
     "description": {
-      "$ref": "#/definitions/Description"
+      "$ref": "https://opencatalogi.nl/oc.description.schema.json"
     },
     "legal": {
       "type": "object",
@@ -190,10 +191,10 @@
           "example": "EUPL-1.0-or-later"
         },
         "mainCopyrightOwner": {
-          "$ref": "#/definitions/Organisation"
+          "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
         },
         "repoOwner": {
-          "$ref": "#/definitions/Organisation"
+          "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
         },
         "authorsFile": {
           "type": "string",
@@ -210,24 +211,26 @@
           "type": "string",
           "description": "This key describes how the software is currently maintained.\n\ninternal - means that the software is internally maintained by the repository owner;\n\ncontract - means that there is a commercial contract that binds an entity to the maintenance of the software;\n\ncommunity - means that the software is currently maintained by one or more people that donate their time to the project;\n\nnone - means that the software is not actively maintained.",
           "enum": [
+            "none",
             "internal",
             "contract",
             "community"
           ],
-          "example": "none"
+          "example": "none",
+          "required": true
         },
         "contractors": {
           "type": "array",
           "description": "This key describes the entity or entities, if any, that are currently contracted for maintaining the software. They can be companies, organizations, or other collective names.",
           "items": {
-            "$ref": "#/definitions/Contractor"
+            "$ref": "https://opencatalogi.nl/oc.contractor.schema.json"
           }
         },
         "contacts": {
           "description": "One or more contacts maintaining this software.\n\nThis key describes the technical people currently responsible for maintaining the software. All contacts need to be a physical person, not a company or an organisation. If somebody is acting as a representative of an institution, it must be listed within the affiliation of the contact.\n\nIn case of a commercial agreement (or a chain of such agreements), specify the final entities actually contracted to deliver the maintenance. Do not specify the software owner unless it is technically involved with the maintenance of the product as well.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Contact"
+            "$ref": "https://opencatalogi.nl/oc.contact.schema.json"
           }
         }
       },
@@ -241,7 +244,8 @@
       "properties": {
         "localisationReady": {
           "type": "boolean",
-          "description": "If true, the software has infrastructure in place or is otherwise designed to be multilingual. It does not need to be available in more than one language."
+          "description": "If true, the software has infrastructure in place or is otherwise designed to be multilingual. It does not need to be available in more than one language.",
+          "required": true
         },
         "availableLanguages": {
           "type": "array",
@@ -261,21 +265,21 @@
           "type": "array",
           "description": "This key contains a list of runtime dependencies that are distributed under an open-source license.",
           "items": {
-            "$ref": "#/definitions/Dependency"
+            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
           }
         },
         "proprietary": {
           "type": "array",
           "description": "This key contains a list of runtime dependencies that are distributed under a proprietary license.",
           "items": {
-            "$ref": "#/definitions/Dependency"
+            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
           }
         },
         "hardware": {
           "type": "array",
           "description": "This key contains a list of hardware dependencies that must be owned to use the software.",
           "items": {
-            "$ref": "#/definitions/Dependency"
+            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
           }
         }
       }
@@ -380,456 +384,10 @@
       }
     },
     "rating": {
-      "$ref": "#/definitions/Rating"
+      "$ref": "https://opencatalogi.nl/oc.rating.schema.json"
     }
   },
   "required": [
     "name"
-  ],
-  "definitions": {
-    "Application": {
-      "title": "Application",
-      "x-stoplight": {
-        "id": "rxtjerlhpkxnm"
-      },
-      "type": "object",
-      "description": "",
-      "x-tags": [
-        "application"
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "shortDescription": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "detailPageImageUrl": {
-          "type": "string"
-        },
-        "documentationUrl": {
-          "type": "string"
-        },
-        "demoUrl": {
-          "type": "string"
-        },
-        "bpmnProcessUrl": {
-          "type": "string"
-        },
-        "isPublished": {
-          "type": "boolean"
-        },
-        "owner": {
-          "type": "object",
-          "properties": {
-            "fullName": {
-              "type": "string"
-            },
-            "email": {
-              "type": "string"
-            },
-            "pictureUrl": {
-              "type": "string"
-            }
-          }
-        },
-        "components": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ComponentUrl"
-          }
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "ComponentUrl": {
-      "title": "ComponentUrl",
-      "x-stoplight": {
-        "id": "yw083kveb0cc0"
-      },
-      "type": "object",
-      "properties": {
-        "repositoryUrl": {
-          "type": "string"
-        }
-      }
-    },
-    "Contact": {
-      "title": "Contact",
-      "x-stoplight": {
-        "id": "bspcro7twxzw5"
-      },
-      "type": "object",
-      "examples": [
-        {
-          "id": "string"
-        }
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "name": {
-          "type": "string",
-          "description": "This key contains the full name of one of the technical contacts. It must be a real person; do NOT populate this key with generic contact information, company departments, associations, etc."
-        },
-        "email": {
-          "type": "string",
-          "description": "This key contains the e-mail address of the technical contact. It must be an email address of where the technical contact can be directly reached; do NOT populate this key with mailing-lists or generic contact points like “info@acme.inc”. The e-mail address must not be obfuscated. To improve resistance against e-mail collection, use \\x64 to replace @, as allowed by the YAML specification.",
-          "format": "email"
-        },
-        "phone": {
-          "type": "string",
-          "description": "phone number (with international prefix). This has to be a string."
-        },
-        "affiliation": {
-          "type": "string",
-          "description": "This key contains an explicit affiliation information for the technical contact. In case of multiple maintainers, this can be used to create a relation between each technical contact and each maintainer entity. It can contain for instance a company name, an association name, etc."
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "x-tags": [
-        "contact"
-      ]
-    },
-    "Contractor": {
-      "title": "Contractor",
-      "x-stoplight": {
-        "id": "wmxrj9lq1v5y2"
-      },
-      "type": "object",
-      "x-tags": [
-        "contractor"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "organisation": {
-          "$ref": "#/definitions/Organisation"
-        },
-        "until": {
-          "type": "string",
-          "description": "This is a date (YYYY-MM-DD). This key must contain the date at which the maintenance is going to end. In case of community maintenance, the value should not be more than 2 years in the future, and thus will need to be regularly updated as the community continues working on the project.",
-          "format": "date"
-        }
-      },
-      "required": [
-        "id",
-        "organisation"
-      ]
-    },
-    "Dependency": {
-      "title": "Dependency",
-      "x-stoplight": {
-        "id": "9i3us044e6i0o"
-      },
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        }
-      },
-      "x-tags": [
-        "dependency"
-      ],
-      "examples": [
-        {
-          "id": "string"
-        }
-      ]
-    },
-    "Description": {
-      "title": "Description",
-      "x-stoplight": {
-        "id": "8c1akpli341fd"
-      },
-      "type": "object",
-      "x-tags": [
-        "description"
-      ],
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "localisedName": {
-          "type": "string",
-          "description": "This key is an opportunity to localise the name in a specific language. It contains the (short) public name of the product. It should be the name most people usually refer to the software. In case the software has both an internal “code” name and a commercial name, use the commercial name.",
-          "example": "Medusa"
-        },
-        "shortDescription": {
-          "type": "string",
-          "maxLength": 150,
-          "description": "This key contains a short description of the software. It should be a single line containing a single sentence. Maximum 150 characters are allowed.",
-          "example": "Advanced booking system for hospitals"
-        },
-        "longDescription": {
-          "type": "string",
-          "description": "This key contains a longer description of the software, between 150 and 10000 chars. It is meant to provide an overview of the capabilities of the software for a potential user. The audience for this text should be that of users of the software, not developers. You can think of this text as the description of the software that would be in its website (if the software had one).\n\nThis description can contain some basic markdown: *italic*, **bold**, bullet points and [links](#).",
-          "maxLength": 10000
-        },
-        "documentation": {
-          "type": "string",
-          "description": "This key contains a reference to the user-level (not developer-level) documentation of the software. The value must be a URL to a hosted version of the documentation.\n\nIt is suggested that the URL points to a hosted version of the documentation that is immediately readable through a common web browser in both desktop and mobile format. The documentation should be rendered in HTML and browsable like a website (with a navigation index, a search bar, etc.).\n\nIf the documentation is instead available only as a document, put a direct view/download link as URL in this key. You should commit the document as part of the source code repository, and then link to it using the code hosting source browser URL (e.g.: GitHub URL to the file). Prefer using open formats like PDF or ODT for maximum interoperability.\n\nWhichever the format for the documentation, remember to make its source files available under an open license, possibly by committing them as part of the repository itself.",
-          "format": "url"
-        },
-        "apiDocumentation": {
-          "type": "string",
-          "description": "This key contains a reference to the API documentation of the software. The value must be a URL to a hosted version of the documentation.\n\nIt is suggested that the URL points to a hosted version of the documentation that is immediately readable through a common web browser. The documentation should be rendered in HTML and browsable like a website (with a navigation index, a search bar, etc.), and if there is a reference or test deployment, possibly offer an interactive interface (e.g. Swagger).\n\nIf the documentation is instead available only as a document, put a direct view/download link as URL in this key. You should commit the document as part of the source code repository, and then link to it using the code hosting source browser URL (e.g.: GitHub URL to the file). Prefer using open formats like PDF or ODT for maximum interoperability.\n\nWhichever the format for the documentation, remember to make its source files available under an open license, possibly by committing them as part of the repository itself.",
-          "format": "url"
-        },
-        "features": {
-          "description": "This key contains a list of software features, describing what capabilities the software allows to do. The audience for this text should be that of public decision makers who will be commissioning the software. The features should thus not target developers; instead of listing technical features referring to implementation details, prefer listing user-visible functionalities of the software.\n\nWhile the key is mandatory, there is no mandatory minimum or maximum number of features that should be listed in this key.\n\nThe suggested number of features to list is between 5 and 20, depending on the software size and complexity. There is no need for exhaustiveness, as users can always read the documentation for additional information.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "screenshots": {
-          "type": "array",
-          "description": "This key contains one or multiple paths to files showing screenshots of the software. They are meant to give a quick idea on how the software looks like and how it works. The key value can be the relative path to the file starting from the root of the repository, or it can be an absolute URL pointing to the screenshot in raw version. In both cases, the file must reside inside the same repository where the publiccode.yml file is stored.\n\nScreenshots can be of any shape and size; the suggested formats are:\n\n- Desktop: 1280x800 @1x\n- Tablet: 1024x768 @2x\n- Mobile: 375x667 @2x",
-          "items": {
-            "type": "string"
-          }
-        },
-        "videos": {
-          "description": "This key contains one or multiple URLs of videos showing how the software works. Like screenshots, videos should be used to give a quick overview on how the software looks like and how it works. Videos must be hosted on a video sharing website that supports the oEmbed standard; popular options are YouTube and Vimeo.\n\nSince videos are an integral part of the documentation, it is recommended to publish them with an open license.",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "url"
-          }
-        },
-        "awards": {
-          "description": "A list of awards won by the software.",
-          "type": "array",
-          "items": {
-            "type": "string",
-            "format": "url"
-          }
-        }
-      },
-      "required": [
-        "features"
-      ]
-    },
-    "Organisation": {
-      "title": "Organisation",
-      "x-stoplight": {
-        "id": "n9bmvlkld52vx"
-      },
-      "type": "object",
-      "description": "[extension of the publiccode standard] [extension of  the klanten API organisatie object] ",
-      "examples": [
-        {
-          "id": "string",
-          "name": "string",
-          "description": "string",
-          "logo": "http://example.com",
-          "supports": [
-            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-          ],
-          "owns": [
-            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-          ],
-          "uses": [
-            "497f6eca-6276-4993-bfeb-53cbbbba6f08"
-          ],
-          "token": "string",
-          "github": "string",
-          "gitlab": "string",
-          "website": "string",
-          "phone": "string",
-          "email": "string"
-        }
-      ],
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "logo": {
-          "type": "string",
-          "format": "uri",
-          "description": "The logo of this organisation"
-        },
-        "supports": {
-          "type": "array",
-          "uniqueItems": true,
-          "description": "A list of  components supported by this organisation",
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "owns": {
-          "type": "array",
-          "uniqueItems": true,
-          "description": "A list of  components supported by this organisation",
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "uses": {
-          "type": "array",
-          "uniqueItems": true,
-          "description": "A list of  components supported by this organisation",
-          "items": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "token": {
-          "type": "string",
-          "description": "An optional NL-Design token that contains the organisations style"
-        },
-        "github": {
-          "type": "string",
-          "format": "url",
-          "description": "A link the the organisations github "
-        },
-        "gitlab": {
-          "type": "string",
-          "format": "url",
-          "description": "A link to the organisations gitlab"
-        },
-        "website": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "public",
-            "private",
-            "unkown"
-          ],
-          "example": "public",
-          "description": "The type of this organisation"
-        },
-        "catalogusAPI": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "format": "uri"
-        }
-      }
-    },
-    "Rating": {
-      "title": "Rating",
-      "x-stoplight": {
-        "id": "jx42f4gh3wm7u"
-      },
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "rating": {
-          "type": "integer"
-        },
-        "maxRating": {
-          "type": "integer"
-        },
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "Repository": {
-      "title": "Repository",
-      "x-stoplight": {
-        "id": "ugq6xzv7o1vlt"
-      },
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "format": "uuid"
-        },
-        "organisation": {
-          "$ref": "#/definitions/Organisation"
-        },
-        "component": {
-          "$ref": "#"
-        },
-        "source": {
-          "type": "string",
-          "enum": [
-            "github",
-            "gitlab"
-          ]
-        },
-        "name": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "avatar_url": {
-          "type": "string"
-        },
-        "last_change": {
-          "type": "string"
-        },
-        "stars": {
-          "type": "number"
-        },
-        "fork_count": {
-          "type": "number"
-        },
-        "issue_open_count": {
-          "type": "number"
-        },
-        "merge_request_open_count": {
-          "type": "number"
-        },
-        "programming_languages": {
-          "type": "array",
-          "items": {}
-        },
-        "topics": {
-          "type": "array",
-          "items": {}
-        },
-        "content": {
-          "type": "string"
-        },
-        "publiccode_url": {
-          "type": "string"
-        },
-        "default_owner": {
-          "type": "string"
-        }
-      }
-    }
-  }
+  ]
 }

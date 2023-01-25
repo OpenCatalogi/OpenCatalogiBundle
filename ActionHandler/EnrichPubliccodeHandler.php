@@ -32,21 +32,21 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/repository.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
                 ],
                 'componentEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/catalogi.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.catalogi.schema.json'
                 ],
                 'descriptionEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the description entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/description.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.description.schema.json'
                 ],
             ],
         ];

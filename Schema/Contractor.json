@@ -1,10 +1,14 @@
 {
   "title": "Contractor",
-  "$id": "https://opencatalogi.nl/contractor.schema.json",
+  "$id": "https://opencatalogi.nl/oc.contractor.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
-  "type": "object"
+  "type": "object",
   "properties": {
+    "organisation": {
+      "$ref": "https://opencatalogi.nl/oc.organisation.schema.json",
+      "required": true
+    },
     "until": {
       "type": "string",
       "description": "This is a date (YYYY-MM-DD). This key must contain the date at which the maintenance is going to end. In case of community maintenance, the value should not be more than 2 years in the future, and thus will need to be regularly updated as the community continues working on the project.",
@@ -12,7 +16,6 @@
     }
   },
   "required": [
-    "id",
     "organisation"
   ]
 }
