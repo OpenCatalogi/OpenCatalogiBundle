@@ -10,9 +10,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
 
-class FederalizationCommand extends Command
+class FederalizationRegisterCommand extends Command
 {
-    protected static $defaultName = 'opencatalogi:fedaralization:getdata';
+    protected static $defaultName = 'opencatalogi:fedaralization:register';
     private FederalizationService  $federalizationiService;
     private EntityManagerInterface $entityManager;
 
