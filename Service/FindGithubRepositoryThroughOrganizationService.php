@@ -11,9 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Service\CallService;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Finds opencatalogi.yml for organizations and fills the organization with data
+ * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
+ * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data
  */
 class FindGithubRepositoryThroughOrganizationService
 {
@@ -62,42 +64,38 @@ class FindGithubRepositoryThroughOrganizationService
     private function getOpenCatalogiFromGithubRepo(string $organizationName): ?array
     {
         try {
-            $response = $this->callService->call($this->githubApi, $organizationName . '/.github/main/openCatalogi.yaml');
-        } catch (ClientException $exception) {
-            var_dump($exception->getMessage());
-
+            $response = $this->callService->call($this->githubApi, '/'.$organizationName . '/.github/main/openCatalogi.yaml');
+        } catch (Exception $e) {
+            isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName . '/.github/main/openCatalogi.yaml: ' . $e->getMessage());
             return null;
         }
 
-        if ($response == null) {
+        if (!$response) {
             try {
-                $response = $this->callService->call($this->githubApi, $organizationName . '/.github/main/openCatalogi.yml');
-            } catch (ClientException $exception) {
-                var_dump($exception->getMessage());
-
+                $response = $this->callService->call($this->githubApi, '/'.$organizationName . '/.github/main/openCatalogi.yml');
+            } catch (Exception $e) {
+                isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName . '/.github/main/openCatalogi.yml: ' . $e->getMessage());
                 return null;
             }
         }
 
         try {
             $openCatalogi = Yaml::parse($response->getBody()->getContents());
-        } catch (ParseException $exception) {
-            var_dump($exception->getMessage());
+        } catch (Exception $e) {
+            isset($this->io) && $this->io->error('Error found trying to parse fetched /'.$organizationName . '/.github/main/openCatalogi.yml: ' . $e->getMessage());
 
             return null;
         }
 
-        return $openCatalogi ?? [];
+        return $openCatalogi ?? null;
     }
 
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
      *
-     * @param string $slug
+     * @param string $organizationName used as path to fetch from
      *
-     * @throws GuzzleException
-     *
-     * @return array|null|Response
+     * @return array|null
      */
     private function getGithubRepoFromOrganization(string $organizationName): ?array
     {
@@ -105,7 +103,7 @@ class FindGithubRepositoryThroughOrganizationService
             $response = $this->callService->call($this->githubApi, '/repos/' . $organizationName . '/.github', 'GET');
         } catch (\Exception $e) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Error found trying to fetch '.$organizationName.'/.github : '. $e->getMessage());
+            isset($this->io) && $this->io->error('Error found trying to fetch ' . $organizationName . '/.github : ' . $e->getMessage());
             return null;
         }
 
@@ -115,14 +113,18 @@ class FindGithubRepositoryThroughOrganizationService
     }
 
     /**
-     * @param ObjectEntity $organization
+     * Fetches opencatalogi.yaml info with function getOpenCatalogiFromGithubRepo for a organization and updates the given organization
+     * 
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      *
      * @return void
      */
     private function getOrganizationCatalogi(ObjectEntity $organization): void
     {
         if ($this->getGithubRepoFromOrganization($organization->getValue('name'))) {
+            isset($this->io) && $this->io->success('Github repo found and fetched for '.$organization->getName());
             if ($catalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
+                isset($this->io) && $this->io->success('OpenCatalogi.yml found and fetched for '.$organization->getName());
                 try {
                     $organization->hydrate([
                         'name'         => $catalogi['name'],
@@ -138,52 +140,55 @@ class FindGithubRepositoryThroughOrganizationService
                     ]);
                     $this->entityManager->persist($organization);
                     $this->entityManager->flush();
+                    isset($this->io) && $this->io->success($organization->getName().' succesfully updated with fetched catalogi info');
                 } catch (Exception $exception) {
                     // @TODO Monolog ?
-                    isset($this->io) && $this->io->error("Data error for {$organization->getValue('name')}, {$exception->getMessage()}");
+                    isset($this->io) && $this->io->error("Could not hydrate {$organization->getName()} with new catalogi data, {$exception->getMessage()}");
                 }
-
             }
         }
     }
 
-    private function getRequiredGatewayObjects(array $data, array $configuration): ?array
+    /**
+     * Makes sure this action has all the gateway objects it needs
+     */
+    private function getRequiredGatewayObjects()
     {
-        $githubApi = $this->entityManager->getRepository('App:Gateway')->find($this->configuration['githubApi']);
-
         !isset($this->organisationEntity) && $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if (!isset($this->organisationEntity)) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json');
-            return $data;
+            return [];
         }
 
         !isset($this->githubApi) && $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API']);
         if (!isset($this->githubApi)) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a Source for Github API');
-            return $data;
+            return [];
         };
     }
 
     /**
-     * @param array $data          data set at the start of the handler
-     * @param array $configuration configuration of the action
+     * Makes sure the action the action can actually runs and then executes functions to update a organization with fetched opencatalogi.yaml info
+     * 
+     * @param ?array $data          data set at the start of the handler (not needed here)
+     * @param ?array $configuration configuration of the action          (not needed here)
      *
-     * @throws GuzzleException
-     *
-     * @return array dataset at the end of the handler
-     */
-    public function findGithubRepositoryThroughOrganizationHandler(array $data, array $configuration): array
+     * @return array dataset at the end of the handler                   (not needed here)
+     */ 
+    public function findGithubRepositoryThroughOrganizationHandler(?array $data = [], ?array $configuration = []): array
     {
         $this->configuration = $configuration;
         $this->data = $data;
 
         $this->getRequiredGatewayObjects($data, $configuration);
+        isset($this->io) && $this->io->success('Action config succesfully loaded');
 
         // If we want to do it for al repositories
         foreach ($this->organisationEntity->getObjectEntities() as $organization) {
             if ($organization->getValue('github')) {
+                isset($this->io) && $this->io->success('Github value set for '.$organization->getName());
                 // get org name and search if the org has an .github repository
                 $this->getOrganizationCatalogi($organization);
             }
