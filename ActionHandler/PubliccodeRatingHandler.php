@@ -43,7 +43,6 @@ class PubliccodeRatingHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        dump("enrichComponentWithRating");
         return $this->publiccodeService->enrichComponentWithRating($data, $configuration);
     }
 }
