@@ -5,7 +5,10 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoriesThroughOrganizationService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
+/**
+ * Via de github organisatie de repro's vand eorganisatie ophalen
+ */
+class FindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
 {
     private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
 
@@ -19,7 +22,7 @@ class PubliccodeFindRepositoriesThroughOrganizationHandler implements ActionHand
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeFindRepositoriesThroughOrganizationHandler',
+            'title'      => 'FindRepositoriesThroughOrganizationHandler',
             'description'=> 'This handler finds repositories through organizations',
             'required'   => ['repositoryEntityId'],
             'properties' => [

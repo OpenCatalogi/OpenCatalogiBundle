@@ -16,26 +16,26 @@ class GithubEventService
     private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
     private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
-    private RateComponentService $rateComponentService;
+    private RatingService $ratingService;
     private PubliccodeService $publiccodeService;
     private array $configuration;
     private array $data;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        GithubApiService $githubService,
-        CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService,
+        EntityManagerInterface                     $entityManager,
+        GithubApiService                           $githubService,
+        CheckRepositoriesForPubliccodeService      $checkRepositoriesForPubliccodeService,
         FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService,
         FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService,
-        RateComponentService $rateComponentService,
-        PubliccodeService $publiccodeService
+        RatingService                              $ratingService,
+        PubliccodeService                          $publiccodeService
     ) {
         $this->entityManager = $entityManager;
         $this->githubService = $githubService;
         $this->checkRepositoriesForPubliccodeService = $checkRepositoriesForPubliccodeService;
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
         $this->findRepositoriesThroughOrganizationService = $findRepositoriesThroughOrganizationService;
-        $this->rateComponentService = $rateComponentService;
+        $this->ratingService = $ratingService;
         $this->publiccodeService = $publiccodeService;
         $this->configuration = [];
         $this->data = [];
@@ -82,7 +82,7 @@ class GithubEventService
         }
 
         if ($component = $repository->getValue('component')) {
-            $this->rateComponentService->rateComponent($component, $ratingEntity);
+            $this->ratingService->rateComponent($component, $ratingEntity);
         }
 
         $repository->setValue('name', $content['repository']['name']);

@@ -5,7 +5,11 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CheckRepositoriesForPubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class PubliccodeCheckRepositoriesForPubliccodeHandler implements ActionHandlerInterface
+
+/**
+ * Haalt publiccode bestanden op
+ */
+class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
     private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
 
@@ -19,7 +23,7 @@ class PubliccodeCheckRepositoriesForPubliccodeHandler implements ActionHandlerIn
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeCheckRepositoriesForPubliccodeHandler',
+            'title'      => 'EnrichPubliccodeHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],
             'properties' => [

@@ -5,7 +5,10 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
+/**
+ * Haalt applications op van de componenten catalogus
+ */
+class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
 
@@ -25,8 +28,8 @@ class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
         return [
             '$id'        => 'https://opencatalogi.nl/oc.application.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'SyncedApplicationToGatewayHandler',
-            'description'=> 'This is a action to create objects from the fetched application.',
+            'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
+            'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'   => ['source', 'applicationEntity'],
             'properties' => [
                 'source' => [

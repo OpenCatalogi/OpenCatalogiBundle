@@ -3,13 +3,16 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\RateComponentService;
+use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 
-class PubliccodeRatingHandler implements ActionHandlerInterface
+/**
+ * Berkent de rating van het component
+ */
+class RatingHandler implements ActionHandlerInterface
 {
-    private RateComponentService $ratingService;
+    private RatingService $ratingService;
 
-    public function __construct(RateComponentService $ratingService)
+    public function __construct(RatingService $ratingService)
     {
         $this->ratingService = $ratingService;
     }
@@ -19,7 +22,7 @@ class PubliccodeRatingHandler implements ActionHandlerInterface
         return [
             '$id'        => 'https://opencatalogi.nl/oc.rating.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeRatingHandler',
+            'title'      => 'RatingHandler',
             'description'=> 'This handler sets the rating of a component',
             'required'   => ['componentEntityId', 'ratingEntityId'],
             'properties' => [

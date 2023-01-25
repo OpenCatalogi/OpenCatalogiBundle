@@ -9,7 +9,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
 
-class RateComponentService
+class RatingService
 {
     private EntityManagerInterface $entityManager;
     private GithubApiService $githubService;
