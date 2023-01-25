@@ -80,7 +80,7 @@ class FederalizationService
     public function catalogiHandler(array $data = [], array $configuration = []): array{
 
         // Setup base data
-        $this->prebObjectEntities();
+        $this->prepareObjectEntities();
 
         // Savety cheek
         if(!$this->catalogusEntity){
@@ -202,7 +202,7 @@ class FederalizationService
 
 
         // Get The entities
-        $this->prebObjectEntities();
+        $this->prepareObjectEntities();
 
         // Do our Magic
         $reference = $object['_self']['schema']['ref'];
@@ -261,7 +261,7 @@ class FederalizationService
      *
      * @return void
      */
-    public function prebObjectEntities():void{
+    public function prepareObjectEntities():void{
         if(!isset($this->catalogusEntity)){
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
             (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json'):'');
