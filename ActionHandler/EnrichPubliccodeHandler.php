@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Haalt publiccode bestanden op
+ */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
@@ -25,6 +28,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'EnrichPubliccodeHandler',
+            'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],
             'properties' => [
                 'repositoryEntityId' => [

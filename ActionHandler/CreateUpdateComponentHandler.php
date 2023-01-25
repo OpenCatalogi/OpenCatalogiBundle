@@ -6,7 +6,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
 /**
- * Should be triggerd when an repository object is created or updated.
+ * KOmt te vervallen
  */
 class CreateUpdateComponentHandler implements ActionHandlerInterface
 {

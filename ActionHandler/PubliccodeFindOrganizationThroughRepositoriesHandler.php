@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Loopt door alle repro's heen om de organisatie erbij te zoeken
+ */
 class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;

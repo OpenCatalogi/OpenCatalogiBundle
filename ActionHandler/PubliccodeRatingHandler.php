@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Berkent de rating van het component
+ */
 class PubliccodeRatingHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;

@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Haalt applications op van de componenten catalogus
+ */
 class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
