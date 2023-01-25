@@ -996,10 +996,62 @@ class CatalogiService
         return $this->callService->decodeResponse($githubUserContentSource, $response, 'text/x-yaml');
     }
 
+    public function getDependsOn(array $publicCodeParsed): array
+    {
+        $dependsOn = [
+            'open' => [],
+            'proprietary' => [],
+            'hardware' => []
+        ];
+
+        if (is_array($publicCodeParsed) && key_exists('dependsOn', $publicCodeParsed)) {
+            $open = [];
+            if (key_exists('open', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['open'] as $dependsOnOpen) {
+                    dump($dependsOnOpen);
+                    $dependsOn['open'][] = [
+                        'name' => $dependsOnOpen['name'] ?? null,
+                        'version' => $dependsOnOpen['version'] ?? null
+                    ];
+                }
+
+            }
+
+            dump($dependsOn);
+
+            $proprietary = [];
+            if (key_exists('proprietary', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['proprietary'] as $dependsOnProprietary) {
+                    $dependsOn['proprietary'][] = [
+                        'name' => $dependsOnProprietary['name'] ?? null,
+                        'version' => $dependsOnProprietary['version'] ?? null
+                    ];
+                }
+            }
+
+            dump($dependsOn);
+
+            $hardware = [];
+            if (key_exists('hardware', $publicCodeParsed['dependsOn'])) {
+                foreach ($publicCodeParsed['dependsOn']['hardware'] as $dependsOnHardware) {
+                    $dependsOn['hardware'][] = [
+                        'name' => $dependsOnHardware['name'] ?? null,
+                        'version' => $dependsOnHardware['version'] ?? null
+                    ];
+                }
+            }
+
+            dump($dependsOn);
+        }
+
+        return $dependsOn;
+    }
+
     public function createUpdateComponentHandler(array $data, array $configuration): array
     {
         var_dump('createUpdateComponentHandler triggered');
         $this->configuration = $configuration;
+        dump($data);
         $publicCodeRepoName = $data['request'];
 
         // Remove domain (already known in Source)
@@ -1016,21 +1068,21 @@ class CatalogiService
             throw new \Exception('Component schema could not be found, action configuration could be wrong');
         }
 
-        $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
-
-        $componentObjectEntity->setExternalId($publicCodeRepoName);
-
         $publicCodeParsed = $this->fetchPublicCode($githubUserContentSource, $publicCodeRepoName);
 
-        // dump($publicCodeParsed);
+        dump($publicCodeParsed);
         // PublicCodeParsed could be false if publiccode could not be fetched
-        if ($publicCodeParsed !== false) {
+        if ($publicCodeParsed !== false && is_array($publicCodeParsed)) {
+            $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
+            $componentObjectEntity->setExternalId($publicCodeRepoName);
+            
+            $dependsOn = $this->getDependsOn($publicCodeParsed);
+            
             $componentObjectArray = [
                 'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
                 'name' => $publicCodeParsed['name'] ?? null,
                 'softwareType' => $publicCodeParsed['softwareType'] ?? null,
                 'inputTypes' => $publicCodeParsed['inputTypes'] ?? null,
-                'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
                 'platforms' => $publicCodeParsed['platforms'] ?? null,
                 'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
                 'categories' => $publicCodeParsed['categories'] ?? null,
@@ -1040,17 +1092,18 @@ class CatalogiService
                     'shortDescription' => $publicCodeParsed['description']['nl']['shortDescription'] ?? $publiccode['description']['en']['shortDescription'] ?? null,
                     'documentation' => $publicCodeParsed['description']['nl']['documentation'] ?? $publiccode['description']['en']['documentation'] ?? null,
                     'apiDocumentation' => $publicCodeParsed['description']['nl']['apiDocumentation'] ?? $publiccode['description']['en']['apiDocumentation'] ?? null
-                ]
+                ],
+                'dependsOn' => $dependsOn  // @todo dependsOn is null after hydrate
             ];
             // @todo set parent repository as url
-
             $componentObjectEntity->hydrate($componentObjectArray);
-        }
+            $this->entityManager->persist($componentObjectEntity);
+            $this->entityManager->flush();
+            var_dump('Component created/updated');
 
-        $this->entityManager->persist($componentObjectEntity);
-        $this->entityManager->flush();
-        var_dump('Component created/updated');
-        return ['response' => $componentObjectEntity->getId()->toString()];
+            return ['response' => $componentObjectEntity->getId()->toString()];
+        }
+        return ['response' => false];
     }
 
     /**
@@ -1081,7 +1134,7 @@ class CatalogiService
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-            //            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,
@@ -1140,7 +1193,7 @@ class CatalogiService
                 var_dump($e->getMessage());
                 return ['response' => false];
                 // Log error with monolog
-                //                throw new \Exception($e->getMessage());
+//                throw new \Exception($e->getMessage());
             }
 
             $enrichedComponent = $this->callService->decodeResponse($githubSource, $response, 'text/x-yaml');
@@ -1173,12 +1226,12 @@ class CatalogiService
 
         // Throw event for component action
         if (isset($repositoryObjectArray['url'])) {
-            // dump($repositoryObjectArray['url']);
+//            dump($repositoryObjectArray['url']);
             $event = new ActionEvent('commongateway.action.event', ['request' => $repositoryObjectArray['url']], 'opencatalogi.component.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             $componentId = $event->getData()['response'];
             if (isset($componentId) && $componentId) {
-                // dump($componentId);
+//                dump($componentId);
                 $repositoryObjectArray['component'] = $componentId;
             }
         }
@@ -1219,7 +1272,6 @@ class CatalogiService
         } else {
             $applicationObject = new ObjectEntity($applicationSchema);
         }
-
         // Set same externalId from sync application object on normal application object
         $applicationObject->setExternalId($applicationSyncObject->getExternalId());
 
@@ -1231,21 +1283,27 @@ class CatalogiService
         // Prevent duplicating relation
         $componentIds = [];
         foreach ($applicationObject->getValue('components') as $component) {
-            // var_dump($component->getId()->toString());
+            var_dump($component->getId()->toString());
             $componentIds[] = $component->getId()->toString();
         }
 
         // 2. Loop door componenten, check of er al een object met repoUrl bestaat
         foreach ($applicationSyncObjectArray['components'] as $component) {
             // throw event that triggers creating or updating repository
-            // var_dump('dispatch event for repository');
+            var_dump('dispatch event for repository');
             $event = new ActionEvent('commongateway.action.event', ['request' => $component], 'opencatalogi.repository.check');
             $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             $createdOrUpdatedComponentId = $event->getData()['response'];
             if (isset($createdOrUpdatedComponentId) && $createdOrUpdatedComponentId) {
                 !in_array($createdOrUpdatedComponentId, $componentIds) && $applicationObjectArray['components'][] = $createdOrUpdatedComponentId;
                 $componentIds[] = $createdOrUpdatedComponentId;
-                // var_dump($createdOrUpdatedComponentId);
+                var_dump($createdOrUpdatedComponentId);
+
+                $componentObject = $this->entityManager->getRepository('App:ObjectEntity')->find($createdOrUpdatedComponentId);
+
+                // trigger the rating handler
+                $event = new ActionEvent('commongateway.action.event', ['request' => $componentObject], 'opencatalogi.rating.handler');
+                $this->eventDispatcher->dispatch($event, 'commongateway.action.event');
             }
         }
 

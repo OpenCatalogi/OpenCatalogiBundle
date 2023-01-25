@@ -40,16 +40,18 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-        //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+//            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeCheckRepositoriesForPubliccodeHandler',
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindOrganizationThroughRepositoriesHandler',
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeFindRepositoriesThroughOrganizationHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler"
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler",
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\PubliccodeRatingHandler'
     ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
@@ -147,8 +149,6 @@ class InstallationService implements InstallerInterface
             $action = new Action($actionHandler);
 
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
-                $action->setName('CreateUpdateComponentAction');
-                $action->setDescription('This is a action to create or update a component.');
                 $action->setListens(['opencatalogi.component.check']);
                 $action->setConditions(["==" => [1, 1]]);
 
@@ -156,8 +156,6 @@ class InstallationService implements InstallerInterface
                 $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']);
                 $defaultConfig['source'] = $gitHubUserContentSource->getId()->toString();
             } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
-                $action->setName('SyncedApplicationToGatewayAction');
-                $action->setDescription('This is a action to create objects from the fetched application.');
                 $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
 
                 $applicationSyncSchemaID = $this->setApplicationSchemaId();
@@ -166,19 +164,19 @@ class InstallationService implements InstallerInterface
                     $applicationSyncSchemaID,
                 ]]);
 
-
                 // set source to the defaultConfig array
                 $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
                 $defaultConfig['source'] = $componentenCatalogusSource->getId()->toString();
             } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
-                $action->setName('CreateUpdateRepositoryAction');
-                $action->setDescription('This is a action to create or update a component.');
                 $action->setListens(['opencatalogi.repository.check']);
                 $action->setConditions([[1 => 1]]);
 
                 // set source to the defaultConfig array
                 $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
                 $defaultConfig['source'] = $gitHubAPI->getId()->toString();
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
+                $action->setListens(['opencatalogi.rating.handler']);
+                $action->setConditions([[1 => 1]]);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);
             }
@@ -225,10 +223,10 @@ class InstallationService implements InstallerInterface
     {
         $collectionConfigs = [
             [
-                'name' => 'OpenCatalogi', 
+                'name' => 'OpenCatalogi',
                 //  Might be added later
-                // 'prefix' => 'oc', 
-                'prefix' => null, 
+                // 'prefix' => 'oc',
+                'prefix' => null,
                 'schemaPrefix' => 'https://opencatalogi.nl'],
         ];
         $collections = [];
@@ -291,9 +289,24 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
         }
 
+        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger'])) {
+            $cronjob = new Cronjob();
+            $cronjob->setName('Bronnen trigger');
+            $cronjob->setDescription("This cronjob fires all the open catalogi bronnen actions ever 5 minutes");
+            $cronjob->setThrows(['opencatalogi.bronnen.trigger']);
+            $cronjob->setIsEnabled(true);
+
+            $this->entityManager->persist($cronjob);
+
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
+        } else {
+
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
+        }
+
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
-            $cronjob = new Cronjob(); 
-            $cronjob->setName('Github scrapper');                       
+            $cronjob = new Cronjob();
+            $cronjob->setName('Github scrapper');
             $cronjob->setDescription("This cronjob fires all the open catalogi github actions ever 5 minutes");
             $cronjob->setThrows(['opencatalogi.github']);
             // What does this do
@@ -337,10 +350,20 @@ class InstallationService implements InstallerInterface
         $this->entityManager->persist($componentenCatalogusSource);
         isset($this->io) && $this->io->writeln('Gateway: '. $componentenCatalogusSource->getName().' created');
 
+        // developer.overheid
+        $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
+        $developerOverheid->setName('developerOverheid');
+        $developerOverheid->setAuth('none');
+        $developerOverheid->setLocation('https://developer.overheid.nl/api');
+        $developerOverheid->setIsEnabled(true);
+        $this->entityManager->persist($developerOverheid);
+        isset($this->io) && $this->io->writeln('Gateway: '. $developerOverheid->getName().' created');
+
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
         $gitHubAPI->setName('GitHub API');
         $gitHubAPI->setAuth('apikey');
+        $gitHubAPI->setHeaders(['Accept' => 'application/vnd.github+json']);
         $gitHubAPI->setAuthorizationHeader('Authorization');
         $gitHubAPI->setAuthorizationPassthroughMethod('header');
         $gitHubAPI->setLocation('https://api.github.com');
@@ -364,20 +387,123 @@ class InstallationService implements InstallerInterface
         $this->entityManager->flush();
     }
 
-    public function createSyncCollectionAction()
+    public function createSyncCollectionActionDeveloperOverheid()
     {
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
+        $actionRepository = $this->entityManager->getRepository('App:Action');
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+        $developerOverheidSource = $sourceRepository->findOneBy(['name' => 'developerOverheid']);
+        $repositorySchema = $schemaRepository->findOneBy(['name' => 'Repository']);
+
+        // SyncDeveloperOverheidAction
+        $action = $actionRepository->findOneBy(['name' => 'SyncDeveloperOverheidAction']) ?? new Action();
+        $action->setName('SyncDeveloperOverheidAction');
+        $action->setDescription('This is a synchronization action for the repositories of the developer.overheid.nl');
+        // Cronjob runs every 5 min?
+        $action->setListens(['opencatalogi.bronnen.trigger']);
+        $action->setConditions(['==' => [1, 1]]);
+        $action->setIsLockable(true);
+        $action->setAsync(false);
+        $action->setClass('App\ActionHandler\SynchronizationCollectionHandler');
+        $action->setConfiguration([
+            'entity'    => $repositorySchema->getId()->toString(),
+            'source'    => $developerOverheidSource->getId()->toString(),
+            'location'  => '/repositories',
+            'apiSource' => [
+                'location'        => [
+                    'objects' => 'results',
+                    'idField' => 'id',
+                ],
+                'queryMethod'           => 'page',
+                'syncFromList'          => true,
+                'sourceLeading'         => true,
+                'useDataFromCollection' => false,
+                'mappingIn'             => [],
+                'mappingOut'            => [],
+                'translationsIn'        => [],
+                'translationsOut'       => [],
+                'skeletonIn'            => [],
+            ],
+        ]);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: '. $action->getName().' created');
+
+        $componentSchema = $schemaRepository->findOneBy(['name' => 'Component']);
+
+        // SyncDeveloperOverheidApisAction
+        $SyncDeveloperOverheidApisAction = $actionRepository->findOneBy(['name' => 'SyncDeveloperOverheidApisAction']) ?? new Action();
+        $SyncDeveloperOverheidApisAction->setName('SyncDeveloperOverheidApisAction');
+        $SyncDeveloperOverheidApisAction->setDescription("This is a synchronization action for the api's of the developer.overheid.nl");
+        // Cronjob runs every 5 min?
+        $SyncDeveloperOverheidApisAction->setListens(['opencatalogi.bronnen.trigger']);
+        $SyncDeveloperOverheidApisAction->setConditions(['==' => [1, 1]]);
+        $SyncDeveloperOverheidApisAction->setIsLockable(true);
+        $SyncDeveloperOverheidApisAction->setAsync(false);
+        $SyncDeveloperOverheidApisAction->setClass('App\ActionHandler\SynchronizationCollectionHandler');
+        $SyncDeveloperOverheidApisAction->setConfiguration([
+            'entity'    => $componentSchema->getId()->toString(),
+            'source'    => $developerOverheidSource->getId()->toString(),
+            'location'  => '/apis',
+            'apiSource' => [
+                'location'        => [
+                    'objects' => 'results',
+                    'idField' => 'id',
+                ],
+                'queryMethod'           => 'page',
+                'syncFromList'          => true,
+                'sourceLeading'         => true,
+                'useDataFromCollection' => false,
+                'mappingIn'             => [
+                    'name' => 'service_name',
+//                    'description.localicedName' => 'service_name',
+//                    'description.shortDescription' => 'description',
+//                    'description.documentation' => 'environments.0.documentation_url',
+//                    'description.apiDocumentation' => 'environments.0.specification_url',
+//                    'maintenance.contacts.0.name' => 'organization_name',
+//                    'maintenance.contacts.0.email' => 'contact.email',
+//                    'maintenance.contacts.0.phone' => 'contact.phone',
+//                    'legal.repoOwner.name' => 'organization.name',
+//                    'legal.repoOwner.email' => 'contact.email',
+//                    'legal.repoOwner.phone' => 'contact.phone'
+                ],
+                'mappingOut'            => [],
+                'translationsIn'        => [],
+                'translationsOut'       => [],
+                'skeletonIn'            => [
+                    'nl' => [
+                      'commonground' => [
+                          'layerType' => 'process'
+                      ]
+                    ],
+                    'softwareType' => 'api',
+                    'maintenance' => [
+                        'type' => 'internal'
+                    ]
+                ],
+            ],
+        ]);
+        $this->entityManager->persist($SyncDeveloperOverheidApisAction);
+        isset($this->io) && $this->io->writeln('Action: '. $SyncDeveloperOverheidApisAction->getName().' created');
+    }
+
+    public function createSyncCollectionActionComponentenCatalogus()
+    {
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
         $actionRepository = $this->entityManager->getRepository('App:Action');
         $applicationSyncSchemaID = $this->setApplicationSchemaId();
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
         $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
 
-        // SyncZakenCollectionAction
+        // SyncApplicationCollectionAction
         $action = $actionRepository->findOneBy(['name' => 'SyncApplicationCollectionAction']) ?? new Action();
         $action->setName('SyncApplicationCollectionAction');
-        $action->setDescription('This is a synchronization action from the componentencatalogus to the gateway.');
+        $action->setDescription('This is a synchronization action from the componentencatalogus products to the gateway.');
         // Cronjob runs every 5 min?
         $action->setListens(['opencatalogi.default.listens']);
         $action->setConditions(['==' => [1, 1]]);
+        $action->setIsLockable(true);
+        $action->setAsync(false);
+        $action->setClass('App\ActionHandler\SynchronizationCollectionHandler');
         $action->setConfiguration([
             'entity'    => $applicationSyncSchemaID,
             'source'    => $componentenCatalogusSource->getId()->toString(),
@@ -398,11 +524,65 @@ class InstallationService implements InstallerInterface
                 'skeletonIn'            => [],
             ],
         ]);
-        $action->setAsync(false);
-        $action->setClass('App\ActionHandler\SynchronizationCollectionHandler');
         $this->entityManager->persist($action);
         isset($this->io) && $this->io->writeln('Action: '. $action->getName().' created');
     }
+
+    public function createSyncCollectionActionGithub()
+    {
+        $schemaRepository = $this->entityManager->getRepository('App:Entity');
+        $actionRepository = $this->entityManager->getRepository('App:Action');
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+        $developerOverheidSource = $sourceRepository->findOneBy(['name' => 'GitHub API']);
+        $repositorySchema = $schemaRepository->findOneBy(['name' => 'Repository']);
+
+        // SyncGithubAction
+        $action = $actionRepository->findOneBy(['name' => 'SyncGithubAction']) ?? new Action();
+        $action->setName('SyncGithubAction');
+        $action->setDescription('This is a synchronization action for the publiccode component of the api.github.com');
+        // Cronjob runs every 5 min?
+        $action->setListens(['opencatalogi.bronnen.trigger']);
+        $action->setConditions(['==' => [1, 1]]);
+        $action->setAsync(false);
+        $action->setClass('App\ActionHandler\SynchronizationCollectionHandler');
+        $action->setIsLockable(true);
+        $action->setConfiguration([
+            'entity'    => $repositorySchema->getId()->toString(),
+            'source'    => $developerOverheidSource->getId()->toString(),
+            'location'  => '/search/code',
+            'callService' => [
+                'query' => 'q=publiccode+in:path+path:/+extension:yaml+extension:yml'
+            ],
+            'apiSource' => [
+                'location'        => [
+                    'objects' => 'items',
+                    'idField' => 'sha',
+                ],
+                'sourceLimit' => 1000,
+                'sourceLimitKey' => 'per_page',
+                'queryMethod'           => 'page',
+                'syncFromList'          => true,
+                'sourceLeading'         => true,
+                'useDataFromCollection' => false,
+                'mappingIn'             => [
+                    'name' => 'repository.name',
+                    'url' => 'repository.html_url',
+                    'publiccode_url' => 'html_url',
+                    'avatar_url' => 'repository.owner.avatar_url',
+                    'default_owner' => 'repository.owner.login',
+                ],
+                'mappingOut'            => [],
+                'translationsIn'        => [],
+                'translationsOut'       => [],
+                'skeletonIn'            => [
+                    'source' => 'github'
+                ],
+            ],
+        ]);
+        $this->entityManager->persist($action);
+        isset($this->io) && $this->io->writeln('Action: '. $action->getName().' created');
+    }
+
 
     public function
     setApplicationSchemaId()
@@ -476,8 +656,10 @@ class InstallationService implements InstallerInterface
         // create sources
         $this->createSources();
 
-        // create sync collection action
-        $this->createSyncCollectionAction();
+        // create sync collection action for componentencatalogus, developer.overheid and api.github.com
+        $this->createSyncCollectionActionComponentenCatalogus();
+        $this->createSyncCollectionActionDeveloperOverheid();
+        $this->createSyncCollectionActionGithub();
         // create actions from the given actionHandlers
         $this->addActions();
 

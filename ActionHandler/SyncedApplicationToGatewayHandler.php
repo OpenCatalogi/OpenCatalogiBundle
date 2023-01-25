@@ -26,6 +26,7 @@ class SyncedApplicationToGatewayHandler implements ActionHandlerInterface
             '$id'        => 'https://opencatalogi.nl/oc.application.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'SyncedApplicationToGatewayHandler',
+            'description'=> 'This is a action to create objects from the fetched application.',
             'required'   => ['source', 'applicationEntity'],
             'properties' => [
                 'source' => [

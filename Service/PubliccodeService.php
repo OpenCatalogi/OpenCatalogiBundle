@@ -409,7 +409,7 @@ class PubliccodeService
                     // $organization->setValue('uses', $catalogi['uses']);
                     // $organization->setValue('supports', $catalogi['supports']);
 
-                    // New 
+                    // New
                     $organization->hydrate([
                         'name' => $catalogi['name'],
                         'description' => $catalogi['description'],
@@ -472,12 +472,16 @@ class PubliccodeService
         $this->configuration = $configuration;
         $this->data = $data;
 
+
+
         $componentEntity = $this->entityManager->getRepository('App:Entity')->find($this->configuration['componentEntityId']);
         $ratingEntity = $this->entityManager->getRepository('App:Entity')->find($this->configuration['ratingEntityId']);
 
-        foreach ($componentEntity->getObjectEntities() as $component) {
-            $this->rateComponent($component, $ratingEntity);
-        }
+        $this->rateComponent($data['request'], $ratingEntity);
+
+//        foreach ($componentEntity->getObjectEntities() as $component) {
+//            $this->rateComponent($component, $ratingEntity);
+//        }
 
         return $this->data;
     }

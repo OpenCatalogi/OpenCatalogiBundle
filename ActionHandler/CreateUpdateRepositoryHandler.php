@@ -26,7 +26,8 @@ class CreateUpdateRepositoryHandler implements ActionHandlerInterface
             '$id'        => 'https://opencatalogi.nl/oc.repository.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'CreateUpdateRepositoryHandler',
-            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'repositoryEntity'],
+            'description'=> 'This is a handler to create or update a repository',
+            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'repositoryEntity', 'organizationEntity'],
             'properties' => [
                 'source' => [
                     'type'        => 'uuid',

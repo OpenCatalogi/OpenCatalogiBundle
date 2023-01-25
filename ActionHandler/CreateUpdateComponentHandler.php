@@ -26,6 +26,7 @@ class CreateUpdateComponentHandler implements ActionHandlerInterface
             '$id'        => 'https://opencatalogi.nl/oc.component.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'CreateUpdateComponentHandler',
+            'description'=> 'This is a handler to create or update a component.',
             'required'   => ['source', 'entity', 'location', 'componentsEntity', 'componentsLocation'],
             'properties' => [
                 'source' => [
