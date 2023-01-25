@@ -2,16 +2,16 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
 class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
-    private PubliccodeService $publiccodeService;
+    private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
 
-    public function __construct(PubliccodeService $publiccodeService)
+    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
-        $this->publiccodeService = $publiccodeService;
+        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
     }
 
     public function getConfiguration()
@@ -43,6 +43,6 @@ class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHand
 
     public function run(array $data, array $configuration): array
     {
-        return $this->publiccodeService->enrichRepositoryWithOrganizationHandler($data, $configuration);
+        return $this->findOrganizationThroughRepositoriesService->enrichRepositoryWithOrganizationHandler($data, $configuration);
     }
 }

@@ -2,16 +2,16 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\RateComponentService;
 
 class PubliccodeRatingHandler implements ActionHandlerInterface
 {
-    private PubliccodeService $publiccodeService;
+    private RateComponentService $ratingService;
 
-    public function __construct(PubliccodeService $publiccodeService)
+    public function __construct(RateComponentService $ratingService)
     {
-        $this->publiccodeService = $publiccodeService;
+        $this->ratingService = $ratingService;
     }
 
     public function getConfiguration()
@@ -43,6 +43,6 @@ class PubliccodeRatingHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->publiccodeService->enrichComponentWithRating($data, $configuration);
+        return $this->ratingService->enrichComponentWithRating($data, $configuration);
     }
 }
