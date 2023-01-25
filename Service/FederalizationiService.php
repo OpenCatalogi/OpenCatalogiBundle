@@ -235,15 +235,19 @@ class FederalizationiService
     public function prebObjectEntities():void{
         if(!isset($this->catalogusEntity)){
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
+            (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json'):'');
         }
         if(!isset($this->componentEntity)){
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
+            (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/component.schema.json'):'');
         }
         if(!isset($this->organisationEntity)){
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
+            (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/organisation.schema.json'):'');
         }
         if(!isset($this->applicationEntity)){
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
+            (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/application.schema.json'):'');
         }
     }
 
