@@ -29,9 +29,6 @@ use App\Event\ActionEvent;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 use Symfony\Component\Yaml\Yaml;
 
-// Cleanup
-use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
-
 class CatalogiService
 {
     private EntityManagerInterface $entityManager;
@@ -1080,9 +1077,9 @@ class CatalogiService
         if ($publicCodeParsed !== false && is_array($publicCodeParsed)) {
             $componentObjectEntity = $this->objectRepo->findOneBy(['entity' => $componentSchema, 'externalId' => $publicCodeRepoName]) ?? new ObjectEntity($componentSchema);
             $componentObjectEntity->setExternalId($publicCodeRepoName);
-            
+
             $dependsOn = $this->getDependsOn($publicCodeParsed);
-            
+
             $componentObjectArray = [
                 'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
                 'name' => $publicCodeParsed['name'] ?? null,
