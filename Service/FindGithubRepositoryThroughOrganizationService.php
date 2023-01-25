@@ -61,35 +61,31 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private function getOpenCatalogiFromGithubRepo(string $organizationName): ?array
     {
-        // if ($this->checkGithubKey()) {
-        //     return $this->checkGithubKey();
-        // }
+        try {
+            $response = $this->callService->call($this->githubApi, $organizationName . '/.github/main/openCatalogi.yaml');
+        } catch (ClientException $exception) {
+            var_dump($exception->getMessage());
 
-        // try {
-        //     $response = $this->githubusercontentClient->request('GET', $organizationName . '/.github/main/openCatalogi.yaml');
-        // } catch (ClientException $exception) {
-        //     var_dump($exception->getMessage());
+            return null;
+        }
 
-        //     return null;
-        // }
+        if ($response == null) {
+            try {
+                $response = $this->callService->call($this->githubApi, $organizationName . '/.github/main/openCatalogi.yml');
+            } catch (ClientException $exception) {
+                var_dump($exception->getMessage());
 
-        // if ($response == null) {
-        //     try {
-        //         $response = $this->githubusercontentClient->request('GET', $organizationName . '/.github/main/openCatalogi.yml');
-        //     } catch (ClientException $exception) {
-        //         var_dump($exception->getMessage());
+                return null;
+            }
+        }
 
-        //         return null;
-        //     }
-        // }
+        try {
+            $openCatalogi = Yaml::parse($response->getBody()->getContents());
+        } catch (ParseException $exception) {
+            var_dump($exception->getMessage());
 
-        // try {
-        //     $openCatalogi = Yaml::parse($response->getBody()->getContents());
-        // } catch (ParseException $exception) {
-        //     var_dump($exception->getMessage());
-
-        //     return null;
-        // }
+            return null;
+        }
 
         return $openCatalogi ?? [];
     }

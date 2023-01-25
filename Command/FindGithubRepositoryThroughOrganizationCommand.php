@@ -27,9 +27,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('This command gets al or a single catalogi from the federalized network')
-            ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin');
-            // ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe catalogue by id or name');
+            ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
+            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info');
+        // ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe catalogue by id or name');
 
     }
 
