@@ -3,23 +3,23 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
 use LarpingBase\LarpingBundle\Service\LarpingService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindGitRepoThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
 
-class FindGitRepoThroughOrganizationCommand extends Command
+class FindGithubRepositoryThroughOrganizationCommand extends Command
 {
-    protected static $defaultName = 'opencatalogi:findgitrepothroughorganization:execute';
-    private FindGitRepoThroughOrganizationService  $findGitRepoThroughOrganizationService;
+    protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
+    private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
     private EntityManagerInterface $entityManager;
 
 
-    public function __construct(FindGitRepoThroughOrganizationService $findGitRepoThroughOrganizationService, EntityManagerInterface $entityManager)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService, EntityManagerInterface $entityManager)
     {
-        $this->findGitRepoThroughOrganizationService = $findGitRepoThroughOrganizationService;
+        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
         $this->entityManager = $entityManager;
         parent::__construct();
     }
@@ -37,13 +37,13 @@ class FindGitRepoThroughOrganizationCommand extends Command
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
         $io = new SymfonyStyle($input, $output);
-        $this->findGitRepoThroughOrganizationService->setStyle($io);
+        $this->findGithubRepositoryThroughOrganizationService->setStyle($io);
 
         // Handle the command optiosn
         // $catalogusId = $input->getOption('catalogus', false);
 
         // if(!$catalogusId){
-        //     $this->findGitRepoThroughOrganizationService->catalogiHandler();
+        //     $this->findGithubRepositoryThroughOrganizationService->catalogiHandler();
         // }
         // else{
         //     $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
@@ -55,7 +55,7 @@ class FindGitRepoThroughOrganizationCommand extends Command
         //         $io->error('Could not find object entity by id or name ' . $catalogusId);
         //         return 1;
         //     }
-        //     $this->findGitRepoThroughOrganizationService->readCatalogus($catalogusObject);
+        //     $this->findGithubRepositoryThroughOrganizationService->readCatalogus($catalogusObject);
         // }
 
 

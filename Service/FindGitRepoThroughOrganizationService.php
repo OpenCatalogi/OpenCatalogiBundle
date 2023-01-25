@@ -15,7 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Finds opencatalogi.yml for organizations and fills the organization with data
  */
-class FindGitRepoThroughOrganizationService
+class FindGithubRepositoryThroughOrganizationService
 {
     private EntityManagerInterface $entityManager;
     private array $configuration;
@@ -178,7 +178,7 @@ class FindGitRepoThroughOrganizationService
      *
      * @return array dataset at the end of the handler
      */
-    public function findGitRepoThroughOrganizationHandler(array $data, array $configuration): array
+    public function findGithubRepositoryThroughOrganizationHandler(array $data, array $configuration): array
     {
         $this->configuration = $configuration;
         $this->data = $data;

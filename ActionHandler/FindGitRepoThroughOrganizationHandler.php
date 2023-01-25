@@ -2,16 +2,16 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  OpenCatalogi\OpenCatalogiBundle\Service\FindGitRepoThroughOrganizationService;
+use  OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class FindGitRepoThroughOrganizationHandler implements ActionHandlerInterface
+class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
-    private FindGitRepoThroughOrganizationService $findGitRepoThroughOrganizationService;
+    private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
 
-    public function __construct(FindGitRepoThroughOrganizationService $findGitRepoThroughOrganizationService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
-        $this->findGitRepoThroughOrganizationService = $findGitRepoThroughOrganizationService;
+        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
     }
 
     public function getConfiguration()
@@ -43,6 +43,6 @@ class FindGitRepoThroughOrganizationHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->findGitRepoThroughOrganizationService->findGitRepoThroughOrganizationHandler($data, $configuration);
+        return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
     }
 }
