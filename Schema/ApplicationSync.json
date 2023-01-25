@@ -1,14 +1,13 @@
 {
-  "title": "Application",
-  "$id": "https://opencatalogi.nl/oc.application.schema.json",
+  "title": "ApplicationSync",
+  "$id": "https://opencatalogi.nl/application_sync.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
   "description": "",
   "properties": {
     "name": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "shortDescription": {
       "type": "string"
@@ -32,24 +31,10 @@
       "type": "boolean"
     },
     "owner": {
-      "type": "object",
-      "properties": {
-        "fullName": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "pictureUrl": {
-          "type": "string"
-        }
-      }
+      "type": "array"
     },
     "components": {
-      "type": "array",
-      "items": {
-        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
-      }
+      "type": "array"
     }
   },
   "required": [

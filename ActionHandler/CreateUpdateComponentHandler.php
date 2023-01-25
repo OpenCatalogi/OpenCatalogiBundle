@@ -5,7 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-class CatalogiHandler implements ActionHandlerInterface
+class CreateUpdateComponentHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;
 
@@ -23,20 +23,18 @@ class CatalogiHandler implements ActionHandlerInterface
     {
 
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.component.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler'
-            ];
-
-        // We don't need all of this
-
-        /*
-        return [
-            '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler',
-            'required'   => ['entity', 'location', 'componentsEntity', 'componentsLocation'],
+            'title'      => 'CreateUpdateComponentHandler',
+            'description'=> 'This is a handler to create or update a component.',
+            'required'   => ['source', 'entity', 'location', 'componentsEntity', 'componentsLocation'],
             'properties' => [
+                'source' => [
+                    'type'        => 'uuid',
+                    'description' => 'The uuid of the github usercontent source',
+                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
+                    'required'    => true,
+                ],
                 'entity' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the Catalogi entity',
@@ -59,14 +57,12 @@ class CatalogiHandler implements ActionHandlerInterface
                 ],
                 'componentsLocation' => [
                     'type'        => 'string',
-                    'description' => 'The location where we can find Components',
+                    'description' => 'The location where we can find Component',
                     'example'     => '/api/oc/components',
                     'required'    => true,
                 ],
-            ],
+            ]
         ];
-
-        */
     }
 
     /**
@@ -79,6 +75,6 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->catalogiService->catalogiHandler($data, $configuration);
+        return $this->catalogiService->createUpdateComponentHandler($data, $configuration);
     }
 }
