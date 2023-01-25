@@ -5,10 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
-/**
- * Loopt door alle repro's heen om de organisatie erbij te zoeken
- */
-class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
+class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
     private PubliccodeService $publiccodeService;
 
@@ -22,17 +19,10 @@ class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHand
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeFindOrganizationThroughRepositoriesHandler',
-            'description'=> 'This handler finds organizations through repositories',
-            'required'   => ['repositoryEntityId', 'organisationEntityId'],
+            'title'      => 'FindGithubRepositoryThroughOrganizationHandler',
+            'description'=> 'This handler finds the .github repository through organizations',
+            'required'   => ['organisationEntityId'],
             'properties' => [
-                'repositoryEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the repository entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
-                ],
                 'organisationEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the organisation entity',
@@ -46,6 +36,6 @@ class PubliccodeFindOrganizationThroughRepositoriesHandler implements ActionHand
 
     public function run(array $data, array $configuration): array
     {
-        return $this->publiccodeService->enrichRepositoryWithOrganizationHandler($data, $configuration);
+        return $this->publiccodeService->enrichOrganizationWithCatalogi($data, $configuration);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  OpenCatalogi\OpenCatalogiBundle\Service\PubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\CheckRepositoriesForPubliccodeService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
 /**
@@ -10,19 +10,14 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
  */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
-    private PubliccodeService $publiccodeService;
+    private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
 
-    public function __construct(PubliccodeService $publiccodeService)
+    public function __construct(CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService)
     {
-        $this->publiccodeService = $publiccodeService;
+        $this->checkRepositoriesForPubliccodeService = $checkRepositoriesForPubliccodeService;
     }
 
-    /**
-     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
-     *
-     * @throws array a [json-schema](https://json-schema.org/) that this  action should comply to
-     */
-    public function getConfiguration(): array
+    public function getConfiguration()
     {
         return [
             '$id'        => 'https://example.com/person.schema.json',
@@ -58,6 +53,6 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->publiccodeService->enrichPubliccodeHandler($data, $configuration);
+        return $this->checkRepositoriesForPubliccodeService->enrichPubliccodeHandler($data, $configuration);
     }
 }
