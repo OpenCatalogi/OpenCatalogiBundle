@@ -108,8 +108,8 @@ class FindGitRepoThroughOrganizationService
         try {
             $response = $this->callService->call($this->githubApi, '/repos/' . $organizationName . '/.github', 'GET');
         } catch (\Exception $e) {
-            // @TODO Log error with monolog ?
-            var_dump($e->getMessage());
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Error found trying to fetch '.$organizationName.'/.github : '. $e->getMessage());
             return null;
         }
 
@@ -143,6 +143,7 @@ class FindGitRepoThroughOrganizationService
                     $this->entityManager->persist($organization);
                     $this->entityManager->flush();
                 } catch (Exception $exception) {
+                    // @TODO Monolog ?
                     isset($this->io) && $this->io->error("Data error for {$organization->getValue('name')}, {$exception->getMessage()}");
                 }
 
@@ -156,12 +157,14 @@ class FindGitRepoThroughOrganizationService
 
         !isset($this->organisationEntity) && $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if (!isset($this->organisationEntity)) {
+            // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json');
             return $data;
         }
 
         !isset($this->githubApi) && $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API']);
         if (!isset($this->githubApi)) {
+            // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a Source for Github API');
             return $data;
         };
