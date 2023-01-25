@@ -16,7 +16,7 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationiService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -30,7 +30,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 use Symfony\Component\Yaml\Yaml;
 
 // Cleanup
-use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationiService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 
 class CatalogiService
 {
@@ -50,7 +50,7 @@ class CatalogiService
     private Entity $componentEntity;
     private Entity $organisationEntity;
     private Entity $applicationEntity;
-    private FederalizationiService $federalizationiService;
+    private FederalizationService $federalizationiService;
 
     private $entityRepo;
     private $objectRepo;

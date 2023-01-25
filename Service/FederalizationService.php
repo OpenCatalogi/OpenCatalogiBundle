@@ -25,7 +25,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
 
-class FederalizationiService
+class FederalizationService
 {
     private EntityManagerInterface $entityManager;
     private SessionInterface $session;
@@ -111,7 +111,7 @@ class FederalizationiService
         $reportOut = [];
 
         // Check if the past object is a
-        if($catalogus->getEntity->getReferecne() != "https://opencatalogi.nl/catalogi.schema.json"){
+        if($catalogus->getEntity->getReference() != "https://opencatalogi.nl/catalogi.schema.json"){
             (isset($this->io)?$this->io->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json'):'');
             return $reportOut;
         }

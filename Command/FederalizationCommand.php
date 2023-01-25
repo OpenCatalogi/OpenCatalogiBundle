@@ -3,7 +3,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
 use LarpingBase\LarpingBundle\Service\LarpingService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationiService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,11 +13,11 @@ use Doctrine\ORM\EntityManagerInterface;
 class FederalizationCommand extends Command
 {
     protected static $defaultName = 'opencatalogi:fedaralization:getdata';
-    private FederalizationiService  $federalizationiService;
+    private FederalizationService  $federalizationiService;
     private EntityManagerInterface $entityManager;
 
 
-    public function __construct(FederalizationiService  $federalizationiService, EntityManagerInterface $entityManager)
+    public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
     {
         $this->federalizationiService = $federalizationiService;
         $this->entityManager = $entityManager;
