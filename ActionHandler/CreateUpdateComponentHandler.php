@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Should be triggerd when an repository object is created or updated.
+ */
 class CreateUpdateComponentHandler implements ActionHandlerInterface
 {
     private CatalogiService $catalogiService;

@@ -6,6 +6,9 @@ use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationiService;
 
+/**
+ * Handles the federalisation cron actions for open catalogi. e.g. getting data from other catalogi
+ */
 class CatalogiHandler implements ActionHandlerInterface
 {
     private FederalizationiService $federalizationiService;

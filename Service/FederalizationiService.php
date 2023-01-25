@@ -71,6 +71,35 @@ class FederalizationiService
     }
 
     /**
+     * Handles the sync all catalogi action from the catalogi handler
+     *
+     * @param array $data
+     * @param array $configuration
+     * @return array
+     */
+    public function catalogiHandler(array $data = [], array $configuration = []): array{
+
+        // Setup base data
+        $this->prebObjectEntities();
+
+        // Savety cheek
+        if(!$this->catalogusEntity){
+            (isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json'):'');
+            return $data;
+        }
+
+        // Get al the catalogi
+        $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity'=>$this->catalogusEntity]);
+
+        // Sync them
+        foreach ($catalogi as $catalogus){
+            $this->readCatalogus($catalogus);
+        }
+
+        return $data;
+    }
+
+    /**
      * Get and handle oll the objects of an catalogi specific
      *
      * @param ObjectEntity $catalogus The catalogus that should be read
@@ -249,35 +278,6 @@ class FederalizationiService
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
             (!$this->applicationEntity && isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/application.schema.json'):'');
         }
-    }
-
-    /**
-     * Handles the sync all catalogi action from the catalogi handler
-     *
-     * @param array $data
-     * @param array $configuration
-     * @return array
-     */
-    public function catalogiHandler(array $data = [], array $configuration = []): array{
-
-        // Setup base data
-        $this->prebObjectEntities();
-
-        // Savety cheek
-        if(!$this->catalogusEntity){
-            (isset($this->io)?$this->io->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json'):'');
-            return $data;
-        }
-
-        // Get al the catalogi
-        $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity'=>$this->catalogusEntity]);
-
-        // Sync them
-        foreach ($catalogi as $catalogus){
-            $this->readCatalogus($catalogus);
-        }
-
-        return $data;
     }
 
 }
