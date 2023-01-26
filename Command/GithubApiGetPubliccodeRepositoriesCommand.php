@@ -30,7 +30,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         $this
             ->setDescription('This command triggers OpenCatalogi GithubPubliccodeService')
             ->setHelp('This command allows you to get all repositories or one repository from https://api.github.com/search/code')
-            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a singe repository by id or name');
+            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a singe repository by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
