@@ -54,6 +54,7 @@ class DeveloperOverheidService
     {
         $this->io = $io;
         $this->synchronizationService->setStyle($io);
+        $this->mappingService->setStyle($io);
 
         return $this;
     }
@@ -106,7 +107,7 @@ class DeveloperOverheidService
             return $this->mapping;
         }
 
-        $this->mapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/repositories"]);
+        $this->mapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api"]);
 
         if(!$this->mapping){
             $this->io->error("No mapping found for https://developer.overheid.nl/api/repositories");
@@ -123,12 +124,13 @@ class DeveloperOverheidService
     public function getRepositories(): array{
 
         $result = [];
+
         // Dow e have a source
         if(!$source = $this->getSource()){
             return $result;
         }
 
-        $repositories = $this->callService->call($source)['results'];
+        $repositories = $this->callService->call($source,'/repositories')['results'];
 
         $this->io->debug("Found ".count($repositories)." repositories");
         foreach($repositories as $repository){
@@ -137,7 +139,7 @@ class DeveloperOverheidService
 
         $this->entityManager->flush();
 
-        return $result];
+        return $result;
     }
 
     /**
@@ -151,7 +153,7 @@ class DeveloperOverheidService
         }
 
         $this->io->debug('Getting repository '.$id);
-        $repository = $this->callService->call($source, '/'.$id);
+        $repository = $this->callService->call($source, '/repositories/'.$id);
 
         if(!$repository){
             $this->io->error('Could not find repository '.$id.' an source '.$source);
@@ -180,10 +182,10 @@ class DeveloperOverheidService
             return ;
         }
 
+        $this->io->debug("Mapping object".$repository['name']);
+        $repository = $this->mappingService->mapping($mapping, $repository);
 
-        $this->io->debug("Mapping object");
-
-        $this->io->debug("Checking repository ".$repository['name']);
+        $this->io->debug("Importing object".$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         $synchronization->setMapping($this->mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository['id']);
