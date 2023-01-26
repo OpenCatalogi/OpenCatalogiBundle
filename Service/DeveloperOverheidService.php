@@ -7,6 +7,7 @@ use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
+use CommonGateway\CoreBundle\Service\MappingService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -29,15 +30,18 @@ class DeveloperOverheidService
     private SynchronizationService $synchronizationService;
     private Entity $repositoryEntity;
     private Mapping $mapping;
+    private MappingService $mappingService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService
+        SynchronizationService $synchronizationService,
+        MappingService $mappingService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
+        $this->mappingService = $mappingService;
     }
 
     /**
@@ -175,6 +179,9 @@ class DeveloperOverheidService
         if(!$mapping = $this->getMapping()){
             return ;
         }
+
+
+        $this->io->debug("Mapping object");
 
         $this->io->debug("Checking repository ".$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
