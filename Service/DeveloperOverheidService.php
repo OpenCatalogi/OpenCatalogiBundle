@@ -165,9 +165,7 @@ class DeveloperOverheidService
      * @return ?Entity
      */
     public function getComponentEntity(): ?Entity{
-        $this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"]);
-
-        if(!$this->componentEntity){
+        if(!$this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"])){
             $this->io->error("No entity found for https://opencatalogi.nl/oc.component.schema.json");
         }
 
@@ -180,9 +178,7 @@ class DeveloperOverheidService
      * @return ?Mapping
      */
     public function getComponentMapping(): ?Mapping{
-        $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/components"]);
-
-        if(!$this->componentMapping){
+        if(!$this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/components"])){
             $this->io->error("No mapping found for https://developer.overheid.nl/api/components");
         }
 
@@ -205,7 +201,7 @@ class DeveloperOverheidService
 
         $this->io->comment('Trying to get all components from source '.$source->getName());
 
-        // rows per page are 10, so i get only 10 results
+        // @TODO rows per page are 10, so i get only 10 results
         $response = $this->callService->call($source, '/apis');
 
         $components = json_decode($response->getBody()->getContents(), true);
@@ -276,4 +272,6 @@ class DeveloperOverheidService
 
         return $synchronization->getObject();
     }
+
+
 }

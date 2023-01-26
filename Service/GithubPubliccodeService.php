@@ -90,9 +90,7 @@ class GithubPubliccodeService
      * @return ?Mapping
      */
     public function getRepositoriesMapping(): ?Mapping{
-        $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://api.github.com/search/code"]);
-
-        if(!$this->componentMapping){
+        if(!$this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://api.github.com/search/code"])){
             $this->io->error("No mapping found for https://api.github.com/search/code");
         }
 
@@ -105,9 +103,8 @@ class GithubPubliccodeService
      * @return ?Mapping
      */
     public function getRepositoryMapping(): ?Mapping{
-        $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://api.github.com/repositories"]);
 
-        if(!$this->componentMapping){
+        if(!$this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://api.github.com/repositories"])){
             $this->io->error("No mapping found for https://api.github.com/repositories");
         }
 
@@ -128,7 +125,7 @@ class GithubPubliccodeService
             return $result;
         }
 
-        // rows per page are 10, so i get only 10 results
+        // @TODO rows per page are 10, so i get only 10 results
         $response = $this->callService->call($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
 
         $repositories = json_decode($response->getBody()->getContents(), true);

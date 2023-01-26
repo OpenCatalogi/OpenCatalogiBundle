@@ -99,7 +99,7 @@ class ComponentenCatalogusService
             return $result;
         }
 
-        // rows per page are 10, so i get only 10 results
+        // @TODO rows per page are 10, so i get only 10 results
         $response = $this->callService->call($source, '/products');
 
         $applications = json_decode($response->getBody()->getContents(), true);
@@ -115,7 +115,7 @@ class ComponentenCatalogusService
     }
 
     /**
-     * Get a application trough the products of https://componentencatalogus.commonground.nl/api/products/{id}
+     * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}
      *
      * @return array
      */
@@ -157,8 +157,6 @@ class ComponentenCatalogusService
             return ;
         }
 
-        var_dump($application);
-
         $this->io->success("Checking application ".$application['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $applicationEntity, $application['id']);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $application);
@@ -172,9 +170,8 @@ class ComponentenCatalogusService
      * @return ?Entity
      */
     public function getComponentEntity(): ?Entity{
-        $this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"]);
 
-        if(!$this->componentEntity){
+        if(!$this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"])){
             $this->io->error("No entity found for https://opencatalogi.nl/oc.component.schema.json");
         }
 
@@ -187,9 +184,7 @@ class ComponentenCatalogusService
      * @return ?Mapping
      */
     public function getComponentMapping(): ?Mapping{
-        $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://componentencatalogus.commonground.nl/api/components"]);
-
-        if(!$this->componentMapping){
+        if(!$this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://componentencatalogus.commonground.nl/api/components"])){
             $this->io->error("No mapping found for https://componentencatalogus.commonground.nl/api/components");
         }
 
@@ -198,7 +193,7 @@ class ComponentenCatalogusService
 
 
     /**
-     * Get components trough the componenrs of https://componentencatalogus.commonground.nl/api/components
+     * Get components through the components of https://componentencatalogus.commonground.nl/api/components
      *
      * @return array
      */
@@ -212,7 +207,7 @@ class ComponentenCatalogusService
 
         $this->io->comment('Trying to get all components from source '.$source->getName());
 
-        // rows per page are 10, so i get only 10 results
+        // @TODO rows per page are 10, so i get only 10 results
         $response = $this->callService->call($source, '/components');
 
         $components = json_decode($response->getBody()->getContents(), true);
