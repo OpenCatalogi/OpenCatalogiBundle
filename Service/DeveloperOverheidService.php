@@ -64,9 +64,9 @@ class DeveloperOverheidService
      * @return ?Source
      */
     public function getSource(): ?Source{
-        if($this->source){
-            return $this->source;
-        }
+//        if($this->source){
+//            return $this->source;
+//        }
 
         $this->source = $this->entityManager->getRepository("App:Gateway")->findOneBy(["location"=>"https://developer.overheid.nl/api"]);
 
@@ -83,9 +83,9 @@ class DeveloperOverheidService
      * @return ?Source
      */
     public function getRepositoryEntity(): ?Entity{
-        if($this->repositoryEntity){
-            return $this->repositoryEntity;
-        }
+//        if($this->repositoryEntity){
+//            return $this->repositoryEntity;
+//        }
 
         $this->repositoryEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.repository.schema.json"]);
 
@@ -102,9 +102,9 @@ class DeveloperOverheidService
      * @return ?Source
      */
     public function getMapping(): ?Entity{
-        if($this->mapping){
-            return $this->mapping;
-        }
+//        if($this->mapping){
+//            return $this->mapping;
+//        }
 
         $this->mapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/repositories"]);
 
@@ -116,7 +116,7 @@ class DeveloperOverheidService
     }
 
     /**
-     * Get components trough the repositories of developer.overheid.nl
+     * Get repositories trough the repositories of developer.overheid.nl
      *
      * @return array
      */
@@ -128,10 +128,13 @@ class DeveloperOverheidService
             return $result;
         }
 
-        $repositories = $this->callService->call($source.'/repositories')['results'];
+        // rows per page are 10, so i get only 10 results
+        $response = $this->callService->call($source, '/repositories');
 
-        $this->io->debug("Found ".count($repositories)." repositories");
-        foreach($repositories as $repository){
+        $repositories = json_decode($response->getBody()->getContents(), true);
+
+        $this->io->writeln("Found ".count($repositories)." repositories");
+        foreach($repositories['results'] as $repository){
             $result[] = $this->importRepository($repository);
         }
 
@@ -141,7 +144,9 @@ class DeveloperOverheidService
     }
 
     /**
-     * @return ObjectEntity
+     * Get a repository trough the repositories of developer.overheid.nl
+     *
+     * @return array
      */
     public function getRepository(string $id){
 
@@ -150,7 +155,7 @@ class DeveloperOverheidService
             return;
         }
 
-        $this->io->debug('Getting repository '.$id);
+        $this->io->writeln('Getting repository '.$id);
         $repository = $this->callService->call($source, '/repositories/'.$id);
 
         if(!$repository){
@@ -171,22 +176,22 @@ class DeveloperOverheidService
 
         // Dow e have a source
         if(!$source = $this->getSource()){
-            return;
+            return ;
         }
         if(!$repositoryEntity = $this->getRepositoryEntity()){
-            return;
+            return ;
         }
-        if(!$mapping = $this->getMapping()){
-            return;
-        }
+//        if(!$mapping = $this->getMapping()){
+//            return ;
+//        }
 
 
-        $this->io->debug("Mapping object");
+//        $this->io->writeln("Mapping object " . $mapping);
 
-        $this->io->debug("Checking repository ".$repository['name']);
+        $this->io->writeln("Checking repository ".$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization->setMapping($this->mapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository['id']);
+//        $synchronization->setMapping($this->mapping);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
         return $synchronization->getObject();
     }

@@ -6,6 +6,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -28,8 +29,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
-            ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl')
-            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a singe repository by id or name');
+            ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -37,14 +37,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $this->developerOverheidService->setStyle($io);
 
-        // Handle the command optiosn
-        $repositoryId = $input->getOption('repository', false);
-
-        if(!$repositoryId){
-            $this->developerOverheidService->getRepositories();
-        } else{
-            $this->developerOverheidService->getRepository($repositoryId);
-        }
+        $this->developerOverheidService->getRepositories();
 
         return 0;
     }
