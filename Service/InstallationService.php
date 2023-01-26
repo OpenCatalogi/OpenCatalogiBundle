@@ -50,7 +50,7 @@ class InstallationService implements InstallerInterface
 //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\SyncedApplicationToGatewayHandler",
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler'
     ];
 
