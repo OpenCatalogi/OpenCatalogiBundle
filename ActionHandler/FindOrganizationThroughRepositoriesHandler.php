@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use  OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 
+/**
+ * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info
+ */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;

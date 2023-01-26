@@ -14,8 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
- * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data
+ * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info
  */
 class FindOrganizationThroughRepositoriesService
 {
@@ -61,8 +60,6 @@ class FindOrganizationThroughRepositoriesService
      * @param string      $url
      * @param string|null $path
      *
-     * @throws GuzzleException
-     *
      * @return array|null
      */
     public function requestFromUrl(string $url, ?string $path = null): ?array
@@ -84,8 +81,6 @@ class FindOrganizationThroughRepositoriesService
      * This function gets all the github repository details.
      *
      * @param array $item a repository from github with a publicclode.yaml file
-     *
-     * @throws GuzzleException
      *
      * @return array
      */
@@ -111,7 +106,7 @@ class FindOrganizationThroughRepositoriesService
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
      *
-     * @param string $slug
+     * @param string $slug endpoint to request
      *
      * @throws GuzzleException
      *
@@ -134,11 +129,13 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
+     * Hydrates the repository with earlier fetched github data
+     * 
      * @param ObjectEntity $repository the repository where we want to find an organisation for
-     *
+     * @param ?array       $github     fetched organization info from github
      * @throws Exception
      */
-    public function setRepositoryWithGithubInfo(ObjectEntity $repository, $github): ObjectEntity
+    public function setRepositoryWithGithubInfo(ObjectEntity $repository, ?array $github): ObjectEntity
     {
         $repository->hydrate([
             'source' => 'github',
@@ -152,6 +149,7 @@ class FindOrganizationThroughRepositoriesService
             'programming_languages' => $github['programming_languages']
         ]);
         $this->entityManager->persist($repository);
+        isset($this->io) && $this->io->success("Mapped repo {$github['name']}");
 
         return $repository;
     }
@@ -201,14 +199,16 @@ class FindOrganizationThroughRepositoriesService
                     isset($this->io) && $this->io->success("Enriched repository");
 
                     return $repository;
+                } else {
+                    isset($this->io) && $this->io->error("No organisation found for fetched repository");
                 }
                 break;
             case 'gitlab':
-                // hetelfde maar dan voor gitlab
+                // hetzelfde maar dan voor gitlab
+                // @TODO code for gitlab as we do for github repositories
                 isset($this->io) && $this->io->error("We dont do gitlab yet ($url)");
                 break;
             default:
-                // error voor onbeknd type
                 isset($this->io) && $this->io->error("We dont know this type source yet ($source)");
                 break;
         }
@@ -244,7 +244,7 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * Makes sure the action the action can actually runs and then executes functions to update a organization with fetched opencatalogi.yaml info
+     * Makes sure the action the action can actually runs and then executes functions to update a repository with fetched organization info
      * 
      * @param ?array $data          data set at the start of the handler (not needed here)
      * @param ?array $configuration configuration of the action          (not needed here)
