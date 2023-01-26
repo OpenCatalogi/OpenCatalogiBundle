@@ -68,10 +68,10 @@ class DeveloperOverheidService
             return $this->source;
         }
 
-        $this->source = $this->entityManager->getRepository("App:Gateway")->findOneBy(["location"=>"https://developer.overheid.nl/api/repositories"]);
+        $this->source = $this->entityManager->getRepository("App:Gateway")->findOneBy(["location"=>"https://developer.overheid.nl/api"]);
 
         if(!$this->source){
-            $this->io->error("No source found for https://developer.overheid.nl/api/repositories");
+            $this->io->error("No source found for https://developer.overheid.nl/api");
         }
 
         return $this->source;
@@ -82,15 +82,15 @@ class DeveloperOverheidService
      *
      * @return ?Source
      */
-    public function getEntity(): ?Entity{
+    public function getRepositoryEntity(): ?Entity{
         if($this->repositoryEntity){
             return $this->repositoryEntity;
         }
 
-        $this->repositoryEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://developer.overheid.nl/api/repositories"]);
+        $this->repositoryEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.repository.schema.json"]);
 
         if(!$this->repositoryEntity){
-            $this->io->error("No entity found for https://developer.overheid.nl/api/repositories");
+            $this->io->error("No entity found for https://opencatalogi.nl/oc.repository.schema.json");
         }
 
         return $this->repositoryEntity;
@@ -128,7 +128,7 @@ class DeveloperOverheidService
             return $result;
         }
 
-        $repositories = $this->callService->call($source)['results'];
+        $repositories = $this->callService->call($source.'/repositories')['results'];
 
         $this->io->debug("Found ".count($repositories)." repositories");
         foreach($repositories as $repository){
@@ -137,13 +137,13 @@ class DeveloperOverheidService
 
         $this->entityManager->flush();
 
-        return $result];
+        return $result;
     }
 
     /**
      * @return ObjectEntity
      */
-    public function getGetComponent(string $id){
+    public function getRepository(string $id){
 
         // Dow e have a source
         if(!$source = $this->getSource()){
@@ -151,18 +151,18 @@ class DeveloperOverheidService
         }
 
         $this->io->debug('Getting repository '.$id);
-        $repository = $this->callService->call($source, '/'.$id);
+        $repository = $this->callService->call($source, '/repositories/'.$id);
 
         if(!$repository){
             $this->io->error('Could not find repository '.$id.' an source '.$source);
-            return ;
+            return;
         }
         $repository = $this->importRepository($repository);
 
         $this->entityManager->flush();
 
-        return $repository->getObject()
-;    }
+        return $repository->getObject();
+    }
 
     /**
      * @return ObjectEntity
@@ -171,13 +171,13 @@ class DeveloperOverheidService
 
         // Dow e have a source
         if(!$source = $this->getSource()){
-            return ;
+            return;
         }
         if(!$repositoryEntity = $this->getRepositoryEntity()){
-            return ;
+            return;
         }
         if(!$mapping = $this->getMapping()){
-            return ;
+            return;
         }
 
 

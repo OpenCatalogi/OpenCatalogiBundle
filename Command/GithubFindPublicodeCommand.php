@@ -11,7 +11,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Command to execute the FindGithubRepositoryThroughOrganizationService
  */
-class FindGithubRepositoryThroughOrganizationCommand extends Command
+class GithubFindPublicodeCommand extends Command
 {
     protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
     private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
