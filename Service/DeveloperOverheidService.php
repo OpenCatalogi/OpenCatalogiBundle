@@ -98,13 +98,10 @@ class DeveloperOverheidService
             return $result;
         }
 
-        // rows per page are 10, so i get only 10 results
-        $response = $this->callService->call($source, '/repositories');
-
-        $repositories = json_decode($response->getBody()->getContents(), true);
+        $repositories = $this->callService->getAllResults($source, '/repositories');
 
         $this->io->success("Found ".count($repositories)." repositories");
-        foreach($repositories['results'] as $repository){
+        foreach($repositories as $repository){
             $result[] = $this->importRepository($repository);
         }
 
@@ -187,7 +184,7 @@ class DeveloperOverheidService
 
 
     /**
-     * Get components trough the componenrs of developer.overheid.nl/apis
+     * Get components through the components of developer.overheid.nl/apis
      *
      * @return array
      */
@@ -201,13 +198,10 @@ class DeveloperOverheidService
 
         $this->io->comment('Trying to get all components from source '.$source->getName());
 
-        // @TODO rows per page are 10, so i get only 10 results
-        $response = $this->callService->call($source, '/apis');
-
-        $components = json_decode($response->getBody()->getContents(), true);
+        $components = $this->callService->getAllResults($source, '/apis');
 
         $this->io->success("Found ".count($components)." components");
-        foreach($components['results'] as $component){
+        foreach($components as $component){
             $result[] = $this->importComponent($component);
         }
 
@@ -272,6 +266,4 @@ class DeveloperOverheidService
 
         return $synchronization->getObject();
     }
-
-
 }
