@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class FindOrganizationThroughRepositoriesCommand extends Command
 {
-    protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
+    protected static $defaultName = 'opencatalogi:findOrganizationThroughRepositories:execute';
     private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
 
 
