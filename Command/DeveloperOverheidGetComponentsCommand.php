@@ -5,19 +5,18 @@ namespace OpenCatalogi\OpenCatalogiBundle\Command;
 use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the DeveloperOverheidService
+ * Command to execute the DeveloperOverheidService.
  */
 class DeveloperOverheidGetComponentsCommand extends Command
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'opencatalogi:developeroverheid:components';
     private DeveloperOverheidService  $developerOverheidService;
-
 
     public function __construct(DeveloperOverheidService $developerOverheidService)
     {
@@ -41,7 +40,7 @@ class DeveloperOverheidGetComponentsCommand extends Command
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
-        if(!$componentId){
+        if (!$componentId) {
             $this->developerOverheidService->getComponents();
         } elseif (!$this->developerOverheidService->getComponent($componentId)) {
             return Command::FAILURE;

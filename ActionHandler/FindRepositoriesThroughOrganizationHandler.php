@@ -2,11 +2,11 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoriesThroughOrganizationService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoriesThroughOrganizationService;
 
 /**
- * Via de github organisatie de repro's vand eorganisatie ophalen
+ * Via de github organisatie de repro's vand eorganisatie ophalen.
  */
 class FindRepositoriesThroughOrganizationHandler implements ActionHandlerInterface
 {
@@ -31,7 +31,7 @@ class FindRepositoriesThroughOrganizationHandler implements ActionHandlerInterfa
                     'description' => 'The uuid of the repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
                 ],
             ],
         ];

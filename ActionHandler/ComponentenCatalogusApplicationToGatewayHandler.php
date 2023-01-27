@@ -2,11 +2,11 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 
 /**
- * Haalt applications op van de componenten catalogus
+ * Haalt applications op van de componenten catalogus.
  */
 class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerInterface
 {
@@ -24,7 +24,6 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function getConfiguration(): array
     {
-
         return [
             '$id'        => 'https://opencatalogi.nl/oc.application.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
@@ -43,9 +42,9 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
                     'description' => 'The uuid of the Application entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.application.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.application.schema.json',
                 ],
-            ]
+            ],
         ];
     }
 
