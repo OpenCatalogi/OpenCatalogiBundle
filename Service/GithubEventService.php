@@ -2,10 +2,8 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,13 +20,13 @@ class GithubEventService
     private array $data;
 
     public function __construct(
-        EntityManagerInterface                     $entityManager,
-        GithubApiService                           $githubService,
-        CheckRepositoriesForPubliccodeService      $checkRepositoriesForPubliccodeService,
+        EntityManagerInterface $entityManager,
+        GithubApiService $githubService,
+        CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService,
         FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService,
         FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService,
-        RatingService                              $ratingService,
-        PubliccodeService                          $publiccodeService
+        RatingService $ratingService,
+        PubliccodeService $publiccodeService
     ) {
         $this->entityManager = $entityManager;
         $this->githubService = $githubService;

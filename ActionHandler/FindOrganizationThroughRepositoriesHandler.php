@@ -2,11 +2,11 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 
 /**
- * Loopt door alle repro's heen om de organisatie erbij te zoeken
+ * Loopt door alle repro's heen om de organisatie erbij te zoeken.
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
@@ -31,14 +31,14 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
                     'description' => 'The uuid of the repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
                 ],
                 'organisationEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the organisation entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json',
                 ],
             ],
         ];

@@ -9,13 +9,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the FindGithubRepositoryThroughOrganizationService
+ * Command to execute the FindGithubRepositoryThroughOrganizationService.
  */
-class FindGithubRepositoryThroughOrganizationCommand extends Command
+class GithubFindPublicodeCommand extends Command
 {
     protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
     private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
-
 
     public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
