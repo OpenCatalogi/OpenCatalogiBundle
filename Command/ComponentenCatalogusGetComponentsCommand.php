@@ -44,7 +44,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
             return Command::FAILURE;
         }
-    
+
         return Command::SUCCES;
     }
 }

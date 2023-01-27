@@ -26,7 +26,7 @@ class DeveloperOverheidService
     private Mapping $componentMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
-    
+
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
@@ -97,7 +97,7 @@ class DeveloperOverheidService
 
             return $result;
         }
-    
+
         $repositories = $this->callService->getAllResults($source, '/repositories');
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
@@ -128,7 +128,7 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->success('Getting repository '.$id);
         $response = $this->callService->call($source, '/repositories/'.$id);
-    
+
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
@@ -142,7 +142,7 @@ class DeveloperOverheidService
         }
 
         $this->entityManager->flush();
-    
+
         isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->getObject();
@@ -206,6 +206,7 @@ class DeveloperOverheidService
 
     /**
      * Get components through the components of developer.overheid.nl/apis.
+     *
      * @todo duplicate with ComponentenCatalogusService ?
      *
      * @return array
@@ -237,6 +238,7 @@ class DeveloperOverheidService
 
     /**
      * Get a component trough the components of developer.overheid.nl/apis/{id}.
+     *
      * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param string $id
