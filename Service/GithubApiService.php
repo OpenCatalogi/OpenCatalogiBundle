@@ -375,7 +375,7 @@ class GithubApiService
     // }
 
     /**
-     * Searches github for publiccode files
+     * Searches github for publiccode files @TODO testing
      *
      * @param $data
      * @param $configuration
@@ -413,7 +413,7 @@ class GithubApiService
         $repositories = array_merge($repositoriesYaml['results'],$repositoriesYml['results']);
 
         foreach($repositories as $repository){
-            $repository = $this->handlerepositoryArray($repository);
+            $repository = $this->handleRepositoryArray($repository);
             $this->entityManager->persist($repository);
         }
 
@@ -423,7 +423,7 @@ class GithubApiService
     }
 
     /**
-     * Turn an repro array into an object we can handle
+     * Turn an repro array into an object we can handle @TODO testing
      *
      * @param array $repro
      * @param Mapping $mapping
@@ -439,7 +439,10 @@ class GithubApiService
             return null;
         }
 
+        // @TODO Get mapping by ref repository
+
         // Mapp the repro to something ussefull
+        // @TODO test mapping
         $mappedRepository = $this->mappingService->mapping($this->repositoryMapping ?? $mapping, $repository);
 
         // Turn the organisation into a synchronyzed object
