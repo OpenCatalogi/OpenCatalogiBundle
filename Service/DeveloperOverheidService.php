@@ -25,6 +25,7 @@ class DeveloperOverheidService
     private Entity $componentEntity;
     private Mapping $componentMapping;
     private MappingService $mappingService;
+    private SymfonyStyle $io;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -85,6 +86,8 @@ class DeveloperOverheidService
     /**
      * Get repositories through the repositories of developer.overheid.nl/repositories.
      *
+     * @todo duplicate with GithubPubliccodeService ?
+     *
      * @return array
      */
     public function getRepositories(): array
@@ -92,19 +95,15 @@ class DeveloperOverheidService
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repositories');
+            isset($this->io) && $this->io->error('No source found when trying to get Repositories');
 
             return $result;
         }
 
-        // rows per page are 10, so i get only 10 results
-        // TODO: pagination?
-        $response = $this->callService->call($source, '/repositories');
-
-        $repositories = json_decode($response->getBody()->getContents(), true);
+        $repositories = $this->callService->getAllResults($source, '/repositories');
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
-        foreach ($repositories['results'] as $repository) {
+        foreach ($repositories as $repository) {
             $result[] = $this->importRepository($repository);
         }
 
@@ -114,7 +113,9 @@ class DeveloperOverheidService
     }
 
     /**
-     * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
+     * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
+     *
+     * @todo duplicate with GithubPubliccodeService ?
      *
      * @param string $id
      *
@@ -130,22 +131,29 @@ class DeveloperOverheidService
         }
 
         isset($this->io) && $this->io->success('Getting repository '.$id);
-        $repository = $this->callService->call($source, '/repositories/'.$id);
+        $response = $this->callService->call($source, '/repositories/'.$id);
+
+        $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find repository '.$id.' an source '.$source);
+            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
         $repository = $this->importRepository($repository);
+        if ($repository === null) {
+            return null;
+        }
 
         $this->entityManager->flush();
+
+        isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->getObject();
     }
 
     /**
-     * @todo
+     * @todo duplicate with GithubPubliccodeService ?
      *
      * @param $repository
      *
@@ -201,7 +209,9 @@ class DeveloperOverheidService
     }
 
     /**
-     * Get components trough the componenrs of developer.overheid.nl/apis.
+     * Get components through the components of developer.overheid.nl/apis.
+     *
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @return array
      */
@@ -218,13 +228,10 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
 
-        // rows per page are 10, so i get only 10 results
-        $response = $this->callService->call($source, '/apis');
-
-        $components = json_decode($response->getBody()->getContents(), true);
+        $components = $this->callService->getAllResults($source, '/apis');
 
         isset($this->io) && $this->io->success('Found '.count($components).' components');
-        foreach ($components['results'] as $component) {
+        foreach ($components as $component) {
             $result[] = $this->importComponent($component);
         }
 
@@ -235,6 +242,8 @@ class DeveloperOverheidService
 
     /**
      * Get a component trough the components of developer.overheid.nl/apis/{id}.
+     *
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param string $id
      *
@@ -273,7 +282,7 @@ class DeveloperOverheidService
     }
 
     /**
-     * @todo
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param $component
      *
@@ -298,12 +307,12 @@ class DeveloperOverheidService
             return null;
         }
 
-        isset($this->io) && $this->io->debug('Mapping object'.$component['name']);
+        isset($this->io) && $this->io->debug('Mapping object'.$component['service_name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
-        isset($this->io) && $this->io->comment('Checking component '.$component['service_name']);
+        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
