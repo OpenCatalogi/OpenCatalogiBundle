@@ -93,7 +93,7 @@ class DeveloperOverheidService
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get a Repositories');
-            
+
             return $result;
         }
 
