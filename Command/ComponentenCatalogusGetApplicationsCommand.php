@@ -41,10 +41,10 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
 
         if (!$applicationId) {
             $this->componentenCatalogusService->getApplications();
-        } else {
-            $this->componentenCatalogusService->getApplication($applicationId);
+        } elseif (!$this->componentenCatalogusService->getApplication($applicationId)) {
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCES;
     }
 }

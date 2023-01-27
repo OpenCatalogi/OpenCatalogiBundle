@@ -25,7 +25,8 @@ class DeveloperOverheidService
     private Entity $componentEntity;
     private Mapping $componentMapping;
     private MappingService $mappingService;
-
+    private SymfonyStyle $io;
+    
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
@@ -96,15 +97,11 @@ class DeveloperOverheidService
 
             return $result;
         }
-
-        // rows per page are 10, so i get only 10 results
-        // TODO: pagination?
-        $response = $this->callService->call($source, '/repositories');
-
-        $repositories = json_decode($response->getBody()->getContents(), true);
+    
+        $repositories = $this->callService->getAllResults($source, '/repositories');
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
-        foreach ($repositories['results'] as $repository) {
+        foreach ($repositories as $repository) {
             $result[] = $this->importRepository($repository);
         }
 
@@ -114,7 +111,7 @@ class DeveloperOverheidService
     }
 
     /**
-     * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
+     * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
      * @param string $id
      *
@@ -130,16 +127,23 @@ class DeveloperOverheidService
         }
 
         isset($this->io) && $this->io->success('Getting repository '.$id);
-        $repository = $this->callService->call($source, '/repositories/'.$id);
+        $response = $this->callService->call($source, '/repositories/'.$id);
+    
+        $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find repository '.$id.' an source '.$source);
+            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
         $repository = $this->importRepository($repository);
+        if ($repository === null) {
+            return null;
+        }
 
         $this->entityManager->flush();
+    
+        isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->getObject();
     }
@@ -201,7 +205,8 @@ class DeveloperOverheidService
     }
 
     /**
-     * Get components trough the componenrs of developer.overheid.nl/apis.
+     * Get components through the components of developer.overheid.nl/apis.
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @return array
      */
@@ -220,10 +225,8 @@ class DeveloperOverheidService
 
         $components = $this->callService->getAllResults($source, '/apis');
 
-        $components = json_decode($response->getBody()->getContents(), true);
-
         isset($this->io) && $this->io->success('Found '.count($components).' components');
-        foreach ($components['results'] as $component) {
+        foreach ($components as $component) {
             $result[] = $this->importComponent($component);
         }
 
@@ -234,6 +237,7 @@ class DeveloperOverheidService
 
     /**
      * Get a component trough the components of developer.overheid.nl/apis/{id}.
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param string $id
      *
@@ -272,7 +276,7 @@ class DeveloperOverheidService
     }
 
     /**
-     * @todo
+     * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param $component
      *

@@ -41,10 +41,10 @@ class ComponentenCatalogusGetComponentsCommand extends Command
 
         if (!$componentId) {
             $this->componentenCatalogusService->getComponents();
-        } else {
-            $this->componentenCatalogusService->getComponent($componentId);
+        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
+            return Command::FAILURE;
         }
-
-        return 0;
+    
+        return Command::SUCCES;
     }
 }

@@ -29,7 +29,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories')
-            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id or name');
+            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
