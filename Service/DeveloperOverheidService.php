@@ -55,6 +55,7 @@ class DeveloperOverheidService
     {
         $this->io = $io;
         $this->synchronizationService->setStyle($io);
+        $this->mappingService->setStyle($io);
 
         return $this;
     }
@@ -198,6 +199,7 @@ class DeveloperOverheidService
     public function getComponents(): array{
 
         $result = [];
+
         // Dow e have a source
         if(!$source = $this->getSource()){
             return $result;
@@ -266,6 +268,8 @@ class DeveloperOverheidService
             return ;
         }
 
+        $this->io->debug("Mapping object".$repository['name']);
+        $repository = $this->mappingService->mapping($mapping, $repository);
 
         $this->io->comment("Mapping object " . $mapping);
 
