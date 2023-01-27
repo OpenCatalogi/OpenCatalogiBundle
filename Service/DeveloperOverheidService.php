@@ -85,6 +85,7 @@ class DeveloperOverheidService
 
     /**
      * Get repositories through the repositories of developer.overheid.nl/repositories.
+     *
      * @todo duplicate with GithubPubliccodeService ?
      *
      * @return array
@@ -113,6 +114,7 @@ class DeveloperOverheidService
 
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
+     *
      * @todo duplicate with GithubPubliccodeService ?
      *
      * @param string $id

@@ -95,7 +95,7 @@ class ComponentenCatalogusService
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Applications');
-            
+
             return $result;
         }
 
