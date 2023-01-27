@@ -3,31 +3,27 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\DashboardCard;
-use App\Entity\Gateway;
 use App\Entity\Entity;
+use App\Entity\Gateway;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
-use App\Service\SynchronizationService;
+use App\Event\ActionEvent;
 use App\Exception\GatewayException;
+use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use Conduction\CommonGroundBundle\Service\CommonGroundService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use CommonGateway\OpenCatalogiBundle\OpenCatalogiService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use App\Event\ActionEvent;
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CatalogiService
 {
@@ -55,7 +51,6 @@ class CatalogiService
     private $valueRepo;
     private $actionRepo;
 
-
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,
@@ -81,9 +76,10 @@ class CatalogiService
     }
 
     /**
-     * Set symfony style in order to output to the console
+     * Set symfony style in order to output to the console.
      *
      * @param SymfonyStyle $io
+     *
      * @return self
      */
     public function setStyle(SymfonyStyle $io): self
@@ -94,9 +90,10 @@ class CatalogiService
     }
 
     /**
-     * Get and handle oll the objects of a catalogi
+     * Get and handle oll the objects of a catalogi.
      *
      * @param ObjectEntity $catalogus
+     *
      * @return void
      */
     public function readCatalogi(Gateway $source): void
@@ -104,7 +101,7 @@ class CatalogiService
         //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
         // var_dump('hello darkness my old friend');
 
-        (isset($this->io) ? $this->io->info('Looking at ' . $source->getName() . '(@:' . $source->getLocation() . ')') : '');
+        (isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')') : '');
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
             $source,
@@ -113,7 +110,7 @@ class CatalogiService
             ['query' => ['limit' => 10000]]
         )->getBody()->getContents(), true)['results'];
 
-        (isset($this->io) ? $this->io->writeln(['Found ' . count($objects) . ' objects']) : '');
+        (isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '');
 
         // Now we can check if any objects where removed
         //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
@@ -151,28 +148,28 @@ class CatalogiService
 
         $this->entityManager->flush();
 
-
         (isset($this->io) ? $this->io->writeln(['', 'Looking for objects to remove']) : '');
         // Now we can check if any objects where removed
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' => $source]);
 
-        (isset($this->io) ? $this->io->writeln(['Currently ' . count($synchonizations) . ' object attached to this source']) : '');
+        (isset($this->io) ? $this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']) : '');
         $counter = 0;
         foreach ($synchonizations as $synchonization) {
             if (!in_array($synchonization->getSourceId(), $synchonizedObjects)) {
                 $this->entityManager->remove($synchonization->getObject());
 
-                (isset($this->io) ? $this->io->writeln(['Removed ' . $synchonization->getSourceId()]) : '');
+                (isset($this->io) ? $this->io->writeln(['Removed '.$synchonization->getSourceId()]) : '');
                 $counter++;
             }
         }
-        (isset($this->io) ? $this->io->writeln(['Removed ' . $counter . ' object attached to this source']) : '');
+        (isset($this->io) ? $this->io->writeln(['Removed '.$counter.' object attached to this source']) : '');
 
         $this->entityManager->flush();
     }
 
     /**
      * @param array $object
+     *
      * @return void
      */
     public function handleObject(array $object, Gateway $source): ?Synchronization
@@ -182,7 +179,6 @@ class CatalogiService
             return null;
         }
 
-
         // Get The entities
         $this->prebObjectEntities();
 
@@ -190,16 +186,16 @@ class CatalogiService
         $reference = $object['_self']['schema']['ref'];
 
         switch ($reference) {
-            case "https://opencatalogi.nl/oc.catalogi.schema.json":
+            case 'https://opencatalogi.nl/oc.catalogi.schema.json':
                 $entity = $this->catalogusEntity;
                 break;
-            case "https://opencatalogi.nl/oc.organisation.schema.json":
+            case 'https://opencatalogi.nl/oc.organisation.schema.json':
                 $entity = $this->organisationEntity;
                 break;
-            case "https://opencatalogi.nl/oc.component.schema.json":
+            case 'https://opencatalogi.nl/oc.component.schema.json':
                 $entity = $this->componentEntity;
                 break;
-            case "https://opencatalogi.nl/oc.application.schema.json":
+            case 'https://opencatalogi.nl/oc.application.schema.json':
                 $entity = $this->applicationEntity;
                 break;
             default:
@@ -210,12 +206,12 @@ class CatalogiService
         // Lets handle whatever we found
         if (isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0) {
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
-            $baseSync =  $object['_self']['synchronisations'][0];
+            $baseSync = $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
 
             // Check for source
             if (!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $baseSync['source']['location']])) {
-                $source =  new Source();
+                $source = new Source();
                 $source->setName($baseSync['source']['name']);
                 $source->setDescription($baseSync['source']['description']);
                 $source->setLocation($baseSync['source']['location']);
@@ -240,7 +236,7 @@ class CatalogiService
     }
 
     /**
-     * Makes sure that we have the object entities that we need
+     * Makes sure that we have the object entities that we need.
      *
      * @return void
      */
@@ -289,14 +285,14 @@ class CatalogiService
 
             $this->entityManager->flush();
 
-            /*
-            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
-            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
-            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
-            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
-            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
-            $this->entityManager->persist($opencatalogiCatalog);
-            */
+        /*
+        $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+        $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
+        $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+        $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+        $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+        $this->entityManager->persist($opencatalogiCatalog);
+        */
         } else {
         }
 
@@ -461,7 +457,7 @@ class CatalogiService
     private function getDataFromCatalogi(array $catalogi, string $type): array
     {
         $location = $type === 'Catalogi' ? $this->configuration['location'] : $this->configuration['componentsLocation'];
-        $url = $catalogi['source']['location'] . $location;
+        $url = $catalogi['source']['location'].$location;
         if (isset($this->io)) {
             $this->io->text("Get $type from (known Catalogi: {$catalogi['source']['name']}) \"$url\"");
         }
@@ -513,7 +509,7 @@ class CatalogiService
             $response = $this->callService->call($source, $config['location'], 'GET', [
                 'query' => array_merge($config['query'], $page !== 1 ? ['page' => $page] : []),
             ]);
-        } catch (Exception | GuzzleException $exception) {
+        } catch (Exception|GuzzleException $exception) {
             $this->synchronizationService->ioCatchException($exception, ['trace', 'line', 'file', 'message' => [
                 'type'       => 'error',
                 'preMessage' => "Error while doing getUnknown{$config['type']} for Catalogi: ({$catalogi['source']['name']}) \"{$config['url']}\" (Page: $page): ",
@@ -730,12 +726,12 @@ class CatalogiService
 
         if (isset($this->io)) {
             $totalKnownComponents = is_countable($knownComponents) ? count($knownComponents) : 0;
-            $this->io->section("Found $totalKnownComponents known Component" . ($totalKnownComponents !== 1 ? 's' : ''));
+            $this->io->section("Found $totalKnownComponents known Component".($totalKnownComponents !== 1 ? 's' : ''));
             $this->io->block('Converting all known Components to readable/usable arrays...');
         }
 
         // Convert ObjectEntities to useable arrays
-        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://' . $_SERVER['HTTP_HOST'] : 'http://localhost';
+        $domain = isset($_SERVER['HTTP_HOST']) && $_SERVER['HTTP_HOST'] !== 'localhost' ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://localhost';
         foreach ($knownComponents as &$component) {
             // We only need the metadata and/or id in this specific case to get the ComponentLocation.
             $component = $component->toArray(1, ['id', 'synchronizations', 'self'], true);
@@ -768,17 +764,17 @@ class CatalogiService
                 isset($componentSync['gateway']['location']) && isset($componentSync['sourceId']) &&
                 array_key_exists('endpoint', $componentSync)
             ) {
-                return $componentSync['gateway']['location'] . $componentSync['endpoint'] . '/' . $componentSync['sourceId'];
+                return $componentSync['gateway']['location'].$componentSync['endpoint'].'/'.$componentSync['sourceId'];
             }
         }
         if (
             isset($component['x-commongateway-metadata']['self']) &&
             str_contains($component['x-commongateway-metadata']['self'], $this->configuration['componentsLocation'])
         ) {
-            return $catalogiLocation . $component['x-commongateway-metadata']['self'];
+            return $catalogiLocation.$component['x-commongateway-metadata']['self'];
         }
 
-        return $catalogiLocation . $this->configuration['componentsLocation'] . '/' . $component['id'];
+        return $catalogiLocation.$this->configuration['componentsLocation'].'/'.$component['id'];
     }
 
     /**
@@ -883,7 +879,7 @@ class CatalogiService
     {
         $totalUnknownComponents = is_countable($unknownComponents) ? count($unknownComponents) : 0;
         if (isset($this->io) && $totalUnknownComponents > 0) {
-            $this->io->block("Found $totalUnknownComponents unknown Component" . ($totalUnknownComponents !== 1 ? 's' : '') . ', start adding them...');
+            $this->io->block("Found $totalUnknownComponents unknown Component".($totalUnknownComponents !== 1 ? 's' : '').', start adding them...');
         }
 
         $addedComponents = [];
@@ -977,13 +973,13 @@ class CatalogiService
             1 => '/main/publiccode.yaml',
             2 => '/master/publiccode.yaml',
             3 => '/main/publiccode.yml',
-            4 => '/master/publiccode.yml'
+            4 => '/master/publiccode.yml',
         ];
 
         try {
             // var_dump($tryCount);
             // var_dump($publicCodeRepoName . $fileNamesToTry[$tryCount]);
-            $response = $this->callService->call($githubUserContentSource, $publicCodeRepoName . $fileNamesToTry[$tryCount]);
+            $response = $this->callService->call($githubUserContentSource, $publicCodeRepoName.$fileNamesToTry[$tryCount]);
         } catch (\Exception $e) {
             if ($tryCount == 3) {
                 return false;
@@ -1001,9 +997,9 @@ class CatalogiService
     public function getDependsOn(array $publicCodeParsed): array
     {
         $dependsOn = [
-            'open' => [],
+            'open'        => [],
             'proprietary' => [],
-            'hardware' => []
+            'hardware'    => [],
         ];
 
         if (is_array($publicCodeParsed) && key_exists('dependsOn', $publicCodeParsed)) {
@@ -1012,11 +1008,10 @@ class CatalogiService
                 foreach ($publicCodeParsed['dependsOn']['open'] as $dependsOnOpen) {
                     dump($dependsOnOpen);
                     $dependsOn['open'][] = [
-                        'name' => $dependsOnOpen['name'] ?? null,
-                        'version' => $dependsOnOpen['version'] ?? null
+                        'name'    => $dependsOnOpen['name'] ?? null,
+                        'version' => $dependsOnOpen['version'] ?? null,
                     ];
                 }
-
             }
 
             dump($dependsOn);
@@ -1025,8 +1020,8 @@ class CatalogiService
             if (key_exists('proprietary', $publicCodeParsed['dependsOn'])) {
                 foreach ($publicCodeParsed['dependsOn']['proprietary'] as $dependsOnProprietary) {
                     $dependsOn['proprietary'][] = [
-                        'name' => $dependsOnProprietary['name'] ?? null,
-                        'version' => $dependsOnProprietary['version'] ?? null
+                        'name'    => $dependsOnProprietary['name'] ?? null,
+                        'version' => $dependsOnProprietary['version'] ?? null,
                     ];
                 }
             }
@@ -1037,8 +1032,8 @@ class CatalogiService
             if (key_exists('hardware', $publicCodeParsed['dependsOn'])) {
                 foreach ($publicCodeParsed['dependsOn']['hardware'] as $dependsOnHardware) {
                     $dependsOn['hardware'][] = [
-                        'name' => $dependsOnHardware['name'] ?? null,
-                        'version' => $dependsOnHardware['version'] ?? null
+                        'name'    => $dependsOnHardware['name'] ?? null,
+                        'version' => $dependsOnHardware['version'] ?? null,
                     ];
                 }
             }
@@ -1081,21 +1076,21 @@ class CatalogiService
             $dependsOn = $this->getDependsOn($publicCodeParsed);
 
             $componentObjectArray = [
-                'softwareVersion' => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
-                'name' => $publicCodeParsed['name'] ?? null,
-                'softwareType' => $publicCodeParsed['softwareType'] ?? null,
-                'inputTypes' => $publicCodeParsed['inputTypes'] ?? null,
-                'platforms' => $publicCodeParsed['platforms'] ?? null,
-                'outputTypes' => $publicCodeParsed['outputTypes'] ?? null,
-                'categories' => $publicCodeParsed['categories'] ?? null,
+                'softwareVersion'   => $publicCodeParsed['publiccodeYmlVersion'] ?? null,
+                'name'              => $publicCodeParsed['name'] ?? null,
+                'softwareType'      => $publicCodeParsed['softwareType'] ?? null,
+                'inputTypes'        => $publicCodeParsed['inputTypes'] ?? null,
+                'platforms'         => $publicCodeParsed['platforms'] ?? null,
+                'outputTypes'       => $publicCodeParsed['outputTypes'] ?? null,
+                'categories'        => $publicCodeParsed['categories'] ?? null,
                 'developmentStatus' => $publicCodeParsed['developmentStatus'] ?? null,
-                'url' => $publicCodeParsed['url'] ?? null,
-                'description' => [
+                'url'               => $publicCodeParsed['url'] ?? null,
+                'description'       => [
                     'shortDescription' => $publicCodeParsed['description']['nl']['shortDescription'] ?? $publiccode['description']['en']['shortDescription'] ?? null,
-                    'documentation' => $publicCodeParsed['description']['nl']['documentation'] ?? $publiccode['description']['en']['documentation'] ?? null,
-                    'apiDocumentation' => $publicCodeParsed['description']['nl']['apiDocumentation'] ?? $publiccode['description']['en']['apiDocumentation'] ?? null
+                    'documentation'    => $publicCodeParsed['description']['nl']['documentation'] ?? $publiccode['description']['en']['documentation'] ?? null,
+                    'apiDocumentation' => $publicCodeParsed['description']['nl']['apiDocumentation'] ?? $publiccode['description']['en']['apiDocumentation'] ?? null,
                 ],
-                'dependsOn' => $dependsOn  // @todo dependsOn is null after hydrate
+                'dependsOn' => $dependsOn,  // @todo dependsOn is null after hydrate
             ];
             // @todo set parent repository as url
             $componentObjectEntity->hydrate($componentObjectArray);
@@ -1105,6 +1100,7 @@ class CatalogiService
 
             return ['response' => $componentObjectEntity->getId()->toString()];
         }
+
         return ['response' => false];
     }
 
@@ -1136,12 +1132,12 @@ class CatalogiService
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            //            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,
             'phone'       => null,
-            'email'       => null
+            'email'       => null,
         ]);
         $this->entityManager->persist($organizationObject);
 
@@ -1154,7 +1150,6 @@ class CatalogiService
         $this->data = $data['request'];
         $this->configuration = $configuration;
         $repositoryNonUnriched = $this->data;
-
 
         // Log errors with monolog
         if (!isset($this->data['repositoryUrl']) || strpos($this->data['repositoryUrl'], 'gitlab.com')) {
@@ -1174,7 +1169,6 @@ class CatalogiService
         $possibleRepositoryObjects = $this->valueRepo->findBy(['stringValue' => $repositoryNonUnriched['repositoryUrl']]);
         foreach ($possibleRepositoryObjects as $possibleRepositoryObject) {
             if ($possibleRepositoryObject->getAttribute()->getEntity()->getId()->toString() == $this->configuration['repositoryEntity']) {
-
                 $repositoryObject = $possibleRepositoryObject->getObjectEntity();
                 break;
             }
@@ -1186,13 +1180,14 @@ class CatalogiService
 
         // Fetch repository info
         isset($this->data['repositoryUrl']) && strpos($this->data['repositoryUrl'], 'github.com') &&
-            $endpoint = "/repos/" . trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
+            $endpoint = '/repos/'.trim(parse_url($this->data['repositoryUrl'], PHP_URL_PATH), '/');
 
-        if (isset($endpoint) && $endpoint !== "/repos/") {
+        if (isset($endpoint) && $endpoint !== '/repos/') {
             try {
                 $response = $this->callService->call($githubSource, $endpoint, 'GET');
             } catch (\Exception $e) {
                 var_dump($e->getMessage());
+
                 return ['response' => false];
                 // Log error with monolog
 //                throw new \Exception($e->getMessage());
@@ -1203,7 +1198,7 @@ class CatalogiService
             if (is_string($enrichedComponent)) {
                 dump('ENRICHED COMPONENT STRING');
                 dump($enrichedComponent);
-                die;
+                exit;
             }
 
             $repositoryObjectArray = [
@@ -1252,7 +1247,6 @@ class CatalogiService
         var_dump('syncedApplicationToGatewayHandler triggered');
         $this->data = $data['response'];
         $this->configuration = $configuration;
-
 
         $applicationSyncObjectArray = $this->data;
         $applicationSyncObject = $this->objectRepo->find($applicationSyncObjectArray['_self']['id']);

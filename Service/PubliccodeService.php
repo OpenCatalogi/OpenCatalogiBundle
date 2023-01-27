@@ -2,12 +2,10 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Entity;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\HttpFoundation\Response;
 
 class PubliccodeService
 {
@@ -52,16 +50,16 @@ class PubliccodeService
 
                     // New
                     $organization->hydrate([
-                        'name' => $catalogi['name'],
-                        'description' => $catalogi['description'],
-                        'type' => $catalogi['type'],
-                        'telephone' => $catalogi['telephone'],
-                        'email' => $catalogi['email'],
-                        'website' => $catalogi['website'],
-                        'logo' => $catalogi['logo'],
+                        'name'         => $catalogi['name'],
+                        'description'  => $catalogi['description'],
+                        'type'         => $catalogi['type'],
+                        'telephone'    => $catalogi['telephone'],
+                        'email'        => $catalogi['email'],
+                        'website'      => $catalogi['website'],
+                        'logo'         => $catalogi['logo'],
                         'catalogusAPI' => $catalogi['catalogusAPI'],
-                        'uses' => $catalogi['uses'],
-                        'supports' => $catalogi['supports']
+                        'uses'         => $catalogi['uses'],
+                        'supports'     => $catalogi['supports'],
                     ]);
                 } catch (Exception $exception) {
                     var_dump("Data error for {$organization->getValue('name')}, {$exception->getMessage()}");

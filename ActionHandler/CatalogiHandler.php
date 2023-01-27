@@ -2,12 +2,11 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 
 /**
- * Handles the federalisation cron actions for open catalogi. e.g. getting data from other catalogi
+ * Handles the federalisation cron actions for open catalogi. e.g. getting data from other catalogi.
  */
 class CatalogiHandler implements ActionHandlerInterface
 {
@@ -25,13 +24,12 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function getConfiguration(): array
     {
-
         return [
-            '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'CatalogiHandler',
-            'description' => 'Syncs  all the know catalogi'
-            ];
+            '$id'         => 'https://example.com/person.schema.json',
+            '$schema'     => 'https://json-schema.org/draft/2020-12/schema',
+            'title'       => 'CatalogiHandler',
+            'description' => 'Syncs  all the know catalogi',
+        ];
 
         // We don't need all of this
 
