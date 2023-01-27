@@ -27,7 +27,8 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
-            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info');
+            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info')
+            ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -35,7 +36,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $this->findOrganizationThroughRepositoriesService->setStyle($io);
 
-        $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler();
+        $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $input->getOption('repositoryId', false));
 
         return 0;
     }
