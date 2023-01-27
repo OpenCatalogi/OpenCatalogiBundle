@@ -6,7 +6,7 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 
 /**
- * Berkent de rating van het component
+ * Berkent de rating van het component.
  */
 class RatingHandler implements ActionHandlerInterface
 {
@@ -31,14 +31,14 @@ class RatingHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json',
                 ],
                 'ratingEntityId' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the rating entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.rating.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.rating.schema.json',
                 ],
             ],
         ];

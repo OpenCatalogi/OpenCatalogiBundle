@@ -2,8 +2,9 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Gateway as Source;
+use CommonGateway\CoreBundle\Service\CallService;
 use App\Entity\ObjectEntity;
+use App\Entity\Gateway as Source;
 use App\Service\SynchronySationService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -12,7 +13,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use CommonGateway\CoreBundle\Service\CallService;
 
 class GithubApiService
 {
@@ -126,7 +126,7 @@ class GithubApiService
             'issue_open_count'        => $item['open_issues_count'],
             //            'merge_request_open_count'   => $this->requestFromUrl($item['merge_request_open_count']),
             'programming_languages'   => $this->requestFromUrl($item['languages_url']),
-//            'organisation'            => $item['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($item) : null,
+            //            'organisation'            => $item['owner']['type'] === 'Organization' ? $this->getGithubOwnerInfo($item) : null,
             //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
             //                'related_apis' => //
         ];
@@ -217,7 +217,7 @@ class GithubApiService
             'name'        => $item['owner']['login'],
             'description' => null,
             'logo'        => $item['owner']['avatar_url'] ?? null,
-//            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
+            //            'owns'        => $this->getGithubOwnerRepositories($item['owner']['repos_url']),
             'token'       => null,
             'github'      => $item['owner']['html_url'] ?? null,
             'website'     => null,

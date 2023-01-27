@@ -9,15 +9,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the FindGithubRepositoryThroughOrganizationService
+ * Command to execute the FindGithubRepositoryThroughOrganizationService.
  */
 class GithubFindPublicodeCommand extends Command
 {
     protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
     private GithubApiService $githubApiService;
 
-
-    public function __construct(GithubApiService $githubApiService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
         $this->githubApiService = $githubApiService;
         parent::__construct();
@@ -42,6 +41,6 @@ class GithubFindPublicodeCommand extends Command
             $this->githubApiService->handleFindRepositoriesContainingPubliccode();
         //}
 
-        return 0;
+        return Command::SUCCESS;
     }
 }

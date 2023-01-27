@@ -16,7 +16,7 @@
     "minimum-stability" : "dev",
     "require": {
         "php": ">=7.4",
-		"commongateway/corebundle": "dev-master"
+		"commongateway/corebundle": "dev-feature/oc-bundle"
 	},
 	"require-dev" : {
 		"symfony/dependency-injection" : "~3.4|~4.1|~5.0"

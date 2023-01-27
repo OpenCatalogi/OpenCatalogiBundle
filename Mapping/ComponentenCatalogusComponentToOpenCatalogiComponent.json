@@ -1,0 +1,34 @@
+{
+  "title": "ComponentenCatalogusComponentToOpenCatalogiComponent",
+  "$id": "https://componentencatalogus.commonground.nl/api/components",
+  "$schema": "https://json-schema.org/draft/2020-12/mapping",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "name": "{{ name }}",
+    "description.localisedName": "{{ name }}",
+    "description.shortDescription": "{{ description }}",
+    "description.longDescription": "{{ description }}",
+    "legal.repoOwner.name": "{{ owner.fullName }}",
+    "legal.repoOwner.email": "{{ owner.email }}",
+    "nl.commonground.layerType": "{{ layerType }}",
+    "landingURL": "{{ repositoryUrl }}",
+    "developmentStatus": "{{ status }}",
+    "url.url": "{{ repositoryUrl }}",
+    "url.organisation.name": "{{ organisationName }}"
+  },
+  "unset": [
+    "layerType",
+    "owner",
+    "status",
+    "expectedQuarter",
+    "expectedYear",
+    "developedBy",
+    "createdAt",
+    "reuseType",
+    "organisationName",
+    "repositoryUrl",
+    "contact"
+  ],
+  "cast": []
+}

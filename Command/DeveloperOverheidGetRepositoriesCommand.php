@@ -12,10 +12,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Command to execute the DeveloperOverheidService.
  */
-class DeveloperOverheidGetComponentsCommand extends Command
+class DeveloperOverheidGetRepositoriesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
-    protected static $defaultName = 'opencatalogi:developeroverheid:components';
+    protected static $defaultName = 'opencatalogi:developeroverheid:repositories';
     private DeveloperOverheidService  $developerOverheidService;
 
     public function __construct(DeveloperOverheidService $developerOverheidService)
@@ -28,8 +28,8 @@ class DeveloperOverheidGetComponentsCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
-            ->setHelp('This command allows you to get all components or one component from developer.overheid.nl/apis')
-            ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
+            ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories')
+            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -38,11 +38,11 @@ class DeveloperOverheidGetComponentsCommand extends Command
         $this->developerOverheidService->setStyle($io);
 
         // Handle the command options
-        $componentId = $input->getOption('component', false);
+        $repositoryId = $input->getOption('repository', false);
 
-        if (!$componentId) {
-            $this->developerOverheidService->getComponents();
-        } elseif (!$this->developerOverheidService->getComponent($componentId)) {
+        if (!$repositoryId) {
+            $this->developerOverheidService->getRepositories();
+        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }
 

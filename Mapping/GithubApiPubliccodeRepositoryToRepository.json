@@ -1,0 +1,25 @@
+{
+  "title": "DeveloperOverheidApisToComponent",
+  "$id": "https://api.github.com/search/code",
+  "$schema": "https://json-schema.org/draft/2020-12/mapping",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "name": "{{ repository.name }}",
+    "url": "{{ repository.html_url }}",
+    "publiccode_url": "{{ html_url }}",
+    "organisation.name": "{{ repository.owner.login }}",
+    "organisation.logo": "{{ repository.owner.avatar_url }}",
+    "organisation.github": "{{ repository.owner.url }}",
+    "organisation.type": "{{ repository.owner.type }}"
+  },
+  "unset": [
+    "path",
+    "sha",
+    "git_url",
+    "html_url",
+    "score",
+    "repository"
+  ],
+  "cast": []
+}

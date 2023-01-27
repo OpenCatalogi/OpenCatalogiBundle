@@ -2,11 +2,11 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 
 /**
- * Komt te vervallen
+ * Komt te vervallen.
  */
 class CreateUpdateRepositoryHandler implements ActionHandlerInterface
 {
@@ -24,7 +24,6 @@ class CreateUpdateRepositoryHandler implements ActionHandlerInterface
      */
     public function getConfiguration(): array
     {
-
         return [
             '$id'        => 'https://opencatalogi.nl/oc.repository.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
@@ -43,7 +42,7 @@ class CreateUpdateRepositoryHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the Catalogi entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.catalogi.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.catalogi.schema.json',
                 ],
                 'location' => [
                     'type'        => 'string',
@@ -56,23 +55,23 @@ class CreateUpdateRepositoryHandler implements ActionHandlerInterface
                     'description' => 'The uuid of the Component entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json',
                 ],
                 'repositoryEntity' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the Repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
                 ],
                 'organizationEntity' => [
                     'type'        => 'uuid',
                     'description' => 'The uuid of the Repository entity',
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json'
+                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json',
                 ],
-            ]
+            ],
         ];
     }
 
