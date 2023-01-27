@@ -17,14 +17,31 @@ class GithubApiService
     private ?Client $githubClient;
     private ?Client $githubusercontentClient;
     private CallService $callService;
+    private EntityManagerInterface $entityManager;
+    private SymfonyStyle $io;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
-        CallService $callService
+        CallService $callService,
+        EntityManagerInterface $entityManager
     ) {
         $this->parameterBag = $parameterBag;
         $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
         $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * Set symfony style in order to output to the console
+     *
+     * @param SymfonyStyle $io
+     * @return self
+     */
+    public function setStyle(SymfonyStyle $io): self
+    {
+        $this->io = $io;
+
+        return $this;
     }
 
     /**
@@ -313,5 +330,25 @@ class GithubApiService
         $response = json_decode($response->getBody()->getContents(), true);
 
         return $response['private'];
+    }
+
+    /**
+     * Searches github for publiccode files
+     *
+     * @param $data
+     * @param $configuration
+     * @return array
+     */
+    public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): array{
+
+       // get github source
+
+        // check if github source has authkey
+
+        // find on publiccode.yml
+
+        // find onf publiccode.yaml
+
+        return $data;
     }
 }
