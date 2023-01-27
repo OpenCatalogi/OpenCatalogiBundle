@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- *  This class handles the interaction with developer.overheid.nl.
+ *  This class handles the interaction with github.com.
  */
 class GithubPubliccodeService
 {
@@ -209,12 +209,12 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
-        $repository = $this->mappingService->mapping($mapping, $repository['repository']['name']);
+        isset($this->io) && $this->io->comment('Mapping object '.$repository['repository']['name']);
+        $repository = $this->mappingService->mapping($mapping, $repository);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
+        isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
