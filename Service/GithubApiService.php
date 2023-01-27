@@ -2,6 +2,9 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
+use App\Entity\Gateway as Source;
+use App\Entity\ObjectEntity;
+use App\Service\SynchronySationService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -17,14 +20,46 @@ class GithubApiService
     private ?Client $githubClient;
     private ?Client $githubusercontentClient;
     private CallService $callService;
+    private EntityManagerInterface $entityManager;
+    private SymfonyStyle $io;
+    private Source $source;
+    private SynchronySationService $synchronySationService;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
-        CallService $callService
+        CallService $callService,
+        EntityManagerInterface $entityManager,
+        SynchronySationService $synchronySationService
     ) {
         $this->parameterBag = $parameterBag;
         $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
         $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
+        $this->entityManager = $entityManager;
+        $this->synchronySationService = $synchronySationService;
+    }
+
+    /**
+     * Set symfony style in order to output to the console
+     *
+     * @param SymfonyStyle $io
+     * @return self
+     */
+    public function setStyle(SymfonyStyle $io): self
+    {
+        $this->io = $io;
+
+        return $this;
+    }
+
+    public function getSource(){
+        !isset($this->source) && $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com/']);
+        if (!isset($this->source)) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a Source for the Github API');
+            return [];
+        };
+
+        return $this->source;
     }
 
     /**
@@ -313,5 +348,107 @@ class GithubApiService
         $response = json_decode($response->getBody()->getContents(), true);
 
         return $response['private'];
+    }
+
+    /**
+     * Searches github for publiccode files
+     *
+     * @param $data
+     * @param $configuration
+     * @return array
+     */
+    public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): array{
+
+       // get github source
+        if(!$source = $this->getSource()){
+            return $data;
+        }
+
+        // check if github source has authkey
+
+        // Build the query
+
+        $query = [
+            'page'     => 1,
+            'per_page' => 200,
+            'order'    => 'desc',
+            'sort'     => 'author-date',
+            'q'        => 'publiccode in:path path:/  extension:yml', // so we are looking for a yaml file called publiccode based in the repo root
+        ];
+
+
+        // find on publiccode.yml
+        $repositoriesYml = $this->callService->call($source,'/search/code',['query' => $this->query]);
+
+        $query['q'] = 'publiccode in:path path:/  extension:yaml'; // switch from yml to yaml
+        // find onf publiccode.yaml
+        $repositoriesYaml = $this->callService->call($source,'/search/code',['query' => $this->query]);
+
+        // merge rhe result
+        $repositories = array_merge($repositoriesYaml['results'],$repositoriesYml['results']);
+
+        foreach($repositories as $reprository){
+            $reprository = $this->handleReprositoryArray($reprository);
+            $this->entityManager->persist($reprository);
+        }
+
+        $this->entityManager->flush();
+
+        return $data;
+    }
+
+    /**
+     * Turn an repro array into an object we can handle
+     *
+     * @param array $repro
+     * @return ObjectEntity
+     */
+    public function handleReprositoryArray(array $reprository): ObjectEntity {
+
+        // check for mapping
+
+        // Mapp the repro to something ussefull
+        $mappedRepro = $this->mappingService->mapping($this->repositoryMapping, $reprository);
+
+        // Turn the organisation into a synchronyzed object
+        $synchronysation = $this->synchronySationService->synchronize($mappedRepro, $this->reprositoryEntity, $this->source());
+        $reprositoryObject = $synchronysation->getObject();
+
+        if(isset($reprository['organisation'])){
+            $organisation = $this->handleReprositoryArray($reprository['organisation']);
+            $reprository->setValue('organization', $organisation);
+        }
+
+        return $reprositoryObject;
+
+    }
+
+    /**
+     * Turn an organisation array into an object we can handle
+     *
+     * @param array $repro
+     * @return ObjectEntity
+     */
+    public function handleOrganizationArray(array $organisation): ObjectEntity {
+
+        // check for mapping
+
+        // Mapp the repro to something ussefull
+        $mappedOrganisation = $this->mappingService->mapping($this->repositoryMapping, $organisation);
+
+        // Turn the organisation into a synchronyzed object
+        $synchronysation = $this->synchronySationService->synchronize($mappedOrganisation, $this->organizationEntity, $this->source());
+        $organisationObject = $synchronysation->getObject();
+
+        if(isset($organisation['repositories'])){
+            foreach($organisation['repositories'] as $reprository){
+                $reprository = $this->handleReprositoryArray($reprository);
+                // Organizations don't have repositories so we need to set to organization on the repo site and persist that
+                $reprository->setValue('organization', $organisation);
+                $this->entityManager->persist($reprository);
+            }
+        }
+
+        return $organisationObject;
     }
 }

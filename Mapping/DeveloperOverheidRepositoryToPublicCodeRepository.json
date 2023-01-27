@@ -1,0 +1,14 @@
+{
+  "title": "DeveloperOverheidRepositoryToPublicCodeRepository",
+  "$id": "https://opencatalogi.nl/oc.developeroverheid.repository.mapping.json",
+  "$schema": "https://json-schema.org/draft/2020-12/maping",
+  "version": "0.0.1",
+  "passTrough": true,
+  "mapping": [],
+  "unset": [
+    "owner_name",
+    "related_apis",
+    "archived"
+    ],
+  "cast": []
+}
