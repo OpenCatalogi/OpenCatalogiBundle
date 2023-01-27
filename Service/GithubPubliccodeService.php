@@ -244,7 +244,7 @@ class GithubPubliccodeService
         }
         if (!$mapping = $this->getRepositoryMapping()) {
             isset($this->io) && $this->io->error('No RepositoryMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
-            
+
             return null;
         }
 
