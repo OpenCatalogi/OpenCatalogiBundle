@@ -29,7 +29,7 @@ class DeveloperOverheidGetComponentsCommand extends Command
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all components or one component from developer.overheid.nl/apis')
-            ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe component by id');
+            ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

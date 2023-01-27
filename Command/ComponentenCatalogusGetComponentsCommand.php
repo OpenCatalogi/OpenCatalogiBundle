@@ -28,7 +28,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         $this
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all components or one component from componentencatalogus.commonground.nl/api/components')
-            ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe component by id');
+            ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

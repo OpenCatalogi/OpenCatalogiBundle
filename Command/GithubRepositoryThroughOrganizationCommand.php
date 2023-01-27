@@ -36,6 +36,6 @@ class GithubRepositoryThroughOrganizationCommand extends Command
 
         $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler();
 
-        return 0;
+        return Command::SUCCES;
     }
 }

@@ -94,6 +94,8 @@ class ComponentenCatalogusService
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to get Applications');
+            
             return $result;
         }
 
@@ -284,7 +286,6 @@ class ComponentenCatalogusService
      */
     public function importComponent($component): ?ObjectEntity
     {
-
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');

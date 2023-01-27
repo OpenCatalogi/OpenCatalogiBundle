@@ -27,7 +27,7 @@ class FederalizationGetCommand extends Command
         $this
             ->setDescription('This command gets al or a single catalogi from the federalized network')
             ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
-            ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a singe catalogue by id or name');
+            ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -55,6 +55,6 @@ class FederalizationGetCommand extends Command
             $this->federalizationService->readCatalogus($catalogusObject);
         }
 
-        return 0;
+        return Command::SUCCES;;
     }
 }
