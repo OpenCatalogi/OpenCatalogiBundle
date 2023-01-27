@@ -112,6 +112,7 @@ class GithubPubliccodeService
     /**
      * Get repositories through the repositories of https://api.github.com/search/code
      * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
+     * @todo duplicate with DeveloperOverheidService ?
      *
      * @return array
      */
@@ -123,7 +124,10 @@ class GithubPubliccodeService
             return $result;
         }
 
-        // @TODO rows per page are 10, so i get only 10 results
+        // @TODO rows per page, pagination:
+//        $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
+        
+        // todo: only returns the first 10 items
         $response = $this->callService->call($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
@@ -137,18 +141,21 @@ class GithubPubliccodeService
 
         return $result;
     }
-
+    
     /**
      * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
+     * @todo duplicate with DeveloperOverheidService ?
      *
-     * @return array
+     * @param string $id
+     * @return array|null
      */
-    public function getRepository(string $id)
+    public function getRepository(string $id): ?array
     {
-
         // Do we have a source
         if (!$source = $this->getSource()) {
-            return;
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            
+            return null;
         }
 
         isset($this->io) && $this->io->success('Getting repository '.$id);
@@ -159,9 +166,12 @@ class GithubPubliccodeService
         if (!$repository) {
             isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
-            return;
+            return null;
         }
         $repository = $this->importRepository($repository);
+        if ($repository === null) {
+            return null;
+        }
 
         $this->entityManager->flush();
 
@@ -169,24 +179,35 @@ class GithubPubliccodeService
 
         return $repository->toArray();
     }
-
+    
     /**
-     * @return ObjectEntity
+     * @todo
+     *
+     * @param $repository
+     * @return ?ObjectEntity
      */
-    public function importPubliccodeRepository($repository)
+    public function importPubliccodeRepository($repository): ?ObjectEntity
     {
-
         // Do we have a source
         if (!$source = $this->getSource()) {
-            return;
+            isset($this->io) && $this->io->error('No source found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            
+            return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            return;
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            
+            return null;
         }
         if (!$mapping = $this->getRepositoriesMapping()) {
-            return;
+            isset($this->io) && $this->io->error('No RepositoriesMapping found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            
+            return null;
         }
 
+        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
+        $repository = $this->mappingService->mapping($mapping, $repository['repository']['name']);
+    
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
@@ -196,24 +217,33 @@ class GithubPubliccodeService
 
         return $synchronization->getObject();
     }
-
+    
     /**
-     * @return ObjectEntity
+     * @todo duplicate with DeveloperOverheidService ?
+     *
+     * @param $repository
+     * @return ObjectEntity|null
      */
-    public function importRepository($repository)
+    public function importRepository($repository): ?ObjectEntity
     {
-
         // Do we have a source
         if (!$source = $this->getSource()) {
-            return;
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            
+            return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            return;
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            
+            return null;
         }
         if (!$mapping = $this->getRepositoryMapping()) {
-            return;
+            return null;
         }
 
+        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
+        $repository = $this->mappingService->mapping($mapping, $repository['name']);
+    
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
