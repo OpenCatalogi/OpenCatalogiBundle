@@ -1,22 +1,21 @@
 <?php
 
 // src/Service/LarpingService.php
+
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use Exception;
 use App\Entity\Action;
-use App\Entity\DashboardCard;
+use App\Entity\CollectionEntity;
 use App\Entity\Cronjob;
+use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\ObjectEntity;
-use App\Entity\CollectionEntity;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstallationService implements InstallerInterface
 {
@@ -28,7 +27,7 @@ class InstallationService implements InstallerInterface
     public const OBJECTS_THAT_SHOULD_HAVE_CARDS = [
         'https://opencatalogi.nl/oc.component.schema.json',
         'https://opencatalogi.nl/oc.application.schema.json',
-        'https://opencatalogi.nl/oc.catalogi.schema.json'
+        'https://opencatalogi.nl/oc.catalogi.schema.json',
     ];
 
     public const SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS = [
@@ -40,18 +39,18 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-//            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
+        //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
 
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler",
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler'
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
@@ -62,9 +61,10 @@ class InstallationService implements InstallerInterface
     }
 
     /**
-     * Set symfony style in order to output to the console
+     * Set symfony style in order to output to the console.
      *
      * @param SymfonyStyle $io
+     *
      * @return self
      */
     public function setStyle(SymfonyStyle $io): self
@@ -99,7 +99,6 @@ class InstallationService implements InstallerInterface
         }
 
         foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
-
             switch ($value['type']) {
                 case 'string':
                 case 'array':
@@ -118,11 +117,12 @@ class InstallationService implements InstallerInterface
                     return $defaultConfig;
             }
         }
+
         return $defaultConfig;
     }
 
     /**
-     * This function creates actions for all the actionHandlers in OpenCatalogi
+     * This function creates actions for all the actionHandlers in OpenCatalogi.
      *
      * @return void
      */
@@ -131,13 +131,13 @@ class InstallationService implements InstallerInterface
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
 
         $actionHandlers = $this::ACTION_HANDLERS;
-        (isset($this->io)?$this->io->writeln(['','<info>Looking for actions</info>']):'');
+        (isset($this->io) ? $this->io->writeln(['', '<info>Looking for actions</info>']) : '');
 
         foreach ($actionHandlers as $handler) {
             $actionHandler = $this->container->get($handler);
 
             if ($this->entityManager->getRepository('App:Action')->findOneBy(['class' => get_class($actionHandler)])) {
-                (isset($this->io) ? $this->io->writeln(['Action found for ' . $handler]) : '');
+                (isset($this->io) ? $this->io->writeln(['Action found for '.$handler]) : '');
                 continue;
             }
 
@@ -150,7 +150,7 @@ class InstallationService implements InstallerInterface
 
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
                 $action->setListens(['opencatalogi.component.check']);
-                $action->setConditions(["==" => [1, 1]]);
+                $action->setConditions(['==' => [1, 1]]);
 
                 // set source to the defaultConfig array
                 $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']);
@@ -187,7 +187,7 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($action);
 
-            (isset($this->io) ? $this->io->writeln(['Action created for ' . $handler]) : '');
+            (isset($this->io) ? $this->io->writeln(['Action created for '.$handler]) : '');
         }
     }
 
@@ -195,7 +195,7 @@ class InstallationService implements InstallerInterface
     {
         $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
         $endpoints = [];
-        foreach($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
+        foreach ($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
             if (!$endpointRepository->findOneBy(['name' => $entity->getName()])) {
                 $endpoint = new Endpoint($entity, $objectThatShouldHaveEndpoint['path'], $objectThatShouldHaveEndpoint['methods']);
@@ -205,7 +205,7 @@ class InstallationService implements InstallerInterface
                 $endpoints[] = $endpoint;
             }
         }
-        (isset($this->io) ? $this->io->writeln(count($endpoints).' Endpoints Created'): '');
+        (isset($this->io) ? $this->io->writeln(count($endpoints).' Endpoints Created') : '');
 
         return $endpoints;
     }
@@ -213,9 +213,10 @@ class InstallationService implements InstallerInterface
     private function addSchemasToCollection(CollectionEntity $collection, string $schemaPrefix): CollectionEntity
     {
         $entities = $this->entityManager->getRepository('App:Entity')->findByReferencePrefix($schemaPrefix);
-        foreach($entities as $entity) {
+        foreach ($entities as $entity) {
             $entity->addCollection($collection);
         }
+
         return $collection;
     }
 
@@ -226,13 +227,13 @@ class InstallationService implements InstallerInterface
                 'name' => 'OpenCatalogi',
                 //  Might be added later
                 // 'prefix' => 'oc',
-                'prefix' => null,
-                'schemaPrefix' => 'https://opencatalogi.nl'],
+                'prefix'       => null,
+                'schemaPrefix' => 'https://opencatalogi.nl', ],
         ];
         $collections = [];
-        foreach($collectionConfigs as $collectionConfig) {
+        foreach ($collectionConfigs as $collectionConfig) {
             $collectionsFromEntityManager = $this->entityManager->getRepository('App:CollectionEntity')->findBy(['name' => $collectionConfig['name']]);
-            if(count($collectionsFromEntityManager) == 0){
+            if (count($collectionsFromEntityManager) == 0) {
                 $collection = new CollectionEntity($collectionConfig['name'], $collectionConfig['prefix'], 'OpenCatalogiBundle');
             } else {
                 $collection = $collectionsFromEntityManager[0];
@@ -242,14 +243,15 @@ class InstallationService implements InstallerInterface
             $this->entityManager->flush();
             $collections[$collectionConfig['name']] = $collection;
         }
-        (isset($this->io) ? $this->io->writeln(count($collections).' Collections Created'): '');
+        (isset($this->io) ? $this->io->writeln(count($collections).' Collections Created') : '');
+
         return $collections;
     }
 
     public function createDashboardCards($objectsThatShouldHaveCards)
     {
         foreach ($objectsThatShouldHaveCards as $object) {
-            (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: ' . $object) : '');
+            (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: '.$object) : '');
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
             if (
                 !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()])
@@ -277,63 +279,59 @@ class InstallationService implements InstallerInterface
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi'])) {
             $cronjob = new Cronjob();
             $cronjob->setName('Open Catalogi');
-            $cronjob->setDescription("This cronjob fires all the open catalogi actions ever 5 minutes");
+            $cronjob->setDescription('This cronjob fires all the open catalogi actions ever 5 minutes');
             $cronjob->setThrows(['opencatalogi.default.listens']);
             $cronjob->setIsEnabled(true);
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger'])) {
             $cronjob = new Cronjob();
             $cronjob->setName('Bronnen trigger');
-            $cronjob->setDescription("This cronjob fires all the open catalogi bronnen actions ever 5 minutes");
+            $cronjob->setDescription('This cronjob fires all the open catalogi bronnen actions ever 5 minutes');
             $cronjob->setThrows(['opencatalogi.bronnen.trigger']);
             $cronjob->setIsEnabled(true);
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
             $cronjob = new Cronjob();
             $cronjob->setName('Github scrapper');
-            $cronjob->setDescription("This cronjob fires all the open catalogi github actions ever 5 minutes");
+            $cronjob->setDescription('This cronjob fires all the open catalogi github actions ever 5 minutes');
             $cronjob->setThrows(['opencatalogi.github']);
             // What does this do
             $cronjob->setIsEnabled(false);
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation'])) {
             $cronjob = new Cronjob();
             $cronjob->setName('Federation');
-            $cronjob->setDescription("This cronjob fires all the open catalogi federation actions ever 5 minutes");
+            $cronjob->setDescription('This cronjob fires all the open catalogi federation actions ever 5 minutes');
             $cronjob->setThrows(['opencatalogi.federation']);
             // Doesn't work?
             $cronjob->setIsEnabled(false);
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '. $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
     }
 
@@ -348,7 +346,7 @@ class InstallationService implements InstallerInterface
         $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
         $componentenCatalogusSource->setIsEnabled(true);
         $this->entityManager->persist($componentenCatalogusSource);
-        isset($this->io) && $this->io->writeln('Gateway: '. $componentenCatalogusSource->getName().' created');
+        isset($this->io) && $this->io->writeln('Gateway: '.$componentenCatalogusSource->getName().' created');
 
         // developer.overheid
         $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
@@ -357,7 +355,7 @@ class InstallationService implements InstallerInterface
         $developerOverheid->setLocation('https://developer.overheid.nl/api');
         $developerOverheid->setIsEnabled(true);
         $this->entityManager->persist($developerOverheid);
-        isset($this->io) && $this->io->writeln('Gateway: '. $developerOverheid->getName().' created');
+        isset($this->io) && $this->io->writeln('Gateway: '.$developerOverheid->getName().' created');
 
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
@@ -380,7 +378,7 @@ class InstallationService implements InstallerInterface
         $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
         $gitHubUserContentSource->setIsEnabled(true);
         $this->entityManager->persist($gitHubUserContentSource);
-        isset($this->io) && $this->io->writeln('Gateway: '. $gitHubUserContentSource->getName().' created');
+        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubUserContentSource->getName().' created');
 
         // flush the sources before adding actions via the addActions function
         // we need the id of the sources
@@ -407,8 +405,7 @@ class InstallationService implements InstallerInterface
         return $applicationSyncSchemaID;
     }
 
-    public function
-    checkDataConsistency()
+    public function checkDataConsistency()
     {
         // Lets create some genneric dashboard cards
         $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
@@ -433,6 +430,7 @@ class InstallationService implements InstallerInterface
                 $schemas[] = $foundSchema;
             } else {
                 isset($this->io) && $this->io->writeln('Schema: '.$schema.' could not be found. Installation failed');
+
                 throw new Exception('Schema: '.$schema.' could not be found. Installation failed');
             }
         }

@@ -7,7 +7,6 @@ use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\HttpFoundation\Response;
 
 class CheckRepositoriesForPubliccodeService
 {

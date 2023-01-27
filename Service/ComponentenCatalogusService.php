@@ -47,9 +47,10 @@ class ComponentenCatalogusService
     }
 
     /**
-     * Set symfony style in order to output to the console
+     * Set symfony style in order to output to the console.
      *
      * @param SymfonyStyle $io
+     *
      * @return self
      */
     public function setStyle(SymfonyStyle $io): self
