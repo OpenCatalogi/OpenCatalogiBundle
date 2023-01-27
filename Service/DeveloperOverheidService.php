@@ -67,7 +67,7 @@ class DeveloperOverheidService
      */
     public function getSource(): ?Source{
         if(!$this->source = $this->entityManager->getRepository("App:Gateway")->findOneBy(["location"=>"https://developer.overheid.nl/api"])){
-            $this->io->error("No source found for https://developer.overheid.nl/api");
+            isset($this->io) && $this->io->error("No source found for https://developer.overheid.nl/api");
         }
 
         return $this->source;
@@ -80,7 +80,7 @@ class DeveloperOverheidService
      */
     public function getRepositoryEntity(): ?Entity{
         if(!$this->repositoryEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.repository.schema.json"])){
-            $this->io->error("No entity found for https://opencatalogi.nl/oc.repository.schema.json");
+            isset($this->io) && $this->io->error("No entity found for https://opencatalogi.nl/oc.repository.schema.json");
         }
 
         return $this->repositoryEntity;
@@ -103,8 +103,8 @@ class DeveloperOverheidService
         $response = $this->callService->call($source, '/repositories');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
-
-        $this->io->success("Found ".count($repositories)." repositories");
+    
+        isset($this->io) && $this->io->success("Found ".count($repositories)." repositories");
         foreach($repositories['results'] as $repository){
             $result[] = $this->importRepository($repository);
         }
@@ -125,12 +125,12 @@ class DeveloperOverheidService
         if(!$source = $this->getSource()){
             return;
         }
-
-        $this->io->success('Getting repository '.$id);
+    
+        isset($this->io) && $this->io->success('Getting repository '.$id);
         $repository = $this->callService->call($source, '/repositories/'.$id);
 
         if(!$repository){
-            $this->io->error('Could not find repository '.$id.' an source '.$source);
+            isset($this->io) && $this->io->error('Could not find repository '.$id.' an source '.$source);
             return;
         }
         $repository = $this->importRepository($repository);
@@ -152,8 +152,8 @@ class DeveloperOverheidService
         if(!$repositoryEntity = $this->getRepositoryEntity()){
             return ;
         }
-
-        $this->io->success("Checking repository ".$repository['name']);
+    
+        isset($this->io) && $this->io->success("Checking repository ".$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
@@ -169,7 +169,7 @@ class DeveloperOverheidService
         $this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"]);
 
         if(!$this->componentEntity){
-            $this->io->error("No entity found for https://opencatalogi.nl/oc.component.schema.json");
+            isset($this->io) && $this->io->error("No entity found for https://opencatalogi.nl/oc.component.schema.json");
         }
 
         return $this->componentEntity;
@@ -184,7 +184,7 @@ class DeveloperOverheidService
         $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/components"]);
 
         if(!$this->componentMapping){
-            $this->io->error("No mapping found for https://developer.overheid.nl/api/components");
+            isset($this->io) && $this->io->error("No mapping found for https://developer.overheid.nl/api/components");
         }
 
         return $this->componentMapping;
@@ -204,15 +204,15 @@ class DeveloperOverheidService
         if(!$source = $this->getSource()){
             return $result;
         }
-
-        $this->io->comment('Trying to get all components from source '.$source->getName());
+    
+        isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
 
         // rows per page are 10, so i get only 10 results
         $response = $this->callService->call($source, '/apis');
 
         $components = json_decode($response->getBody()->getContents(), true);
-
-        $this->io->success("Found ".count($components)." components");
+    
+        isset($this->io) && $this->io->success("Found ".count($components)." components");
         foreach($components['results'] as $component){
             $result[] = $this->importComponent($component);
         }
@@ -233,21 +233,21 @@ class DeveloperOverheidService
         if(!$source = $this->getSource()){
             return;
         }
-
-        $this->io->comment('Trying to get component with id: '.$id);
+    
+        isset($this->io) && $this->io->comment('Trying to get component with id: '.$id);
         $response = $this->callService->call($source, '/apis/'.$id);
 
         $component = json_decode($response->getBody()->getContents(), true);
 
         if(!$component){
-            $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
+            isset($this->io) && $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
             return;
         }
         $component = $this->importComponent($component);
 
         $this->entityManager->flush();
-
-        $this->io->success('Found component with id: '.$id);
+    
+        isset($this->io) && $this->io->success('Found component with id: '.$id);
 
         return $component->toArray();
     }
@@ -267,13 +267,13 @@ class DeveloperOverheidService
         if(!$mapping = $this->getComponentMapping()){
             return ;
         }
-
-        $this->io->debug("Mapping object".$repository['name']);
-        $repository = $this->mappingService->mapping($mapping, $repository);
-
-        $this->io->comment("Mapping object " . $mapping);
-
-        $this->io->comment("Checking component ".$component['service_name']);
+    
+        isset($this->io) && $this->io->debug("Mapping object".$component['name']);
+        $component = $this->mappingService->mapping($mapping, $component);
+    
+        isset($this->io) && $this->io->comment("Mapping object " . $mapping);
+    
+        isset($this->io) && $this->io->comment("Checking component ".$component['service_name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
