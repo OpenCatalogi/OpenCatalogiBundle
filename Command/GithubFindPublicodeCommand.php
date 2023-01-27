@@ -36,6 +36,6 @@ class GithubFindPublicodeCommand extends Command
 
         $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler();
 
-        return Command::SUCCES;
+        return Command::SUCCESS;
     }
 }

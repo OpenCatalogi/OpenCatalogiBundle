@@ -46,6 +46,6 @@ class DeveloperOverheidGetComponentsCommand extends Command
             return Command::FAILURE;
         }
 
-        return Command::SUCCES;
+        return Command::SUCCESS;
     }
 }

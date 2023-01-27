@@ -55,6 +55,6 @@ class FederalizationGetCommand extends Command
             $this->federalizationService->readCatalogus($catalogusObject);
         }
 
-        return Command::SUCCES;
+        return Command::SUCCESS;
     }
 }
