@@ -65,7 +65,8 @@ class DeveloperOverheidService
      *
      * @return ?Source
      */
-    public function getSource(): ?Source{
+    public function getSource(): ?Source
+    {
         if(!$this->source = $this->entityManager->getRepository("App:Gateway")->findOneBy(["location"=>"https://developer.overheid.nl/api"])){
             isset($this->io) && $this->io->error("No source found for https://developer.overheid.nl/api");
         }
@@ -78,7 +79,8 @@ class DeveloperOverheidService
      *
      * @return ?Entity
      */
-    public function getRepositoryEntity(): ?Entity{
+    public function getRepositoryEntity(): ?Entity
+    {
         if(!$this->repositoryEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.repository.schema.json"])){
             isset($this->io) && $this->io->error("No entity found for https://opencatalogi.nl/oc.repository.schema.json");
         }
@@ -91,8 +93,8 @@ class DeveloperOverheidService
      *
      * @return array
      */
-    public function getRepositories(): array{
-
+    public function getRepositories(): array
+    {
         $result = [];
         // Dow e have a source
         if(!$source = $this->getSource()){
@@ -113,17 +115,19 @@ class DeveloperOverheidService
 
         return $result;
     }
-
+    
     /**
      * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}
      *
-     * @return array
+     * @param string $id
+     * @return array|null
      */
-    public function getRepository(string $id){
-
+    public function getRepository(string $id): ?array
+    {
         // Dow e have a source
         if(!$source = $this->getSource()){
-            return;
+            isset($this->io) && $this->io->error("No source found when trying to get a Repository with id: ".$id);
+            return null;
         }
     
         isset($this->io) && $this->io->success('Getting repository '.$id);
@@ -131,7 +135,7 @@ class DeveloperOverheidService
 
         if(!$repository){
             isset($this->io) && $this->io->error('Could not find repository '.$id.' an source '.$source);
-            return;
+            return null;
         }
         $repository = $this->importRepository($repository);
 
@@ -139,18 +143,23 @@ class DeveloperOverheidService
 
         return $repository->getObject();
     }
-
+    
     /**
-     * @return ObjectEntity
+     * @todo
+     *
+     * @param $repository
+     * @return ObjectEntity|null
      */
-    public function importRepository($repository){
-
+    public function importRepository($repository): ?ObjectEntity
+    {
         // Dow e have a source
         if(!$source = $this->getSource()){
-            return ;
+            isset($this->io) && $this->io->error("No source found when trying to import a Repository ".isset($repository['name'])?$repository['name']:'');
+            return null;
         }
         if(!$repositoryEntity = $this->getRepositoryEntity()){
-            return ;
+            isset($this->io) && $this->io->error("No RepositoryEntity found when trying to import a Repository ".isset($repository['name'])?$repository['name']:'');
+            return null;
         }
     
         isset($this->io) && $this->io->success("Checking repository ".$repository['name']);
@@ -165,10 +174,9 @@ class DeveloperOverheidService
      *
      * @return ?Entity
      */
-    public function getComponentEntity(): ?Entity{
-        $this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"]);
-
-        if(!$this->componentEntity){
+    public function getComponentEntity(): ?Entity
+    {
+        if(!$this->componentEntity = $this->entityManager->getRepository("App:Entity")->findOneBy(["reference"=>"https://opencatalogi.nl/oc.component.schema.json"])){
             isset($this->io) && $this->io->error("No entity found for https://opencatalogi.nl/oc.component.schema.json");
         }
 
@@ -180,10 +188,9 @@ class DeveloperOverheidService
      *
      * @return ?Mapping
      */
-    public function getComponentMapping(): ?Mapping{
-        $this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/components"]);
-
-        if(!$this->componentMapping){
+    public function getComponentMapping(): ?Mapping
+    {
+        if(!$this->componentMapping = $this->entityManager->getRepository("App:Mapping")->findOneBy(["reference"=>"https://developer.overheid.nl/api/components"])){
             isset($this->io) && $this->io->error("No mapping found for https://developer.overheid.nl/api/components");
         }
 
@@ -196,12 +203,13 @@ class DeveloperOverheidService
      *
      * @return array
      */
-    public function getComponents(): array{
-
+    public function getComponents(): array
+    {
         $result = [];
 
         // Dow e have a source
         if(!$source = $this->getSource()){
+            isset($this->io) && $this->io->error("No source found when trying to get Components");
             return $result;
         }
     
@@ -221,17 +229,19 @@ class DeveloperOverheidService
 
         return $result;
     }
-
+    
     /**
      * Get a component trough the components of developer.overheid.nl/apis/{id}
      *
-     * @return array
+     * @param string $id
+     * @return array|null
      */
-    public function getComponent(string $id){
-
+    public function getComponent(string $id): ?array
+    {
         // Dow e have a source
         if(!$source = $this->getSource()){
-            return;
+            isset($this->io) && $this->io->error("No source found when trying to get a Component with id: ".$id);
+            return null;
         }
     
         isset($this->io) && $this->io->comment('Trying to get component with id: '.$id);
@@ -241,9 +251,13 @@ class DeveloperOverheidService
 
         if(!$component){
             isset($this->io) && $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
-            return;
+            return null;
         }
+        
         $component = $this->importComponent($component);
+        if ($component === null) {
+            return null;
+        }
 
         $this->entityManager->flush();
     
@@ -251,21 +265,27 @@ class DeveloperOverheidService
 
         return $component->toArray();
     }
-
+    
     /**
-     * @return ObjectEntity
+     * @todo
+     *
+     * @param $component
+     * @return ObjectEntity|null
      */
-    public function importComponent($component){
-
+    public function importComponent($component): ?ObjectEntity
+    {
         // Dow e have a source
-        if(!$source = $this->getSource()){
-            return ;
+        if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error("No source found when trying to import a Component ".isset($component['name'])?$component['name']:'');
+            return null;
         }
-        if(!$componentEntity = $this->getComponentEntity()){
-            return ;
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error("No ComponentEntity found when trying to import a Component ".isset($component['name'])?$component['name']:'');
+            return null;
         }
-        if(!$mapping = $this->getComponentMapping()){
-            return ;
+        if (!$mapping = $this->getComponentMapping()) {
+            isset($this->io) && $this->io->error("No ComponentMapping found when trying to import a Component ".isset($component['name'])?$component['name']:'');
+            return null;
         }
     
         isset($this->io) && $this->io->debug("Mapping object".$component['name']);

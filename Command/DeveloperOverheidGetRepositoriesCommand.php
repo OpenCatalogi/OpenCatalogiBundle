@@ -29,16 +29,24 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
-            ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories');
+            ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories')
+            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id or name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $this->developerOverheidService->setStyle($io);
-
-        $this->developerOverheidService->getRepositories();
-
-        return 0;
+    
+        // Handle the command options
+        $repositoryId = $input->getOption('repository', false);
+    
+        if(!$repositoryId){
+            $this->developerOverheidService->getRepositories();
+        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
+            return Command::FAILURE;
+        }
+        
+        return Command::SUCCES;
     }
 }

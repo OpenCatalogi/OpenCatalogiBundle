@@ -38,15 +38,15 @@ class DeveloperOverheidGetComponentsCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $this->developerOverheidService->setStyle($io);
 
-        // Handle the command optiosn
+        // Handle the command options
         $componentId = $input->getOption('component', false);
 
         if(!$componentId){
             $this->developerOverheidService->getComponents();
-        } else{
-            $this->developerOverheidService->getComponent($componentId);
+        } elseif (!$this->developerOverheidService->getComponent($componentId)) {
+            return Command::FAILURE;
         }
 
-        return 0;
+        return Command::SUCCES;
     }
 }
