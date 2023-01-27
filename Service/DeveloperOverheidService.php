@@ -90,12 +90,15 @@ class DeveloperOverheidService
     public function getRepositories(): array
     {
         $result = [];
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to get a Repositories');
+            
             return $result;
         }
 
         // rows per page are 10, so i get only 10 results
+        // TODO: pagination?
         $response = $this->callService->call($source, '/repositories');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
@@ -119,7 +122,7 @@ class DeveloperOverheidService
      */
     public function getRepository(string $id): ?array
     {
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
 
@@ -150,7 +153,7 @@ class DeveloperOverheidService
      */
     public function importRepository($repository): ?ObjectEntity
     {
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
@@ -206,7 +209,7 @@ class DeveloperOverheidService
     {
         $result = [];
 
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Components');
 
@@ -239,7 +242,7 @@ class DeveloperOverheidService
      */
     public function getComponent(string $id): ?array
     {
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get a Component with id: '.$id);
 
@@ -278,7 +281,7 @@ class DeveloperOverheidService
      */
     public function importComponent($component): ?ObjectEntity
     {
-        // Dow e have a source
+        // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
