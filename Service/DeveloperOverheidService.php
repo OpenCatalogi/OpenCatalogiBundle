@@ -21,9 +21,9 @@ class DeveloperOverheidService
     private CallService $callService;
     private Source $source;
     private SynchronizationService $synchronizationService;
-    private Entity $repositoryEntity;
-    private Entity $componentEntity;
-    private Mapping $componentMapping;
+    private ?Entity $repositoryEntity;
+    private ?Entity $componentEntity;
+    private ?Mapping $componentMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 

@@ -22,8 +22,8 @@ class GithubPubliccodeService
     private CallService $callService;
     private Source $source;
     private SynchronizationService $synchronizationService;
-    private Entity $repositoryEntity;
-    private Mapping $repositoryMapping;
+    private ?Entity $repositoryEntity;
+    private ?Mapping $repositoryMapping;
     private MappingService $mappingService;
 
     public function __construct(

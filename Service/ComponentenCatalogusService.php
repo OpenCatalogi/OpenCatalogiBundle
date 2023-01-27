@@ -21,10 +21,10 @@ class ComponentenCatalogusService
     private CallService $callService;
     private Source $source;
     private SynchronizationService $synchronizationService;
-    private Entity $applicationEntity;
-    private Mapping $applicationMapping;
-    private Entity $componentEntity;
-    private Mapping $componentMapping;
+    private ?Entity $applicationEntity;
+    private ?Mapping $applicationMapping;
+    private ?Entity $componentEntity;
+    private ?Mapping $componentMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
