@@ -124,14 +124,8 @@ class GithubPubliccodeService
         if (!$source = $this->getSource()) {
             return $result;
         }
-
-        // @TODO rows per page, pagination:
-//        $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
-
-        // todo: only returns the first 10 items
-        $response = $this->callService->call($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
-
-        $repositories = json_decode($response->getBody()->getContents(), true);
+        
+        $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
         foreach ($repositories['items'] as $repository) {

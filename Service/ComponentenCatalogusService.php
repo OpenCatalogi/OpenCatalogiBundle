@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- *  This class handles the interaction with developer.overheid.nl.
+ *  This class handles the interaction with componentencatalogus.commonground.nl.
  */
 class ComponentenCatalogusService
 {
