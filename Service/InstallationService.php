@@ -385,8 +385,7 @@ class InstallationService implements InstallerInterface
         $this->entityManager->flush();
     }
 
-    public function
-    setApplicationSchemaId()
+    public function setApplicationSchemaId()
     {
         $schemaRepository = $this->entityManager->getRepository('App:Entity');
 

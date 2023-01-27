@@ -17,7 +17,6 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     protected static $defaultName = 'opencatalogi:componentencatalogus:components';
     private ComponentenCatalogusService  $componentenCatalogusService;
 
-
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
@@ -40,9 +39,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         // Handle the command optiosn
         $componentId = $input->getOption('component', false);
 
-        if(!$componentId){
+        if (!$componentId) {
             $this->componentenCatalogusService->getComponents();
-        } else{
+        } else {
             $this->componentenCatalogusService->getComponent($componentId);
         }
 

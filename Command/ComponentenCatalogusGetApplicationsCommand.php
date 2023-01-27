@@ -17,7 +17,6 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     protected static $defaultName = 'opencatalogi:componentencatalogus:applications';
     private ComponentenCatalogusService  $componentenCatalogusService;
 
-
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
@@ -40,9 +39,9 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         // Handle the command optiosn
         $applicationId = $input->getOption('application', false);
 
-        if(!$applicationId){
+        if (!$applicationId) {
             $this->componentenCatalogusService->getApplications();
-        } else{
+        } else {
             $this->componentenCatalogusService->getApplication($applicationId);
         }
 
