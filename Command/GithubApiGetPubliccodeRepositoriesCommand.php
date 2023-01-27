@@ -5,19 +5,18 @@ namespace OpenCatalogi\OpenCatalogiBundle\Command;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the GithubService
+ * Command to execute the GithubService.
  */
 class GithubApiGetPubliccodeRepositoriesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'opencatalogi:githubapi:repositories';
     private GithubPubliccodeService  $githubPubliccodeService;
-
 
     public function __construct(GithubPubliccodeService $githubPubliccodeService)
     {
@@ -41,9 +40,9 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);
 
-        if(!$repositoryId){
+        if (!$repositoryId) {
             $this->githubPubliccodeService->getRepositories();
-        } else{
+        } else {
             $this->githubPubliccodeService->getRepository($repositoryId);
         }
 
