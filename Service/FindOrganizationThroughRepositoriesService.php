@@ -154,7 +154,7 @@ class FindOrganizationThroughRepositoriesService
     //     return $repository;
     // }
 
-    
+
     /**
      * This function gets the content of the given url.
      *
@@ -240,7 +240,7 @@ class FindOrganizationThroughRepositoriesService
                 // let's get the repository datar
                 isset($this->io) && $this->io->info("Trying to fetch repository from: $url");
                 $github = $this->getRepositoryFromUrl($url);
-                if ($github['owner']['type'] === 'Organization') { 
+                if ($github['owner']['type'] === 'Organization') {
                     $github['organisation'] = $this->getGithubOwnerInfo($github);
                 } else {
                     isset($this->io) && $this->io->error("No organisation found for fetched repository");
@@ -281,6 +281,8 @@ class FindOrganizationThroughRepositoriesService
                 break;
         }
 
+        isset($repositoryObject) && $this->entityManager->persist($repositoryObject);
+
         return null;
     }
 
@@ -311,7 +313,7 @@ class FindOrganizationThroughRepositoriesService
         };
 
         !isset($this->repositoryMapping) && $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
-        if (!isset($this->githubApi)) {
+        if (!isset($this->repositoryMapping)) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a repository for reference https://opencatalogi.nl/oc.repository.schema.json');
             return [];
@@ -354,6 +356,7 @@ class FindOrganizationThroughRepositoriesService
             isset($this->io) && $this->io->info('Looping through repositories');
             $this->loopThroughRepositories();
         }
+        $this->entityManager->flush();
 
 
         isset($this->io) && $this->io->success('findOrganizationThroughRepositoriesHandler finished');
