@@ -16,7 +16,7 @@ class GithubFindPublicodeCommand extends Command
     protected static $defaultName = 'opencatalogi:findGithubRepositoryThroughOrganization:execute';
     private GithubApiService $githubApiService;
 
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    public function __construct(GithubApiService $githubApiService)
     {
         $this->githubApiService = $githubApiService;
         parent::__construct();
@@ -32,7 +32,7 @@ class GithubFindPublicodeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($io);
+        $this->githubApiService->setStyle($io);
 
         //if(){
 //
