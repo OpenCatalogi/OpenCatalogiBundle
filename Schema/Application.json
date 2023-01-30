@@ -32,18 +32,7 @@
       "type": "boolean"
     },
     "owner": {
-      "type": "object",
-      "properties": {
-        "fullName": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "pictureUrl": {
-          "type": "string"
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.owner.schema.json"
     },
     "components": {
       "type": "array",
