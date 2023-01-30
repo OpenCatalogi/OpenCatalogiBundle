@@ -191,7 +191,7 @@ class InstallationService implements InstallerInterface
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
             ) {
-                $action->setListens(['opencatalogi.bronnen']);
+                $action->setListens(['opencatalogi.bronnen.trigger']);
                 $action->setConditions([[1 => 1]]);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);
