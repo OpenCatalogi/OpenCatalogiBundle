@@ -232,7 +232,6 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->success('Found '.count($components).' components');
         foreach ($components as $component) {
-
             $result[] = $this->importComponent($component);
         }
 
@@ -283,9 +282,9 @@ class DeveloperOverheidService
     }
 
     /**
-     * Turn an repo array into an object we can handle
+     * Turn an repo array into an object we can handle.
      *
-     * @param array $repro
+     * @param array   $repro
      * @param Mapping $mapping
      *
      * @return ?ObjectEntity
@@ -338,7 +337,6 @@ class DeveloperOverheidService
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 
-
         $componentObject = $synchronization->getObject();
 
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
@@ -346,7 +344,6 @@ class DeveloperOverheidService
 
             return null;
         }
-
 
         if ($component['related_repositories']) {
             // only do someting with the first item in the array

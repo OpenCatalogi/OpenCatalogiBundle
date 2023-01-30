@@ -164,9 +164,9 @@ class ComponentenCatalogusService
     }
 
     /**
-     * Turn an component array into an object we can handle
+     * Turn an component array into an object we can handle.
      *
-     * @param array $repro
+     * @param array   $repro
      * @param Mapping $mapping
      *
      * @return ?ObjectEntity
