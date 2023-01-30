@@ -95,6 +95,7 @@ class RatingService
         
         isset($this->io) && $this->io->comment('Trying to create ratings for all component ObjectEntities');
     
+        isset($this->io) && is_countable($componentEntity->getObjectEntities()) ? $this->io->success('Found '.count($componentEntity->getObjectEntities()).' components') : $this->io->success('Found 0 components');
         foreach ($componentEntity->getObjectEntities() as $component) {
             $result[] = $this->rateComponent($component, $ratingEntity);
         }
