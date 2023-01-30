@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "type": "object",
   "description": "",
+  "nameProperties": ["name"],
   "properties": {
     "organisation": {
       "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"

@@ -4,20 +4,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "version": "0.1.0",
   "type": "object",
+  "nameProperties": ["name"],
   "properties": {
     "source": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "location": {
-          "type": "string"
-        }
-      }
+      "type": "string"
     },
     "organisation": {
       "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"

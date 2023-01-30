@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "type": "object",
   "description": "[extension of the publiccode standard] This object defines an installation of a given component within an environement",
+  "nameProperties": ["organization"],
   "properties": {
     "organization": {
       "type": "string",
