@@ -25,6 +25,7 @@ class GithubPubliccodeService
     private ?Entity $repositoryEntity;
     private ?Entity $organizationEntity;
     private ?Mapping $repositoryMapping;
+    private ?Mapping $organizationMapping;
     private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
@@ -134,6 +135,12 @@ class GithubPubliccodeService
             return false;
         };
 
+        // if (!isset($this->organizationMapping) && !$this->organizationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
+        //     // @TODO Monolog ?
+        //     isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
+        //     return false;
+        // };
+
         if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
@@ -181,7 +188,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
         foreach ($repositories as $repository) {
-            $result[] = $this->importPubliccodeRepository($repository);
+            $result[] = $this->importPubliccodeRepository($repository, 'publiccode');
         }
         $this->entityManager->flush();
 
@@ -250,6 +257,47 @@ class GithubPubliccodeService
     }
 
     /**
+     * Turn an organisation array into an object we can handle
+     *
+     * @param array $repro
+     * @param Mapping $mapping
+     * 
+     * @return ?ObjectEntity
+     */
+    public function handleOrganizationArray(array $organisation): ?ObjectEntity
+    {
+        // check for mapping
+        if (!$this->organizationMapping) {
+            $this->io->error('Organization mapping not set/given');
+
+            return null;
+        }
+    
+        // Find or create existing sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->organizationEntity, $organisation['id']);
+        isset($this->io) && $this->io->comment('Mapping organisation object ' . $organisation['name']);
+        // Set mapping on sync object
+        $synchronization->setMapping($this->organizationMapping);
+        // Map object and create/update it
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $organisation);
+        isset($this->io) && $this->io->comment('Organisation synchronization created with id: ' . $synchronization->getId()->toString());
+
+        $organisationObject = $synchronization->getObject();
+        $organisation = $organisationObject->toArray();
+
+        if (isset($organisation['repositories'])) {
+            foreach ($organisation['repositories'] as $repository) {
+                $repositoryObject = $this->importRepository($repository);
+                // Organizations don't have repositories so we need to set to organization on the repo site and persist that @TODO i dont get this?
+                // $repositoryObject->setValue('organization', $organisation);
+                // $this->entityManager->persist($repository);
+            }
+        }
+
+        return $organisationObject;
+    }
+
+    /**
      * @todo duplicate with DeveloperOverheidService ?
      *
      * @param $repository
@@ -258,32 +306,28 @@ class GithubPubliccodeService
      */
     public function importRepository($repository): ?ObjectEntity
     {
-        // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+        $this->getRequiredGatewayObjects();
 
-            return null;
-        }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
-
-            return null;
-        }
-        if (!$mapping = $this->getRepositoryMapping()) {
-            isset($this->io) && $this->io->error('No RepositoryMapping found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
-
-            return null;
-        }
-
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-
-        isset($this->io) && $this->io->comment('Mapping object ' . $repository['name']);
-        isset($this->io) && $this->io->comment('The mapping object ' . $mapping);
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
-
-        $synchronization->setMapping($mapping);
+        // Find or create existing sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['id']);
+        isset($this->io) && $this->io->comment('Mapping repository object ' . $repository['name']);
+        // Set mapping on sync object
+        $synchronization->setMapping($this->repositoriesMapping);
+        // Map object and create/update it
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+
+        $repositoryObject = $synchronization->getObject();
+        $repository = $repositoryObject->toArray();
+
+        dump($repository);
+
+        // @TODO 
+        if (isset($repository['organisation'])) {
+            // @TODO create new function in this service that does the same as githubApiService->handleOrganizationArray
+            $organisationObject = $this->handleOrganizationArray($repository['organisation']); 
+            $repositoryObject->setValue('organization', $organisationObject->getId()->toString());
+        }
 
         return $synchronization->getObject();
     }
