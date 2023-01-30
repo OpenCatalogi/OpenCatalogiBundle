@@ -5,32 +5,18 @@
   "version": "0.0.1",
   "passTrough": false,
   "mapping": {
-    "name": "{{ service_name }}",
-    "description.localisedName": "{{ service_name }}",
-    "description.shortDescription": "{{ description }}",
-    "description.longDescription": "{{ description }}",
-    "description.documentation": "{{ environments.0.documentation_url }}",
-    "description.apiDocumentation": "{{ environments.0.specification_url }}",
-    "legal.repoOwner.name": "{{ organization.name }}",
-    "legal.repoOwner.email": "{{ contact.email }}",
-    "legal.repoOwner.phone": "{{ contact.phone }}",
-    "legal.repoOwner.website": "{{ contact.url }}",
-    "legal.repoOwner.type": "Organization"
-  },
-  "unset":[
-    "service_name",
-    "environments",
-    "organization",
-    "contact",
-    "design_rule_scores",
-    "scores",
-    "related_repositories",
-    "terms_of_use",
-    "badges",
-    "is_reference_implementation",
-    "referenced_apis",
-    "api_type",
-    "api_authentication"
-  ],
-  "cast": []
+    "name": "service_name",
+    // vastsetten op de laag api
+    "description.localisedName": "service_name",
+    "description.shortDescription": "description",
+    "description.longDescription": "description",
+    "description.documentation": "environments.0.documentation_url",
+    "description.apiDocumentation": "environments.0.specification_url",
+    "legal.repoOwner.name": "organization.name",
+    "legal.repoOwner.email": "contact.email",
+    "legal.repoOwner.phone": "contact.phone",
+    "legal.repoOwner.website": "contact.url",
+    "legal.repoOwner.type": "Organization",
+    // In de code los kijken of er repro objecten zijn en die aanmaken
+  }
 }
