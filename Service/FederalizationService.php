@@ -121,15 +121,25 @@ class FederalizationService
 
         if (!isset($this->sourceObject)) {
             $this->sourceObject = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $source]);
-            (!$this->sourceObject && isset($this->io) ? $this->io->error('Could not find a source for '.$source) : '');
-            return $reportOut;
+            (!$this->sourceObject && isset($this->io) ? $this->io->note('Could not find a source for '.$source) : '');
+           // return $reportOut;
         }
 
-        (isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')') : '');
+        // If we cant find one we make one
+        if (!isset($this->sourceObject)) {
+            $this->sourceObject = New Source();
+            $this->sourceObject->setLocation($source);
+            $this->sourceObject->setName($source);
+            $this->entityManager->persist($this->sourceObject);
+            (isset($this->io) ? $this->io->comment('Created source') : '');
+        }
+
+        (isset($this->io) ? $this->io->info('Looking at '.$this->sourceObject->getName().'(@:'.$this->sourceObject->getLocation().')') : '');
+
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
-            $source,
-            '/search/',
+            $this->sourceObject,
+            '/api/search',
             'GET',
             ['query'=> ['limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
@@ -142,14 +152,16 @@ class FederalizationService
         // Handle new objects
         $counter = 0;
         foreach ($objects as $key => $object) {
-            $counter++;
             // Lets make sure we have a reference
             if (!isset($object['_self']['schema']['ref'])) {
                 continue;
             }
-            $synchonization = $this->handleObject($object, $source);
-            $synchonizedObjects[] = $synchonization->getSourceId();
-            $this->entityManager->persist($synchonization);
+            $synchonization = $this->handleObject($object, $this->sourceObject);
+            if($synchonization){
+                $counter++;
+                $synchonizedObjects[] = $synchonization->getSourceId();
+                $this->entityManager->persist($synchonization);
+            }
 
             // Lets save every so ofthen
             if ($counter >= 100) {
@@ -195,7 +207,7 @@ class FederalizationService
      *
      * @return void
      */
-    public function handleObject(array $object, Gateway $source): ?Synchronization
+    public function handleObject(array $object, Source $source): ?Synchronization
     {
         // Lets make sure we have a reference, just in case this function gets ussed seperatly
         if (!isset($object['_self']['schema']['ref'])) {
@@ -209,22 +221,26 @@ class FederalizationService
         $reference = $object['_self']['schema']['ref'];
 
         switch ($reference) {
-            case 'https://opencatalogi.nl/catalogi.schema.json':
+            case 'https://opencatalogi.nl/oc.catalogi.schema.json':
                 $entity = $this->catalogusEntity;
                 break;
-            case 'https://opencatalogi.nl/organisation.schema.json':
+            case 'https://opencatalogi.nl/oc.organisation.schema.json':
                 $entity = $this->organisationEntity;
                 break;
-            case 'https://opencatalogi.nl/component.schema.json':
+            case 'https://opencatalogi.nl/oc.component.schema.json':
                 $entity = $this->componentEntity;
                 break;
-            case 'https://opencatalogi.nl/application.schema.json':
+            case 'https://opencatalogi.nl/oc.application.schema.json':
                 $entity = $this->applicationEntity;
                 break;
             default:
                 // Unknown type, lets output something to IO
+                (isset($this->io) ? $this->io->error('Trying to load object from cataloge on unknonw reference '.$reference.'') : '');
                 return null;
         }
+
+
+        (isset($this->io) ? $this->io->info('Syncing object of reference '.$reference.'') : '');
 
         // Lets handle whatever we found
         if (isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0) {
@@ -240,21 +256,29 @@ class FederalizationService
                 $source->setLocation($baseSync['source']['location']);
             }
         } else {
-            // This catalogi is teh source so lets roll
+            // This catalogi is the source so lets roll
             $externalId = $object['id'];
+            (isset($this->io) ? $this->io->comment('The catalouge is the source so lets use id' .$externalId) : '');
         }
 
         // Lets se if we already have an synchronisation
         if (!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])) {
+            (isset($this->io) ? $this->io->comment('Creating new synnchronization') : '');
             $synchonization = new Synchronization($source, $entity);
             $synchonization->setSourceId($object['id']);
+        }
+        else{
+            (isset($this->io) ? $this->io->comment('Using exisiting synnchronization') : '');
         }
 
         if (isset($object['_self'])) {
             unset($object['_self']);
         }
 
+
         // Lets sync
+        (isset($this->io) ? $this->io->comment('Lets go sync') : '');
+        (isset($this->io) ? $this->synchronizationService->setStyle($this->io): '');
         return $this->synchronizationService->handleSync($synchonization, $object);
     }
 
