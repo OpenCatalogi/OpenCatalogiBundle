@@ -140,7 +140,7 @@ class GithubPubliccodeService
             return false;
         };
 
-        if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+        if (!isset($this->repositoriesMapping) && !$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
             return false;
         }
@@ -229,7 +229,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @todo
+     * Maps a repository object and creates/updates a Synchronization
      *
      * @param $repository
      *
@@ -237,13 +237,12 @@ class GithubPubliccodeService
      */
     public function importPubliccodeRepository($repository): ?ObjectEntity
     {
+        // Find or create existing sync
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
-
-        isset($this->io) && $this->io->comment('Mapping object ' . $repository['repository']['name']);
-        isset($this->io) && $this->io->comment('The mapping object ' . $this->repositoriesMapping);
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
-
+        isset($this->io) && $this->io->comment('Mapping repository object ' . $repository['repository']['name']);
+        // Set mapping on sync object
         $synchronization->setMapping($this->repositoriesMapping);
+        // Map object and create/update it
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
