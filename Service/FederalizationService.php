@@ -28,7 +28,7 @@ class FederalizationService
     private $catalogusEntity;
     private $componentEntity;
     private $organisationEntity;
-    private $applicationEntity;;
+    private $applicationEntity;
     private $sourceObject;
 
     public function __construct(
@@ -107,8 +107,8 @@ class FederalizationService
         $reportOut = [];
 
         // Check if the past object is a
-        if ($catalogus->getEntity->getReference() != 'https://opencatalogi.nl/catalogi.schema.json') {
-            (isset($this->io) ? $this->io->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json') : '');
+        if ($catalogus->getEntity()->getReference() != 'https://opencatalogi.nl/oc.catalogi.schema.json') {
+            (isset($this->io) ? $this->io->error('The suplied Object is not of the type https://opencatalogi.nl/oc.catalogi.schema.json') : '');
 
             return $reportOut;
         }
@@ -120,8 +120,8 @@ class FederalizationService
         }
 
         if (!isset($this->sourceObject)) {
-            $this->sourceObject = $this->entityManager->getRepository('App:Source')->findOneBy(['location' => $source]);
-            (!$this->sourceObject && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '');
+            $this->sourceObject = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $source]);
+            (!$this->sourceObject && isset($this->io) ? $this->io->error('Could not find a source for '.$source) : '');
             return $reportOut;
         }
 

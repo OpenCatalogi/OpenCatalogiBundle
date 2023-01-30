@@ -11,7 +11,6 @@ use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\Mapping;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -341,7 +340,7 @@ class InstallationService implements InstallerInterface
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
 
         // componentencatalogus
-        $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
+        $componentenCatalogusSource = $sourceRepository->findOneBy(['location' => 'https://componentencatalogus.commonground.nl/api']) ?? new Source();
         $componentenCatalogusSource->setName('componentencatalogus');
         $componentenCatalogusSource->setAuth('none');
         $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
@@ -350,16 +349,16 @@ class InstallationService implements InstallerInterface
         isset($this->io) && $this->io->writeln('Gateway: '.$componentenCatalogusSource->getName().' created');
 
         // developer.overheid
-        $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
+        $developerOverheid = $sourceRepository->findOneBy(['location' => 'https://developer.overheid.nl/api']) ?? new Source();
         $developerOverheid->setName('developerOverheid');
         $developerOverheid->setAuth('none');
         $developerOverheid->setLocation('https://developer.overheid.nl/api');
         $developerOverheid->setIsEnabled(true);
         $this->entityManager->persist($developerOverheid);
-        isset($this->io) && $this->io->writeln('Gateway: '.$developerOverheid->getName().' created');
+        isset($this->io) && $this->io->writeln('Source: '.$developerOverheid->getName().' created');
 
         // GitHub API
-        $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
+        $gitHubAPI = $sourceRepository->findOneBy(['location' => 'https://api.github.com']) ?? new Source();
         $gitHubAPI->setName('GitHub API');
         $gitHubAPI->setAuth('apikey');
         $gitHubAPI->setHeaders(['Accept' => 'application/vnd.github+json']);
@@ -370,40 +369,29 @@ class InstallationService implements InstallerInterface
         $this->entityManager->persist($gitHubAPI);
         $dashboardCard = new DashboardCard($gitHubAPI);
         $this->entityManager->persist($dashboardCard);
-        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubAPI->getName().' created');
+        isset($this->io) && $this->io->writeln('Source: '.$gitHubAPI->getName().' created');
 
         // GitHub usercontent
-        $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
+        $gitHubUserContentSource = $sourceRepository->findOneBy(['location' => 'https://raw.githubusercontent.com']) ?? new Source();
         $gitHubUserContentSource->setName('GitHub usercontent');
         $gitHubUserContentSource->setAuth('none');
         $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
         $gitHubUserContentSource->setIsEnabled(true);
         $this->entityManager->persist($gitHubUserContentSource);
-        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubUserContentSource->getName().' created');
+        isset($this->io) && $this->io->writeln('Source: '.$gitHubUserContentSource->getName().' created');
+
+        // GitHub usercontent
+        $openCatalogiSource = $sourceRepository->findOneBy(['location' => 'https://opencatalogi.nl/api']) ?? new Source();
+        $openCatalogiSource->setName('We use the demo environment as a jumping point');
+        $openCatalogiSource->setAuth('none');
+        $openCatalogiSource->setLocation('https://opencatalogi.nl/api');
+        $openCatalogiSource->setIsEnabled(true);
+        $this->entityManager->persist($openCatalogiSource);
+        isset($this->io) && $this->io->writeln('Source: '.$openCatalogiSource->getName().' created');
 
         // flush the sources before adding actions via the addActions function
         // we need the id of the sources
         $this->entityManager->flush();
-    }
-
-    private function addMappings()
-    {
-        $mapping = new Mapping();
-        $mapping->setName('Github repo -> repository');
-        $mapping->setMapping([
-                'source'                  => 'github',
-                'name'                    => 'name',
-                'url'                     => 'html_url',
-                'avatar_url'              => 'owner.avatar_url',
-                'last_change'             => 'updated_at',
-                'stars'                   => 'stargazers_count',
-                'fork_count'              => 'forks_count',
-                'issue_open_count'        => 'open_issues_count'
-        ]);
-        $mapping->setversion('0.1.0');
-        $mapping->setReference('https://opencatalogi.nl/oc.repository.schema.json');
-        $this->entityManager->persist($mapping);
-        isset($this->io) && $this->io->writeln('Mapping: '.$mapping->getName().' created');
     }
 
     public function setApplicationSchemaId()
@@ -438,9 +426,9 @@ class InstallationService implements InstallerInterface
 
         // Doesnt work so lets let search endpoint return all
         $schemasToAddToSearchEndpoint = [
-            // 'https://opencatalogi.nl/oc.application.schema.json',
-            // 'https://opencatalogi.nl/oc.organisation.schema.json',
-            // 'https://opencatalogi.nl/oc.component.schema.json'
+            'https://opencatalogi.nl/oc.application.schema.json',
+            'https://opencatalogi.nl/oc.organisation.schema.json',
+            'https://opencatalogi.nl/oc.component.schema.json',
         ];
 
         $schemas = [];
@@ -483,9 +471,6 @@ class InstallationService implements InstallerInterface
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
         //$this->catalogiService->readCatalogi($opencatalogi);
-
-        // create mappings
-        $this->addMappings();
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook
