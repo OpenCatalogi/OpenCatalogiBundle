@@ -172,27 +172,16 @@ class GithubPubliccodeService
             return [];
         }
 
-        // Find on publiccode.yaml
-        // Build the query
         $config = [];
         $config['query'] = [
-            'page'     => 1,
-            'per_page' => 1,
-            'order'    => 'desc',
-            'sort'     => 'author-date',
-            'q'        => 'publiccode in:path path:/  extension:yml', // So we are looking for a yaml file called publiccode based in the repo root
+            'q' => 'publiccode in:path path:/ extension:yaml extension:yml'
         ];
 
-        $repositoriesYml = $this->callService->getAllResults($this->githubApiSource, '/search/code', $config);
-
-        $config['query']['q'] = 'publiccode in:path path:/  extension:yaml'; // Switch from yml to yaml
-        $repositoriesYaml = $this->callService->getAllResults($this->githubApiSource, '/search/code', $config);
-
-        // Merge the result
-        $repositories = array_merge($repositoriesYaml, $repositoriesYml);
+        // Find on publiccode.yaml
+        $repositories = $this->callService->getAllResults($this->githubApiSource, '/search/code', $config);
 
         isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
-        foreach ($repositories['items'] as $repository) {
+        foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
 
 
@@ -200,7 +189,6 @@ class GithubPubliccodeService
 
             return $result;
         }
-
         $this->entityManager->flush();
 
         return $result;
@@ -256,12 +244,12 @@ class GithubPubliccodeService
     public function importPubliccodeRepository($repository): ?ObjectEntity
     {
         isset($this->io) && $this->io->comment('Mapping object ' . $repository['repository']['name']);
-        $repository = $this->mappingService->mapping($this->componentMapping, $repository);
-
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
+        $mappedRepository = $this->mappingService->mapping($this->componentMapping, $repository);
+        dump($mappedRepository);
+        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
         $synchronization->setMapping($this->componentMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedRepository);
 
         return $synchronization->getObject();
     }
