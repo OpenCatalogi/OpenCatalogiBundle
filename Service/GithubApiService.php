@@ -345,7 +345,7 @@ class GithubApiService
 
     //     return $publiccode;
     // }
-    
+
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
      *
@@ -358,12 +358,13 @@ class GithubApiService
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find Source: Github API');
+
             return [];
         }
-        
-        $response = $this->callService->call($this->githubApiSource, 'repos/' . $slug);
+
+        $response = $this->callService->call($this->githubApiSource, 'repos/'.$slug);
         $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
-        
+
         return $repository['private'];
     }
 

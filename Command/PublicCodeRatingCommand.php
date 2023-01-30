@@ -36,10 +36,10 @@ class PublicCodeRatingCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $this->ratingService->setStyle($io);
-    
+
         // Handle the command options
         $componentId = $input->getOption('component', false);
-    
+
         if (!$componentId) {
             if (!$this->ratingService->enrichComponentsWithRating()) {
                 return Command::FAILURE;
