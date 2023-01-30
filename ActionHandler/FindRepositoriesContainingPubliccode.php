@@ -6,7 +6,7 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
- * Via de github organisatie de repro's vand eorganisatie ophalen
+ * Via de github organisatie de repro's vand eorganisatie ophalen.
  */
 class FindRepositoriesContainingPubliccode implements ActionHandlerInterface
 {

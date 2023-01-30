@@ -306,9 +306,9 @@ class DeveloperOverheidService
 
             return null;
         }
-    
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
-        
+
         isset($this->io) && $this->io->comment('Mapping object'.$component['service_name']);
         $component = $this->mappingService->mapping($mapping, $component);
 

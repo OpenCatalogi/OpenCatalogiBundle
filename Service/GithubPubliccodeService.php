@@ -124,7 +124,7 @@ class GithubPubliccodeService
         if (!$source = $this->getSource()) {
             return $result;
         }
-        
+
         $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
@@ -202,9 +202,9 @@ class GithubPubliccodeService
 
             return null;
         }
-    
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
-        
+
         isset($this->io) && $this->io->comment('Mapping object '.$repository['repository']['name']);
         $repository = $this->mappingService->mapping($mapping, $repository);
 
@@ -242,9 +242,9 @@ class GithubPubliccodeService
 
             return null;
         }
-    
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        
+
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
         $repository = $this->mappingService->mapping($mapping, $repository['name']);
 
