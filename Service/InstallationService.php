@@ -47,9 +47,16 @@ class InstallationService implements InstallerInterface
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
+        'OpenCatalogi\OpencatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
+        'OpenCatalogi\OpencatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler",
+        'OpenCatalogi\OpencatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
+        'OpenCatalogi\OpencatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpencatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubFindPubliccodeHandler",
+//        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubRepositoryThroughOrganizationHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
@@ -176,6 +183,15 @@ class InstallationService implements InstallerInterface
                 $defaultConfig['source'] = $gitHubAPI->getId()->toString();
             } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
+                $action->setConditions([[1 => 1]]);
+            } elseif(strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+                $action->setListens(['opencatalogi.github']);
+                $action->setConditions([[1 => 1]]);
+            } elseif(
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
+            ) {
+                $action->setListens(['opencatalogi.bronnen']);
                 $action->setConditions([[1 => 1]]);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);

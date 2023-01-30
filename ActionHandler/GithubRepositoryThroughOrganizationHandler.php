@@ -5,17 +5,21 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
+use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
 
 /**
  * Haalt applications op van de componenten catalogus.
  */
-class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerInterface
+class GithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
-    private ComponentenCatalogusService $componentenCatalogusService;
+    private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
 
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
     }
 
     /**
@@ -26,7 +30,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.componentencatalogus.application.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.github.organization.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
@@ -45,6 +49,6 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->componentenCatalogusService->getApplications();
+        return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler();
     }
 }
