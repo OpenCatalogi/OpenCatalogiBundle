@@ -129,8 +129,6 @@ class RatingService
         if ($component === null) {
             return null;
         }
-    
-        isset($this->io) && $this->io->success('Created rating for component ObjectEntity with id: '.$id);
 
         return $component->toArray();
     }
@@ -163,6 +161,8 @@ class RatingService
         $component->setValue('rating', $rating);
         $this->entityManager->persist($component);
         $this->entityManager->flush();
+    
+        isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
     }
