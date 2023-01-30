@@ -2,91 +2,136 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
+use App\Entity\Entity;
+use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
+use App\Entity\Mapping;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
+use App\Service\SynchronizationService;
+use App\Service\HandlerService;
+use CommonGateway\CoreBundle\Service\MappingService;
 
 class GithubEventService
 {
     private EntityManagerInterface $entityManager;
-    private GithubApiService $githubService;
-    private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
-    private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
-    private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
-    private RatingService $ratingService;
-    private PubliccodeService $publiccodeService;
     private array $configuration;
     private array $data;
+    private ?Entity $repositoryEntity;
+    private ?Mapping $repositoriesMapping;
+    private ?Source $source;
+    private SynchronizationService $synchronizationService;
+    private HandlerService $handlerService;
+    private MappingService $mappingService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        GithubApiService $githubService,
-        CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService,
-        FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService,
-        FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService,
-        RatingService $ratingService,
-        PubliccodeService $publiccodeService
+        SynchronizationService $synchronizationService,
+        HandlerService $handlerService,
+        MappingService $mappingService
     ) {
         $this->entityManager = $entityManager;
-        $this->githubService = $githubService;
-        $this->checkRepositoriesForPubliccodeService = $checkRepositoriesForPubliccodeService;
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
-        $this->findRepositoriesThroughOrganizationService = $findRepositoriesThroughOrganizationService;
-        $this->ratingService = $ratingService;
-        $this->publiccodeService = $publiccodeService;
         $this->configuration = [];
         $this->data = [];
+        $this->synchronizationService = $synchronizationService;
+        $this->handlerService = $handlerService;
+        $this->mappingService = $mappingService;
     }
 
     /**
-     * @param array $content
+     * Get the github api source.
      *
-     * @throws GuzzleException
-     *
-     * @return Response dataset at the end of the handler
+     * @return ?Source
      */
-    public function updateRepositoryWithEventResponse(array $content): Response
+    public function getSource(): ?Source
     {
-        $repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['name' => 'Repository']);
-        $componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['name' => 'Component']);
-        $organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['name' => 'Organisation']);
-        $descriptionEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['name' => 'Description']);
-        $ratingEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['name' => 'Rating']);
-
-        $repositoryName = $content['repository']['name'];
-
-        if (!$this->entityManager->getRepository('App:ObjectEntity')->findByEntity($repositoryEntity, ['name' => $repositoryName])) {
-            $repository = new ObjectEntity($repositoryEntity);
-        } else {
-            $repository = $this->entityManager->getRepository('App:ObjectEntity')->findByEntity($repositoryEntity, ['name' => $repositoryName])[0];
+        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+            isset($this->io) && $this->io->error('No source found for https://api.github.com');
         }
 
-        if ($publiccodeUrl = $repository->getValue('publiccode_url')) {
-            if (is_array($publiccode = $this->githubService->getPubliccode($publiccodeUrl))) {
-                $this->checkRepositoriesForPubliccodeService->enrichRepositoryWithPubliccode($repository, $componentEntity, $descriptionEntity, $publiccode);
-            }
-        } elseif ($publiccode = $this->githubService->getPubliccodeForGithubEvent($content['organization']['login'], $content['repository']['name'])) {
-            $this->checkRepositoriesForPubliccodeService->enrichRepositoryWithPubliccode($repository, $componentEntity, $descriptionEntity, $publiccode);
+        return $this->source;
+    }
+
+    /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getRepositoryEntity(): ?Entity
+    {
+        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
-        $this->findOrganizationThroughRepositoriesService->enrichRepositoryWithOrganisation($repository, $organisationEntity);
+        return $this->repositoryEntity;
+    }
 
-        if ($organisation = $repository->getValue('organisation')) {
-            if ($organisation instanceof ObjectEntity) {
-                $organisation = $this->findRepositoriesThroughOrganizationService->enrichRepositoryWithOrganisationRepos($organisation, $repositoryEntity);
-                $this->publiccodeService->getOrganizationCatalogi($organisation);
-            }
+    /**
+     * Get the repository mapping.
+     *
+     * @return ?Mapping
+     */
+    public function getRepositoryMapping(): ?Mapping
+    {
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
         }
 
-        if ($component = $repository->getValue('component')) {
-            $this->ratingService->rateComponent($component, $ratingEntity);
+        return $this->repositoryMapping;
+    }
+
+    /**
+     * @param ?array $data          data set at the start of the handler
+     * @param ?array $configuration configuration of the action
+     *
+     * @return array|null
+     */
+    public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
+    {
+        $this->configuration = $configuration;
+        $this->data = $data;
+
+        $request = $this->data['parameters'];
+        if (!$githubEvent = json_decode($request->get('payload'), true)) {
+            $githubEvent = $this->data['request'];
         }
 
-        $repository->setValue('name', $content['repository']['name']);
+        $repositoryName = $githubEvent['repository']['name'];
+
+        if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
+
+            return null;
+        }
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
+
+            return null;
+        }
+        if (!$mapping = $this->getRepositoryMapping()) {
+            isset($this->io) && $this->io->error('No RepositoryMapping found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
+
+            return null;
+        }
+
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $githubEvent['repository']['id']);
+
+        isset($this->io) && $this->io->comment('Mapping object '.$repositoryName);
+        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
+        isset($this->io) && $this->io->comment('Checking repository '.$repositoryName);
+
+        $synchronization->setMapping($mapping);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $githubEvent['repository']);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
+
+        $repository = $synchronization->getObject();
+
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 
-        return new Response(json_encode($repository->toArray()), 200, ['content-type' => 'application/json']);
+        $this->data['response'] = $repository->toArray();
+
+        return $this->data;
     }
 }
