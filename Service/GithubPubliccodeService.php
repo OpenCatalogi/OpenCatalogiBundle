@@ -20,11 +20,14 @@ class GithubPubliccodeService
 {
     private EntityManagerInterface $entityManager;
     private CallService $callService;
-    private Source $source;
+    private Source $githubApiSource;
     private SynchronizationService $synchronizationService;
     private ?Entity $repositoryEntity;
+    private ?Entity $organizationEntity;
     private ?Mapping $repositoryMapping;
+    private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
+    private SymfonyStyle $io;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -60,7 +63,7 @@ class GithubPubliccodeService
      */
     public function getSource(): ?Source
     {
-        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://api.github.com'])) {
+        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
         }
 
@@ -74,7 +77,7 @@ class GithubPubliccodeService
      */
     public function getRepositoryEntity(): ?Entity
     {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
@@ -88,11 +91,11 @@ class GithubPubliccodeService
      */
     public function getRepositoriesMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://api.github.com/search/code'])) {
+        if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
         }
 
-        return $this->componentMapping;
+        return $this->repositoriesMapping;
     }
 
     /**
@@ -102,11 +105,59 @@ class GithubPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://api.github.com/repositories'])) {
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
         }
 
-        return $this->componentMapping;
+        return $this->repositoryMapping;
+    }
+
+    /**
+     * Makes sure this action has all the gateway objects it needs.
+     */
+    private function getRequiredGatewayObjects()
+    {
+        // get github source
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find Source: Github API');
+
+            return false;
+        }
+        if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
+
+            return false;
+        }
+        if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
+
+            return false;
+        }
+
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
+
+            return false;
+        }
+
+        if (!isset($this->repositoriesMapping) && !$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+
+            return false;
+        }
+
+        // check if github source has authkey
+        if (!$this->githubApiSource->getApiKey()) {
+            isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -120,18 +171,23 @@ class GithubPubliccodeService
     public function getRepositories(): ?array
     {
         $result = [];
-        // Do we have a source
-        if (!$source = $this->getSource()) {
-            return null;
+        $safeToContinue = $this->getRequiredGatewayObjects();
+        if (!$safeToContinue) {
+            return [];
         }
 
-        $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');
+        $config = [];
+        $config['query'] = [
+            'q' => 'publiccode in:path path:/ extension:yaml extension:yml',
+        ];
+
+        // Find on publiccode.yaml
+        $repositories = $this->callService->getAllResults($this->githubApiSource, '/search/code', $config);
 
         isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
-        foreach ($repositories['items'] as $repository) {
+        foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
-
         $this->entityManager->flush();
 
         return $result;
@@ -178,7 +234,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @todo
+     * Maps a repository object and creates/updates a Synchronization.
      *
      * @param $repository
      *
@@ -186,33 +242,14 @@ class GithubPubliccodeService
      */
     public function importPubliccodeRepository($repository): ?ObjectEntity
     {
-        // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
-
-            return null;
-        }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
-
-            return null;
-        }
-        if (!$mapping = $this->getRepositoriesMapping()) {
-            isset($this->io) && $this->io->error('No RepositoriesMapping found when trying to import a public code repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
-
-            return null;
-        }
-
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
-
-        isset($this->io) && $this->io->comment('Mapping object '.$repository['repository']['name']);
-        $repository = $this->mappingService->mapping($mapping, $repository);
-
-        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
-
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
-        $synchronization->setMapping($mapping);
+        // Find or create existing sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
+        isset($this->io) && $this->io->comment('Mapping repository object '.$repository['repository']['name']);
+        // Set mapping on sync object
+        $synchronization->setMapping($this->repositoryMapping);
+        // Map object and create/update it
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
@@ -245,14 +282,13 @@ class GithubPubliccodeService
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
-        $repository = $this->mappingService->mapping($mapping, $repository['name']);
-
-        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
-
+        isset($this->io) && $this->io->comment('Mapping object '.$repository['name']);
+        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
+
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
