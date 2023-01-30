@@ -3,7 +3,6 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\CatalogiService;
 use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
 
 /**
