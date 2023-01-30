@@ -183,11 +183,6 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
-
-
-            $this->entityManager->flush();
-
-            return $result;
         }
         $this->entityManager->flush();
 
@@ -250,6 +245,8 @@ class GithubPubliccodeService
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
         $synchronization->setMapping($this->componentMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedRepository);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+
 
         return $synchronization->getObject();
     }
