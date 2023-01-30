@@ -88,16 +88,16 @@ class DeveloperOverheidService
      *
      * @todo duplicate with GithubPubliccodeService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getRepositories(): array
+    public function getRepositories(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Repositories');
 
-            return $result;
+            return null;
         }
 
         $repositories = $this->callService->getAllResults($source, '/repositories');
@@ -213,9 +213,9 @@ class DeveloperOverheidService
      *
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getComponents(): array
+    public function getComponents(): ?array
     {
         $result = [];
 
@@ -223,7 +223,7 @@ class DeveloperOverheidService
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Components');
 
-            return $result;
+            return null;
         }
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());

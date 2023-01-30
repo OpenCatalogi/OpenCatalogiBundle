@@ -115,14 +115,14 @@ class GithubPubliccodeService
      *
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getRepositories(): array
+    public function getRepositories(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
-            return $result;
+            return null;
         }
 
         $repositories = $this->callService->getAllResults($source, '/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml');

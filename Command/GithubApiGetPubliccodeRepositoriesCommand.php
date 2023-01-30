@@ -41,7 +41,9 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         $repositoryId = $input->getOption('repository', false);
 
         if (!$repositoryId) {
-            $this->githubPubliccodeService->getRepositories();
+            if (!$this->githubPubliccodeService->getRepositories()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->githubPubliccodeService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }

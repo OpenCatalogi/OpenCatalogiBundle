@@ -40,7 +40,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         $componentId = $input->getOption('component', false);
 
         if (!$componentId) {
-            $this->componentenCatalogusService->getComponents();
+            if (!$this->componentenCatalogusService->getComponents()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
             return Command::FAILURE;
         }

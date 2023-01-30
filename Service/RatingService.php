@@ -14,6 +14,8 @@ class RatingService
     private GithubApiService $githubService;
     private array $configuration;
     private array $data;
+    private ?Entity $componentEntity;
+    private ?Entity $ratingEntity;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -24,30 +26,97 @@ class RatingService
         $this->configuration = [];
         $this->data = [];
     }
-
+    
     /**
-     * @param array $data          data set at the start of the handler
-     * @param array $configuration configuration of the action
+     * Get the component entity.
      *
-     * @throws GuzzleException|Exception
-     *
-     * @return array dataset at the end of the handler
+     * @return ?Entity
      */
-    public function enrichComponentWithRating(array $data, array $configuration): array
+    public function getComponentEntity(): ?Entity
     {
-        $this->configuration = $configuration;
-        $this->data = $data;
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+        }
+        
+        return $this->componentEntity;
+    }
+    
+    /**
+     * Get the rating entity.
+     *
+     * @return ?Entity
+     */
+    public function getRatingEntity(): ?Entity
+    {
+        if (!$this->ratingEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.rating.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.rating.schema.json');
+        }
+        
+        return $this->ratingEntity;
+    }
+    
+    /**
+     * Create Rating for all components
+     *
+     * @return array|null
+     * @throws Exception
+     */
+    public function enrichComponentsWithRating(): ?array
+    {
+        $result = [];
+    
+        if (!$ratingEntity = $this->getRatingEntity()) {
+            isset($this->io) && $this->io->error('No RatingEntity found when trying to create ratings for all component ObjectEntities');
+        
+            return null;
+        }
+    
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to create ratings for all component ObjectEntities');
+        
+            return null;
+        }
+        
+        isset($this->io) && $this->io->comment('Trying to create ratings for all component ObjectEntities');
+    
+        foreach ($componentEntity->getObjectEntities() as $component) {
+            $result[] = $this->rateComponent($component, $ratingEntity);
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Create Rating for a single component
+     *
+     * @param string $id
+     * @return array|null dataset at the end of the handler
+     * @throws Exception
+     */
+    public function enrichComponentWithRating(string $id): ?array
+    {
+        if (!$ratingEntity = $this->getRatingEntity()) {
+            isset($this->io) && $this->io->error('No RatingEntity found when trying to create a Rating for Component ObjectEntity with id: '.$id);
+        
+            return null;
+        }
+    
+        isset($this->io) && $this->io->comment('Trying to get component ObjectEntity with id: '.$id);
+        $component = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$id]);
+        if (!$component instanceof ObjectEntity) {
+            isset($this->io) && $this->io->error('No component ObjectEntity found with id: '.$id);
+            
+            return null;
+        }
+    
+        $component = $this->rateComponent($component, $ratingEntity);
+        if ($component === null) {
+            return null;
+        }
+    
+        isset($this->io) && $this->io->success('Created rating for component ObjectEntity with id: '.$id);
 
-        $componentEntity = $this->entityManager->getRepository('App:Entity')->find($this->configuration['componentEntityId']);
-        $ratingEntity = $this->entityManager->getRepository('App:Entity')->find($this->configuration['ratingEntityId']);
-
-        $this->rateComponent($data['request'], $ratingEntity);
-
-//        foreach ($componentEntity->getObjectEntities() as $component) {
-//            $this->rateComponent($component, $ratingEntity);
-//        }
-
-        return $this->data;
+        return $component->toArray();
     }
 
     /**
@@ -106,24 +175,25 @@ class RatingService
         $maxRating++;
 
         // @todo does not work yet
-        if ($repository = $component->getValue('url')) {
-            if ($repository->getValue('url') !== null) {
-                $description[] = 'The url: '.$repository->getValue('url').' rated';
-                $rating++;
-
-                if ($this->githubService->checkPublicRepository($repository->getValue('url'))) {
-                    $description[] = 'Rated the repository because it is public';
-                    $rating++;
-                } else {
-                    $description[] = 'Cannot rated the repository because it is private';
-                }
-                $maxRating++;
-            } else {
-                $description[] = 'Cannot rate the url because it is not set';
-            }
-            $maxRating++;
-        }
-        $maxRating = $maxRating + 2;
+//        if ($repository = $component->getValue('url')) {
+//            if ($repository->getValue('url') !== null) {
+//                $description[] = 'The url: '.$repository->getValue('url').' rated';
+//                $rating++;
+//
+//                // todo: test if this works:
+//                if ($this->githubService->checkPublicRepository($repository->getValue('url'))) {
+//                    $description[] = 'Rated the repository because it is public';
+//                    $rating++;
+//                } else {
+//                    $description[] = 'Cannot rated the repository because it is private';
+//                }
+//                $maxRating++;
+//            } else {
+//                $description[] = 'Cannot rate the url because it is not set';
+//            }
+//            $maxRating++;
+//        }
+//        $maxRating = $maxRating + 2;
 
         if ($component->getValue('landingURL') !== null) {
             $description[] = 'The landingURL: '.$component->getValue('landingURL').' rated';
