@@ -391,14 +391,14 @@ class InstallationService implements InstallerInterface
         $mapping = new Mapping();
         $mapping->setName('Github repo -> repository');
         $mapping->setMapping([
-                'source'                  => 'github',
-                'name'                    => 'name',
-                'url'                     => 'html_url',
-                'avatar_url'              => 'owner.avatar_url',
-                'last_change'             => 'updated_at',
-                'stars'                   => 'stargazers_count',
-                'fork_count'              => 'forks_count',
-                'issue_open_count'        => 'open_issues_count'
+            'source'                  => 'github',
+            'name'                    => 'name',
+            'url'                     => 'html_url',
+            'avatar_url'              => 'owner.avatar_url',
+            'last_change'             => 'updated_at',
+            'stars'                   => 'stargazers_count',
+            'fork_count'              => 'forks_count',
+            'issue_open_count'        => 'open_issues_count',
         ]);
         $mapping->setversion('0.1.0');
         $mapping->setReference('https://opencatalogi.nl/oc.repository.schema.json');
@@ -438,9 +438,9 @@ class InstallationService implements InstallerInterface
 
         // Doesnt work so lets let search endpoint return all
         $schemasToAddToSearchEndpoint = [
-            // 'https://opencatalogi.nl/oc.application.schema.json',
-            // 'https://opencatalogi.nl/oc.organisation.schema.json',
-            // 'https://opencatalogi.nl/oc.component.schema.json'
+            'https://opencatalogi.nl/oc.application.schema.json',
+            'https://opencatalogi.nl/oc.organisation.schema.json',
+            'https://opencatalogi.nl/oc.component.schema.json',
         ];
 
         $schemas = [];

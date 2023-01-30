@@ -302,9 +302,9 @@ class ComponentenCatalogusService
 
             return null;
         }
-    
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
-        
+
         isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
