@@ -303,7 +303,7 @@ class ComponentenCatalogusService
             return null;
         }
 
-        isset($this->io) && $this->io->debug('Mapping object'.$component['name']);
+        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);

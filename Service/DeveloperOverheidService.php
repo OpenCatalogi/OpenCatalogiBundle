@@ -307,7 +307,7 @@ class DeveloperOverheidService
             return null;
         }
 
-        isset($this->io) && $this->io->debug('Mapping object'.$component['service_name']);
+        isset($this->io) && $this->io->comment('Mapping object'.$component['service_name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
