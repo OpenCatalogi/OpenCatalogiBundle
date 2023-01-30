@@ -302,14 +302,15 @@ class ComponentenCatalogusService
 
             return null;
         }
-
-        isset($this->io) && $this->io->debug('Mapping object'.$component['name']);
+    
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
+        
+        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking component '.$component['name']);
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 

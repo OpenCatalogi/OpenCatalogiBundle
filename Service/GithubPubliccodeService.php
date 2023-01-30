@@ -202,14 +202,15 @@ class GithubPubliccodeService
 
             return null;
         }
-
+    
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
+        
         isset($this->io) && $this->io->comment('Mapping object '.$repository['repository']['name']);
         $repository = $this->mappingService->mapping($mapping, $repository);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
@@ -241,14 +242,15 @@ class GithubPubliccodeService
 
             return null;
         }
-
+    
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
         $repository = $this->mappingService->mapping($mapping, $repository['name']);
 
         isset($this->io) && $this->io->comment('Mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
