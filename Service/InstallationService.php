@@ -55,7 +55,7 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpencatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
         'OpenCatalogi\OpencatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubFindPubliccodeHandler",
-//        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
+        //        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubRepositoryThroughOrganizationHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
@@ -184,10 +184,10 @@ class InstallationService implements InstallerInterface
             } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
                 $action->setConditions([[1 => 1]]);
-            } elseif(strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
                 $action->setListens(['opencatalogi.github']);
                 $action->setConditions([[1 => 1]]);
-            } elseif(
+            } elseif (
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
             ) {
