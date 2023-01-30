@@ -386,26 +386,6 @@ class InstallationService implements InstallerInterface
         $this->entityManager->flush();
     }
 
-    private function addMappings()
-    {
-        $mapping = new Mapping();
-        $mapping->setName('Github repo -> repository');
-        $mapping->setMapping([
-                'source'                  => 'github',
-                'name'                    => 'name',
-                'url'                     => 'html_url',
-                'avatar_url'              => 'owner.avatar_url',
-                'last_change'             => 'updated_at',
-                'stars'                   => 'stargazers_count',
-                'fork_count'              => 'forks_count',
-                'issue_open_count'        => 'open_issues_count'
-        ]);
-        $mapping->setversion('0.1.0');
-        $mapping->setReference('https://opencatalogi.nl/oc.repository.schema.json');
-        $this->entityManager->persist($mapping);
-        isset($this->io) && $this->io->writeln('Mapping: '.$mapping->getName().' created');
-    }
-
     public function setApplicationSchemaId()
     {
         $schemaRepository = $this->entityManager->getRepository('App:Entity');
@@ -483,9 +463,6 @@ class InstallationService implements InstallerInterface
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
         //$this->catalogiService->readCatalogi($opencatalogi);
-
-        // create mappings
-        $this->addMappings();
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook
