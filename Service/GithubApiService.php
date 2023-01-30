@@ -2,7 +2,9 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use CommonGateway\CoreBundle\Service\CallService;
+use App\Entity\Gateway as Source;
+use App\Entity\ObjectEntity;
+use App\Service\SynchronizationService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -10,64 +12,122 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use CommonGateway\CoreBundle\Service\CallService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use CommonGateway\CoreBundle\Service\MappingService;
+use App\Entity\Mapping;
+use App\Entity\Entity;
 
 class GithubApiService
 {
     private ParameterBagInterface $parameterBag;
-    private ?Client $githubClient;
-    private ?Client $githubusercontentClient;
     private CallService $callService;
+    private EntityManagerInterface $entityManager;
+    private SymfonyStyle $io;
+    private Source $source;
+    private SynchronizationService $synchronizationService;
+    private MappingService $mappingService;
+
+    private ?Mapping $repositoryMapping;
+    private ?Mapping $organizationMapping;
+    private ?Entity $repositoryEntity;
+    private ?Entity $organizationEntity;
+    private ?Source $githubApiSource;
+
+
+    // private ?Client $githubClient;
+    // private ?Client $githubusercontentClient;
 
     public function __construct(
         ParameterBagInterface $parameterBag,
-        CallService $callService
+        CallService $callService,
+        EntityManagerInterface $entityManager,
+        SynchronizationService $synchronizationService,
+        MappingService $mappingService
     ) {
         $this->parameterBag = $parameterBag;
-        $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
-        $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
+        $this->callService = $callService;
+        $this->entityManager = $entityManager;
+        $this->synchronizationService = $synchronizationService;
+        $this->mappingService = $mappingService;
+
+        $this->repositoryMapping = null;
+        $this->organizationMapping = null;
+        $this->repositoryEntity = null;
+        $this->organizationEntity = null;
+        $this->githubApiSource = null;
+
+        // $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
+        // $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
     }
 
     /**
-     * This function check if the github key is provided.
+     * Set symfony style in order to output to the console
      *
-     * @return Response|null
+     * @param SymfonyStyle $io
+     * @return self
      */
-    public function checkGithubKey(): ?Response
+    public function setStyle(SymfonyStyle $io): self
     {
-        if (!$this->githubClient) {
-            return new Response(
-                'Missing github_key in env',
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'json']
-            );
-        }
+        $this->io = $io;
 
-        return null;
+        return $this;
     }
 
-    /**
-     * This function gets the content of the given url.
-     *
-     * @param string      $url
-     * @param string|null $path
-     *
-     * @throws GuzzleException
-     *
-     * @return array|null
-     */
-    public function requestFromUrl(string $url, ?string $path = null): ?array
+    public function getSource()
     {
-        if ($path !== null) {
-            $parse = parse_url($url);
-            $url = str_replace([$path], '', $parse['path']);
-        }
+        !isset($this->source) && $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com/']);
+        if (!isset($this->source)) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a Source for the Github API');
+            return [];
+        };
 
-        if ($response = $this->githubClient->request('GET', $url)) {
-            return json_decode($response->getBody()->getContents(), true);
-        }
-
-        return null;
+        return $this->source;
     }
+
+    // /**
+    //  * This function check if the github key is provided.
+    //  *
+    //  * @return Response|null
+    //  */
+    // public function checkGithubKey(): ?Response
+    // {
+    //     if (!$this->githubClient) {
+    //         return new Response(
+    //             'Missing github_key in env',
+    //             Response::HTTP_BAD_REQUEST,
+    //             ['content-type' => 'json']
+    //         );
+    //     }
+
+    //     return null;
+    // }
+
+    // /**
+    //  * This function gets the content of the given url.
+    //  *
+    //  * @param string      $url
+    //  * @param string|null $path
+    //  *
+    //  * @throws GuzzleException
+    //  *
+    //  * @return array|null
+    //  */
+    // public function requestFromUrl(string $url, ?string $path = null): ?array
+    // {
+    //     if ($path !== null) {
+    //         $parse = parse_url($url);
+    //         $url = str_replace([$path], '', $parse['path']);
+    //     }
+
+    //     if ($response = $this->githubClient->request('GET', $url)) {
+    //         return json_decode($response->getBody()->getContents(), true);
+    //     }
+
+    //     return null;
+    // }
 
     /**
      * This function gets all the github repository details.
@@ -113,7 +173,7 @@ class GithubApiService
         }
 
         try {
-            $response = $this->callService->call('GET', 'repos/'.$slug);
+            $response = $this->callService->call('GET', 'repos/' . $slug);
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
@@ -150,16 +210,16 @@ class GithubApiService
             $url = str_replace([$path], '', $parse['path']);
         }
 
-        if ($response = $this->githubClient->request('GET', $url)) {
-            $responses = json_decode($response->getBody()->getContents(), true);
+        // if ($response = $this->githubClient->request('GET', $url)) {
+        //     $responses = json_decode($response->getBody()->getContents(), true);
 
-            $urls = [];
-            foreach ($responses as $item) {
-                $urls[] = $item['html_url'];
-            }
+        //     $urls = [];
+        //     foreach ($responses as $item) {
+        //         $urls[] = $item['html_url'];
+        //     }
 
-            return $urls;
-        }
+        //     return $urls;
+        // }
 
         return null;
     }
@@ -191,127 +251,291 @@ class GithubApiService
         ];
     }
 
+    // /**
+    //  * This function is searching for repositories containing a publiccode.yaml file.
+    //  *
+    //  * @param string $organizationName
+    //  * @param string $repositoryName
+    //  *
+    //  * @throws GuzzleException
+    //  *
+    //  * @return array|null
+    //  */
+    // public function getPubliccodeForGithubEvent(string $organizationName, string $repositoryName): ?array
+    // {
+    //     $response = null;
+
+    //     try {
+    //         $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yaml');
+    //     } catch (ClientException $exception) {
+    //         var_dump($exception->getMessage());
+    //     }
+
+    //     if ($response == null) {
+    //         try {
+    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yaml');
+    //         } catch (ClientException $exception) {
+    //             var_dump($exception->getMessage());
+
+    //             return null;
+    //         }
+    //     }
+
+    //     if ($response == null) {
+    //         try {
+    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yml');
+    //         } catch (ClientException $exception) {
+    //             var_dump($exception->getMessage());
+
+    //             return null;
+    //         }
+    //     }
+
+    //     if ($response == null) {
+    //         try {
+    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yml');
+    //         } catch (ClientException $exception) {
+    //             var_dump($exception->getMessage());
+
+    //             return null;
+    //         }
+    //     }
+
+    //     try {
+    //         $publiccode = Yaml::parse($response->getBody()->getContents());
+    //     } catch (ParseException $exception) {
+    //         var_dump($exception->getMessage());
+
+    //         return null;
+    //     }
+
+    //     return $publiccode;
+    // }
+
+    // /**
+    //  * This function is searching for repositories containing a publiccode.yaml file.
+    //  *
+    //  * @param string $url
+    //  *
+    //  * @throws GuzzleException
+    //  *
+    //  * @return array|null|Response
+    //  */
+    // public function getPubliccode(string $url)
+    // {
+    //     $parseUrl = parse_url($url);
+    //     $code = explode('/blob/', $parseUrl['path']);
+
+    //     try {
+    //         $response = $this->githubusercontentClient->request('GET', $code[0].'/'.$code[1]);
+    //     } catch (ClientException $exception) {
+    //         var_dump($exception->getMessage());
+
+    //         return null;
+    //     }
+
+    //     try {
+    //         $publiccode = Yaml::parse($response->getBody()->getContents());
+    //     } catch (ParseException $exception) {
+    //         var_dump($exception->getMessage());
+
+    //         return null;
+    //     }
+
+    //     return $publiccode;
+    // }
+
+    // /**
+    //  * This function is searching for repositories containing a publiccode.yaml file.
+    //  *
+    //  * @param string $slug
+    //  *
+    //  * @throws GuzzleException
+    //  *
+    //  * @return array|null|Response
+    //  */
+    // public function checkPublicRepository(string $slug)
+    // {
+    //     if ($this->checkGithubKey()) {
+    //         return $this->checkGithubKey();
+    //     }
+
+    //     try {
+    //         $response = $this->githubClient->request('GET', 'repos/'.$slug);
+    //     } catch (ClientException $exception) {
+    //         return new Response(
+    //             $exception,
+    //             Response::HTTP_BAD_REQUEST,
+    //             ['content-type' => 'json']
+    //         );
+    //     }
+
+    //     $response = json_decode($response->getBody()->getContents(), true);
+
+    //     return $response['private'];
+    // }
+
+    
+
     /**
-     * This function is searching for repositories containing a publiccode.yaml file.
-     *
-     * @param string $organizationName
-     * @param string $repositoryName
-     *
-     * @throws GuzzleException
-     *
-     * @return array|null
+     * Makes sure this action has all the gateway objects it needs
      */
-    public function getPubliccodeForGithubEvent(string $organizationName, string $repositoryName): ?array
+    private function getRequiredGatewayObjects()
     {
-        $response = null;
-
-        try {
-            $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yaml');
-        } catch (ClientException $exception) {
-            var_dump($exception->getMessage());
+        // get github source
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find Source: Github API');
+            return [];
         }
+        if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
+            return [];
+        };
+        if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
+            return [];
+        };
 
-        if ($response == null) {
-            try {
-                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yaml');
-            } catch (ClientException $exception) {
-                var_dump($exception->getMessage());
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find a repository for reference https://opencatalogi.nl/oc.repository.schema.json');
+            return [];
+        };
 
-                return null;
-            }
+        // check if github source has authkey
+        if (!$this->githubApiSource->getApiKey()) {
+            isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
+
+            return [];
         }
-
-        if ($response == null) {
-            try {
-                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yml');
-            } catch (ClientException $exception) {
-                var_dump($exception->getMessage());
-
-                return null;
-            }
-        }
-
-        if ($response == null) {
-            try {
-                $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yml');
-            } catch (ClientException $exception) {
-                var_dump($exception->getMessage());
-
-                return null;
-            }
-        }
-
-        try {
-            $publiccode = Yaml::parse($response->getBody()->getContents());
-        } catch (ParseException $exception) {
-            var_dump($exception->getMessage());
-
-            return null;
-        }
-
-        return $publiccode;
     }
 
     /**
-     * This function is searching for repositories containing a publiccode.yaml file.
+     * Searches github for publiccode files @TODO testing
      *
-     * @param string $url
-     *
-     * @throws GuzzleException
-     *
-     * @return array|null|Response
+     * @param $data
+     * @param $configuration
+     * @return array
      */
-    public function getPubliccode(string $url)
+    public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): array
     {
-        $parseUrl = parse_url($url);
-        $code = explode('/blob/', $parseUrl['path']);
+        $this->getRequiredGatewayObjects();
 
-        try {
-            $response = $this->githubusercontentClient->request('GET', $code[0].'/'.$code[1]);
-        } catch (ClientException $exception) {
-            var_dump($exception->getMessage());
+        // Build the query
+        $query = [
+            'page'     => 1,
+            'per_page' => 1,
+            'order'    => 'desc',
+            'sort'     => 'author-date',
+            'q'        => 'publiccode in:path path:/  extension:yml', // so we are looking for a yaml file called publiccode based in the repo root
+        ];
 
-            return null;
+        // find on publiccode.yml
+        $responseYml = $this->callService->call($this->githubApiSource, '/search/code', 'GET', ['query' => $query]);
+        $repositoriesYml = $this->callService->decodeResponse($this->githubApiSource, $responseYml);
+
+        $query['q'] = 'publiccode in:path path:/  extension:yaml'; // switch from yml to yaml
+
+        // find on publiccode.yaml
+        $responseYaml = $this->callService->call($this->githubApiSource, '/search/code', 'GET', ['query' => $query]);
+        $repositoriesYaml = $this->callService->decodeResponse($this->githubApiSource, $responseYaml);
+
+        // merge the result
+        $repositories = array_merge($repositoriesYaml, $repositoriesYml);
+
+        foreach ($repositories['items'] as $repository) {
+
+            if (isset($repository['repository'])) {
+                $repositoryObject = $this->handleRepositoryArray($repository['repository']);
+                $this->entityManager->persist($repositoryObject);
+                dump($repositoryObject->getId()->toString());
+                dump($repositoryObject->toArray());
+
+                // // REMOVE/DISABLE AFTER TESTING
+                // $this->entityManager->flush();
+                // return $data;
+            }
         }
 
-        try {
-            $publiccode = Yaml::parse($response->getBody()->getContents());
-        } catch (ParseException $exception) {
-            var_dump($exception->getMessage());
+        $this->entityManager->flush();
 
-            return null;
-        }
-
-        return $publiccode;
+        return $data;
     }
 
     /**
-     * This function is searching for repositories containing a publiccode.yaml file.
+     * Turn an repro array into an object we can handle @TODO testing
      *
-     * @param string $slug
-     *
-     * @throws GuzzleException
-     *
-     * @return array|null|Response
+     * @param array $repro
+     * @param Mapping $mapping
+     * 
+     * @return ?ObjectEntity
      */
-    public function checkPublicRepository(string $slug)
+    public function handleRepositoryArray(array $repository, ?Entity $repositoryEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ?ObjectEntity
     {
-        if ($this->checkGithubKey()) {
-            return $this->checkGithubKey();
+        // check for mapping
+        if (!$this->repositoryMapping && !$mapping) {
+            $this->io->error('Repository mapping not set/given');
+
+            return null;
         }
 
-        try {
-            $response = $this->githubClient->request('GET', 'repos/'.$slug);
-        } catch (ClientException $exception) {
-            return new Response(
-                $exception,
-                Response::HTTP_BAD_REQUEST,
-                ['content-type' => 'json']
-            );
+        // Mapp the repro to something ussefull
+        // @TODO mapping aint right
+        $mappedRepository = $this->mappingService->mapping($this->repositoryMapping ?? $mapping, $repository);
+
+        // Handle sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->repositoryEntity ?? $repositoryEntity, $mappedRepository['url']);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedRepository);
+        $repositoryObject = $synchronization->getObject();
+        $repository = $repositoryObject->toArray();
+
+        if (isset($repository['organisation'])) {
+            $organisationObject = $this->handleOrganizationArray($repository['organisation']);
+            $repositoryObject->setValue('organization', $organisationObject->getId()->toString());
         }
 
-        $response = json_decode($response->getBody()->getContents(), true);
+        return $repositoryObject;
+    }
 
-        return $response['private'];
+    /**
+     * Turn an organisation array into an object we can handle
+     *
+     * @param array $repro
+     * @param Mapping $mapping
+     * 
+     * @return ObjectEntity
+     */
+    public function handleOrganizationArray(array $organisation, ?Entity $organizationEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ObjectEntity
+    {
+
+        // check for mapping
+        if (!$this->organizationMapping && !$mapping) {
+            $this->io->error('Organization mapping not set/given');
+
+            return null;
+        }
+
+        // Mapp the repro to something ussefull
+        $mappedOrganisation = $this->mappingService->mapping($this->organizationMapping ?? $mapping, $organisation);
+
+        // Turn the organisation into a synchronyzed object
+        // $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedOrganisation);
+        $organisationObject = $synchronization->getObject();
+        $organisation = $organisationObject->toArray();
+
+        if (isset($organisation['repositories'])) {
+            foreach ($organisation['repositories'] as $repository) {
+                $repositoryObject = $this->handlerepositoryArray($repository);
+                // Organizations don't have repositories so we need to set to organization on the repo site and persist that
+                $repositoryObject->setValue('organization', $organisation);
+                $this->entityManager->persist($repository);
+            }
+        }
+
+        return $organisationObject;
     }
 }

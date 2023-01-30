@@ -6,7 +6,7 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 
 /**
- * Loopt door alle repro's heen om de organisatie erbij te zoeken.
+ * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
@@ -46,6 +46,6 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
 
     public function run(array $data, array $configuration): array
     {
-        return $this->findOrganizationThroughRepositoriesService->enrichRepositoryWithOrganizationHandler($data, $configuration);
+        return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
     }
 }
