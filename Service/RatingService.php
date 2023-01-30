@@ -7,6 +7,7 @@ use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RatingService
 {
@@ -16,6 +17,7 @@ class RatingService
     private array $data;
     private ?Entity $componentEntity;
     private ?Entity $ratingEntity;
+    private SymfonyStyle $io;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -25,6 +27,20 @@ class RatingService
         $this->githubService = $githubService;
         $this->configuration = [];
         $this->data = [];
+    }
+    
+    /**
+     * Set symfony style in order to output to the console.
+     *
+     * @param SymfonyStyle $io
+     *
+     * @return self
+     */
+    public function setStyle(SymfonyStyle $io): self
+    {
+        $this->io = $io;
+        
+        return $this;
     }
     
     /**
