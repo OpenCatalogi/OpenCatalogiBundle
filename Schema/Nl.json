@@ -1,0 +1,25 @@
+{
+  "title": "Nl",
+  "$id": "https://opencatalogi.nl/oc.nl.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "0.1.0",
+  "type": "object",
+  "description": "Extension to the publiccode standard for the netherlands by [vng](https://vng.nl/) in accordance with the publiccode [Country-Specific Sections](https://yml.publiccode.tools/country.html)",
+  "properties": {
+    "commonground": {
+      "$ref": "https://opencatalogi.nl/oc.commonground.schema.json"
+    },
+    "gemma": {
+      "$ref": "https://opencatalogi.nl/oc.gemma.schema.json"
+    },
+    "apm": {
+      "type": "object"
+    },
+    "upl": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

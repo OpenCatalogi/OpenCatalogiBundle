@@ -1,0 +1,23 @@
+{
+  "title": "Localisation",
+  "$id": "https://opencatalogi.nl/oc.localisation.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "0.1.0",
+  "type": "object",
+  "description": "This section provides an overview of the localization features of the software.",
+  "properties": {
+    "localisationReady": {
+      "type": "boolean",
+      "description": "If true, the software has infrastructure in place or is otherwise designed to be multilingual. It does not need to be available in more than one language.",
+      "required": true
+    },
+    "availableLanguages": {
+      "type": "array",
+      "description": "If present, this is the list of languages in which the software is available. Of course, this list will contain at least one language. The primary language subtag cannot be omitted, as mandated by the BCP 47.\n",
+      "items": {}
+    }
+  },
+  "required": [
+    "localisationReady"
+  ]
+}
