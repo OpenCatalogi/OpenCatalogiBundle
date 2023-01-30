@@ -25,7 +25,7 @@ class GithubPubliccodeService
     private ?Entity $repositoryEntity;
     private ?Entity $organizationEntity;
     private ?Mapping $repositoryMapping;
-    private ?Mapping $componentMapping;
+    private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
@@ -91,11 +91,11 @@ class GithubPubliccodeService
      */
     public function getRepositoriesMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'c'])) {
+        if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
         }
 
-        return $this->componentMapping;
+        return $this->repositoriesMapping;
     }
 
     /**
@@ -105,11 +105,11 @@ class GithubPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
         }
 
-        return $this->componentMapping;
+        return $this->repositoryMapping;
     }
 
     /**
@@ -168,7 +168,6 @@ class GithubPubliccodeService
         $result = [];
         $safeToContinue = $this->getRequiredGatewayObjects();
         if (!$safeToContinue) {
-            dump($safeToContinue);
             return [];
         }
 
@@ -238,15 +237,15 @@ class GithubPubliccodeService
      */
     public function importPubliccodeRepository($repository): ?ObjectEntity
     {
-        isset($this->io) && $this->io->comment('Mapping object ' . $repository['repository']['name']);
-        $mappedRepository = $this->mappingService->mapping($this->componentMapping, $repository);
-        dump($mappedRepository);
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
-        $synchronization->setMapping($this->componentMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedRepository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
+        isset($this->io) && $this->io->comment('Mapping object ' . $repository['repository']['name']);
+        isset($this->io) && $this->io->comment('The mapping object ' . $this->repositoriesMapping);
+        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
+
+        $synchronization->setMapping($this->repositoriesMapping);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
@@ -277,15 +276,15 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Mapping object ' . $mapping);
-        $repository = $this->mappingService->mapping($mapping, $repository['name']);
-
-        isset($this->io) && $this->io->comment('Mapping object ' . $mapping);
-
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+
+        isset($this->io) && $this->io->comment('Mapping object ' . $repository['name']);
+        isset($this->io) && $this->io->comment('The mapping object ' . $mapping);
+        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
+
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
