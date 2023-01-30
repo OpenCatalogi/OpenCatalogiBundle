@@ -150,6 +150,34 @@ class ComponentenCatalogusService
     }
 
     /**
+     * Turn an component array into an object we can handle
+     *
+     * @param array $repro
+     * @param Mapping $mapping
+     *
+     * @return ?ObjectEntity
+     */
+    public function handleComponentArray(array $component, ?Entity $componentEntity = null, ?Source $componentenCatalogusSource = null): ?ObjectEntity
+    {
+        if (!$mapping = $this->getComponentMapping()) {
+            isset($this->io) && $this->io->error('No ComponentMapping found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+
+            return null;
+        }
+        // Handle sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $componentenCatalogusSource, $this->componentEntity ?? $componentEntity, $component['id']);
+
+        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
+        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
+
+        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
+        $synchronization->setMapping($mapping);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
+
+        return $synchronization->getObject();
+    }
+
+    /**
      * @todo
      *
      * @param $application
@@ -173,6 +201,25 @@ class ComponentenCatalogusService
         isset($this->io) && $this->io->success('Checking application '.$application['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $applicationEntity, $application['id']);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $application);
+
+
+        $applicationObject = $synchronization->getObject();
+
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No componentEntity found when trying to import a Component');
+
+            return null;
+        }
+
+        if ($application['components']) {
+            $components = [];
+            foreach ($application['components'] as $component) {
+                $componentObject = $this->handleComponentArray($component, $componentEntity, $this->source);
+                $componentObject->setValue('component', $componentObject);
+                $components[] = $componentObject;
+            }
+            $applicationObject->setValue('components', $components);
+        }
 
         return $synchronization->getObject();
     }
@@ -302,9 +349,9 @@ class ComponentenCatalogusService
 
             return null;
         }
-    
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
-        
+
         isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
         $component = $this->mappingService->mapping($mapping, $component);
 
