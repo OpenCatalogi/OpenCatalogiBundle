@@ -345,36 +345,27 @@ class GithubApiService
 
     //     return $publiccode;
     // }
-
-    // /**
-    //  * This function is searching for repositories containing a publiccode.yaml file.
-    //  *
-    //  * @param string $slug
-    //  *
-    //  * @throws GuzzleException
-    //  *
-    //  * @return array|null|Response
-    //  */
-    // public function checkPublicRepository(string $slug)
-    // {
-    //     if ($this->checkGithubKey()) {
-    //         return $this->checkGithubKey();
-    //     }
-
-    //     try {
-    //         $response = $this->githubClient->request('GET', 'repos/'.$slug);
-    //     } catch (ClientException $exception) {
-    //         return new Response(
-    //             $exception,
-    //             Response::HTTP_BAD_REQUEST,
-    //             ['content-type' => 'json']
-    //         );
-    //     }
-
-    //     $response = json_decode($response->getBody()->getContents(), true);
-
-    //     return $response['private'];
-    // }
+    
+    /**
+     * This function is searching for repositories containing a publiccode.yaml file.
+     *
+     * @param string $slug
+     *
+     * @return array|null|Response
+     */
+    public function checkPublicRepository(string $slug)
+    {
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find Source: Github API');
+            return [];
+        }
+        
+        $response = $this->callService->call($this->githubApiSource, 'repos/' . $slug);
+        $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
+        
+        return $repository['private'];
+    }
 
     /**
      * Makes sure this action has all the gateway objects it needs.

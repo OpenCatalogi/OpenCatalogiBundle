@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class RatingService
 {
     private EntityManagerInterface $entityManager;
-    private GithubApiService $githubService;
+    private GithubApiService $githubApiService;
     private array $configuration;
     private array $data;
     private ?Entity $componentEntity;
@@ -21,10 +21,10 @@ class RatingService
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        GithubApiService $githubService
+        GithubApiService $githubApiService
     ) {
         $this->entityManager = $entityManager;
-        $this->githubService = $githubService;
+        $this->githubApiService = $githubApiService;
         $this->configuration = [];
         $this->data = [];
     }
@@ -192,27 +192,25 @@ class RatingService
             $description[] = 'Cannot rate the name because it is not set';
         }
         $maxRating++;
+        
+        if ($repository = $component->getValue('url')) {
+            if ($repository->getValue('url') !== null) {
+                $description[] = 'The url: '.$repository->getValue('url').' rated';
+                $rating++;
 
-        // @todo does not work yet
-//        if ($repository = $component->getValue('url')) {
-//            if ($repository->getValue('url') !== null) {
-//                $description[] = 'The url: '.$repository->getValue('url').' rated';
-//                $rating++;
-//
-//                // todo: test if this works:
-//                if ($this->githubService->checkPublicRepository($repository->getValue('url'))) {
-//                    $description[] = 'Rated the repository because it is public';
-//                    $rating++;
-//                } else {
-//                    $description[] = 'Cannot rated the repository because it is private';
-//                }
-//                $maxRating++;
-//            } else {
-//                $description[] = 'Cannot rate the url because it is not set';
-//            }
-//            $maxRating++;
-//        }
-//        $maxRating = $maxRating + 2;
+                if ($this->githubApiService->checkPublicRepository($repository->getValue('url'))) {
+                    $description[] = 'Rated the repository because it is public';
+                    $rating++;
+                } else {
+                    $description[] = 'Cannot rated the repository because it is private';
+                }
+                $maxRating++;
+            } else {
+                $description[] = 'Cannot rate the url because it is not set';
+            }
+            $maxRating++;
+        }
+        $maxRating = $maxRating + 2;
 
         if ($component->getValue('landingURL') !== null) {
             $description[] = 'The landingURL: '.$component->getValue('landingURL').' rated';
