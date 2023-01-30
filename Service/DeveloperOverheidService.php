@@ -230,8 +230,6 @@ class DeveloperOverheidService
 
         $components = $this->callService->getAllResults($source, '/apis');
 
-        // get the repositories of the components
-
         isset($this->io) && $this->io->success('Found '.count($components).' components');
         foreach ($components as $component) {
 
@@ -265,8 +263,6 @@ class DeveloperOverheidService
         $response = $this->callService->call($source, '/apis/'.$id);
 
         $component = json_decode($response->getBody()->getContents(), true);
-
-        // get the repositories of the component
 
         if (!$component) {
             isset($this->io) && $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
@@ -342,6 +338,7 @@ class DeveloperOverheidService
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 
+
         $componentObject = $synchronization->getObject();
 
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
@@ -349,6 +346,7 @@ class DeveloperOverheidService
 
             return null;
         }
+
 
         if ($component['related_repositories']) {
             // only do someting with the first item in the array
