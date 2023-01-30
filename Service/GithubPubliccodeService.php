@@ -241,7 +241,7 @@ class GithubPubliccodeService
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource, $this->repositoryEntity, $repository['repository']['id']);
         isset($this->io) && $this->io->comment('Mapping repository object ' . $repository['repository']['name']);
         // Set mapping on sync object
-        $synchronization->setMapping($this->repositoriesMapping);
+        $synchronization->setMapping($this->repositoryMapping);
         // Map object and create/update it
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
