@@ -3,19 +3,20 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
-use App\Entity\Gateway as Source;
-use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
-use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Gateway as Source;
+use CommonGateway\CoreBundle\Service\CallService;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
+use App\Entity\Mapping;
 
 /**
- * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
+ * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info
  */
 class FindOrganizationThroughRepositoriesService
 {
@@ -24,32 +25,31 @@ class FindOrganizationThroughRepositoriesService
     private array $data;
     private SymfonyStyle $io;
     private CallService $callService;
-    private GithubApiService $githubApiService;
+    private GithubPubliccodeService $githubPubliccodeService;
 
-    private Entity $organisationEntity;
-    private Mapping $organisationMapping;
-    private Entity $repositoryEntity;
-    private Mapping $repositoryMapping;
-    private Source $githubApi;
+    private ?Entity $organisationEntity;
+    private ?Mapping $organisationMapping;
+    private ?Entity $repositoryEntity;
+    private ?Mapping $repositoryMapping;
+    private ?Source $githubApi;
 
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
-        GithubApiService $githubApiService
+        GithubPubliccodeService $githubPubliccodeService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
-        $this->githubApiService = $githubApiService;
+        $this->githubPubliccodeService = $githubPubliccodeService;
 
         $this->configuration = [];
         $this->data = [];
     }
 
     /**
-     * Set symfony style in order to output to the console.
+     * Set symfony style in order to output to the console
      *
      * @param SymfonyStyle $io
-     *
      * @return self
      */
     public function setStyle(SymfonyStyle $io): self
@@ -60,7 +60,7 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * This function gets the content of the given url. @TODO needs testing with proper data.
+     * This function gets the content of the given url. @TODO needs testing with proper data
      *
      * @param string      $url
      * @param string|null $path
@@ -71,7 +71,6 @@ class FindOrganizationThroughRepositoriesService
     {
         // @TODO url is unknown yet (needs testing with proper data
         isset($this->io) && $this->io->error("Find out what url $ code is continue development: $url");
-
         return null;
         // if ($path !== null) {
         //     $parse = parse_url($url);
@@ -124,11 +123,10 @@ class FindOrganizationThroughRepositoriesService
     public function getRepositoryFromUrl(string $slug)
     {
         try {
-            $response = $this->callService->call($this->githubApi, '/repos/'.$slug);
+            $response = $this->callService->call($this->githubApi, '/repos/' . $slug);
         } catch (Exception $e) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error("Error found trying to fetch '/repos/'.$slug : ".$e->getMessage());
-
+            isset($this->io) && $this->io->error("Error found trying to fetch '/repos/'.$slug : " . $e->getMessage());
             return null;
         }
 
@@ -140,7 +138,7 @@ class FindOrganizationThroughRepositoriesService
 
     // /**
     //  * Hydrates the repository with earlier fetched github data
-    //  *
+    //  * 
     //  * @param ObjectEntity $repository the repository where we want to find an organisation for
     //  * @param ?array       $github     fetched organization info from github
     //  * @throws Exception
@@ -155,6 +153,7 @@ class FindOrganizationThroughRepositoriesService
 
     //     return $repository;
     // }
+
 
     /**
      * This function gets the content of the given url.
@@ -176,6 +175,8 @@ class FindOrganizationThroughRepositoriesService
         $url = str_replace($this->githubApi->getLocation(), '', $url);
         if ($response = $this->callService->call($this->githubApi, $url)) {
             $responses = json_decode($response->getBody()->getContents(), true);
+            isset($this->io) && $this->io->success("Fetched githubowner info: $url");
+            dump($responses);
 
             $urls = [];
             foreach ($responses as $item) {
@@ -188,6 +189,7 @@ class FindOrganizationThroughRepositoriesService
         return null;
     }
 
+
     /**
      * This function gets the github owner details.
      *
@@ -199,7 +201,7 @@ class FindOrganizationThroughRepositoriesService
      */
     public function getGithubOwnerInfo(array $item): array
     {
-        // @TODO
+        // @TODO MappingService 
 
         return [
             'id'          => $item['owner']['id'],
@@ -221,8 +223,7 @@ class FindOrganizationThroughRepositoriesService
     public function enrichRepositoryWithOrganisation(ObjectEntity $repository): ?ObjectEntity
     {
         if (!$repository->getValue('url')) {
-            isset($this->io) && $this->io->error('Repository url not set');
-
+            isset($this->io) && $this->io->error("Repository url not set");
             return null;
         }
         $source = $repository->getValue('source');
@@ -239,38 +240,16 @@ class FindOrganizationThroughRepositoriesService
         switch ($source) {
             case 'github':
                 // let's get the repository datar
-                isset($this->io) && $this->io->info("Trying to fetch repository from: $url");
-                $github = $this->getRepositoryFromUrl($url);
-                if ($github['owner']['type'] === 'Organization') {
-                    $github['organisation'] = $this->getGithubOwnerInfo($github);
+                $fetchedRepository = $this->getRepositoryFromUrl($url);
+                if ($fetchedRepository['owner']['type'] === 'Organization') {
+                    $fetchedRepository['organisation'] = $this->getGithubOwnerInfo($fetchedRepository);
                 } else {
-                    isset($this->io) && $this->io->error('No organisation found for fetched repository');
+                    isset($this->io) && $this->io->error("No organisation found for fetched repository");
                 }
-                $repositoryObject = $this->githubApiService->handleRepositoryArray($github, $this->repositoryEntity, $this->repositoryMapping);
 
-                // This code might nog be needed thanks to handleRepositoryArray code?
-                // if (isset($github['organisation'])) {
-                //     // $repository = $this->setRepositoryWithGithubInfo($repository, $github);
+                // $repositoryObject = $this->githubApiService->handleRepositoryArray($github, $this->repositoryEntity, $this->repositoryMapping);
+                $repositoryObject = $this->githubPubliccodeService->importRepository($fetchedRepository);
 
-                //     if (!$this->entityManager->getRepository('App:ObjectEntity')->findByEntity($this->organisationEntity, ['github' => $github['organisation']['github']])) {
-                //         $organisation = new ObjectEntity();
-                //         $organisation->setEntity($this->organisationEntity);
-                //     } else {
-                //         $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findByEntity($this->organisationEntity, ['github' => $github['organisation']['github']])[0];
-                //     }
-
-                //     $organisation->setValue('owns', $github['organisation']['owns']);
-                //     $organisation->hydrate($github['organisation']);
-                //     $repository->setValue('organisation', $organisation);
-                //     $this->entityManager->persist($organisation);
-                //     $this->entityManager->persist($repository);
-                //     $this->entityManager->flush();
-                //     isset($this->io) && $this->io->success("Enriched repository");
-
-                //     return $repository;
-                // } else {
-                //     isset($this->io) && $this->io->error("No organisation found for fetched repository");
-                // }
                 break;
             case 'gitlab':
                 // hetzelfde maar dan voor gitlab
@@ -288,59 +267,52 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * Makes sure this action has all the gateway objects it needs.
+     * Makes sure this action has all the gateway objects it needs
      */
     private function getRequiredGatewayObjects()
     {
-        !isset($this->organisationEntity) && $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
-        if (!isset($this->organisationEntity)) {
+        if (!isset($this->organisationEntity) && !$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json');
-
             return [];
         }
 
-        !isset($this->repositoryEntity) && $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
-        if (!isset($this->repositoryEntity)) {
+        if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.repository.schema.json');
-
             return [];
         }
 
-        !isset($this->githubApi) && $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API']);
-        if (!isset($this->githubApi)) {
+        if (!isset($this->githubApi) && !$this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a Source for Github API');
-
             return [];
-        }
+        };
 
-        !isset($this->repositoryMapping) && $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
-        if (!isset($this->repositoryMapping)) {
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a repository for reference https://opencatalogi.nl/oc.repository.schema.json');
-
+            isset($this->io) && $this->io->error('Could not find mapping for repository with reference https://api.github.com/repositories');
             return [];
-        }
+        };
     }
 
     /**
-     * Loops through repositories to enrich with organisation.
+     * Loops through repositories to enrich with organisation
      */
     private function loopThroughRepositories()
     {
         foreach ($this->repositoryEntity->getObjectEntities() as $repository) {
             $this->enrichRepositoryWithOrganisation($repository);
+            die;
         }
     }
 
     /**
-     * Makes sure the action the action can actually runs and then executes functions to update a repository with fetched organization info.
-     *
+     * Makes sure the action the action can actually runs and then executes functions to update a repository with fetched organization info
+     * 
      * @param ?array $data          data set at the start of the handler (not needed here)
      * @param ?array $configuration configuration of the action          (not needed here)
-     * @param ?array $repositoryId  optional repository id for testing for a single repository
+     * @param ?array $repositoryId  optional repository id for testing for a single repository   
      *
      * @return array dataset at the end of the handler                   (not needed here)
      */
@@ -362,6 +334,7 @@ class FindOrganizationThroughRepositoriesService
             $this->loopThroughRepositories();
         }
         $this->entityManager->flush();
+
 
         isset($this->io) && $this->io->success('findOrganizationThroughRepositoriesHandler finished');
 
