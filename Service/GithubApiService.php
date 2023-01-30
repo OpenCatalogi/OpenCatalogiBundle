@@ -2,22 +2,22 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
-use CommonGateway\CoreBundle\Service\CallService;
-use CommonGateway\CoreBundle\Service\MappingService;
-use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use CommonGateway\CoreBundle\Service\CallService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use CommonGateway\CoreBundle\Service\MappingService;
+use App\Entity\Mapping;
+use App\Entity\Entity;
 
 class GithubApiService
 {
@@ -31,9 +31,11 @@ class GithubApiService
 
     private ?Mapping $repositoryMapping;
     private ?Mapping $organizationMapping;
+    private ?Mapping $componentMapping;
     private ?Entity $repositoryEntity;
     private ?Entity $organizationEntity;
     private ?Source $githubApiSource;
+
 
     // private ?Client $githubClient;
     // private ?Client $githubusercontentClient;
@@ -62,10 +64,9 @@ class GithubApiService
     }
 
     /**
-     * Set symfony style in order to output to the console.
+     * Set symfony style in order to output to the console
      *
      * @param SymfonyStyle $io
-     *
      * @return self
      */
     public function setStyle(SymfonyStyle $io): self
@@ -81,9 +82,8 @@ class GithubApiService
         if (!isset($this->source)) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a Source for the Github API');
-
             return [];
-        }
+        };
 
         return $this->source;
     }
@@ -174,7 +174,7 @@ class GithubApiService
         }
 
         try {
-            $response = $this->callService->call('GET', 'repos/'.$slug);
+            $response = $this->callService->call('GET', 'repos/' . $slug);
         } catch (ClientException $exception) {
             var_dump($exception->getMessage());
 
@@ -346,65 +346,59 @@ class GithubApiService
     //     return $publiccode;
     // }
 
-    // /**
-    //  * This function is searching for repositories containing a publiccode.yaml file.
-    //  *
-    //  * @param string $slug
-    //  *
-    //  * @throws GuzzleException
-    //  *
-    //  * @return array|null|Response
-    //  */
-    // public function checkPublicRepository(string $slug)
-    // {
-    //     if ($this->checkGithubKey()) {
-    //         return $this->checkGithubKey();
-    //     }
+    /**
+     * This function is searching for repositories containing a publiccode.yaml file.
+     *
+     * @param string $slug
+     *
+     * @return array|null|Response
+     */
+    public function checkPublicRepository(string $slug)
+    {
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error('Could not find Source: Github API');
+            return [];
+        }
 
-    //     try {
-    //         $response = $this->githubClient->request('GET', 'repos/'.$slug);
-    //     } catch (ClientException $exception) {
-    //         return new Response(
-    //             $exception,
-    //             Response::HTTP_BAD_REQUEST,
-    //             ['content-type' => 'json']
-    //         );
-    //     }
+        $response = $this->callService->call($this->githubApiSource, 'repos/' . $slug);
+        $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
 
-    //     $response = json_decode($response->getBody()->getContents(), true);
+        return $repository['private'];
+    }
 
-    //     return $response['private'];
-    // }
+
 
     /**
-     * Makes sure this action has all the gateway objects it needs.
+     * Makes sure this action has all the gateway objects it needs
      */
     private function getRequiredGatewayObjects()
     {
         // get github source
-        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API'])) {
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find Source: Github API');
-
             return [];
         }
         if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
-
             return [];
-        }
+        };
         if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
-
             return [];
-        }
+        };
 
-        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a repository for reference https://opencatalogi.nl/oc.repository.schema.json');
+            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
+            return [];
+        };
 
+        if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
             return [];
         }
 
@@ -417,11 +411,10 @@ class GithubApiService
     }
 
     /**
-     * Searches github for publiccode files @TODO testing.
+     * Searches github for publiccode files @TODO testing
      *
      * @param $data
      * @param $configuration
-     *
      * @return array
      */
     public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): array
@@ -451,6 +444,7 @@ class GithubApiService
         $repositories = array_merge($repositoriesYaml, $repositoriesYml);
 
         foreach ($repositories['items'] as $repository) {
+
             if (isset($repository['repository'])) {
                 $repositoryObject = $this->handleRepositoryArray($repository['repository']);
                 $this->entityManager->persist($repositoryObject);
@@ -469,11 +463,11 @@ class GithubApiService
     }
 
     /**
-     * Turn an repro array into an object we can handle @TODO testing.
+     * Turn an repro array into an object we can handle @TODO OLD CHECK GithubPubliccodeService
      *
-     * @param array   $repro
+     * @param array $repro
      * @param Mapping $mapping
-     *
+     * 
      * @return ?ObjectEntity
      */
     public function handleRepositoryArray(array $repository, ?Entity $repositoryEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ?ObjectEntity
@@ -504,11 +498,11 @@ class GithubApiService
     }
 
     /**
-     * Turn an organisation array into an object we can handle.
+     * Turn an organisation array into an object we can handle @TODO OLD CHECK GithubPubliccodeService
      *
-     * @param array   $repro
+     * @param array $repro
      * @param Mapping $mapping
-     *
+     * 
      * @return ObjectEntity
      */
     public function handleOrganizationArray(array $organisation, ?Entity $organizationEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ObjectEntity
