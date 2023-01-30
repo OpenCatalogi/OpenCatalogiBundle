@@ -1,0 +1,8 @@
+{
+  "title": "ComponentenCatalogusApplicationToOpenCatalogiApplication",
+  "$id": "https://componentencatalogus.commonground.nl/api/applications",
+  "$schema": "https://json-schema.org/draft/2020-12/mapping",
+  "version": "0.0.1",
+  "passTrough": true,
+  "unset": ["components"]
+}

@@ -6,7 +6,7 @@
   "passTrough": false,
   "mapping": {
     "name": "service_name",
-    // vastsetten op de laag api
+    "softwareType": "api",
     "description.localisedName": "service_name",
     "description.shortDescription": "description",
     "description.longDescription": "description",
@@ -16,7 +16,6 @@
     "legal.repoOwner.email": "contact.email",
     "legal.repoOwner.phone": "contact.phone",
     "legal.repoOwner.website": "contact.url",
-    "legal.repoOwner.type": "Organization",
-    // In de code los kijken of er repro objecten zijn en die aanmaken
+    "legal.repoOwner.type": "Organization"
   }
 }

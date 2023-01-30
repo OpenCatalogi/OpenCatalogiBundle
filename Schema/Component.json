@@ -128,246 +128,25 @@
       ]
     },
     "intendedAudience": {
-      "type": "object",
-      "properties": {
-        "countries": {
-          "description": "This key explicitly includes certain countries in the intended audience, i.e. the software explicitly claims compliance with specific processes, technologies or laws. All countries are specified using lowercase ISO 3166-1 alpha-2 two-letter country codes.",
-          "type": "array",
-          "items": {}
-        },
-        "unsupportedCountries": {
-          "type": "array",
-          "description": "This key explicitly marks countries as NOT supported. This might be the case if there is a conflict between how software is working and a specific law, process or technology. All countries are specified using lowercase ISO 3166-1 alpha-2 two-letter country codes.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "scope": {
-          "type": "array",
-          "description": "This key contains a list of tags related to the field of application of the software.",
-          "items": {
-            "type": "string",
-            "example": "agriculture",
-            "enum": [
-              "agriculture",
-              "culture",
-              "defence",
-              "education",
-              "emergency-services",
-              "employment",
-              "energy",
-              "environment",
-              "finance-and-economic-development",
-              "foreign-affairs",
-              "government",
-              "healthcare",
-              "infrastructures",
-              "justice",
-              "local-authorities",
-              "manufacturing",
-              "research",
-              "science-and-technology",
-              "security",
-              "society",
-              "sport",
-              "tourism",
-              "transportation",
-              "welfare"
-            ]
-          }
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.intendedaudience.schema.json"
     },
     "description": {
       "$ref": "https://opencatalogi.nl/oc.description.schema.json"
     },
     "legal": {
-      "type": "object",
-      "description": "This section provides information on the legalstatus of the software, useful to evaluate whether the software can be used or not.\n\nIn the following part of the document, all keys are assumed to be in a sub-section with the name of the language (we will note this with [lang]).",
-      "properties": {
-        "license": {
-          "type": "string",
-          "description": "This string describes the license under which the software is distributed. The string must contain a valid SPDX expression, referring to one (or multiple) open-source license. Please refer to the SPDX documentation for further information.",
-          "example": "EUPL-1.0-or-later"
-        },
-        "mainCopyrightOwner": {
-          "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
-        },
-        "repoOwner": {
-          "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
-        },
-        "authorsFile": {
-          "type": "string",
-          "description": "Some open-source software adopt a convention of identify the copyright holders through a file that lists all the entities that own the copyright. This is common in projects strongly backed by a community where there are many external contributors and no clear single/main copyright owner. In such cases, this key can be used to refer to the authors file, using a path relative to the root of the repository.",
-          "example": "doc/AUTHORS.txt"
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.legal.schema.json"
     },
     "maintenance": {
-      "type": "object",
-      "description": "This section provides information on the maintenance status of the software, useful to evaluate whether the software is actively developed or not.",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "This key describes how the software is currently maintained.\n\ninternal - means that the software is internally maintained by the repository owner;\n\ncontract - means that there is a commercial contract that binds an entity to the maintenance of the software;\n\ncommunity - means that the software is currently maintained by one or more people that donate their time to the project;\n\nnone - means that the software is not actively maintained.",
-          "enum": [
-            "none",
-            "internal",
-            "contract",
-            "community"
-          ],
-          "example": "none",
-          "required": true
-        },
-        "contractors": {
-          "type": "array",
-          "description": "This key describes the entity or entities, if any, that are currently contracted for maintaining the software. They can be companies, organizations, or other collective names.",
-          "items": {
-            "$ref": "https://opencatalogi.nl/oc.contractor.schema.json"
-          }
-        },
-        "contacts": {
-          "description": "One or more contacts maintaining this software.\n\nThis key describes the technical people currently responsible for maintaining the software. All contacts need to be a physical person, not a company or an organisation. If somebody is acting as a representative of an institution, it must be listed within the affiliation of the contact.\n\nIn case of a commercial agreement (or a chain of such agreements), specify the final entities actually contracted to deliver the maintenance. Do not specify the software owner unless it is technically involved with the maintenance of the product as well.",
-          "type": "array",
-          "items": {
-            "$ref": "https://opencatalogi.nl/oc.contact.schema.json"
-          }
-        }
-      },
-      "required": [
-        "type"
-      ]
+      "$ref": "https://opencatalogi.nl/oc.maintenance.schema.json"
     },
     "localisation": {
-      "type": "object",
-      "description": "This section provides an overview of the localization features of the software.",
-      "properties": {
-        "localisationReady": {
-          "type": "boolean",
-          "description": "If true, the software has infrastructure in place or is otherwise designed to be multilingual. It does not need to be available in more than one language.",
-          "required": true
-        },
-        "availableLanguages": {
-          "type": "array",
-          "description": "If present, this is the list of languages in which the software is available. Of course, this list will contain at least one language. The primary language subtag cannot be omitted, as mandated by the BCP 47.\n",
-          "items": {}
-        }
-      },
-      "required": [
-        "localisationReady"
-      ]
+      "$ref": "https://opencatalogi.nl/oc.localisation.schema.json"
     },
     "dependsOn": {
-      "type": "object",
-      "description": "This section provides an overview on the system-level dependencies required to install and use this software.\n\nNOTE: do not list dependencies at the source code level (e.g.: software libraries being used), and focus only on runtime and/or system-level dependencies that must be installed and maintained separately. For instance, a database is a good example of such dependencies.",
-      "properties": {
-        "open": {
-          "type": "array",
-          "description": "This key contains a list of runtime dependencies that are distributed under an open-source license.",
-          "items": {
-            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
-          }
-        },
-        "proprietary": {
-          "type": "array",
-          "description": "This key contains a list of runtime dependencies that are distributed under a proprietary license.",
-          "items": {
-            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
-          }
-        },
-        "hardware": {
-          "type": "array",
-          "description": "This key contains a list of hardware dependencies that must be owned to use the software.",
-          "items": {
-            "$ref": "https://opencatalogi.nl/oc.dependency.schema.json"
-          }
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.dependson.schema.json"
     },
     "nl": {
-      "type": "object",
-      "description": "Extension to the publiccode standard for the netherlands by [vng](https://vng.nl/) in accordance with the publiccode [Country-Specific Sections](https://yml.publiccode.tools/country.html)",
-      "properties": {
-        "commonground": {
-          "type": "object",
-          "description": "Commonground specific properties for use with the [componnenten catalogue](https://componentencatalogus.commonground.nl/).",
-          "properties": {
-            "intendedOrganisations": {
-              "type": "array",
-              "description": "A list of organisations that may use this component (wont be visable to other organisations)",
-              "items": {}
-            },
-            "installationType": {
-              "type": "string",
-              "enum": [
-                "self",
-                "helm",
-                "provision"
-              ],
-              "example": "self",
-              "description": "Extension to publiccode bassed on the componentencatalogus. Should be one of\n- self\n- helm"
-            },
-            "layerType": {
-              "type": "string",
-              "enum": [
-                "interface",
-                "integration",
-                "data",
-                "service",
-                "process"
-              ],
-              "example": "interface",
-              "description": "An extension to public code based on the componentencatalogus. Refers to the layer on wich the component oprates, see [documentation](https://commonground.nl/cms/view/12f73f0d-ae26-4021-ba52-849eef37d11f/de-common-ground-principes/03743740-a49f-48d8-9fc5-e24f86d748ed)"
-            }
-          }
-        },
-        "gemma": {
-          "type": "object",
-          "properties": {
-            "bedrijfsfuncties": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "bedrijfsservices": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "applicatiefunctie": {
-              "type": "string"
-            },
-            "model": {
-              "type": "string",
-              "description": "Het soort model (mag alleen worden gebruikt als het type schema is).",
-              "enum": [
-                "Semantisch",
-                "Conceptueel",
-                "Logisch",
-                "Fysiek"
-              ],
-              "example": "Semantisch"
-            },
-            "referentieComponenten": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "apm": {
-          "type": "object"
-        },
-        "upl": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.nl.schema.json"
     },
     "inputTypes": {
       "type": "array",
