@@ -133,7 +133,6 @@ class FindRepositoriesThroughOrganizationService
                     isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}");
                 }
 
-
                 return $repository;
             case 'gitlab':
                 // hetelfde maar dan voor gitlab
@@ -198,11 +197,13 @@ class FindRepositoriesThroughOrganizationService
             ($organisation = $this->entityManager->find('App:ObjectEntity', $organisationId)) && $this->enrichRepositoryWithOrganisationRepos($organisation);
             if (!$organisation) {
                 isset($this->io) && $this->io->error('Could not find given repository');
+
                 return null;
             }
         } else {
             if (!$organisationEntity = $this->getOrganisationEntity()) {
                 isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+
                 return null;
             }
 
