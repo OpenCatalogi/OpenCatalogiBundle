@@ -39,6 +39,7 @@ class RatingService
     public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
+        $this->githubApiService->setStyle($io);
 
         return $this;
     }
