@@ -190,9 +190,9 @@ class FindRepositoriesThroughOrganizationService
      * @param ?array      $configuration  configuration of the action          (not needed here)
      * @param string|null $organisationId
      *
-     * @return array dataset at the end of the handler                   (not needed here)
+     * @return array|null dataset at the end of the handler                   (not needed here)
      */
-    public function findRepositoriesThroughOrganisationHandler(?array $data = [], ?array $configuration = [], ?string $organisationId = null): array
+    public function findRepositoriesThroughOrganisationHandler(?array $data = [], ?array $configuration = [], ?string $organisationId = null): ?array
     {
         $this->configuration = $configuration;
         $this->data = $data;
