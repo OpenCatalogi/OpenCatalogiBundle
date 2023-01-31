@@ -27,8 +27,8 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
-            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info')
-            ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
+            ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
+            ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find an organization for a specific repository by id');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
