@@ -203,11 +203,13 @@ class RatingService
                 $description[] = 'The url: '.$repository->getValue('url').' rated';
                 $rating++;
 
-                if ($this->githubApiService->checkPublicRepository($repository->getValue('url'))) {
+                if (empty($repository->getValue('url'))) {
+                    $description[] = 'Cannot rate the repository because url is empty';
+                } elseif ($this->githubApiService->checkPublicRepository($repository->getValue('url'))) {
                     $description[] = 'Rated the repository because it is public';
                     $rating++;
                 } else {
-                    $description[] = 'Cannot rated the repository because it is private';
+                    $description[] = 'Cannot rate the repository because it is private';
                 }
                 $maxRating++;
             } else {
