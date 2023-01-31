@@ -78,6 +78,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
+            
+            return null;
         }
 
         return $this->githubApi;
@@ -92,6 +94,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+            
+            return null;
         }
 
         return $this->organisationEntity;
@@ -106,6 +110,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+            
+            return null;
         }
 
         return $this->repositoryEntity;
@@ -120,6 +126,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->organisationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/organisation'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/organisation');
+    
+            return null;
         }
 
         return $this->organisationMapping;
