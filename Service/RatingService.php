@@ -214,7 +214,7 @@ class RatingService
                     $description[] = 'Rated the repository because it is public';
                     $rating++;
                 } else {
-                    $description[] = 'Cannot rate the repository because it is private';
+                    $description[] = 'Cannot rate the repository because it is private (or url is invalid)';
                 }
                 $maxRating++;
             } elseif ($url === null) {
