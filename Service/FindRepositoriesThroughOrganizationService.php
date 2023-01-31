@@ -4,12 +4,10 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use CommonGateway\CoreBundle\Service\CallService;
 use App\Entity\ObjectEntity;
+use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FindRepositoriesThroughOrganizationService
@@ -23,7 +21,6 @@ class FindRepositoriesThroughOrganizationService
     private array $data;
 
     private Entity $organisationEntity;
-
 
     public function __construct(
         CallService $callService,
@@ -94,13 +91,12 @@ class FindRepositoriesThroughOrganizationService
     {
         // make sync object
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with slug: ' . $slug);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with slug: '.$slug);
 
             return null;
         }
 
         $response = $this->callService->call($source, '/repos/'.$slug);
-
 
         $repository = $this->callService->decodeResponse($source, $response, 'application/json');
         isset($this->io) && $this->io->success("Fetch and decode went succesfull for /repos/$slug");
@@ -109,8 +105,9 @@ class FindRepositoriesThroughOrganizationService
     }
 
     /**
-     * @param string $repositoryUrl
+     * @param string       $repositoryUrl
      * @param ObjectEntity $organisation
+     *
      * @return ObjectEntity|null
      */
     public function getOrganisationRepos(string $repositoryUrl, ObjectEntity $organisation): ?ObjectEntity
@@ -119,7 +116,6 @@ class FindRepositoriesThroughOrganizationService
         $domain = parse_url($repositoryUrl, PHP_URL_HOST);
         $domain == 'github.com' && $source = 'github';
         $domain == 'gitlab.com' && $source = 'gitlab';
-
 
         $url = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');
 
@@ -175,9 +171,10 @@ class FindRepositoriesThroughOrganizationService
     }
 
     /**
-     * @param ?array $data data set at the start of the handler (not needed here)
-     * @param ?array $configuration configuration of the action          (not needed here)
+     * @param ?array      $data           data set at the start of the handler (not needed here)
+     * @param ?array      $configuration  configuration of the action          (not needed here)
      * @param string|null $organisationId
+     *
      * @return array dataset at the end of the handler                   (not needed here)
      */
     public function findRepositoriesThroughOrganisationHandler(?array $data = [], ?array $configuration = [], ?string $organisationId = null): array
