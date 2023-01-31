@@ -275,6 +275,12 @@ class GithubPubliccodeService
             return null;
         }
 
+        if (!isset($repository['id'])) {
+            isset($this->io) && $this->io->error('No id set on repository, returning null and continuing');
+
+            return null;
+        }
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
         isset($this->io) && $this->io->comment('Mapping object'.$repository['name']);
