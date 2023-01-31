@@ -197,6 +197,7 @@ class RatingService
         }
         $maxRating++;
 
+        // todo: use GithubApiService functions to check if url->source is github and only than continue
         if ($repository = $component->getValue('url')) {
             if ($repository->getValue('url') !== null) {
                 $description[] = 'The url: '.$repository->getValue('url').' rated';
