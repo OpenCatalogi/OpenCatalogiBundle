@@ -128,13 +128,19 @@ class FindRepositoriesThroughOrganizationService
                 if ($repository) {
                     $repository->setValue('organisation', $organisation);
                     $this->entityManager->persist($repository);
+                    isset($this->io) && $this->io->write("A repository created for organization: {$organisation->getName()}");
+                } else {
+                    isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}");
                 }
+
 
                 return $repository;
             case 'gitlab':
                 // hetelfde maar dan voor gitlab
+                    isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, we dont support gitlab");
             default:
                 // error voor onbeknd type
+                    isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, unknown source type");
         }
 
         return null;
@@ -149,23 +155,28 @@ class FindRepositoriesThroughOrganizationService
      */
     public function enrichRepositoryWithOrganisationRepos(ObjectEntity $organisation): ?ObjectEntity
     {
+        $repositoriesCreated = 0;
         if ($owns = $organisation->getValue('owns')) {
+            isset($this->io) && $this->io->write("Looping through {$organisation->getName()} its 'owns' repositories to create");
             foreach ($owns as $repositoryUrl) {
-                $repository = $this->getOrganisationRepos($repositoryUrl, $organisation);
+                $this->getOrganisationRepos($repositoryUrl, $organisation) && $repositoriesCreated = $repositoriesCreated + 1;
             }
         }
 
         if ($uses = $organisation->getValue('uses')) {
+            isset($this->io) && $this->io->write("Looping through {$organisation->getName()} its 'uses' repositories to create");
             foreach ($uses as $repositoryUrl) {
-                $repository = $this->getOrganisationRepos($repositoryUrl, $organisation);
+                $this->getOrganisationRepos($repositoryUrl, $organisation) && $repositoriesCreated = $repositoriesCreated + 1;
             }
         }
 
         if ($supports = $organisation->getValue('supports')) {
+            isset($this->io) && $this->io->write("Looping through {$organisation->getName()} its 'supports' repositories to create");
             foreach ($supports as $repositoryUrl) {
-                $repository = $this->getOrganisationRepos($repositoryUrl, $organisation);
+                $this->getOrganisationRepos($repositoryUrl, $organisation) && $repositoriesCreated = $repositoriesCreated + 1;
             }
         }
+        $repositoriesCreated && isset($this->io) && $this->io->write("$repositoriesCreated repositories created/updated for organization: {$organisation->getName()}", true);
 
         return $organisation;
     }
@@ -185,10 +196,14 @@ class FindRepositoriesThroughOrganizationService
         if ($organisationId) {
             // If we are testing for one repository
             ($organisation = $this->entityManager->find('App:ObjectEntity', $organisationId)) && $this->enrichRepositoryWithOrganisationRepos($organisation);
-            !$organisation && isset($this->io) && $this->io->error('Could not find given repository');
+            if (!$organisation) {
+                isset($this->io) && $this->io->error('Could not find given repository');
+                return null;
+            }
         } else {
             if (!$organisationEntity = $this->getOrganisationEntity()) {
                 isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+                return null;
             }
 
             // If we want to do it for al repositories
