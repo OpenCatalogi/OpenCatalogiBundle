@@ -11,7 +11,7 @@ class GithubEventService
 {
     private EntityManagerInterface $entityManager;
     private GithubApiService $githubService;
-    private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
+    private EnrichPubliccodeService $checkRepositoriesForPubliccodeService;
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
     private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
     private RatingService $ratingService;
@@ -20,13 +20,13 @@ class GithubEventService
     private array $data;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
-        GithubApiService $githubService,
-        CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService,
+        EntityManagerInterface                     $entityManager,
+        GithubApiService                           $githubService,
+        EnrichPubliccodeService                    $checkRepositoriesForPubliccodeService,
         FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService,
         FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService,
-        RatingService $ratingService,
-        PubliccodeService $publiccodeService
+        RatingService                              $ratingService,
+        PubliccodeService                          $publiccodeService
     ) {
         $this->entityManager = $entityManager;
         $this->githubService = $githubService;
