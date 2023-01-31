@@ -10,6 +10,7 @@ use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -348,25 +349,35 @@ class GithubApiService
     // }
 
     /**
-     * This function is searching for repositories containing a publiccode.yaml file.
+     * This function checks if a github repository is public.
      *
      * @param string $slug
      *
-     * @return array|null|Response
+     * @return bool
      */
-    public function checkPublicRepository(string $slug)
+    public function checkPublicRepository(string $slug): bool
     {
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find Source: Github API');
 
-            return [];
+            return false;
         }
 
-        $response = $this->callService->call($this->githubApiSource, 'repos/'.$slug);
-        $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
+        $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
+        $slug = rtrim($slug, '/');
 
-        return $repository['private'];
+        try {
+            $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);
+            $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
+        } catch (Exception $exception) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error("Exception while checking if public repository: {$exception->getMessage()}");
+
+            return false;
+        }
+
+        return $repository['private'] === false;
     }
 
     /**
