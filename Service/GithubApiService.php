@@ -10,6 +10,7 @@ use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -18,7 +19,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use Exception;
 
 class GithubApiService
 {
@@ -362,15 +362,16 @@ class GithubApiService
 
             return false;
         }
-    
+
         $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
+
         try {
             $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);
             $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
         } catch (Exception $exception) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error("Exception while checking if public repository: {$exception->getMessage()}");
-    
+
             return false;
         }
 
