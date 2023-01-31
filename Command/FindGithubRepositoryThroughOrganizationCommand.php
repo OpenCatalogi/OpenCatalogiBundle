@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class FindGithubRepositoryThroughOrganizationCommand extends Command
 {
+    // the name of the command (the part after "bin/console")
     protected static $defaultName = 'opencatalogi:github:discoverrepository';
     private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
 
@@ -27,7 +28,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
-            ->setHelp('This command allows you to update create owned repositories from orgasation')
+            ->setHelp('This command allows you to update create owned repositories from organisation')
             ->addOption('organisationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
     }
 
