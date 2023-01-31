@@ -147,6 +147,30 @@ class RatingService
     }
 
     /**
+     * Create Rating for a single component when action for this handler is triggered.
+     *
+     * @param array $data          data set at the start of the handler
+     * @param array $configuration configuration of the action
+     *
+     * @throws Exception
+     *
+     * @return array
+     */
+    public function ratingHandler(array $data, array $configuration): array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        if (array_key_exists('id', $this->data['response'])) {
+            $id = $this->data['response']['id'];
+
+            $this->enrichComponentWithRating($id);
+        }
+
+        return $this->data;
+    }
+
+    /**
      * @param ObjectEntity $component
      * @param Entity       $ratingEntity
      *

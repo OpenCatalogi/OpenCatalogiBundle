@@ -78,6 +78,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
+
+            return null;
         }
 
         return $this->githubApi;
@@ -92,6 +94,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+
+            return null;
         }
 
         return $this->organisationEntity;
@@ -106,6 +110,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
         }
 
         return $this->repositoryEntity;
@@ -120,6 +126,8 @@ class FindOrganizationThroughRepositoriesService
     {
         if (!$this->organisationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/organisation'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/organisation');
+
+            return null;
         }
 
         return $this->organisationMapping;
@@ -176,7 +184,7 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * Get a organisation from https://api.github.com/orgs/{org}.
+     * Get an organisation from https://api.github.com/orgs/{org}.
      *
      * @param string $name
      *
@@ -186,7 +194,7 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Organisation with name: '.$name);
+            isset($this->io) && $this->io->error('No source found when trying to get an Organisation with name: '.$name);
 
             return null;
         }
@@ -201,7 +209,7 @@ class FindOrganizationThroughRepositoriesService
         $organisation = json_decode($response->getBody()->getContents(), true);
 
         if (!$organisation) {
-            isset($this->io) && $this->io->error('Could not find a organisation with name: '.$name.' and with source: '.$source->getName());
+            isset($this->io) && $this->io->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }
@@ -226,17 +234,17 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Organisation '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import an Organisation '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$organisationEntity = $this->getOrganisationEntity()) {
-            isset($this->io) && $this->io->error('No organisationEntity found when trying to import a Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
+            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
 
             return null;
         }
         if (!$organisationMapping = $this->getOrganisationMapping()) {
-            isset($this->io) && $this->io->error('No organisationMapping found when trying to import a Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
+            isset($this->io) && $this->io->error('No organisationMapping found when trying to import an Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
 
             return null;
         }
@@ -255,7 +263,7 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * Get a organisation from https://api.github.com/orgs/{org}/repos.
+     * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
      * @param string $name
      *
@@ -265,7 +273,7 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Organisation with name: '.$name);
+            isset($this->io) && $this->io->error('No source found when trying to get an Organisation with name: '.$name);
 
             return null;
         }

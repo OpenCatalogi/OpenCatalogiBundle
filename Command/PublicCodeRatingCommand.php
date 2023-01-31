@@ -28,7 +28,7 @@ class PublicCodeRatingCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi RatingService')
-            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info')
+            ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Rate a single component by id');
     }
 
