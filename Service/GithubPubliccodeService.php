@@ -65,6 +65,7 @@ class GithubPubliccodeService
     {
         if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
+            return null;
         }
 
         return $this->source;
@@ -79,6 +80,7 @@ class GithubPubliccodeService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+            return null;
         }
 
         return $this->repositoryEntity;
@@ -93,6 +95,7 @@ class GithubPubliccodeService
     {
         if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
+            return null;
         }
 
         return $this->repositoriesMapping;
@@ -107,6 +110,7 @@ class GithubPubliccodeService
     {
         if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+            return null;
         }
 
         return $this->repositoryMapping;
