@@ -2,7 +2,7 @@
   "title": "DeveloperOverheidApisToComponent",
   "$id": "https://developer.overheid.nl/api/components",
   "$schema": "https://json-schema.org/draft/2020-12/mapping",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "passTrough": false,
   "mapping": {
     "name": "service_name",

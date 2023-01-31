@@ -64,6 +64,8 @@ class DeveloperOverheidService
     {
         if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://developer.overheid.nl/api'])) {
             isset($this->io) && $this->io->error('No source found for https://developer.overheid.nl/api');
+
+            return null;
         }
 
         return $this->source;
@@ -78,6 +80,8 @@ class DeveloperOverheidService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
         }
 
         return $this->repositoryEntity;
@@ -88,16 +92,16 @@ class DeveloperOverheidService
      *
      * @todo duplicate with GithubPubliccodeService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getRepositories(): array
+    public function getRepositories(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Repositories');
 
-            return $result;
+            return null;
         }
 
         $repositories = $this->callService->getAllResults($source, '/repositories');
@@ -213,9 +217,9 @@ class DeveloperOverheidService
      *
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getComponents(): array
+    public function getComponents(): ?array
     {
         $result = [];
 
@@ -223,7 +227,7 @@ class DeveloperOverheidService
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Components');
 
-            return $result;
+            return null;
         }
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
