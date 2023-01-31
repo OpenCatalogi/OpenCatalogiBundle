@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Command to execute the FindOrganizationThroughRepositoriesService
@@ -42,7 +41,9 @@ class FindOrganizationThroughRepositoriesCommand extends Command
         $repositoryId = $input->getOption('repositoryId', false);
 
         if (!$repositoryId) {
-            $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler();
+            if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
             return Command::FAILURE;
         }
