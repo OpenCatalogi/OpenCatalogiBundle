@@ -134,15 +134,15 @@ class GithubPubliccodeService
      * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
      *
      * @return array
-     * @todo duplicate with DeveloperOverheidService ?
      *
+     * @todo duplicate with DeveloperOverheidService ?
      */
     public function getRepositories(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: ' . $id);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
@@ -188,8 +188,8 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repository ' . $id);
-        $response = $this->callService->call($source, '/repositories/' . $id);
+        isset($this->io) && $this->io->success('Getting repository '.$id);
+        $response = $this->callService->call($source, '/repositories/'.$id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
@@ -221,17 +221,17 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoriesMapping = $this->getRepositoriesMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
@@ -270,7 +270,7 @@ class GithubPubliccodeService
             return null;
         }
         if (!$repositoryMapping = $this->getRepositoryMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
