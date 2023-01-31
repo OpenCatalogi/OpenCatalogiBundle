@@ -145,6 +145,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         if (isset($response)) {
 
+            // @TODO use decodeResponse from the callService
             $openCatalogi = Yaml::parse($response->getBody()->getContents());
             isset($this->io) && $this->io->success("Fetch and decode went succesfull '/'.$organizationName.'/.github/master/openCatalogi.yml', '/'.$organizationName.'/.github/master/openCatalogi.yaml'");
 
@@ -198,24 +199,24 @@ class FindGithubRepositoryThroughOrganizationService
     {
         if ($githubRepo = $this->getGithubRepoFromOrganization($organization->getValue('name'))) {
             isset($this->io) && $this->io->success('Github repo found and fetched for '.$organization->getName());
-            if ($catalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
+            if ($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
                 isset($this->io) && $this->io->success('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
+                // we dont want to set the name, this has to be the login property from the github api
                 $organization->hydrate([
-                    'name'         => $catalogi['name'],
-                    'description'  => $catalogi['description'],
-                    'type'         => $catalogi['type'],
-                    'telephone'    => $catalogi['telephone'],
-                    'email'        => $catalogi['email'],
-                    'website'      => $catalogi['website'],
-                    'logo'         => $catalogi['logo'],
-                    'catalogusAPI' => $catalogi['catalogusAPI'],
-                    'uses'         => $catalogi['uses'],
-                    'supports'     => $catalogi['supports'],
+                    'description'  => $openCatalogi['description'],
+                    'type'         => $openCatalogi['type'],
+                    'telephone'    => $openCatalogi['telephone'],
+                    'email'        => $openCatalogi['email'],
+                    'website'      => $openCatalogi['website'],
+                    'logo'         => $openCatalogi['logo'],
+                    'catalogusAPI' => $openCatalogi['catalogusAPI'],
+                    'uses'         => $openCatalogi['uses'],
+                    'supports'     => $openCatalogi['supports'],
                 ]);
                 $this->entityManager->persist($organization);
                 $this->entityManager->flush();
-                isset($this->io) && $this->io->success($organization->getName().' succesfully updated with fetched catalogi info');
+                isset($this->io) && $this->io->success($organization->getName().' succesfully updated with fetched openCatalogi info');
             }
         }
     }
