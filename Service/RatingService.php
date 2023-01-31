@@ -201,23 +201,26 @@ class RatingService
         }
         $maxRating++;
 
-        // todo: use GithubApiService functions to check if url->source is github and only than continue
         if ($repository = $component->getValue('url')) {
-            if ($repository->getValue('url') !== null) {
-                $description[] = 'The url: '.$repository->getValue('url').' rated';
+            $url = $repository->getValue('url');
+            if (!empty($url)) {
+                $description[] = 'The url: '.$url.' rated';
                 $rating++;
-
-                if (empty($repository->getValue('url'))) {
-                    $description[] = 'Cannot rate the repository because url is empty';
-                } elseif ($this->githubApiService->checkPublicRepository($repository->getValue('url'))) {
+    
+                $domain = parse_url($url, PHP_URL_HOST);
+                if ($domain !== 'github.com') {
+                    $description[] = 'Cannot rate the repository because it is not a valid github repository';
+                } elseif ($this->githubApiService->checkPublicRepository($url)) {
                     $description[] = 'Rated the repository because it is public';
                     $rating++;
                 } else {
                     $description[] = 'Cannot rate the repository because it is private';
                 }
                 $maxRating++;
-            } else {
+            } elseif ($url === null) {
                 $description[] = 'Cannot rate the url because it is not set';
+            } else {
+                $description[] = 'Cannot rate the repository because url is empty';
             }
             $maxRating++;
         }
