@@ -9,13 +9,13 @@ use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Exception;
 
 class FindRepositoriesThroughOrganizationService
 {
     private SymfonyStyle $io;
     private CallService $callService;
     private EntityManagerInterface $entityManager;
-    private GithubApiService $githubService;
     private GithubPubliccodeService $githubPubliccodeService;
     private array $configuration;
     private array $data;
@@ -25,12 +25,10 @@ class FindRepositoriesThroughOrganizationService
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
-        GithubApiService $githubService,
         GithubPubliccodeService $githubPubliccodeService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
-        $this->githubService = $githubService;
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->configuration = [];
         $this->data = [];
@@ -96,9 +94,16 @@ class FindRepositoriesThroughOrganizationService
             return null;
         }
 
-        $response = $this->callService->call($source, '/repos/'.$slug);
+        try {
+            $response = $this->callService->call($source, '/repos/'.$slug);
+            $repository = $this->callService->decodeResponse($source, $response, 'application/json');
+        } catch (Exception $e) {
+            isset($this->io) && $this->io->success("Fetching or decoding failed for {$source->getLocation()}/repos/$slug");
+            
+            return null;
+        }
 
-        $repository = $this->callService->decodeResponse($source, $response, 'application/json');
+
         isset($this->io) && $this->io->success("Fetch and decode went succesfull for /repos/$slug");
 
         return $repository;
@@ -136,10 +141,10 @@ class FindRepositoriesThroughOrganizationService
                 return $repository;
             case 'gitlab':
                 // hetelfde maar dan voor gitlab
-                    isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, we dont support gitlab");
+                isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, we dont support gitlab");
             default:
                 // error voor onbeknd type
-                    isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, unknown source type");
+                isset($this->io) && $this->io->error("Could not create a repository for organization: {$organisation->getName()}, unknown source type");
         }
 
         return null;
