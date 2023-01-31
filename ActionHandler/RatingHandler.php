@@ -46,6 +46,6 @@ class RatingHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->ratingService->enrichComponentWithRating($data, $configuration);
+        return $this->ratingService->ratingHandler($data, $configuration);
     }
 }
