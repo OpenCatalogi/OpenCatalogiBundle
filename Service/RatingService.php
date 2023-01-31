@@ -106,6 +106,8 @@ class RatingService
             $result[] = $this->rateComponent($component, $ratingEntity);
         }
 
+        $this->entityManager->flush();
+
         return $result;
     }
 
@@ -138,6 +140,8 @@ class RatingService
         if ($component === null) {
             return null;
         }
+
+        $this->entityManager->flush();
 
         return $component->toArray();
     }
@@ -189,11 +193,9 @@ class RatingService
         $rating->setValue('maxRating', $ratingComponent['maxRating']);
         $rating->setValue('results', $ratingComponent['results']);
         $this->entityManager->persist($rating);
-        $this->entityManager->flush(); // we flush here so we cache rating first
 
         $component->setValue('rating', $rating);
         $this->entityManager->persist($component);
-        $this->entityManager->flush(); // we flush here for correct caching
 
         isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
