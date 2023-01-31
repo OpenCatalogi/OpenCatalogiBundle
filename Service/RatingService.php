@@ -53,6 +53,7 @@ class RatingService
     {
         if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
             return null;
         }
 
@@ -68,6 +69,7 @@ class RatingService
     {
         if (!$this->ratingEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.rating.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.rating.schema.json');
+
             return null;
         }
 
