@@ -261,7 +261,7 @@ class ComponentenCatalogusService
     {
         if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
-            
+
             return null;
         }
 
@@ -277,7 +277,7 @@ class ComponentenCatalogusService
     {
         if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/components'])) {
             isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/components');
-            
+
             return null;
         }
 
