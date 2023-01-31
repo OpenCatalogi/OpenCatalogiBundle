@@ -32,6 +32,7 @@ class GithubApiService
 
     private ?Mapping $repositoryMapping;
     private ?Mapping $organizationMapping;
+    private ?Mapping $componentMapping;
     private ?Entity $repositoryEntity;
     private ?Entity $organizationEntity;
     private ?Source $githubApiSource;
@@ -385,37 +386,43 @@ class GithubApiService
     private function getRequiredGatewayObjects()
     {
         // get github source
-        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['name' => 'GitHub API'])) {
+        if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find Source: Github API');
 
-            return [];
+            return null;
         }
         if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
 
-            return [];
+            return null;
         }
         if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
 
-            return [];
+            return null;
         }
 
-        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a repository for reference https://opencatalogi.nl/oc.repository.schema.json');
+            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
 
-            return [];
+            return null;
+        }
+
+        if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+
+            return null;
         }
 
         // check if github source has authkey
         if (!$this->githubApiSource->getApiKey()) {
             isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
 
-            return [];
+            return null;
         }
     }
 
@@ -425,9 +432,9 @@ class GithubApiService
      * @param $data
      * @param $configuration
      *
-     * @return array
+     * @return ?array
      */
-    public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): array
+    public function handleFindRepositoriesContainingPubliccode($data = [], $configuration = []): ?array
     {
         $this->getRequiredGatewayObjects();
 
@@ -472,7 +479,7 @@ class GithubApiService
     }
 
     /**
-     * Turn an repro array into an object we can handle @TODO testing.
+     * Turn an repro array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
      * @param array   $repro
      * @param Mapping $mapping
@@ -507,7 +514,7 @@ class GithubApiService
     }
 
     /**
-     * Turn an organisation array into an object we can handle.
+     * Turn an organisation array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
      * @param array   $repro
      * @param Mapping $mapping

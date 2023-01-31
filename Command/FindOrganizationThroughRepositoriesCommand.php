@@ -5,6 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Command;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -35,8 +36,17 @@ class FindOrganizationThroughRepositoriesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $this->findOrganizationThroughRepositoriesService->setStyle($io);
 
-        $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $input->getOption('repositoryId', false));
+        // Handle the command options
+        $repositoryId = $input->getOption('repositoryId', false);
 
-        return 0;
+        if (!$repositoryId) {
+            if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
+                return Command::FAILURE;
+            }
+        } elseif (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
+            return Command::FAILURE;
+        }
+
+        return Command::SUCCESS;
     }
 }
