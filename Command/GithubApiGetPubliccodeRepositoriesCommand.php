@@ -37,11 +37,15 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $this->githubPubliccodeService->setStyle($io);
 
+        $io->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
+
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);
 
         if (!$repositoryId) {
-            $this->githubPubliccodeService->getRepositories();
+            if (!$this->githubPubliccodeService->getRepositories()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->githubPubliccodeService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }

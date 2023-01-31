@@ -41,7 +41,9 @@ class DeveloperOverheidGetComponentsCommand extends Command
         $componentId = $input->getOption('component', false);
 
         if (!$componentId) {
-            $this->developerOverheidService->getComponents();
+            if (!$this->developerOverheidService->getComponents()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->developerOverheidService->getComponent($componentId)) {
             return Command::FAILURE;
         }
