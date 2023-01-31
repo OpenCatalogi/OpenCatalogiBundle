@@ -38,7 +38,7 @@ class GithubFindPublicodeCommand extends Command
 //
         //}
         //else{
-        $this->githubApiService->handleFindRepositoriesContainingPubliccode();
+            $this->githubApiService->handleFindRepositoriesContainingPubliccode();
         //}
 
         return Command::SUCCESS;

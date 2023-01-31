@@ -6,7 +6,7 @@ use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService;
 
 /**
- * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
+ * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {

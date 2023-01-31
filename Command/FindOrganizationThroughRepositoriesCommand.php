@@ -8,14 +8,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
- * Command to execute the FindOrganizationThroughRepositoriesService.
+ * Command to execute the FindOrganizationThroughRepositoriesService
  */
 class FindOrganizationThroughRepositoriesCommand extends Command
 {
     protected static $defaultName = 'opencatalogi:findOrganizationThroughRepositories:execute';
     private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
+
 
     public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
