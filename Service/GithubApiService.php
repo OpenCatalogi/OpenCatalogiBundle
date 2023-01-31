@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use Exception;
 
 class GithubApiService
 {
@@ -361,9 +362,16 @@ class GithubApiService
 
             return [];
         }
-
-        $response = $this->callService->call($this->githubApiSource, 'repos/'.$slug);
-        $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
+    
+        try {
+            $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);
+            $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
+        } catch (Exception $exception) {
+            // @TODO Monolog ?
+            isset($this->io) && $this->io->error("Exception while checking if public repository: {$exception->getMessage()}");
+    
+            return [];
+        }
 
         return $repository['private'];
     }
