@@ -364,7 +364,7 @@ class GithubApiService
         }
 
         $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
-        $slug = rtrim($slug,'/');
+        $slug = rtrim($slug, '/');
 
         try {
             $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);

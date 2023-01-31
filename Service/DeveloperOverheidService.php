@@ -64,6 +64,7 @@ class DeveloperOverheidService
     {
         if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://developer.overheid.nl/api'])) {
             isset($this->io) && $this->io->error('No source found for https://developer.overheid.nl/api');
+
             return null;
         }
 
@@ -79,6 +80,7 @@ class DeveloperOverheidService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
             return null;
         }
 
