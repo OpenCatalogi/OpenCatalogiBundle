@@ -41,7 +41,9 @@ class FindRepositoriesThroughOrganizationCommand extends Command
         $organisationId = $input->getOption('organisationId', false);
 
         if (!$organisationId) {
-            $this->findRepositoriesThroughOrganizationService->findRepositoriesThroughOrganisationHandler();
+            if (!$this->findRepositoriesThroughOrganizationService->findRepositoriesThroughOrganisationHandler()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->findRepositoriesThroughOrganizationService->findRepositoriesThroughOrganisationHandler([], [], $organisationId)) {
             return Command::FAILURE;
         }
