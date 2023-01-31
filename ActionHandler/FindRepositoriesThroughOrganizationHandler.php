@@ -39,6 +39,6 @@ class FindRepositoriesThroughOrganizationHandler implements ActionHandlerInterfa
 
     public function run(array $data, array $configuration): array
     {
-        return $this->findRepositoriesThroughOrganizationService->enrichOrganizationWithRepositoriesHandler($data, $configuration);
+        return $this->findRepositoriesThroughOrganizationService->findRepositoriesThroughOrganisationHandler($data, $configuration);
     }
 }
