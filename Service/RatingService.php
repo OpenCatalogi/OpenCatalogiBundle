@@ -206,7 +206,7 @@ class RatingService
             if (!empty($url)) {
                 $description[] = 'The url: '.$url.' rated';
                 $rating++;
-    
+
                 $domain = parse_url($url, PHP_URL_HOST);
                 if ($domain !== 'github.com') {
                     $description[] = 'Cannot rate the repository because it is not a valid github repository';
