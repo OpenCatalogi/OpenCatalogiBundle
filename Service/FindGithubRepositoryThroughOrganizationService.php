@@ -108,7 +108,7 @@ class FindGithubRepositoryThroughOrganizationService
     {
         // make sync object
         if (!$source = $this->getGithubSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a openCatalogi.yaml from .github file with organisation name: ' . $organizationName);
+            isset($this->io) && $this->io->error('No source found when trying to get a openCatalogi.yaml from .github file with organisation name: '.$organizationName);
 
             return null;
         }
@@ -166,7 +166,7 @@ class FindGithubRepositoryThroughOrganizationService
     {
         // make sync object
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Organisation .github file with name: ' . $organizationName);
+            isset($this->io) && $this->io->error('No source found when trying to get a Organisation .github file with name: '.$organizationName);
 
             return null;
         }
@@ -178,9 +178,8 @@ class FindGithubRepositoryThroughOrganizationService
         }
 
         if (isset($response)) {
-
             $githubRepo = $this->callService->decodeResponse($source, $response, 'application/json');
-            isset($this->io) && $this->io->success("Fetch and decode went succesfull for /repos/".$organizationName.'/.github');
+            isset($this->io) && $this->io->success('Fetch and decode went succesfull for /repos/'.$organizationName.'/.github');
 
             return $githubRepo;
         }
@@ -237,7 +236,7 @@ class FindGithubRepositoryThroughOrganizationService
         if ($organisationId) {
             // If we are testing for one repository
             $organisation = $this->entityManager->find('App:ObjectEntity', $organisationId);
-            if($organisation && $organisation->getValue('name') && $organisation->getValue('github')) {
+            if ($organisation && $organisation->getValue('name') && $organisation->getValue('github')) {
                 $this->getOrganizationCatalogi($organisation);
             } else {
                 isset($this->io) && $this->io->error('Could not find given organisation');
@@ -250,7 +249,7 @@ class FindGithubRepositoryThroughOrganizationService
             // If we want to do it for al repositories
             isset($this->io) && $this->io->info('Looping through organisations');
             foreach ($organisationEntity->getObjectEntities() as $organisation) {
-                if($organisation->getValue('name') && $organisation->getValue('github')) {
+                if ($organisation->getValue('name') && $organisation->getValue('github')) {
                     $this->getOrganizationCatalogi($organisation);
                 }
             }
