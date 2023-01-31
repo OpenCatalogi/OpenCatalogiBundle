@@ -348,21 +348,22 @@ class GithubApiService
     // }
 
     /**
-     * This function is searching for repositories containing a publiccode.yaml file.
+     * This function checks if a github repository is public.
      *
      * @param string $slug
      *
-     * @return array|null|Response
+     * @return bool
      */
-    public function checkPublicRepository(string $slug)
+    public function checkPublicRepository(string $slug): bool
     {
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
             isset($this->io) && $this->io->error('Could not find Source: Github API');
 
-            return [];
+            return false;
         }
     
+        $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
         try {
             $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);
             $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
@@ -370,10 +371,10 @@ class GithubApiService
             // @TODO Monolog ?
             isset($this->io) && $this->io->error("Exception while checking if public repository: {$exception->getMessage()}");
     
-            return [];
+            return false;
         }
 
-        return $repository['private'];
+        return $repository['private'] === false;
     }
 
     /**
