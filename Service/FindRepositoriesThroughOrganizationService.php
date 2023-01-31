@@ -7,9 +7,9 @@ use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Exception;
 
 class FindRepositoriesThroughOrganizationService
 {
@@ -99,10 +99,9 @@ class FindRepositoriesThroughOrganizationService
             $repository = $this->callService->decodeResponse($source, $response, 'application/json');
         } catch (Exception $e) {
             isset($this->io) && $this->io->success("Fetching or decoding failed for {$source->getLocation()}/repos/$slug");
-            
+
             return null;
         }
-
 
         isset($this->io) && $this->io->success("Fetch and decode went succesfull for /repos/$slug");
 
