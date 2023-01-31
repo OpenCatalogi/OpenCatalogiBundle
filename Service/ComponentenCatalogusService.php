@@ -375,8 +375,8 @@ class ComponentenCatalogusService
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
         if (isset($this->io)) {
-            $this->io->comment('Mapping object' . $component['name']);
-            $this->io->comment('The mapping object ' . $mapping);
+            $this->io->comment('Mapping object'.$component['name']);
+            $this->io->comment('The mapping object '.$mapping);
         }
 
         $synchronization->setMapping($mapping);
