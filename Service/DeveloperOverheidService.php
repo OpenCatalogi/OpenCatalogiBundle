@@ -282,6 +282,27 @@ class DeveloperOverheidService
     }
 
     /**
+     * Turn an repo array into an object we can handle.
+     *
+     * @param array   $repro
+     * @param Mapping $mapping
+     *
+     * @return ?ObjectEntity
+     */
+    public function handleRepositoryArray(array $repository, ?Entity $repositoryEntity = null, ?Source $developerOverheidSource = null): ?ObjectEntity
+    {
+        // Handle sync
+        $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $developerOverheidSource, $this->repositoryEntity ?? $repositoryEntity, $repository['id']);
+        isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+
+        $repositoryObject = $synchronization->getObject();
+        $repository = $repositoryObject->toArray();
+
+        return $repositoryObject;
+    }
+
+    /**
      * @todo duplicate with ComponentenCatalogusService ?
      *
      * @param $component
@@ -310,14 +331,28 @@ class DeveloperOverheidService
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
         isset($this->io) && $this->io->comment('Mapping object'.$component['service_name']);
-        $component = $this->mappingService->mapping($mapping, $component);
+        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
 
-        isset($this->io) && $this->io->comment('Mapping object '.$mapping);
-
-        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
+        isset($this->io) && $this->io->comment('Checking component '.$component['service_name']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 
-        return $synchronization->getObject();
+        $componentObject = $synchronization->getObject();
+
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No repositoryEntity found when trying to import a Repository');
+
+            return null;
+        }
+
+        if ($component['related_repositories']) {
+            // only do someting with the first item in the array
+            $repository = $component['related_repositories'][0];
+            $repositoryObject = $this->handleRepositoryArray($repository, $repositoryEntity, $this->source);
+            $repositoryObject->setValue('component', $componentObject);
+            $componentObject->setValue('url', $repositoryObject);
+        }
+
+        return $componentObject;
     }
 }

@@ -6,18 +6,7 @@
   "type": "object",
   "properties": {
     "source": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
-        },
-        "location": {
-          "type": "string"
-        }
-      }
+      "$ref": "https://opencatalogi.nl/oc.source.schema.json"
     },
     "organisation": {
       "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
