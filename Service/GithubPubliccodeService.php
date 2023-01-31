@@ -157,7 +157,7 @@ class GithubPubliccodeService
         // Find on publiccode.yaml
         $repositories = $this->callService->getAllResults($source, '/search/code', $config);
 
-        isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
+        isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -179,7 +179,7 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: ' . $id);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
@@ -194,7 +194,7 @@ class GithubPubliccodeService
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find a repository with id: ' . $id . ' and with source: ' . $source->getName());
+            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
@@ -205,7 +205,7 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found repository with id: ' . $id);
+        isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->toArray();
     }
@@ -244,7 +244,7 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
@@ -260,12 +260,12 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
@@ -283,7 +283,7 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
