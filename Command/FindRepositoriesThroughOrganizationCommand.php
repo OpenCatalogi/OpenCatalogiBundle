@@ -18,7 +18,7 @@ class FindRepositoriesThroughOrganizationCommand extends Command
     protected static $defaultName = 'opencatalogi:findRepositoriesThroughOrganization:execute';
     private FindRepositoriesThroughOrganizationService  $findRepositoriesThroughOrganizationService;
 
-    public function __construct(FindRepositoriesThroughOrganizationService  $findRepositoriesThroughOrganizationService)
+    public function __construct(FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService)
     {
         $this->findRepositoriesThroughOrganizationService = $findRepositoriesThroughOrganizationService;
         parent::__construct();
