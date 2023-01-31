@@ -2,7 +2,7 @@
   "title": "ComponentenCatalogusComponentToOpenCatalogiComponent",
   "$id": "https://componentencatalogus.commonground.nl/api/components",
   "$schema": "https://json-schema.org/draft/2020-12/mapping",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "name",
