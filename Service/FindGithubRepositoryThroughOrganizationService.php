@@ -62,6 +62,7 @@ class FindGithubRepositoryThroughOrganizationService
     {
         if (!$this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
+
             return null;
         }
 
@@ -77,6 +78,7 @@ class FindGithubRepositoryThroughOrganizationService
     {
         if (!$this->rawGithubusercontent = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://raw.githubusercontent.com'])) {
             isset($this->io) && $this->io->error('No source found for https://raw.githubusercontent.com');
+
             return null;
         }
 
@@ -233,6 +235,7 @@ class FindGithubRepositoryThroughOrganizationService
                 $this->getOrganizationCatalogi($organisation);
             } else {
                 isset($this->io) && $this->io->error('Could not find given organisation');
+
                 return null;
             }
         } else {
