@@ -419,7 +419,7 @@ class InstallationService implements InstallerInterface
         $schemasToAddToSearchEndpoint = [
             'https://opencatalogi.nl/oc.application.schema.json',
             'https://opencatalogi.nl/oc.organisation.schema.json',
-            'https://opencatalogi.nl/oc.component.schema.json'
+            'https://opencatalogi.nl/oc.component.schema.json',
         ];
 
         $schemas = [];
