@@ -10,11 +10,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the EnrichPublicodeFromGithubUrlCommand.
+ * Command to execute the EnrichPubliccodeFromGithubUrlCommand.
  */
-class EnrichPublicodeFromGithubUrlCommand extends Command
+class EnrichPubliccodeFromGithubUrlCommand extends Command
 {
-    protected static $defaultName = 'opencatalogi:enrichPublicodeFromGithubUrl:execute';
+    protected static $defaultName = 'opencatalogi:enrichPubliccodeFromGithubUrl:execute';
     private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
     public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
