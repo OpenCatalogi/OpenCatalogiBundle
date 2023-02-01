@@ -73,6 +73,8 @@ class EnrichPubliccodeService
     {
         if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
+
+            return null;
         }
 
         return $this->source;
@@ -87,37 +89,11 @@ class EnrichPubliccodeService
     {
         if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
         }
 
         return $this->repositoryEntity;
-    }
-
-    /**
-     * Get the component entity.
-     *
-     * @return ?Entity
-     */
-    public function getComponentEntity(): ?Entity
-    {
-        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
-        }
-
-        return $this->componentEntity;
-    }
-
-    /**
-     * Get the description entity.
-     *
-     * @return ?Entity
-     */
-    public function getDescriptionEntity(): ?Entity
-    {
-        if (!$this->descriptionEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.description.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.description.schema.json');
-        }
-
-        return $this->descriptionEntity;
     }
 
     /**
@@ -157,7 +133,6 @@ class EnrichPubliccodeService
                 isset($this->io) && $this->io->error('Not able to parse '. $publiccode . ' ' .$e->getMessage());
             }
 
-
             if (isset($parsedPubliccode)) {
                 isset($this->io) && $this->io->success("Fetch and decode went succesfull for $publiccodeUrl");
                 return $parsedPubliccode;
@@ -169,71 +144,21 @@ class EnrichPubliccodeService
 
     /**
      * @param ObjectEntity $repository
-     * @param array $publiccode
+     * @param array $publiccodeUrl
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
-        if (!$componentEntity = $this->getComponentEntity()) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component');
-        }
-        if (!$descriptionEntity = $this->getDescriptionEntity()) {
-            isset($this->io) && $this->io->error('No DescriptionEntity found when trying to import a Description');
-        }
+        if (!$repositoryMapping = $this->getRepositoryMapping()) {
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
-        if (!$component = $repository->getValue('component')) {
-            $component = new ObjectEntity($componentEntity);
+            return null;
         }
 
         $url = trim(parse_url($publiccodeUrl, PHP_URL_PATH), '/');
-
         if ($publiccode = $this->getPubliccodeFromUrl($url)) {
-            dump($publiccode);
-
-            $component->hydrate([
-                'softwareVersion'  => key_exists('publiccodeYmlVersion', $publiccode) ? $publiccode['publiccodeYmlVersion'] : $component->getValue('softwareVersion'),
-                'name'         => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
-                'softwareType'    => key_exists('softwareType', $publiccode) ? $publiccode['softwareType'] : $component->getValue('softwareType'),
-                'developmentStatus'         => key_exists('developmentStatus', $publiccode) ? $publiccode['developmentStatus'] : $component->getValue('developmentStatus'),
-                'landingURL'     => key_exists('landingURL', $publiccode) ? $publiccode['landingURL'] : $component->getValue('landingURL'),
-                'isBasedOn'     => key_exists('isBasedOn', $publiccode) ? $publiccode['isBasedOn'] : $component->getValue('isBasedOn'),
-                'releaseDate'     => key_exists('releaseDate', $publiccode) ? $publiccode['releaseDate'] : $component->getValue('releaseDate'),
-                'logo'     => key_exists('logo', $publiccode) ? $publiccode['logo'] : $component->getValue('logo'),
-                'roadmap'     => key_exists('roadmap', $publiccode) ? $publiccode['roadmap'] : $component->getValue('roadmap'),
-//                'inputTypes'        => key_exists('inputTypes', $publiccode) && $publiccode['inputTypes'],
-//                'outputTypes'      => key_exists('outputTypes', $publiccode) && $publiccode['outputTypes'],
-//                'platforms'         => key_exists('platforms', $publiccode) && $publiccode['platforms'],
-//                'categories' => key_exists('categories', $publiccode) && $publiccode['categories'],
-//                'usedBy'     => key_exists('usedBy', $publiccode) && $publiccode['usedBy'],
-            ]);
-
-            // @TODO
-            // intendedAudience object
-            // legal object -> mainCopyrightOwner, repoOwner
-            // maintenance object -> contractors, contacts
-            // localisation object
-            // dependsOn object -> open, proprietary, hardware
-            // nl object -> commonground, gemma, apm
-
-            if (!$description = $component->getValue('description')) {
-                $description = new ObjectEntity($descriptionEntity);
-            }
-
-            $description->hydrate([
-                'shortDescription'  => key_exists('nl', $publiccode['description']) && key_exists('shortDescription', $publiccode['description']['nl']) ? $publiccode['description']['nl']['shortDescription'] : $description->getValue('shortDescription'),
-                'longDescription'        => key_exists('nl', $publiccode['description']) && key_exists('longDescription', $publiccode['description']['nl']) ? $publiccode['description']['nl']['longDescription'] : $description->getValue('longDescription'),
-                'documentation'         => key_exists('nl', $publiccode['description']) && key_exists('documentation', $publiccode['description']['nl']) ? $publiccode['description']['nl']['documentation'] : $description->getValue('documentation'),
-                'apiDocumentation'    => key_exists('nl', $publiccode['description']) && key_exists('apiDocumentation', $publiccode['description']['nl']) ? $publiccode['description']['nl']['apiDocumentation'] : $description->getValue('apiDocumentation'),
-            ]);
-            $this->entityManager->persist($description);
-
-            $component->setValue('description', $description);
-            $this->entityManager->persist($component);
-            $repository->setValue('component', $component);
-
-            $this->entityManager->persist($repository);
-            $this->entityManager->flush();
+            $this->githubPubliccodeService->mappPubliccode($repository, $publiccode, $repositoryMapping);
         }
 
         return $repository;
