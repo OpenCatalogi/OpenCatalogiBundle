@@ -41,7 +41,9 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
         $repositoryId = $input->getOption('repository', false);
 
         if (!$repositoryId) {
-            $this->developerOverheidService->getRepositories();
+            if (!$this->developerOverheidService->getRepositories()) {
+                return Command::FAILURE;
+            }
         } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }

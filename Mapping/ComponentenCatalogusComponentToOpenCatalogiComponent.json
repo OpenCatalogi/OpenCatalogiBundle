@@ -2,7 +2,7 @@
   "title": "ComponentenCatalogusComponentToOpenCatalogiComponent",
   "$id": "https://componentencatalogus.commonground.nl/api/components",
   "$schema": "https://json-schema.org/draft/2020-12/mapping",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "name",
@@ -11,7 +11,7 @@
     "description.longDescription": "description",
     "legal.repoOwner.name": "owner.fullName",
     "legal.repoOwner.email": "owner.email",
-    "nl.commonground.layerType": "layerType",
+    "nl.commonground.layerType": "{{layerType|trans({'proces': 'process', 'interactie': 'interface', 'services': 'service', 'integratie': 'integration'}, '','en')}}",
     "landingURL": "repositoryUrl",
     "developmentStatus": "status",
     "url.url": "repositoryUrl",

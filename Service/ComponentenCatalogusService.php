@@ -65,6 +65,8 @@ class ComponentenCatalogusService
     {
         if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://componentencatalogus.commonground.nl/api'])) {
             isset($this->io) && $this->io->error('No source found for https://componentencatalogus.commonground.nl/api');
+
+            return null;
         }
 
         return $this->source;
@@ -79,6 +81,8 @@ class ComponentenCatalogusService
     {
         if (!$this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.application.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
+
+            return null;
         }
 
         return $this->applicationEntity;
@@ -93,6 +97,8 @@ class ComponentenCatalogusService
     {
         if (!$this->applicationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/applications'])) {
             isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/applications');
+
+            return null;
         }
 
         return $this->applicationMapping;
@@ -101,16 +107,16 @@ class ComponentenCatalogusService
     /**
      * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
      *
-     * @return array
+     * @return array|null
      */
-    public function getApplications(): array
+    public function getApplications(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Applications');
 
-            return $result;
+            return null;
         }
 
         $applications = $this->callService->getAllResults($source, '/products');
@@ -255,6 +261,8 @@ class ComponentenCatalogusService
     {
         if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
         }
 
         return $this->componentEntity;
@@ -269,6 +277,8 @@ class ComponentenCatalogusService
     {
         if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/components'])) {
             isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/components');
+
+            return null;
         }
 
         return $this->componentMapping;
@@ -279,9 +289,9 @@ class ComponentenCatalogusService
      *
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @return array
+     * @return array|null
      */
-    public function getComponents(): array
+    public function getComponents(): ?array
     {
         $result = [];
 
@@ -289,7 +299,7 @@ class ComponentenCatalogusService
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get Components');
 
-            return $result;
+            return null;
         }
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
@@ -374,10 +384,11 @@ class ComponentenCatalogusService
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
+        if (isset($this->io)) {
+            $this->io->comment('Mapping object'.$component['name']);
+            $this->io->comment('The mapping object '.$mapping);
+        }
 
-        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 

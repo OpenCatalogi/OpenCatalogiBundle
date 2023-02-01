@@ -26,7 +26,7 @@ class GithubPublicodeFromReproCommand extends Command
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
-            ->setHelp('This command allows you to update a organizations with found opencatalogi.yml info');
+            ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
