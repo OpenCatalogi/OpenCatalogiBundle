@@ -39,17 +39,21 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-        //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
-
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
+        //        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler",
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubFindPubliccodeHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
@@ -176,6 +180,15 @@ class InstallationService implements InstallerInterface
                 $defaultConfig['source'] = $gitHubAPI->getId()->toString();
             } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
+                $action->setConditions([[1 => 1]]);
+            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+                $action->setListens(['opencatalogi.github']);
+                $action->setConditions([[1 => 1]]);
+            } elseif (
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
+            ) {
+                $action->setListens(['opencatalogi.bronnen.trigger']);
                 $action->setConditions([[1 => 1]]);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);

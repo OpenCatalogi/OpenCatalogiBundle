@@ -3,18 +3,20 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
  * Haalt applications op van de componenten catalogus.
+ *
+ * @TODO: The corresponding command has been deleted from the command folder, this handler can be deleted?
  */
-class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerInterface
+class GithubFindPubliccodeHandler implements ActionHandlerInterface
 {
-    private ComponentenCatalogusService $componentenCatalogusService;
+    private GithubApiService $githubApiService;
 
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(GithubApiService $githubApiService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->githubApiService = $githubApiService;
     }
 
     /**
@@ -25,7 +27,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.componentencatalogus.application.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.githubapi.publiccode.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
@@ -44,6 +46,6 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->componentenCatalogusService->getApplications();
+        return $this->githubApiService->handleFindRepositoriesContainingPubliccode();
     }
 }

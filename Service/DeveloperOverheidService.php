@@ -193,6 +193,8 @@ class DeveloperOverheidService
     {
         if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
         }
 
         return $this->componentEntity;
@@ -207,6 +209,8 @@ class DeveloperOverheidService
     {
         if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://developer.overheid.nl/api/components'])) {
             isset($this->io) && $this->io->error('No mapping found for https://developer.overheid.nl/api/components');
+
+            return null;
         }
 
         return $this->componentMapping;
