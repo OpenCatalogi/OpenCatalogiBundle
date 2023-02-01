@@ -45,6 +45,7 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeFromGithubUrlHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
