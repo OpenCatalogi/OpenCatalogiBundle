@@ -35,10 +35,10 @@ class EnrichPubliccodeService
     private Source $source;
 
     public function __construct(
-        EntityManagerInterface  $entityManager,
-        CallService             $callService,
-        SynchronizationService  $synchronizationService,
-        MappingService          $mappingService,
+        EntityManagerInterface $entityManager,
+        CallService $callService,
+        SynchronizationService $synchronizationService,
+        MappingService $mappingService,
         GithubPubliccodeService $githubPubliccodeService
     ) {
         $this->entityManager = $entityManager;
@@ -149,7 +149,7 @@ class EnrichPubliccodeService
     {
         // make sync object
         if (!$source = $this->getGithubSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with publiccode url: ' . $publiccodeUrl);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with publiccode url: '.$publiccodeUrl);
 
             return null;
         }
@@ -157,24 +157,23 @@ class EnrichPubliccodeService
         try {
             $response = $this->callService->call($source, '/'.$publiccodeUrl);
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Error found trying to fetch '.$publiccodeUrl .' ' .$e->getMessage());
+            isset($this->io) && $this->io->error('Error found trying to fetch '.$publiccodeUrl.' '.$e->getMessage());
         }
 
         if (isset($response)) {
-
             $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
             $publiccode = base64_decode($publiccode['content']);
 
             // @TODO use decodeResponse from the callService
             try {
                 $parsedPubliccode = Yaml::parse($publiccode);
-
             } catch (Exception $e) {
-                isset($this->io) && $this->io->error('Not able to parse '. $publiccode . ' ' .$e->getMessage());
+                isset($this->io) && $this->io->error('Not able to parse '.$publiccode.' '.$e->getMessage());
             }
 
             if (isset($parsedPubliccode)) {
                 isset($this->io) && $this->io->success("Fetch and decode went succesfull for $publiccodeUrl");
+
                 return $parsedPubliccode;
             }
         }
@@ -184,7 +183,7 @@ class EnrichPubliccodeService
 
     /**
      * @param ObjectEntity $repository
-     * @param array $publiccodeUrl
+     * @param array        $publiccodeUrl
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
@@ -205,9 +204,10 @@ class EnrichPubliccodeService
     }
 
     /**
-     * @param array|null $data data set at the start of the handler
-     * @param array|null $configuration configuration of the action
+     * @param array|null  $data          data set at the start of the handler
+     * @param array|null  $configuration configuration of the action
      * @param string|null $repositoryId
+     *
      * @return array dataset at the end of the handler
      */
     public function enrichPubliccodeHandler(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): array
