@@ -29,7 +29,6 @@ class EnrichPublicodeCommand extends Command
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
