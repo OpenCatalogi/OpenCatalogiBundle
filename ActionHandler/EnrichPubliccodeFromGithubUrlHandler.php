@@ -4,7 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService;
-use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
 
 /**
  * Haalt publiccode bestanden op.
