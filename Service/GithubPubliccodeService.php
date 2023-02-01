@@ -317,7 +317,7 @@ class GithubPubliccodeService
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
-    public function mappPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
+    public function mapPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
     {
         if (!$componentEntity = $this->getComponentEntity()) {
             isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
