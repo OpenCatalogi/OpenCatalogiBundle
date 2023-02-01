@@ -266,7 +266,7 @@ class EnrichPubliccodeFromGithubUrlService
 
         $url = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');
         if ($publiccode = $this->getPubliccodeFromUrl($url)) {
-            $this->githubPubliccodeService->mappPubliccode($repository, $publiccode, $repositoryMapping);
+            $this->githubPubliccodeService->mapPubliccode($repository, $publiccode, $repositoryMapping);
         }
 
         return $repository;
