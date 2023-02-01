@@ -39,10 +39,10 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-//        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+        //        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
