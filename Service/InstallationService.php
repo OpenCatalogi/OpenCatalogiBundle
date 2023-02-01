@@ -39,24 +39,21 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-        //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
-
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
+//        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+//        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
         "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubFindPubliccodeHandler",
-        //        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubRepositoryThroughOrganizationHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 

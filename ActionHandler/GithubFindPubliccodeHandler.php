@@ -7,6 +7,8 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
  * Haalt applications op van de componenten catalogus.
+ *
+ * @TODO: The corresponding command has been deleted from the command folder, this handler can be deleted?
  */
 class GithubFindPubliccodeHandler implements ActionHandlerInterface
 {
