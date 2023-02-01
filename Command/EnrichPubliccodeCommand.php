@@ -10,11 +10,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the EnrichPublicodeCommand.
+ * Command to execute the EnrichPubliccodeCommand.
  */
-class EnrichPublicodeCommand extends Command
+class EnrichPubliccodeCommand extends Command
 {
-    protected static $defaultName = 'opencatalogi:enrichPublicode:execute';
+    protected static $defaultName = 'opencatalogi:enrichPubliccode:execute';
     private EnrichPubliccodeService $enrichPubliccodeService;
 
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
