@@ -20,22 +20,22 @@ class GithubPubliccodeService
 {
     private EntityManagerInterface $entityManager;
     private CallService $callService;
-    private Source $githubApiSource;
+    private Source $source;
     private SynchronizationService $synchronizationService;
     private ?Entity $repositoryEntity;
-    private ?Entity $organizationEntity;
+    private ?Entity $componentEntity;
     private ?Mapping $repositoryMapping;
-    private ?Mapping $organizationMapping;
     private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        CallService $callService,
+        CallService            $callService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
-    ) {
+        MappingService         $mappingService
+    )
+    {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
@@ -87,6 +87,22 @@ class GithubPubliccodeService
         }
 
         return $this->repositoryEntity;
+    }
+
+    /**
+     * Get the component entity.
+     *
+     * @return ?Entity
+     */
+    public function getComponentEntity(): ?Entity
+    {
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
+        }
+
+        return $this->componentEntity;
     }
 
     /**
@@ -142,17 +158,15 @@ class GithubPubliccodeService
      * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
      *
      * @return array
-     *
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @return array|null
      */
     public function getRepositories(): ?array
     {
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: ' . $id);
 
             return null;
         }
@@ -167,7 +181,7 @@ class GithubPubliccodeService
         // Find on publiccode.yaml
         $repositories = $this->callService->getAllResults($source, '/search/code', $config);
 
-        isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
+        isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -179,17 +193,17 @@ class GithubPubliccodeService
     /**
      * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @todo duplicate with DeveloperOverheidService ?
-     *
      * @param string $id
      *
      * @return array|null
+     * @todo duplicate with DeveloperOverheidService ?
+     *
      */
     public function getRepository(string $id): ?array
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: ' . $id);
 
             return null;
         }
@@ -198,13 +212,13 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repository '.$id);
-        $response = $this->callService->call($source, '/repositories/'.$id);
+        isset($this->io) && $this->io->success('Getting repository ' . $id);
+        $response = $this->callService->call($source, '/repositories/' . $id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
+            isset($this->io) && $this->io->error('Could not find a repository with id: ' . $id . ' and with source: ' . $source->getName());
 
             return null;
         }
@@ -215,7 +229,7 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found repository with id: '.$id);
+        isset($this->io) && $this->io->success('Found repository with id: ' . $id);
 
         return $repository->toArray();
     }
@@ -231,76 +245,113 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoriesMapping = $this->getRepositoriesMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$repository['repository']['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$repositoriesMapping);
+        isset($this->io) && $this->io->comment('Mapping object' . $repository['repository']['name']);
+        isset($this->io) && $this->io->comment('The mapping object ' . $repositoriesMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
+        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
 
     /**
-     * @todo duplicate with DeveloperOverheidService ?
-     *
      * @param $repository
      *
      * @return ObjectEntity|null
+     * @todo duplicate with DeveloperOverheidService ?
+     *
      */
     public function importRepository($repository): ?ObjectEntity
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$repositoryMapping = $this->getRepositoryMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
-
-            return null;
-        }
-
-        if (!isset($repository['id'])) {
-            isset($this->io) && $this->io->error('No id set on repository, returning null and continuing');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$repository['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
+        isset($this->io) && $this->io->comment('Mapping object' . $repository['name']);
+        isset($this->io) && $this->io->comment('The mapping object ' . $repositoryMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
+        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
-        isset($this->io) && $this->io->success('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
+
+    /**
+     * @param ObjectEntity $repository
+     * @param array $publiccode
+     *
+     * @return ObjectEntity|null dataset at the end of the handler
+     */
+    public function mappPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
+    {
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
+
+            return null;
+        }
+        $organisation = $repository->getValue('organisation');
+
+        if (!$component = $repository->getValue('component')) {
+            $component = new ObjectEntity($componentEntity);
+        }
+
+        isset($this->io) && $this->io->comment('Mapping object' . key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
+        isset($this->io) && $this->io->comment('The mapping object ' . $repositoryMapping);
+
+        $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
+        $component->hydrate($componentArray);
+        // set the name
+        $component->hydrate([
+            'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
+        ]);
+
+        // @TODO array of objects properties, cannot do it with mapping
+        // legal object -> mainCopyrightOwner, repoOwner
+        // maintenance object -> contractors, contacts
+        // dependsOn object -> open, proprietary, hardware
+
+        $this->entityManager->persist($component);
+        $repository->setValue('component', $component);
+        $this->entityManager->persist($repository);
+        $this->entityManager->flush();
+
+        return $repository;
+    }
+
 }
