@@ -41,19 +41,15 @@ class InstallationService implements InstallerInterface
     public const ACTION_HANDLERS = [
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        //        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubPubliccodeFromRepoHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateComponentHandler",
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\CreateUpdateRepositoryHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
-        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubFindPubliccodeHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
@@ -152,33 +148,7 @@ class InstallationService implements InstallerInterface
             $defaultConfig = $this->addActionConfiguration($actionHandler);
             $action = new Action($actionHandler);
 
-            if ($schema['$id'] == 'https://opencatalogi.nl/oc.component.schema.json') {
-                $action->setListens(['opencatalogi.component.check']);
-                $action->setConditions(['==' => [1, 1]]);
-
-                // set source to the defaultConfig array
-                $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']);
-                $defaultConfig['source'] = $gitHubUserContentSource->getId()->toString();
-            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.application.schema.json') {
-                $action->setListens(['commongateway.object.create', 'commongateway.object.update']);
-
-                $applicationSyncSchemaID = $this->setApplicationSchemaId();
-                $action->setConditions(['==' => [
-                    ['var' => 'entity'],
-                    $applicationSyncSchemaID,
-                ]]);
-
-                // set source to the defaultConfig array
-                $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']);
-                $defaultConfig['source'] = $componentenCatalogusSource->getId()->toString();
-            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
-                $action->setListens(['opencatalogi.repository.check']);
-                $action->setConditions([[1 => 1]]);
-
-                // set source to the defaultConfig array
-                $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']);
-                $defaultConfig['source'] = $gitHubAPI->getId()->toString();
-            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
+            if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
                 $action->setConditions([[1 => 1]]);
             } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {

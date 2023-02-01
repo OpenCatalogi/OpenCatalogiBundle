@@ -23,7 +23,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'PubliccodeFindGithubRepositoryThroughOrganizationHandler',
+            'title'      => 'FindGithubRepositoryThroughOrganizationHandler',
             'description'=> 'This handler finds the .github repository through organizations',
             'required'   => ['source', 'organisationEntityId'],
             'properties' => [
