@@ -333,7 +333,7 @@ class FindOrganizationThroughRepositoriesService
 
                 // Check if we didnt already loop through this organization during this loop
                 if (isset($github['owner']['login']) && in_array($github['owner']['login'], $createdOrganizations)) {
-                    isset($this->io) && $this->io->info("Organization already created/updated during this loop, continuing.");
+                    isset($this->io) && $this->io->info('Organization already created/updated during this loop, continuing.');
 
                     return null;
                 }
