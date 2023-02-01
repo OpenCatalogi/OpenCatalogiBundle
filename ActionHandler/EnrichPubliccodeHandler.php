@@ -3,18 +3,18 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\CheckRepositoriesForPubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
 
 /**
  * Haalt publiccode bestanden op.
  */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
-    private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
+    private EnrichPubliccodeService $enrichPubliccodeService;
 
-    public function __construct(CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService)
+    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
-        $this->checkRepositoriesForPubliccodeService = $checkRepositoriesForPubliccodeService;
+        $this->enrichPubliccodeService = $enrichPubliccodeService;
     }
 
     public function getConfiguration()
@@ -53,6 +53,6 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->checkRepositoriesForPubliccodeService->enrichPubliccodeHandler($data, $configuration);
+        return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
     }
 }

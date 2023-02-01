@@ -20,12 +20,11 @@ class GithubPubliccodeService
 {
     private EntityManagerInterface $entityManager;
     private CallService $callService;
-    private Source $githubApiSource;
+    private Source $source;
     private SynchronizationService $synchronizationService;
     private ?Entity $repositoryEntity;
-    private ?Entity $organizationEntity;
+    private ?Entity $componentEntity;
     private ?Mapping $repositoryMapping;
-    private ?Mapping $organizationMapping;
     private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
@@ -90,6 +89,22 @@ class GithubPubliccodeService
     }
 
     /**
+     * Get the component entity.
+     *
+     * @return ?Entity
+     */
+    public function getComponentEntity(): ?Entity
+    {
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
+        }
+
+        return $this->componentEntity;
+    }
+
+    /**
      * Get the repositories mapping.
      *
      * @return ?Mapping
@@ -144,8 +159,6 @@ class GithubPubliccodeService
      * @return array
      *
      * @todo duplicate with DeveloperOverheidService ?
-     *
-     * @return array|null
      */
     public function getRepositories(): ?array
     {
@@ -179,11 +192,11 @@ class GithubPubliccodeService
     /**
      * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @todo duplicate with DeveloperOverheidService ?
-     *
      * @param string $id
      *
      * @return array|null
+     *
+     * @todo duplicate with DeveloperOverheidService ?
      */
     public function getRepository(string $id): ?array
     {
@@ -260,11 +273,11 @@ class GithubPubliccodeService
     }
 
     /**
-     * @todo duplicate with DeveloperOverheidService ?
-     *
      * @param $repository
      *
      * @return ObjectEntity|null
+     *
+     * @todo duplicate with DeveloperOverheidService ?
      */
     public function importRepository($repository): ?ObjectEntity
     {
@@ -285,12 +298,6 @@ class GithubPubliccodeService
             return null;
         }
 
-        if (!isset($repository['id'])) {
-            isset($this->io) && $this->io->error('No id set on repository, returning null and continuing');
-
-            return null;
-        }
-
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
         isset($this->io) && $this->io->comment('Mapping object'.$repository['name']);
@@ -299,8 +306,50 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
-        isset($this->io) && $this->io->success('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
+    }
+
+    /**
+     * @param ObjectEntity $repository
+     * @param array        $publiccode
+     *
+     * @return ObjectEntity|null dataset at the end of the handler
+     */
+    public function mapPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
+    {
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
+
+            return null;
+        }
+        $organisation = $repository->getValue('organisation');
+
+        if (!$component = $repository->getValue('component')) {
+            $component = new ObjectEntity($componentEntity);
+        }
+
+        isset($this->io) && $this->io->comment('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
+        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
+
+        $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
+        $component->hydrate($componentArray);
+        // set the name
+        $component->hydrate([
+            'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
+        ]);
+
+        // @TODO array of objects properties, cannot do it with mapping
+        // legal object -> mainCopyrightOwner, repoOwner
+        // maintenance object -> contractors, contacts
+        // dependsOn object -> open, proprietary, hardware
+
+        $this->entityManager->persist($component);
+        $repository->setValue('component', $component);
+        $this->entityManager->persist($repository);
+        $this->entityManager->flush();
+
+        return $repository;
     }
 }
