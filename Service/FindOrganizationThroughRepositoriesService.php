@@ -175,7 +175,7 @@ class FindOrganizationThroughRepositoriesService
 
         if (isset($response)) {
             $repository = $this->callService->decodeResponse($source, $response, 'application/json');
-            isset($this->io) && $this->io->success("Fetch and decode went succesfull for /repos/$slug");
+            isset($this->io) && $this->io->info("Fetch and decode went succesfull for /repos/$slug");
 
             return $repository;
         }
@@ -203,7 +203,7 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting organisation '.$name);
+        isset($this->io) && $this->io->info('Getting organisation '.$name);
         $response = $this->callService->call($source, '/orgs/'.$name);
 
         $organisation = json_decode($response->getBody()->getContents(), true);
@@ -282,7 +282,7 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repos from organisation '.$name);
+        isset($this->io) && $this->io->info('Getting repos from organisation '.$name);
         $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
@@ -304,9 +304,10 @@ class FindOrganizationThroughRepositoriesService
     }
 
     /**
-     * @param ObjectEntity $repository the repository where we want to find an organisation for
+     * @param ObjectEntity $repository           the repository where we want to find an organisation for
+     * @param ?array       $createdOrganizations the already created organizations during a parent loop so we dont waste time/performance on the same organizations
      */
-    public function enrichRepositoryWithOrganisation(ObjectEntity $repository): ?ObjectEntity
+    public function enrichRepositoryWithOrganisation(ObjectEntity $repository, array &$createdOrganizations = []): ?ObjectEntity
     {
         if (!$repository->getValue('url')) {
             isset($this->io) && $this->io->error('Repository url not set');
@@ -329,6 +330,14 @@ class FindOrganizationThroughRepositoriesService
                 // let's get the repository datar
                 isset($this->io) && $this->io->info("Trying to fetch repository from: $url");
                 $github = $this->getRepositoryFromUrl($url);
+
+                // Check if we didnt already loop through this organization during this loop
+                if (isset($github['owner']['login']) && in_array($github['owner']['login'], $createdOrganizations)) {
+                    isset($this->io) && $this->io->info('Organization already created/updated during this loop, continuing.');
+
+                    return null;
+                }
+
                 $repository = $this->githubPubliccodeService->importRepository($github);
 
                 if ($github['owner']['type'] === 'Organization') {
@@ -345,6 +354,8 @@ class FindOrganizationThroughRepositoriesService
 
                     $this->entityManager->persist($organisation);
                     $this->entityManager->flush();
+
+                    $createdOrganizations[] = $github['owner']['login'];
                 } else {
                     isset($this->io) && $this->io->error('No organisation found for fetched repository');
                 }
@@ -389,8 +400,9 @@ class FindOrganizationThroughRepositoriesService
 
             // If we want to do it for al repositories
             isset($this->io) && $this->io->info('Looping through repositories');
+            $createdOrganizations = [];
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
-                $this->enrichRepositoryWithOrganisation($repository);
+                $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
             }
         }
         $this->entityManager->flush();
