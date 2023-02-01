@@ -18,7 +18,6 @@
     "outputTypes": "outputTypes",
     "platforms": "platforms",
     "categories": "categories",
-    "usedBy": "usedBy",
     "description.shortDescription": "description.nl.shortDescription",
     "description.longDescription": "description.nl.longDescription",
     "description.documentation": "description.nl.documentation",
