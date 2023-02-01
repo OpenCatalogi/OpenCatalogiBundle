@@ -23,7 +23,7 @@ class GithubPubliccodeService
     private Source $githubApiSource;
     private SynchronizationService $synchronizationService;
     private ?Entity $repositoryEntity;
-    private ?Entity $organizationEntity;
+    private ?Entity $componentEntity;
     private ?Mapping $repositoryMapping;
     private ?Mapping $organizationMapping;
     private ?Mapping $repositoriesMapping;
@@ -88,6 +88,22 @@ class GithubPubliccodeService
         }
 
         return $this->repositoryEntity;
+    }
+
+    /**
+     * Get the component entity.
+     *
+     * @return ?Entity
+     */
+    public function getComponentEntity(): ?Entity
+    {
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
+        }
+
+        return $this->componentEntity;
     }
 
     /**
@@ -305,6 +321,9 @@ class GithubPubliccodeService
      */
     public function mappPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
     {
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
+        }
 
         $organisation = $repository->getValue('organisation');
 
@@ -331,7 +350,6 @@ class GithubPubliccodeService
         $repository->setValue('component', $component);
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
-        dump($component->toArray());
 
         return $repository;
     }

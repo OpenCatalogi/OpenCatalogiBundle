@@ -97,6 +97,22 @@ class EnrichPubliccodeService
     }
 
     /**
+     * Get the repository mapping.
+     *
+     * @return ?Mapping
+     */
+    public function getRepositoryMapping(): ?Mapping
+    {
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/publiccode/component');
+
+            return null;
+        }
+
+        return $this->repositoryMapping;
+    }
+
+    /**
      * This function fetches repository data.
      *
      * @param string $publiccodeUrl endpoint to request
