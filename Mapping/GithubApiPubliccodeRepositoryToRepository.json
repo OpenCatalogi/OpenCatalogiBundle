@@ -7,7 +7,7 @@
   "mapping": {
     "name": "repository.name",
     "url": "repository.html_url",
-    "publiccode_url": "html_url",
+    "publiccode_url": "git_url",
     "source": "github"
   }
 }
