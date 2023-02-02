@@ -185,12 +185,13 @@ class ComponentenCatalogusService
 
         return $application->toArray();
     }
-
+    
     /**
-     * Turn an component array into an object we can handle.
+     * Turn a component array into an object we can handle.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
+     * @param array $component
+     * @param Entity|null $componentEntity
+     * @param Source|null $componentenCatalogusSource
      *
      * @return ?ObjectEntity
      */
