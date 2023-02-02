@@ -25,6 +25,7 @@ class ComponentenCatalogusService
     private ?Mapping $applicationMapping;
     private ?Entity $componentEntity;
     private ?Mapping $componentMapping;
+    private ?Entity $repositoryEntity;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
@@ -102,6 +103,22 @@ class ComponentenCatalogusService
         }
 
         return $this->applicationMapping;
+    }
+
+    /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getRepositoryEntity(): ?Entity
+    {
+        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
+        }
+
+        return $this->repositoryEntity;
     }
 
     /**
@@ -184,6 +201,12 @@ class ComponentenCatalogusService
 
             return null;
         }
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+
+            return null;
+        }
+
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $componentenCatalogusSource, $this->componentEntity ?? $componentEntity, $component['id']);
 
@@ -191,10 +214,43 @@ class ComponentenCatalogusService
         isset($this->io) && $this->io->comment('The mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking component '.$component['name']);
-        $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
 
-        return $synchronization->getObject();
+        // do the mapping of the component set two variables
+        $component = $componentArray = $this->mappingService->mapping($mapping, $component);
+        // unset component url before creating object, we don't want duplicate repositories
+        // we do not need the organisation set because this will be set in the FindOrganizationThroughRepositoriesService
+        unset($component['url']);
+
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
+        $componentObject = $synchronization->getObject();
+
+        // if the component is already set to a repository return the component object
+        if ($componentObject->getValue('url')) {
+            return $componentObject;
+        }
+
+        // if the component isn't already set to a repository create or get the repo and set it to the component url
+        if (key_exists('url', $componentArray)) {
+            if (key_exists('url', $componentArray['url']) && $repository = $this->entityManager->getRepository('App:ObjectEntity')->findByEntity($repositoryEntity, ['url' => $componentArray['url']['url']])) {
+                $repository = $repository[0];
+                $componentObject->setValue('url', $repository);
+
+                $this->entityManager->persist($repository);
+            } elseif(key_exists('url', $componentArray['url'])) {
+                $repository = new ObjectEntity($repositoryEntity);
+                $repository->hydrate([
+                    'name' => $componentArray['url']['name'],
+                    'url' => $componentArray['url']['url']
+                ]);
+                $componentObject->setValue('url', $repository);
+                $this->entityManager->persist($repository);
+            }
+        }
+
+        $this->entityManager->persist($componentObject);
+        $this->entityManager->flush();
+
+        return $componentObject;
     }
 
     /**
@@ -249,7 +305,10 @@ class ComponentenCatalogusService
             $applicationObject->setValue('components', $components);
         }
 
-        return $synchronization->getObject();
+        $this->entityManager->persist($applicationObject);
+        $this->entityManager->flush();
+
+        return $applicationObject;
     }
 
     /**
