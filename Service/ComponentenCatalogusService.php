@@ -390,7 +390,6 @@ class ComponentenCatalogusService
         // do the mapping of the component set two variables
         $component = $componentArray = $this->mappingService->mapping($mapping, $component);
         // unset component url before creating object, we don't want duplicate repositories
-        // we do not need the organisation set because this will be set in the FindOrganizationThroughRepositoriesService
         unset($component['url']);
 
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
