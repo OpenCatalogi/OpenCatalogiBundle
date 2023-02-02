@@ -25,6 +25,7 @@ class GithubPubliccodeService
     private ?Entity $repositoryEntity;
     private ?Entity $componentEntity;
     private ?Mapping $repositoryMapping;
+    private Entity $applicationEntity;
     private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
@@ -134,6 +135,20 @@ class GithubPubliccodeService
         }
 
         return $this->repositoryMapping;
+    }
+
+    /**
+     * Get the application entity.
+     *
+     * @return ?Entity
+     */
+    public function getApplicationEntity(): ?Entity
+    {
+        if (!$this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
+        }
+
+        return $this->applicationEntity;
     }
 
     /**
@@ -266,7 +281,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -305,7 +320,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -324,7 +339,11 @@ class GithubPubliccodeService
 
             return null;
         }
-        $organisation = $repository->getValue('organisation');
+        if (!$applicationEntity = $this->getApplicationEntity()) {
+            isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
+
+            return null;
+        }
 
         if (!$component = $repository->getValue('component')) {
             $component = new ObjectEntity($componentEntity);
@@ -334,21 +353,54 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
+        dump($componentArray);
         $component->hydrate($componentArray);
         // set the name
         $component->hydrate([
             'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
         ]);
 
+        if (!$component->getValue('applicationSuite')) {
+            if (key_exists('applicationSuite', $publiccode) && $application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
+                $component->setValue('applicationSuite', $application);
+
+//                if ($applicationComponents = $application->getValue('components')) {
+//                    $components = array_merge($applicationComponents, [$component]);
+//                } else {
+//                    $components = [$component];
+//
+//                }
+
+                $this->entityManager->persist($application);
+                $this->entityManager->flush();
+
+//                dump($application->toArray());
+            } elseif(key_exists('applicationSuite', $publiccode)) {
+                $application = new ObjectEntity($applicationEntity);
+                $application->hydrate([
+                    'name' => $publiccode['applicationSuite'],
+                    'components' => [$component]
+                ]);
+                $this->entityManager->persist($application);
+                $this->entityManager->flush();
+
+                $component->setValue('applicationSuite', $application);
+//                dump($application->toArray());
+            }
+        }
+
         // @TODO array of objects properties, cannot do it with mapping
         // legal object -> mainCopyrightOwner, repoOwner
         // maintenance object -> contractors, contacts
         // dependsOn object -> open, proprietary, hardware
 
+        $this->entityManager->flush();
         $this->entityManager->persist($component);
         $repository->setValue('component', $component);
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
+
+        dump($component->toArray());
 
         return $repository;
     }
