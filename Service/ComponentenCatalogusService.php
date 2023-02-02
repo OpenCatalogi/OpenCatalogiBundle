@@ -25,6 +25,7 @@ class ComponentenCatalogusService
     private ?Mapping $applicationMapping;
     private ?Entity $componentEntity;
     private ?Mapping $componentMapping;
+    private ?Entity $repositoryEntity;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
@@ -105,6 +106,22 @@ class ComponentenCatalogusService
     }
 
     /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getRepositoryEntity(): ?Entity
+    {
+        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
+        }
+
+        return $this->repositoryEntity;
+    }
+
+    /**
      * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
      *
      * @return array|null
@@ -170,34 +187,6 @@ class ComponentenCatalogusService
     }
 
     /**
-     * Turn an component array into an object we can handle.
-     *
-     * @param array   $repro
-     * @param Mapping $mapping
-     *
-     * @return ?ObjectEntity
-     */
-    public function handleComponentArray(array $component, ?Entity $componentEntity = null, ?Source $componentenCatalogusSource = null): ?ObjectEntity
-    {
-        if (!$mapping = $this->getComponentMapping()) {
-            isset($this->io) && $this->io->error('No ComponentMapping found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
-        // Handle sync
-        $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $componentenCatalogusSource, $this->componentEntity ?? $componentEntity, $component['id']);
-
-        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
-
-        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
-        $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
-
-        return $synchronization->getObject();
-    }
-
-    /**
      * @todo
      *
      * @param $application
@@ -230,7 +219,7 @@ class ComponentenCatalogusService
 
         isset($this->io) && $this->io->success('Checking application '.$application['name']);
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $application);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $application);
 
         $applicationObject = $synchronization->getObject();
 
@@ -243,13 +232,16 @@ class ComponentenCatalogusService
         if ($application['components']) {
             $components = [];
             foreach ($application['components'] as $component) {
-                $componentObject = $this->handleComponentArray($component, $componentEntity, $this->source);
+                $componentObject = $this->importComponent($component);
                 $components[] = $componentObject;
             }
             $applicationObject->setValue('components', $components);
         }
 
-        return $synchronization->getObject();
+        $this->entityManager->persist($applicationObject);
+        $this->entityManager->flush();
+
+        return $applicationObject;
     }
 
     /**
@@ -381,17 +373,50 @@ class ComponentenCatalogusService
 
             return null;
         }
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
-
-        if (isset($this->io)) {
-            $this->io->comment('Mapping object'.$component['name']);
-            $this->io->comment('The mapping object '.$mapping);
+            return null;
         }
 
-        $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
+        // Handle sync
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
-        return $synchronization->getObject();
+        isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
+        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
+
+        isset($this->io) && $this->io->comment('Checking component '.$component['name']);
+
+        // do the mapping of the component set two variables
+        $component = $componentArray = $this->mappingService->mapping($mapping, $component);
+        // unset component url before creating object, we don't want duplicate repositories
+        unset($component['url']);
+
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
+        $componentObject = $synchronization->getObject();
+
+        // if the component isn't already set to a repository create or get the repo and set it to the component url
+        if (key_exists('url', $componentArray) &&
+            key_exists('url', $componentArray['url']) &&
+            key_exists('name', $componentArray['url'])) {
+            if (!($repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]))) {
+                $repository = new ObjectEntity($repositoryEntity);
+                $repository->hydrate([
+                    'name' => $componentArray['url']['name'],
+                    'url'  => $componentArray['url']['url'],
+                ]);
+            }
+            $this->entityManager->persist($repository);
+            if ($componentObject->getValue('url')) {
+                // if the component is already set to a repository return the component object
+                return $componentObject;
+            }
+            $componentObject->setValue('url', $repository);
+        }
+
+        $this->entityManager->persist($componentObject);
+        $this->entityManager->flush();
+
+        return $componentObject;
     }
 }
