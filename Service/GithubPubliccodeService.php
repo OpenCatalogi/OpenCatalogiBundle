@@ -325,10 +325,13 @@ class GithubPubliccodeService
 
         return $synchronization->getObject();
     }
-
+    
     /**
+     * @todo
+     *
      * @param ObjectEntity $repository
-     * @param array        $publiccode
+     * @param array $publiccode
+     * @param $repositoryMapping
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
@@ -360,33 +363,18 @@ class GithubPubliccodeService
             'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
         ]);
 
-        if (!$component->getValue('applicationSuite')) {
-            if (key_exists('applicationSuite', $publiccode) && $application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
-                $component->setValue('applicationSuite', $application);
-
-//                if ($applicationComponents = $application->getValue('components')) {
-//                    $components = array_merge($applicationComponents, [$component]);
-//                } else {
-//                    $components = [$component];
-//
-//                }
-
-                $this->entityManager->persist($application);
-                $this->entityManager->flush();
-
-//                dump($application->toArray());
-            } elseif(key_exists('applicationSuite', $publiccode)) {
+        if (key_exists('applicationSuite', $publiccode)) {
+            if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate([
                     'name' => $publiccode['applicationSuite'],
                     'components' => [$component]
                 ]);
-                $this->entityManager->persist($application);
-                $this->entityManager->flush();
-
-                $component->setValue('applicationSuite', $application);
-//                dump($application->toArray());
             }
+            $this->entityManager->persist($application);
+            $component->setValue('applicationSuite', $application);
+            $this->entityManager->persist($application);
+            $this->entityManager->flush();
         }
 
         // @TODO array of objects properties, cannot do it with mapping
