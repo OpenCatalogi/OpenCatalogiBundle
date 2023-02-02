@@ -395,34 +395,24 @@ class ComponentenCatalogusService
 
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
         $componentObject = $synchronization->getObject();
-
+    
         // if the component isn't already set to a repository create or get the repo and set it to the component url
-        if (key_exists('url', $componentArray)) {
-            if (key_exists('url', $componentArray['url']) && $repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity'=>$repositoryEntity, 'name' => $componentArray['url']['name']])) {
-                $this->entityManager->persist($repository);
-
-                if (!$componentObject->getValue('url')) {
-                    $componentObject->setValue('url', $repository);
-                } else {
-                    // if the component is already set to a repository return the component object
-                    return $componentObject;
-                }
-
-            } elseif(key_exists('url', $componentArray['url'])) {
+        if (key_exists('url', $componentArray) &&
+            key_exists('url', $componentArray['url']) &&
+            key_exists('name', $componentArray['url'])) {
+            if (!($repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]))) {
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
                     'url' => $componentArray['url']['url']
                 ]);
-                $this->entityManager->persist($repository);
-
-                if (!$componentObject->getValue('url')) {
-                    $componentObject->setValue('url', $repository);
-                } else {
-                    // if the component is already set to a repository return the component object
-                    return $componentObject;
-                }
             }
+            $this->entityManager->persist($repository);
+            if ($componentObject->getValue('url')) {
+                // if the component is already set to a repository return the component object
+                return $componentObject;
+            }
+            $componentObject->setValue('url', $repository);
         }
 
         $this->entityManager->persist($componentObject);
