@@ -403,7 +403,7 @@ class ComponentenCatalogusService
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
-                    'url'  => $componentArray['url']['url']
+                    'url'  => $componentArray['url']['url'],
                 ]);
             }
             $this->entityManager->persist($repository);
