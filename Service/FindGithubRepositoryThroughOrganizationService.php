@@ -305,9 +305,9 @@ class FindGithubRepositoryThroughOrganizationService
         $component = new ObjectEntity($componentEntity);
         $component->hydrate([
             'name' => $repositoryObject->getValue('name'),
-            'url' => $repositoryObject,
+            'url'  => $repositoryObject,
             // set the organisation to usedBy if type is uses
-            'usedBy' => $type == 'use' ? [$organization] : []
+            'usedBy' => $type == 'use' ? [$organization] : [],
         ]);
         $repositoryObject->setValue('component', $component);
         $this->entityManager->persist($repositoryObject);

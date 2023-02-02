@@ -335,7 +335,7 @@ class FindOrganizationThroughRepositoriesService
             $component = new ObjectEntity($componentEntity);
             $component->hydrate([
                 'name' => $repositoryObject->getValue('name'),
-                'url' => $repositoryObject
+                'url'  => $repositoryObject,
             ]);
             $repositoryObject->setValue('component', $component);
             $this->entityManager->persist($repositoryObject);
