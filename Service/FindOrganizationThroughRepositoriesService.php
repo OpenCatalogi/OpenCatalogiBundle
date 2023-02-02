@@ -234,17 +234,17 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import an Organisation '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
 
             return null;
         }
         if (!$organisationEntity = $this->getOrganisationEntity()) {
-            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
+            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
 
             return null;
         }
         if (!$organisationMapping = $this->getOrganisationMapping()) {
-            isset($this->io) && $this->io->error('No organisationMapping found when trying to import an Organisation '.isset($github['owner']['login']) ? $github['owner']['login'] : '');
+            isset($this->io) && $this->io->error('No organisationMapping found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
 
             return null;
         }
@@ -256,7 +256,7 @@ class FindOrganizationThroughRepositoriesService
 
         isset($this->io) && $this->io->comment('Checking organisation '.$organisation['login']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $organisation);
         isset($this->io) && $this->io->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -274,6 +274,11 @@ class FindOrganizationThroughRepositoriesService
         // Do we have a source
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to get an Organisation with name: '.$name);
+
+            return null;
+        }
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
         }
@@ -295,7 +300,8 @@ class FindOrganizationThroughRepositoriesService
 
         $owns = [];
         foreach ($repositories as $repository) {
-            $owns[] = $repository['html_url'];
+            $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
+            $owns[] = $repositoryObject;
         }
 
         isset($this->io) && $this->io->success('Found '.count($owns).' repos from organisation with name: '.$name);
@@ -329,7 +335,10 @@ class FindOrganizationThroughRepositoriesService
             case 'github':
                 // let's get the repository datar
                 isset($this->io) && $this->io->info("Trying to fetch repository from: $url");
-                $github = $this->getRepositoryFromUrl($url);
+
+                if (!$github = $this->getRepositoryFromUrl($url)) {
+                    return null;
+                }
 
                 // Check if we didnt already loop through this organization during this loop
                 if (isset($github['owner']['login']) && in_array($github['owner']['login'], $createdOrganizations)) {
