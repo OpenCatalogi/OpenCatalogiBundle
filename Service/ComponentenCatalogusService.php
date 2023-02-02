@@ -235,12 +235,11 @@ class ComponentenCatalogusService
                     // if the component is already set to a repository return the component object
                     return $componentObject;
                 }
-
-            } elseif(key_exists('url', $componentArray['url'])) {
+            } elseif (key_exists('url', $componentArray['url'])) {
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
-                    'url' => $componentArray['url']['url']
+                    'url'  => $componentArray['url']['url'],
                 ]);
                 $this->entityManager->persist($repository);
 
