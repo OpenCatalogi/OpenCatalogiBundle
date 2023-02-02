@@ -292,7 +292,7 @@ class ComponentenCatalogusService
 
         isset($this->io) && $this->io->success('Checking application '.$application['name']);
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $application);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $application);
 
         $applicationObject = $synchronization->getObject();
 
@@ -455,7 +455,7 @@ class ComponentenCatalogusService
         }
 
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
 
         return $synchronization->getObject();
     }
