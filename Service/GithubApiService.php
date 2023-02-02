@@ -501,7 +501,7 @@ class GithubApiService
 
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->repositoryEntity ?? $repositoryEntity, $mappedRepository['url']);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedRepository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $mappedRepository);
         $repositoryObject = $synchronization->getObject();
         $repository = $repositoryObject->toArray();
 
@@ -536,7 +536,7 @@ class GithubApiService
 
         // Turn the organisation into a synchronyzed object
         // $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $mappedOrganisation);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $mappedOrganisation);
         $organisationObject = $synchronization->getObject();
         $organisation = $organisationObject->toArray();
 

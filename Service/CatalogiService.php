@@ -232,7 +232,7 @@ class CatalogiService
         }
 
         // Lets sync
-        return $this->synchronizationService->handleSync($synchonization, $object);
+        return $this->synchronizationService->synchronize($synchonization, $object);
     }
 
     /**
@@ -707,7 +707,7 @@ class CatalogiService
         // Add any unknown Component so we know them as well
         $newComponents = $this->addNewComponents($unknownComponents);
 
-        // todo: update/sync all existing components with the SynchronizationService->handleSync() function?
+        // todo: update/sync all existing components with the SynchronizationService->synchronize() function?
         // todo: Or do this in a separate cronjob/handler, also do this Async^ ?
 
         return $newComponents;

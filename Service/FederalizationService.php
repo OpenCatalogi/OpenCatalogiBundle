@@ -247,7 +247,7 @@ class FederalizationService
         }
 
         // Lets sync
-        return $this->synchronizationService->handleSync($synchonization, $object);
+        return $this->synchronizationService->synchronize($synchonization, $object);
     }
 
     /**

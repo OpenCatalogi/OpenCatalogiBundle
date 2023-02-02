@@ -256,7 +256,7 @@ class FindOrganizationThroughRepositoriesService
 
         isset($this->io) && $this->io->comment('Checking organisation '.$organisation['login']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $organisation);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
         isset($this->io) && $this->io->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
