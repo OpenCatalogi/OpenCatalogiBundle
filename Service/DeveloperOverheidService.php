@@ -351,9 +351,9 @@ class DeveloperOverheidService
     }
 
     /**
-     *
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
@@ -370,21 +370,21 @@ class DeveloperOverheidService
         }
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
         if (key_exists('legal', $componentArray) &&
-            key_exists('repoOwner', $componentArray['legal'])  &&
+            key_exists('repoOwner', $componentArray['legal']) &&
             key_exists('name', $componentArray['legal']['repoOwner'])) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate([
-                    'name' => $componentArray['legal']['repoOwner']['name'],
-                    'email'  => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
-                    'phone'  => key_exists('phone', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['phone'] : null,
+                    'name'     => $componentArray['legal']['repoOwner']['name'],
+                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
+                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['phone'] : null,
                     'website'  => key_exists('website', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['website'] : null,
-                    'type'  => key_exists('type', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['type'] : null,
+                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['type'] : null,
                 ]);
             }
             $this->entityManager->persist($organisation);
 
-            if($legal = $componentObject->getValue('legal')) {
+            if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('repoOwner')) {
                     // if the component is already set to a repoOwner return the component object
                     return $componentObject;
@@ -396,6 +396,7 @@ class DeveloperOverheidService
                 $componentObject->setValue('legal', $legal);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
@@ -408,6 +409,7 @@ class DeveloperOverheidService
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
