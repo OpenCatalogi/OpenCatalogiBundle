@@ -22,8 +22,7 @@
       "uniqueItems": true,
       "description": "A list of  components supported by this organisation",
       "items": {
-        "type": "string",
-        "format": "uuid"
+        "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
       }
     },
     "owns": {
@@ -31,8 +30,7 @@
       "uniqueItems": true,
       "description": "A list of  components supported by this organisation",
       "items": {
-        "type": "string",
-        "format": "uuid"
+        "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
       }
     },
     "uses": {
@@ -40,8 +38,7 @@
       "uniqueItems": true,
       "description": "A list of  components supported by this organisation",
       "items": {
-        "type": "string",
-        "format": "uuid"
+        "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
       }
     },
     "token": {
