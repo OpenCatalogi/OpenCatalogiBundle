@@ -383,9 +383,9 @@ class ComponentenCatalogusService
     }
 
     /**
-     *
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function importRepositoryThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
@@ -414,13 +414,14 @@ class ComponentenCatalogusService
             }
             $componentObject->setValue('url', $repository);
         }
+
         return null;
     }
 
     /**
-     *
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
@@ -437,18 +438,18 @@ class ComponentenCatalogusService
         }
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
         if (key_exists('legal', $componentArray) &&
-            key_exists('repoOwner', $componentArray['legal'])  &&
+            key_exists('repoOwner', $componentArray['legal']) &&
             key_exists('name', $componentArray['legal']['repoOwner'])) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate([
-                    'name' => $componentArray['legal']['repoOwner']['name'],
+                    'name'   => $componentArray['legal']['repoOwner']['name'],
                     'email'  => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
                 ]);
             }
             $this->entityManager->persist($organisation);
 
-            if($legal = $componentObject->getValue('legal')) {
+            if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('repoOwner')) {
                     // if the component is already set to a repoOwner return the component object
                     return $componentObject;
@@ -460,6 +461,7 @@ class ComponentenCatalogusService
                 $componentObject->setValue('legal', $legal);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
@@ -472,6 +474,7 @@ class ComponentenCatalogusService
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
