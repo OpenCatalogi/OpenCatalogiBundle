@@ -252,7 +252,7 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return array|null
      */
-    public function getOrganisationRepo(string $url): ?ObjectEntity
+    public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
@@ -305,7 +305,9 @@ class FindGithubRepositoryThroughOrganizationService
         $component = new ObjectEntity($componentEntity);
         $component->hydrate([
             'name' => $repositoryObject->getValue('name'),
-            'url' => $repositoryObject
+            'url' => $repositoryObject,
+            // set the organisation to usedBy if type is uses
+            'usedBy' => $type == 'use' ? [$organization] : []
         ]);
         $repositoryObject->setValue('component', $component);
         $this->entityManager->persist($repositoryObject);
@@ -339,15 +341,14 @@ class FindGithubRepositoryThroughOrganizationService
                 $uses = [];
                 foreach ($openCatalogi['uses'] as $use) {
                     // get organisation repos and set the property
-                    // @TODO get repository component and set the organisation to usedBy
-                    $component = $uses[] = $this->getOrganisationRepo($use);
+                    $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
                 }
                 $organization->setValue('uses', $uses);
 
                 $supports = [];
                 foreach ($openCatalogi['supports'] as $supports) {
                     // get organisation component and set the property
-                    $component = $supports[] = $this->getOrganisationRepo($supports);
+                    $supports[] = $this->getOrganisationRepo($supports, $organization, 'supports');
                 }
                 $organization->setValue('supports', $supports);
 
