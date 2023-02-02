@@ -15,7 +15,6 @@
     "landingURL": "repositoryUrl",
     "developmentStatus": "status",
     "url.url": "repositoryUrl",
-    "url.name": "name",
-    "url.organisation.name": "organisationName"
+    "url.name": "name"
   }
 }
