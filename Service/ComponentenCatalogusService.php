@@ -374,7 +374,7 @@ class ComponentenCatalogusService
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($component['name']) ? $component['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
         }
