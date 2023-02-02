@@ -394,7 +394,7 @@ class ComponentenCatalogusService
 
         $synchronization = $this->synchronizationService->handleSync($synchronization, $component);
         $componentObject = $synchronization->getObject();
-    
+
         // if the component isn't already set to a repository create or get the repo and set it to the component url
         if (key_exists('url', $componentArray) &&
             key_exists('url', $componentArray['url']) &&
@@ -403,7 +403,7 @@ class ComponentenCatalogusService
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
-                    'url' => $componentArray['url']['url']
+                    'url'  => $componentArray['url']['url']
                 ]);
             }
             $this->entityManager->persist($repository);
