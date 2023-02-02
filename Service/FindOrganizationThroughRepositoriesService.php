@@ -35,6 +35,7 @@ class FindOrganizationThroughRepositoriesService
     private Entity $repositoryEntity;
     private Mapping $repositoryMapping;
     private Source $githubApi;
+    private ?Entity $componentEntity;
 
     public function __construct(
         CallService $callService,
@@ -131,6 +132,22 @@ class FindOrganizationThroughRepositoriesService
         }
 
         return $this->organisationMapping;
+    }
+
+    /**
+     * Get the component entity.
+     *
+     * @return ?Entity
+     */
+    public function getComponentEntity(): ?Entity
+    {
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
+        }
+
+        return $this->componentEntity;
     }
 
     /**
@@ -278,7 +295,7 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.$name);
 
             return null;
         }
@@ -301,7 +318,31 @@ class FindOrganizationThroughRepositoriesService
         $owns = [];
         foreach ($repositories as $repository) {
             $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
-            $owns[] = $repositoryObject;
+            $this->entityManager->persist($repositoryObject);
+            $this->entityManager->flush();
+
+            if ($component = $repositoryObject->getValue('component')) {
+                $owns[] = $component;
+                continue;
+            }
+
+            if (!$componentEntity = $this->getComponentEntity()) {
+                isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+
+                return null;
+            }
+
+            $component = new ObjectEntity($componentEntity);
+            $component->hydrate([
+                'name' => $repositoryObject->getValue('name'),
+                'url' => $repositoryObject
+            ]);
+            $repositoryObject->setValue('component', $component);
+            $this->entityManager->persist($repositoryObject);
+            $this->entityManager->persist($component);
+            $this->entityManager->flush();
+
+            $owns[] = $component;
         }
 
         isset($this->io) && $this->io->success('Found '.count($owns).' repos from organisation with name: '.$name);
@@ -357,7 +398,7 @@ class FindOrganizationThroughRepositoriesService
                     $repository->setValue('organisation', $organisation);
                     $this->entityManager->persist($repository);
 
-                    // get organisation repos and set the property
+                    // get organisation component and set the property
                     $owns = $this->getOrganisationRepos($github['owner']['login']);
                     $organisation->setValue('owns', $owns);
 

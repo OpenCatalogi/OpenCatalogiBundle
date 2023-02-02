@@ -49,7 +49,6 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
