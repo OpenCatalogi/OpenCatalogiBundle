@@ -405,11 +405,11 @@ class GithubPubliccodeService
 
         return $synchronization->getObject();
     }
-    
+
     /**
-     *
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $component
+     *
      * @return ObjectEntity|null
      */
     public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
@@ -424,8 +424,8 @@ class GithubPubliccodeService
             if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate([
-                    'name' => $publiccode['applicationSuite'],
-                    'components' => [$component]
+                    'name'       => $publiccode['applicationSuite'],
+                    'components' => [$component],
                 ]);
             }
             $this->entityManager->persist($application);
@@ -433,13 +433,14 @@ class GithubPubliccodeService
             $this->entityManager->persist($application);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
     /**
-     *
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
@@ -457,7 +458,7 @@ class GithubPubliccodeService
         }
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
         if (key_exists('legal', $publiccode) &&
-            key_exists('mainCopyrightOwner', $publiccode['legal'])  &&
+            key_exists('mainCopyrightOwner', $publiccode['legal']) &&
             key_exists('name', $publiccode['legal']['mainCopyrightOwner'])) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['mainCopyrightOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
@@ -467,7 +468,7 @@ class GithubPubliccodeService
             }
             $this->entityManager->persist($organisation);
 
-            if($legal = $componentObject->getValue('legal')) {
+            if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('mainCopyrightOwner')) {
                     // if the component is already set to a repoOwner return the component object
                     return $componentObject;
@@ -479,6 +480,7 @@ class GithubPubliccodeService
                 $componentObject->setValue('legal', $legal);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
@@ -491,13 +493,14 @@ class GithubPubliccodeService
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
     /**
-     *
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
@@ -515,7 +518,7 @@ class GithubPubliccodeService
         }
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
         if (key_exists('legal', $publiccode) &&
-            key_exists('repoOwner', $publiccode['legal'])  &&
+            key_exists('repoOwner', $publiccode['legal']) &&
             key_exists('name', $publiccode['legal']['repoOwner'])) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['repoOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
@@ -525,7 +528,7 @@ class GithubPubliccodeService
             }
             $this->entityManager->persist($organisation);
 
-            if($legal = $componentObject->getValue('legal')) {
+            if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('repoOwner')) {
                     // if the component is already set to a repoOwner return the component object
                     return $componentObject;
@@ -537,6 +540,7 @@ class GithubPubliccodeService
                 $componentObject->setValue('legal', $legal);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
@@ -549,13 +553,14 @@ class GithubPubliccodeService
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
     /**
-     *
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
@@ -573,7 +578,6 @@ class GithubPubliccodeService
         }
         if (key_exists('maintenance', $publiccode) &&
             key_exists('contractors', $publiccode['maintenance'])) {
-
             $contractors = [];
             foreach ($publiccode['maintenance']['contractors'] as $contractor) {
                 if (key_exists('name', $contractor)) {
@@ -588,7 +592,7 @@ class GithubPubliccodeService
                 }
             }
 
-            if($maintenance = $componentObject->getValue('maintenance')) {
+            if ($maintenance = $componentObject->getValue('maintenance')) {
                 if ($maintenance->getValue('contractors')) {
                     // if the component is already set to a contractors return the component object
                     return $componentObject;
@@ -600,6 +604,7 @@ class GithubPubliccodeService
                 $componentObject->setValue('maintenance', $maintenance);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
@@ -612,13 +617,14 @@ class GithubPubliccodeService
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
     /**
-     *
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $componentObject
+     *
      * @return ObjectEntity|null
      */
     public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
@@ -636,7 +642,6 @@ class GithubPubliccodeService
         }
         if (key_exists('maintenance', $publiccode) &&
             key_exists('contacts', $publiccode['maintenance'])) {
-
             $contacts = [];
             foreach ($publiccode['maintenance']['contacts'] as $contact) {
                 if (key_exists('name', $contact)) {
@@ -651,7 +656,7 @@ class GithubPubliccodeService
                 }
             }
 
-            if($maintenance = $componentObject->getValue('maintenance')) {
+            if ($maintenance = $componentObject->getValue('maintenance')) {
                 if ($maintenance->getValue('contacts')) {
                     // if the component is already set to a contractors return the component object
                     return $componentObject;
@@ -663,18 +668,20 @@ class GithubPubliccodeService
                 $componentObject->setValue('maintenance', $maintenance);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
+
                 return $componentObject;
             }
 
             $maintenance = new ObjectEntity($maintenanceEntity);
             $maintenance->hydrate([
-                'contacts' => $contacts
+                'contacts' => $contacts,
             ]);
             $this->entityManager->persist($maintenance);
             $componentObject->setValue('maintenance', $maintenance);
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
         }
+
         return null;
     }
 
@@ -682,7 +689,7 @@ class GithubPubliccodeService
      * @todo
      *
      * @param ObjectEntity $repository
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param $repositoryMapping
      *
      * @return ObjectEntity|null dataset at the end of the handler
@@ -694,7 +701,6 @@ class GithubPubliccodeService
 
             return null;
         }
-
 
         if (!$component = $repository->getValue('component')) {
             $component = new ObjectEntity($componentEntity);
