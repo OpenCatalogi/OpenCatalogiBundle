@@ -246,11 +246,12 @@ class FindGithubRepositoryThroughOrganizationService
     }
 
     /**
-     * Get or create a component for the given repository
+     * Get or create a component for the given repository.
      *
      * @param ObjectEntity $repositoryObject
      * @param ObjectEntity $organization
-     * @param string $type
+     * @param string       $type
+     *
      * @return array|null
      */
     public function setRepositoryComponent(ObjectEntity $repositoryObject, ObjectEntity $organization, string $type): ?ObjectEntity
@@ -283,9 +284,10 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
-     * @param string $url
+     * @param string       $url
      * @param ObjectEntity $organization
-     * @param string $type
+     * @param string       $type
+     *
      * @return array|null
      */
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
