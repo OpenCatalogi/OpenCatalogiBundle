@@ -66,6 +66,9 @@ class FindOrganizationThroughRepositoriesService
     public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
+        $this->githubPubliccodeService->setStyle($io);
+        $this->synchronizationService->setStyle($io);
+        $this->mappingService->setStyle($io);
 
         return $this;
     }
@@ -273,7 +276,7 @@ class FindOrganizationThroughRepositoriesService
 
         isset($this->io) && $this->io->comment('Checking organisation '.$organisation['login']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $organisation);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
         isset($this->io) && $this->io->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();

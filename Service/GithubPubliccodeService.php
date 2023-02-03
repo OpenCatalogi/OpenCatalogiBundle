@@ -57,6 +57,7 @@ class GithubPubliccodeService
     {
         $this->io = $io;
         $this->synchronizationService->setStyle($io);
+        $this->mappingService->setStyle($io);
 
         return $this;
     }
@@ -178,7 +179,7 @@ class GithubPubliccodeService
      */
     public function getLegalEntity(): ?Entity
     {
-        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.legal.schema.json'])) {
+        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.legal.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
 
             return null;
@@ -194,7 +195,7 @@ class GithubPubliccodeService
      */
     public function getMaintenanceEntity(): ?Entity
     {
-        if (!$this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.maintenance.schema.json'])) {
+        if (!$this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.maintenance.schema.json'])) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.maintenance.schema.json');
 
             return null;
@@ -361,7 +362,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -400,7 +401,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -686,13 +687,13 @@ class GithubPubliccodeService
     }
 
     /**
-     * @todo
-     *
      * @param ObjectEntity $repository
      * @param array        $publiccode
      * @param $repositoryMapping
      *
      * @return ObjectEntity|null dataset at the end of the handler
+     *
+     * @todo
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
     {
@@ -732,5 +733,35 @@ class GithubPubliccodeService
         $this->entityManager->flush();
 
         return $repository;
+    }
+
+    public function parsePubliccode(string $repositoryUrl, $response): ?array
+    {
+        if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository ');
+
+            return null;
+        }
+
+        $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
+
+        if (is_array($publiccode) && key_exists('content', $publiccode)) {
+            $publiccode = base64_decode($publiccode['content']);
+        }
+
+        // @TODO use decodeResponse from the callService
+        try {
+            $parsedPubliccode = Yaml::parse($publiccode);
+        } catch (Exception $e) {
+            isset($this->io) && $this->io->error('Not able to parse '.$publiccode.' '.$e->getMessage());
+        }
+
+        if (isset($parsedPubliccode)) {
+            isset($this->io) && $this->io->success("Fetch and decode went succesfull for $repositoryUrl");
+
+            return $parsedPubliccode;
+        }
+
+        return null;
     }
 }
