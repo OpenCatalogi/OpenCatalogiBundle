@@ -361,7 +361,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -400,7 +400,7 @@ class GithubPubliccodeService
 
         isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();

@@ -213,7 +213,7 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->success('Checking repository '.$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
     }
@@ -342,7 +342,7 @@ class DeveloperOverheidService
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $developerOverheidSource, $this->repositoryEntity ?? $repositoryEntity, $repository['id']);
         isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
         $repository = $repositoryObject->toArray();
@@ -455,7 +455,7 @@ class DeveloperOverheidService
             unset($componentMapping['legal']['repoOwner']);
         }
 
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $componentMapping);
+        $synchronization = $this->synchronizationService->synchronize($synchronization, $componentMapping);
         $componentObject = $synchronization->getObject();
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
