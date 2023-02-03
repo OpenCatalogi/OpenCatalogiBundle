@@ -53,7 +53,6 @@ class FindGithubRepositoryThroughOrganizationService
     public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
-        $this->callService->setStyle($io);
         $this->githubPubliccodeService->setStyle($io);
 
         return $this;
