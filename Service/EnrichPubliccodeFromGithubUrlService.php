@@ -230,21 +230,7 @@ class EnrichPubliccodeFromGithubUrlService
         }
 
         if (isset($response)) {
-            $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
-            $publiccode = base64_decode($publiccode['content']);
-
-            // @TODO use decodeResponse from the callService
-            try {
-                $parsedPubliccode = Yaml::parse($publiccode);
-            } catch (Exception $e) {
-                isset($this->io) && $this->io->error('Not able to parse '.$publiccode.' '.$e->getMessage());
-            }
-
-            if (isset($parsedPubliccode)) {
-                isset($this->io) && $this->io->success("Fetch and decode went succesfull for $repositoryUrl");
-
-                return $parsedPubliccode;
-            }
+            return $this->githubPubliccodeService->parsePubliccode($repositoryUrl, $response);
         }
 
         return null;
