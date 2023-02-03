@@ -24,6 +24,8 @@ class DeveloperOverheidService
     private ?Entity $repositoryEntity;
     private ?Entity $componentEntity;
     private ?Mapping $componentMapping;
+    private ?Entity $legalEntity;
+    private Entity $organisationEntity;
     private MappingService $mappingService;
     private SymfonyStyle $io;
 
@@ -85,6 +87,38 @@ class DeveloperOverheidService
         }
 
         return $this->repositoryEntity;
+    }
+
+    /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getOrganisationEntity(): ?Entity
+    {
+        if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+
+            return null;
+        }
+
+        return $this->organisationEntity;
+    }
+
+    /**
+     * Get the legal entity.
+     *
+     * @return ?Entity
+     */
+    public function getLegalEntity(): ?Entity
+    {
+        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.legal.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
+
+            return null;
+        }
+
+        return $this->legalEntity;
     }
 
     /**
@@ -179,7 +213,7 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->success('Checking repository '.$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
         return $synchronization->getObject();
     }
@@ -297,17 +331,86 @@ class DeveloperOverheidService
      *
      * @return ?ObjectEntity
      */
-    public function handleRepositoryArray(array $repository, ?Entity $repositoryEntity = null, ?Source $developerOverheidSource = null): ?ObjectEntity
+    public function handleRepositoryArray(array $repository, ?Source $developerOverheidSource = null): ?ObjectEntity
     {
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No repositoryEntity found when trying to import a Repository');
+
+            return null;
+        }
+
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $developerOverheidSource, $this->repositoryEntity ?? $repositoryEntity, $repository['id']);
         isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
         $repository = $repositoryObject->toArray();
 
         return $repositoryObject;
+    }
+
+    /**
+     * @param array        $componentArray
+     * @param ObjectEntity $componentObject
+     *
+     * @return ObjectEntity|null
+     */
+    public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
+    {
+        if (!$organisationEntity = $this->getOrganisationEntity()) {
+            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation ');
+
+            return null;
+        }
+        if (!$legalEntity = $this->getLegalEntity()) {
+            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+
+            return null;
+        }
+        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+        if (key_exists('legal', $componentArray) &&
+            key_exists('repoOwner', $componentArray['legal']) &&
+            key_exists('name', $componentArray['legal']['repoOwner'])) {
+            if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
+                $organisation = new ObjectEntity($organisationEntity);
+                $organisation->hydrate([
+                    'name'     => $componentArray['legal']['repoOwner']['name'],
+                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
+                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['phone'] : null,
+                    'website'  => key_exists('website', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['website'] : null,
+                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['type'] : null,
+                ]);
+            }
+            $this->entityManager->persist($organisation);
+
+            if ($legal = $componentObject->getValue('legal')) {
+                if ($repoOwner = $legal->getValue('repoOwner')) {
+                    // if the component is already set to a repoOwner return the component object
+                    return $componentObject;
+                }
+
+                $legal->setValue('repoOwner', $organisation);
+                $this->entityManager->persist($legal);
+
+                $componentObject->setValue('legal', $legal);
+                $this->entityManager->persist($componentObject);
+                $this->entityManager->flush();
+
+                return $componentObject;
+            }
+
+            $legal = new ObjectEntity($legalEntity);
+            $legal->hydrate([
+                'repoOwner' => $organisation,
+            ]);
+            $this->entityManager->persist($legal);
+            $componentObject->setValue('legal', $legal);
+            $this->entityManager->persist($componentObject);
+            $this->entityManager->flush();
+        }
+
+        return null;
     }
 
     /**
@@ -336,30 +439,36 @@ class DeveloperOverheidService
             return null;
         }
 
+        // repoOwner
+
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
         isset($this->io) && $this->io->comment('Mapping object'.$component['service_name']);
         isset($this->io) && $this->io->comment('The mapping object '.$mapping);
 
         isset($this->io) && $this->io->comment('Checking component '.$component['service_name']);
-        $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
 
+        // do the mapping of the component set two variables
+        $componentMapping = $componentArray = $this->mappingService->mapping($mapping, $component);
+        // unset component url before creating object, we don't want duplicate repositories
+        if (key_exists('legal', $componentMapping) && key_exists('repoOwner', $componentMapping['legal'])) {
+            unset($componentMapping['legal']['repoOwner']);
+        }
+
+        $synchronization = $this->synchronizationService->handleSync($synchronization, $componentMapping);
         $componentObject = $synchronization->getObject();
 
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No repositoryEntity found when trying to import a Repository');
-
-            return null;
-        }
+        $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
         if ($component['related_repositories']) {
             // only do someting with the first item in the array
             $repository = $component['related_repositories'][0];
-            $repositoryObject = $this->handleRepositoryArray($repository, $repositoryEntity, $this->source);
+            $repositoryObject = $this->handleRepositoryArray($repository, $source);
             $repositoryObject->setValue('component', $componentObject);
             $componentObject->setValue('url', $repositoryObject);
         }
+
+        $this->entityManager->persist($componentObject);
 
         return $componentObject;
     }

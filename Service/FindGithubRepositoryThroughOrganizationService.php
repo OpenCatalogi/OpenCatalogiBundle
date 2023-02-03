@@ -25,15 +25,19 @@ class FindGithubRepositoryThroughOrganizationService
     private SymfonyStyle $io;
     private CallService $callService;
     private Entity $organisationEntity;
+    private ?Entity $componentEntity;
     private Source $githubApi;
     private Source $rawGithubusercontent;
+    private GithubPubliccodeService $githubPubliccodeService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
+        GithubPubliccodeService $githubPubliccodeService,
         CallService $callService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
+        $this->githubPubliccodeService = $githubPubliccodeService;
 
         $this->configuration = [];
         $this->data = [];
@@ -99,6 +103,54 @@ class FindGithubRepositoryThroughOrganizationService
         }
 
         return $this->organisationEntity;
+    }
+
+    /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getRepositoryEntity(): ?Entity
+    {
+        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
+            return null;
+        }
+
+        return $this->repositoryEntity;
+    }
+
+    /**
+     * Get the component entity.
+     *
+     * @return ?Entity
+     */
+    public function getComponentEntity(): ?Entity
+    {
+        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+
+            return null;
+        }
+
+        return $this->componentEntity;
+    }
+
+    /**
+     * Get the repository mapping.
+     *
+     * @return ?bool
+     */
+    public function checkGithubAuth(): ?bool
+    {
+        if (!$this->githubApi->getApiKey()) {
+            isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -194,6 +246,78 @@ class FindGithubRepositoryThroughOrganizationService
     }
 
     /**
+     * Get an organisation from https://api.github.com/orgs/{org}/repos.
+     *
+     * @param string $url
+     *
+     * @return array|null
+     */
+    public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
+    {
+        // Do we have a source
+        if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to get an Organisation with name: '.$url);
+
+            return null;
+        }
+        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.$url);
+
+            return null;
+        }
+
+        if (!$this->checkGithubAuth()) {
+            return null;
+        }
+
+        $domain = parse_url($url, PHP_URL_HOST);
+        if (!$domain == 'github.com') {
+            return null;
+        }
+
+        $name = trim(parse_url($url, PHP_URL_PATH), '/');
+
+        isset($this->io) && $this->io->info('Getting repo from organisation '.$name);
+        $response = $this->callService->call($source, '/repos/'.$name);
+
+        $repository = json_decode($response->getBody()->getContents(), true);
+
+        if (!$repository) {
+            isset($this->io) && $this->io->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
+
+            return null;
+        }
+        $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->flush();
+        isset($this->io) && $this->io->success('Found repo from organisation with name: '.$name);
+
+        if ($component = $repositoryObject->getValue('component')) {
+            return $component;
+        }
+
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+
+            return null;
+        }
+
+        $component = new ObjectEntity($componentEntity);
+        $component->hydrate([
+            'name' => $repositoryObject->getValue('name'),
+            'url'  => $repositoryObject,
+            // set the organisation to usedBy if type is uses
+            'usedBy' => $type == 'use' ? [$organization] : [],
+        ]);
+        $repositoryObject->setValue('component', $component);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->persist($component);
+        $this->entityManager->flush();
+
+        return $component;
+    }
+
+    /**
      * Fetches opencatalogi.yaml info with function getOpenCatalogiFromGithubRepo for an organization and updates the given organization.
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
@@ -207,11 +331,30 @@ class FindGithubRepositoryThroughOrganizationService
             if ($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
                 isset($this->io) && $this->io->success('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
+                if (!$openCatalogi) {
+                    return;
+                }
                 // we dont want to set the name, this has to be the login property from the github api
-                $allowedKeys = ['description', 'type', 'telephone', 'email', 'website', 'logo', 'catalogusAPI', 'uses', 'supports'];
+                $allowedKeys = ['description', 'type', 'telephone', 'email', 'website', 'logo', 'catalogusAPI'];
                 $organization->hydrate(array_intersect_key($openCatalogi, array_flip($allowedKeys)));
+
+                $uses = [];
+                foreach ($openCatalogi['uses'] as $use) {
+                    // get organisation repos and set the property
+                    $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
+                }
+                $organization->setValue('uses', $uses);
+
+                $supports = [];
+                foreach ($openCatalogi['supports'] as $supports) {
+                    // get organisation component and set the property
+                    $supports[] = $this->getOrganisationRepo($supports, $organization, 'supports');
+                }
+                $organization->setValue('supports', $supports);
+
                 $this->entityManager->persist($organization);
                 $this->entityManager->flush();
+
                 isset($this->io) && $this->io->success($organization->getName().' succesfully updated with fetched openCatalogi info');
             }
         }
