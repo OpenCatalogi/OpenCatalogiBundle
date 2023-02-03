@@ -246,10 +246,46 @@ class FindGithubRepositoryThroughOrganizationService
     }
 
     /**
+     * Get or create a component for the given repository
+     *
+     * @param ObjectEntity $repositoryObject
+     * @param ObjectEntity $organization
+     * @param string $type
+     * @return array|null
+     */
+    public function setRepositoryComponent(ObjectEntity $repositoryObject, ObjectEntity $organization, string $type): ?ObjectEntity
+    {
+        if ($component = $repositoryObject->getValue('component')) {
+            return $component;
+        }
+
+        if (!$componentEntity = $this->getComponentEntity()) {
+            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+
+            return null;
+        }
+
+        $component = new ObjectEntity($componentEntity);
+        $component->hydrate([
+            'name' => $repositoryObject->getValue('name'),
+            'url'  => $repositoryObject,
+            // set the organisation to usedBy if type is uses
+            'usedBy' => $type == 'use' ? [$organization] : [],
+        ]);
+        $repositoryObject->setValue('component', $component);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->persist($component);
+        $this->entityManager->flush();
+
+        return $component;
+    }
+
+    /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
      * @param string $url
-     *
+     * @param ObjectEntity $organization
+     * @param string $type
      * @return array|null
      */
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
@@ -260,12 +296,6 @@ class FindGithubRepositoryThroughOrganizationService
 
             return null;
         }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.$url);
-
-            return null;
-        }
-
         if (!$this->checkGithubAuth()) {
             return null;
         }
@@ -292,29 +322,7 @@ class FindGithubRepositoryThroughOrganizationService
         $this->entityManager->flush();
         isset($this->io) && $this->io->success('Found repo from organisation with name: '.$name);
 
-        if ($component = $repositoryObject->getValue('component')) {
-            return $component;
-        }
-
-        if (!$componentEntity = $this->getComponentEntity()) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
-
-        $component = new ObjectEntity($componentEntity);
-        $component->hydrate([
-            'name' => $repositoryObject->getValue('name'),
-            'url'  => $repositoryObject,
-            // set the organisation to usedBy if type is uses
-            'usedBy' => $type == 'use' ? [$organization] : [],
-        ]);
-        $repositoryObject->setValue('component', $component);
-        $this->entityManager->persist($repositoryObject);
-        $this->entityManager->persist($component);
-        $this->entityManager->flush();
-
-        return $component;
+        return $this->setRepositoryComponent($repositoryObject, $organization, $type);
     }
 
     /**
