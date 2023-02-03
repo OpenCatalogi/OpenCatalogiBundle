@@ -30,17 +30,20 @@ class ComponentenCatalogusService
     private MappingService $mappingService;
     private SymfonyStyle $io;
     private Entity $organisationEntity;
+    private DeveloperOverheidService $developerOverheidService;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        DeveloperOverheidService $developerOverheidService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->developerOverheidService;
     }
 
     /**
@@ -419,66 +422,6 @@ class ComponentenCatalogusService
     }
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
-     *
-     * @return ObjectEntity|null
-     */
-    public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
-    {
-        if (!$organisationEntity = $this->getOrganisationEntity()) {
-            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation ');
-
-            return null;
-        }
-        if (!$legalEntity = $this->getLegalEntity()) {
-            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
-
-            return null;
-        }
-        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
-        if (key_exists('legal', $componentArray) &&
-            key_exists('repoOwner', $componentArray['legal']) &&
-            key_exists('name', $componentArray['legal']['repoOwner'])) {
-            if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
-                $organisation = new ObjectEntity($organisationEntity);
-                $organisation->hydrate([
-                    'name'   => $componentArray['legal']['repoOwner']['name'],
-                    'email'  => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
-                ]);
-            }
-            $this->entityManager->persist($organisation);
-
-            if ($legal = $componentObject->getValue('legal')) {
-                if ($repoOwner = $legal->getValue('repoOwner')) {
-                    // if the component is already set to a repoOwner return the component object
-                    return $componentObject;
-                }
-
-                $legal->setValue('repoOwner', $organisation);
-                $this->entityManager->persist($legal);
-
-                $componentObject->setValue('legal', $legal);
-                $this->entityManager->persist($componentObject);
-                $this->entityManager->flush();
-
-                return $componentObject;
-            }
-
-            $legal = new ObjectEntity($legalEntity);
-            $legal->hydrate([
-                'repoOwner' => $organisation,
-            ]);
-            $this->entityManager->persist($legal);
-            $componentObject->setValue('legal', $legal);
-            $this->entityManager->persist($componentObject);
-            $this->entityManager->flush();
-        }
-
-        return null;
-    }
-
-    /**
      * @todo duplicate with DeveloperOverheidService ?
      *
      * @param $component
@@ -524,7 +467,7 @@ class ComponentenCatalogusService
         $componentObject = $synchronization->getObject();
 
         $this->importRepositoryThroughComponent($componentArray, $componentObject);
-        $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
+        $this->developerOverheidService->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
         $this->entityManager->persist($componentObject);
         $this->entityManager->flush();
