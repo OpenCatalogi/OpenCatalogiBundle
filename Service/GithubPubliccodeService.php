@@ -29,6 +29,10 @@ class GithubPubliccodeService
     private ?Mapping $repositoriesMapping;
     private MappingService $mappingService;
     private SymfonyStyle $io;
+    private Entity $contractorsEntity;
+    private Entity $contactsEntity;
+    private Entity $maintenanceEntity;
+    private Entity $legalEntity;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -152,6 +156,82 @@ class GithubPubliccodeService
     }
 
     /**
+     * Get the repository entity.
+     *
+     * @return ?Entity
+     */
+    public function getOrganisationEntity(): ?Entity
+    {
+        if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+
+            return null;
+        }
+
+        return $this->organisationEntity;
+    }
+
+    /**
+     * Get the legal entity.
+     *
+     * @return ?Entity
+     */
+    public function getLegalEntity(): ?Entity
+    {
+        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.legal.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
+
+            return null;
+        }
+
+        return $this->legalEntity;
+    }
+
+    /**
+     * Get the maintenance entity.
+     *
+     * @return ?Entity
+     */
+    public function getMaintenanceEntity(): ?Entity
+    {
+        if (!$this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.maintenance.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.maintenance.schema.json');
+
+            return null;
+        }
+
+        return $this->maintenanceEntity;
+    }
+
+    /**
+     * Get the contractors entity.
+     *
+     * @return ?Entity
+     */
+    public function getContractorEntity(): ?Entity
+    {
+        if (!$this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
+        }
+
+        return $this->contractorsEntity;
+    }
+
+    /**
+     * Get the contact entity.
+     *
+     * @return ?Entity
+     */
+    public function getContactEntity(): ?Entity
+    {
+        if (!$this->contactsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contact.schema.json'])) {
+            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
+        }
+
+        return $this->contactsEntity;
+    }
+
+    /**
      * Get the repository mapping.
      *
      * @return ?bool
@@ -180,7 +260,7 @@ class GithubPubliccodeService
         $result = [];
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            isset($this->io) && $this->io->error('No source found when trying to get all Repositories');
 
             return null;
         }
@@ -327,6 +407,278 @@ class GithubPubliccodeService
     }
     
     /**
+     *
+     * @param array $publiccode
+     * @param ObjectEntity $component
+     * @return ObjectEntity|null
+     */
+    public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
+    {
+        if (!$applicationEntity = $this->getApplicationEntity()) {
+            isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
+
+            return null;
+        }
+
+        if (key_exists('applicationSuite', $publiccode)) {
+            if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
+                $application = new ObjectEntity($applicationEntity);
+                $application->hydrate([
+                    'name' => $publiccode['applicationSuite'],
+                    'components' => [$component]
+                ]);
+            }
+            $this->entityManager->persist($application);
+            $component->setValue('applicationSuite', $application);
+            $this->entityManager->persist($application);
+            $this->entityManager->flush();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param array $componentArray
+     * @param ObjectEntity $componentObject
+     * @return ObjectEntity|null
+     */
+    public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
+    {
+        if (!$organisationEntity = $this->getOrganisationEntity()) {
+            isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+
+            return null;
+        }
+
+        if (!$legalEntity = $this->getLegalEntity()) {
+            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+
+            return null;
+        }
+        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+        if (key_exists('legal', $publiccode) &&
+            key_exists('mainCopyrightOwner', $publiccode['legal'])  &&
+            key_exists('name', $publiccode['legal']['mainCopyrightOwner'])) {
+            if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['mainCopyrightOwner']['name']]))) {
+                $organisation = new ObjectEntity($organisationEntity);
+                $organisation->hydrate([
+                    'name' => $publiccode['legal']['mainCopyrightOwner']['name'],
+                ]);
+            }
+            $this->entityManager->persist($organisation);
+
+            if($legal = $componentObject->getValue('legal')) {
+                if ($repoOwner = $legal->getValue('mainCopyrightOwner')) {
+                    // if the component is already set to a repoOwner return the component object
+                    return $componentObject;
+                }
+
+                $legal->setValue('mainCopyrightOwner', $organisation);
+                $this->entityManager->persist($legal);
+
+                $componentObject->setValue('legal', $legal);
+                $this->entityManager->persist($componentObject);
+                $this->entityManager->flush();
+                return $componentObject;
+            }
+
+            $legal = new ObjectEntity($legalEntity);
+            $legal->hydrate([
+                'mainCopyrightOwner' => $organisation,
+            ]);
+            $this->entityManager->persist($legal);
+            $componentObject->setValue('legal', $legal);
+            $this->entityManager->persist($componentObject);
+            $this->entityManager->flush();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param array $publiccode
+     * @param ObjectEntity $componentObject
+     * @return ObjectEntity|null
+     */
+    public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
+    {
+        if (!$organisationEntity = $this->getOrganisationEntity()) {
+            isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+
+            return null;
+        }
+
+        if (!$legalEntity = $this->getLegalEntity()) {
+            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+
+            return null;
+        }
+        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+        if (key_exists('legal', $publiccode) &&
+            key_exists('repoOwner', $publiccode['legal'])  &&
+            key_exists('name', $publiccode['legal']['repoOwner'])) {
+            if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['repoOwner']['name']]))) {
+                $organisation = new ObjectEntity($organisationEntity);
+                $organisation->hydrate([
+                    'name' => $publiccode['legal']['repoOwner']['name'],
+                ]);
+            }
+            $this->entityManager->persist($organisation);
+
+            if($legal = $componentObject->getValue('legal')) {
+                if ($repoOwner = $legal->getValue('repoOwner')) {
+                    // if the component is already set to a repoOwner return the component object
+                    return $componentObject;
+                }
+
+                $legal->setValue('repoOwner', $organisation);
+                $this->entityManager->persist($legal);
+
+                $componentObject->setValue('legal', $legal);
+                $this->entityManager->persist($componentObject);
+                $this->entityManager->flush();
+                return $componentObject;
+            }
+
+            $legal = new ObjectEntity($legalEntity);
+            $legal->hydrate([
+                'repoOwner' => $organisation,
+            ]);
+            $this->entityManager->persist($legal);
+            $componentObject->setValue('legal', $legal);
+            $this->entityManager->persist($componentObject);
+            $this->entityManager->flush();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param array $componentArray
+     * @param ObjectEntity $componentObject
+     * @return ObjectEntity|null
+     */
+    public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
+    {
+        if (!$maintenanceEntity = $this->getMaintenanceEntity()) {
+            isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
+
+            return null;
+        }
+
+        if (!$contractorsEntity = $this->getContractorEntity()) {
+            isset($this->io) && $this->io->error('No ContractorEntity found when trying to import an Contractor ');
+
+            return null;
+        }
+        if (key_exists('maintenance', $publiccode) &&
+            key_exists('contractors', $publiccode['maintenance'])) {
+
+            $contractors = [];
+            foreach ($publiccode['maintenance']['contractors'] as $contractor) {
+                if (key_exists('name', $contractor)) {
+                    if (!($contractor = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $contractorsEntity, 'name' => $contractor['name']]))) {
+                        $contractor = new ObjectEntity($contractorsEntity);
+                        $contractor->hydrate([
+                            'name' => $contractor['name'],
+                        ]);
+                    }
+                    $this->entityManager->persist($contractor);
+                    $contractors[] = $contractor;
+                }
+            }
+
+            if($maintenance = $componentObject->getValue('maintenance')) {
+                if ($maintenance->getValue('contractors')) {
+                    // if the component is already set to a contractors return the component object
+                    return $componentObject;
+                }
+
+                $maintenance->setValue('contractors', $contractors);
+                $this->entityManager->persist($maintenance);
+
+                $componentObject->setValue('maintenance', $maintenance);
+                $this->entityManager->persist($componentObject);
+                $this->entityManager->flush();
+                return $componentObject;
+            }
+
+            $maintenance = new ObjectEntity($contractorsEntity);
+            $maintenance->hydrate([
+                'contractors' => $contractors,
+            ]);
+            $this->entityManager->persist($maintenance);
+            $componentObject->setValue('maintenance', $maintenance);
+            $this->entityManager->persist($componentObject);
+            $this->entityManager->flush();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param array $publiccode
+     * @param ObjectEntity $componentObject
+     * @return ObjectEntity|null
+     */
+    public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
+    {
+        if (!$maintenanceEntity = $this->getMaintenanceEntity()) {
+            isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
+
+            return null;
+        }
+
+        if (!$contactEntity = $this->getContactEntity()) {
+            isset($this->io) && $this->io->error('No ContactEntity found when trying to import an Contact ');
+
+            return null;
+        }
+        if (key_exists('maintenance', $publiccode) &&
+            key_exists('contacts', $publiccode['maintenance'])) {
+
+            $contacts = [];
+            foreach ($publiccode['maintenance']['contacts'] as $contact) {
+                if (key_exists('name', $contact)) {
+                    if (!($contact = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $this->contractorsEntity, 'name' => $contact['name']]))) {
+                        $contact = new ObjectEntity($contactEntity);
+                        $contact->hydrate([
+                            'name' => $contact['name'],
+                        ]);
+                    }
+                    $this->entityManager->persist($contact);
+                    $contacts[] = $contact;
+                }
+            }
+
+            if($maintenance = $componentObject->getValue('maintenance')) {
+                if ($maintenance->getValue('contacts')) {
+                    // if the component is already set to a contractors return the component object
+                    return $componentObject;
+                }
+
+                $maintenance->setValue('contacts', $contacts);
+                $this->entityManager->persist($maintenance);
+
+                $componentObject->setValue('maintenance', $maintenance);
+                $this->entityManager->persist($componentObject);
+                $this->entityManager->flush();
+                return $componentObject;
+            }
+
+            $maintenance = new ObjectEntity($maintenanceEntity);
+            $maintenance->hydrate([
+                'contacts' => $contacts
+            ]);
+            $this->entityManager->persist($maintenance);
+            $componentObject->setValue('maintenance', $maintenance);
+            $this->entityManager->persist($componentObject);
+            $this->entityManager->flush();
+        }
+        return null;
+    }
+
+    /**
      * @todo
      *
      * @param ObjectEntity $repository
@@ -342,11 +694,7 @@ class GithubPubliccodeService
 
             return null;
         }
-        if (!$applicationEntity = $this->getApplicationEntity()) {
-            isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
 
-            return null;
-        }
 
         if (!$component = $repository->getValue('component')) {
             $component = new ObjectEntity($componentEntity);
@@ -356,39 +704,26 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
-        dump($componentArray);
         $component->hydrate($componentArray);
         // set the name
         $component->hydrate([
             'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
         ]);
 
-        if (key_exists('applicationSuite', $publiccode)) {
-            if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
-                $application = new ObjectEntity($applicationEntity);
-                $application->hydrate([
-                    'name' => $publiccode['applicationSuite'],
-                    'components' => [$component]
-                ]);
-            }
-            $this->entityManager->persist($application);
-            $component->setValue('applicationSuite', $application);
-            $this->entityManager->persist($application);
-            $this->entityManager->flush();
-        }
+        $component = $this->createApplicationSuite($publiccode, $component);
+        $component = $this->createMainCopyrightOwner($publiccode, $component);
+        $component = $this->createRepoOwner($publiccode, $component);
 
-        // @TODO array of objects properties, cannot do it with mapping
-        // legal object -> mainCopyrightOwner, repoOwner
-        // maintenance object -> contractors, contacts
-        // dependsOn object -> open, proprietary, hardware
+        // @TODO these to functions aren't working
+        // contracts and contacts are not set to the component
+//        $component = $this->createContractors($publiccode, $component);
+//        $component = $this->createContacts($publiccode, $component);
 
         $this->entityManager->flush();
         $this->entityManager->persist($component);
         $repository->setValue('component', $component);
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
-
-        dump($component->toArray());
 
         return $repository;
     }
