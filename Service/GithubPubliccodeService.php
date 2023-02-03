@@ -57,6 +57,8 @@ class GithubPubliccodeService
     {
         $this->io = $io;
         $this->synchronizationService->setStyle($io);
+        $this->callService->setStyle($io);
+        $this->mappingService->setStyle($io);
 
         return $this;
     }

@@ -43,7 +43,7 @@ class ComponentenCatalogusService
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
-        $this->developerOverheidService;
+        $this->developerOverheidService = $developerOverheidService;
     }
 
     /**
@@ -56,6 +56,8 @@ class ComponentenCatalogusService
     public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
+        $this->callService->setStyle($io);
+        $this->developerOverheidService->setStyle($io);
         $this->synchronizationService->setStyle($io);
         $this->mappingService->setStyle($io);
 

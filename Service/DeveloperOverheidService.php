@@ -51,6 +51,7 @@ class DeveloperOverheidService
     public function setStyle(SymfonyStyle $io): self
     {
         $this->io = $io;
+        $this->callService->setStyle($io);
         $this->synchronizationService->setStyle($io);
         $this->mappingService->setStyle($io);
 
