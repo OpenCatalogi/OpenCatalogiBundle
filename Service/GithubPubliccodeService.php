@@ -36,11 +36,10 @@ class GithubPubliccodeService
 
     public function __construct(
         EntityManagerInterface $entityManager,
-        CallService            $callService,
+        CallService $callService,
         SynchronizationService $synchronizationService,
-        MappingService         $mappingService
-    )
-    {
+        MappingService $mappingService
+    ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
@@ -276,7 +275,7 @@ class GithubPubliccodeService
         // Find on publiccode.yaml
         $repositories = $this->callService->getAllResults($source, '/search/code', $config);
 
-        isset($this->io) && $this->io->success('Found ' . count($repositories) . ' repositories');
+        isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -298,7 +297,7 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: ' . $id);
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
@@ -307,13 +306,13 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repository ' . $id);
-        $response = $this->callService->call($source, '/repositories/' . $id);
+        isset($this->io) && $this->io->success('Getting repository '.$id);
+        $response = $this->callService->call($source, '/repositories/'.$id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find a repository with id: ' . $id . ' and with source: ' . $source->getName());
+            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
@@ -324,7 +323,7 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found repository with id: ' . $id);
+        isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->toArray();
     }
@@ -340,30 +339,30 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
         if (!$repositoriesMapping = $this->getRepositoriesMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object' . $repository['repository']['name']);
-        isset($this->io) && $this->io->comment('The mapping object ' . $repositoriesMapping);
+        isset($this->io) && $this->io->comment('Mapping object'.$repository['repository']['name']);
+        isset($this->io) && $this->io->comment('The mapping object '.$repositoriesMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['repository']['name']);
+        isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
@@ -379,36 +378,36 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if (!$repositoryMapping = $this->getRepositoryMapping()) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository ' . isset($repository['name']) ? $repository['name'] : '');
+            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object' . $repository['name']);
-        isset($this->io) && $this->io->comment('The mapping object ' . $repositoryMapping);
+        isset($this->io) && $this->io->comment('Mapping object'.$repository['name']);
+        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository ' . $repository['name']);
+        isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: ' . $synchronization->getId()->toString());
+        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }
 
     /**
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $component
      *
      * @return ObjectEntity|null
@@ -425,7 +424,7 @@ class GithubPubliccodeService
             if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate([
-                    'name' => $publiccode['applicationSuite'],
+                    'name'       => $publiccode['applicationSuite'],
                     'components' => [$component],
                 ]);
             }
@@ -439,7 +438,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
      *
      * @return ObjectEntity|null
@@ -499,7 +498,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $componentObject
      *
      * @return ObjectEntity|null
@@ -559,7 +558,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @param array $componentArray
+     * @param array        $componentArray
      * @param ObjectEntity $componentObject
      *
      * @return ObjectEntity|null
@@ -623,7 +622,7 @@ class GithubPubliccodeService
     }
 
     /**
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param ObjectEntity $componentObject
      *
      * @return ObjectEntity|null
@@ -688,12 +687,12 @@ class GithubPubliccodeService
 
     /**
      * @param ObjectEntity $repository
-     * @param array $publiccode
+     * @param array        $publiccode
      * @param $repositoryMapping
      *
      * @return ObjectEntity|null dataset at the end of the handler
-     * @todo
      *
+     * @todo
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
     {
@@ -707,8 +706,8 @@ class GithubPubliccodeService
             $component = new ObjectEntity($componentEntity);
         }
 
-        isset($this->io) && $this->io->comment('Mapping object' . key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
-        isset($this->io) && $this->io->comment('The mapping object ' . $repositoryMapping);
+        isset($this->io) && $this->io->comment('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
+        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
@@ -753,7 +752,7 @@ class GithubPubliccodeService
         try {
             $parsedPubliccode = Yaml::parse($publiccode);
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Not able to parse ' . $publiccode . ' ' . $e->getMessage());
+            isset($this->io) && $this->io->error('Not able to parse '.$publiccode.' '.$e->getMessage());
         }
 
         if (isset($parsedPubliccode)) {

@@ -327,6 +327,7 @@ class DeveloperOverheidService
      * Turn a repo array into an object we can handle.
      *
      * @param array $repository
+     *
      * @return ?ObjectEntity
      */
     public function handleRepositoryArray(array $repository): ?ObjectEntity
