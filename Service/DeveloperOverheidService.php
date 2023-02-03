@@ -324,15 +324,19 @@ class DeveloperOverheidService
     }
 
     /**
-     * Turn an repo array into an object we can handle.
+     * Turn a repo array into an object we can handle.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
-     *
+     * @param array $repository
      * @return ?ObjectEntity
      */
-    public function handleRepositoryArray(array $repository, ?Source $developerOverheidSource = null): ?ObjectEntity
+    public function handleRepositoryArray(array $repository): ?ObjectEntity
     {
+        // Do we have a source
+        if (!$source = $this->getSource()) {
+            isset($this->io) && $this->io->error('No source found when trying to get a Repository: ');
+
+            return null;
+        }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
             isset($this->io) && $this->io->error('No repositoryEntity found when trying to import a Repository');
 
@@ -340,14 +344,11 @@ class DeveloperOverheidService
         }
 
         // Handle sync
-        $synchronization = $this->synchronizationService->findSyncBySource($this->source ?? $developerOverheidSource, $this->repositoryEntity ?? $repositoryEntity, $repository['id']);
+        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
-        $repositoryObject = $synchronization->getObject();
-        $repository = $repositoryObject->toArray();
-
-        return $repositoryObject;
+        return $synchronization->getObject();
     }
 
     /**
@@ -463,7 +464,7 @@ class DeveloperOverheidService
         if ($component['related_repositories']) {
             // only do someting with the first item in the array
             $repository = $component['related_repositories'][0];
-            $repositoryObject = $this->handleRepositoryArray($repository, $source);
+            $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);
             $componentObject->setValue('url', $repositoryObject);
         }
