@@ -209,7 +209,6 @@ class InstallationService implements InstallerInterface
         foreach ($entities as $entity) {
             $entity->addCollection($collection);
             // set all entity maxDepth to 5
-            $this->setEntityMaxDepth();
         }
 
         return $collection;
@@ -401,6 +400,7 @@ class InstallationService implements InstallerInterface
 
     public function checkDataConsistency()
     {
+        $this->setEntityMaxDepth();
         // Lets create some genneric dashboard cards
         $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
 
