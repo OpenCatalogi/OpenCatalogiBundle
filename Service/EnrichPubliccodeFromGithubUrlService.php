@@ -17,27 +17,103 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnrichPubliccodeFromGithubUrlService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
 
+    /**
+     * @var Entity
+     */
     private Entity $componentEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $componentMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $applicationEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $repositoryEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $repositoryMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $organizationEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $contractorsEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $contactsEntity;
+
+    /**
+     * @var Entity 
+     */
     private Entity $dependencyEntity;
 
+    /**
+     * @var Source
+     */
     private Source $source;
 
+    /**
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param CallService $callService CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService $mappingService MappingService
+     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,

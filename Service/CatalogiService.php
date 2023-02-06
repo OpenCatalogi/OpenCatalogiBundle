@@ -27,22 +27,81 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CatalogiService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SessionInterface
+     */
     private SessionInterface $session;
+
+    /**
+     * @var CommonGroundService
+     */
     private CommonGroundService $commonGroundService;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var EventDispatcherInterface
+     */
     private EventDispatcherInterface $eventDispatcher;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
 
-    // Lets prevent unnesecery database calls
+    // Lets prevent unnesecery database calls.
+
+    /**
+     * @var Entity
+     */
     private Entity $catalogusEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $componentEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $applicationEntity;
+
+    /**
+     * @var FederalizationService
+     */
     private FederalizationService $federalizationService;
 
     private $entityRepo;
@@ -51,6 +110,15 @@ class CatalogiService
     private $valueRepo;
     private $actionRepo;
 
+    /**
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param SessionInterface $session SessionInterface
+     * @param CommonGroundService $commonGroundService CommonGroundService
+     * @param CallService $callService CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param EventDispatcherInterface $eventDispatcher EventDispatcherInterface
+     * @param GithubApiService $githubApiService GithubApiService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,

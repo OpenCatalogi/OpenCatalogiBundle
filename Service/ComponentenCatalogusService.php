@@ -17,21 +17,83 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var Source
+     */
     private Source $source;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $applicationEntity;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $applicationMapping;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $legalEntity;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $componentMapping;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $repositoryEntity;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var DeveloperOverheidService
+     */
     private DeveloperOverheidService $developerOverheidService;
 
+    /**
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param CallService $callService CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService $mappingService MappingService
+     * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
