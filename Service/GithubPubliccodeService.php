@@ -34,6 +34,12 @@ class GithubPubliccodeService
     private Entity $maintenanceEntity;
     private Entity $legalEntity;
 
+    /**
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param CallService $callService CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService $mappingService MappingService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,

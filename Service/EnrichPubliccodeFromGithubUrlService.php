@@ -98,7 +98,7 @@ class EnrichPubliccodeFromGithubUrlService
     private Entity $contactsEntity;
 
     /**
-     * @var Entity 
+     * @var Entity
      */
     private Entity $dependencyEntity;
 

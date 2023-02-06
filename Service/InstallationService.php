@@ -53,6 +53,11 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
+    /**
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param ContainerInterface $container ContainerInterface
+     * @param CatalogiService $catalogiService CatalogiService
+     */
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
     {
         $this->entityManager = $entityManager;

@@ -40,6 +40,13 @@ class GithubApiService
     // private ?Client $githubClient;
     // private ?Client $githubusercontentClient;
 
+    /**
+     * @param ParameterBagInterface $parameterBag ParameterBagInterface
+     * @param CallService $callService CallService
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService $mappingService MappingService
+     */
     public function __construct(
         ParameterBagInterface $parameterBag,
         CallService $callService,

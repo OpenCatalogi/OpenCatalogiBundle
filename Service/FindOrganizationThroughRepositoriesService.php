@@ -37,6 +37,14 @@ class FindOrganizationThroughRepositoriesService
     private Source $githubApi;
     private ?Entity $componentEntity;
 
+    /**
+     * @param CallService $callService CallService
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param GithubApiService $githubApiService GithubApiService
+     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService $mappingService MappingService
+     */
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
