@@ -57,14 +57,14 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         $style = new SymfonyStyle($input, $output);
         $this->componentenCatalogusService->setStyle($style);
 
-        // Handle the command optiosn
+        // Handle the command options.
         $componentId = $input->getOption('component', false);
 
-        if (!$componentId) {
+        if ($componentId === false) {
             if (!$this->componentenCatalogusService->getComponents()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
+        } elseif ($this->componentenCatalogusService->getComponent($componentId) === false) {
             return Command::FAILURE;
         }
 
