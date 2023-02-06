@@ -20,21 +20,79 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FindOrganizationThroughRepositoriesService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
 
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $organisationMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $repositoryEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $repositoryMapping;
+
+    /**
+     * @var Source
+     */
     private Source $githubApi;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
 
     /**

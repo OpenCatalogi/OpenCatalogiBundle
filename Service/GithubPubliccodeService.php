@@ -18,20 +18,79 @@ use Symfony\Component\Yaml\Yaml;
  */
 class GithubPubliccodeService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var Source
+     */
     private Source $source;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $repositoryEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $repositoryMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $applicationEntity;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $repositoriesMapping;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var Entity
+     */
     private Entity $contractorsEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $contactsEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $maintenanceEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $legalEntity;
 
     /**

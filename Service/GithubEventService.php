@@ -9,14 +9,49 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GithubEventService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubService;
+
+    /**
+     * @var CheckRepositoriesForPubliccodeService
+     */
     private CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService;
+
+    /**
+     * @var FindOrganizationThroughRepositoriesService
+     */
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
+
+    /**
+     * @var FindRepositoriesThroughOrganizationService
+     */
     private FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService;
+
+    /**
+     * @var RatingService
+     */
     private RatingService $ratingService;
+
+    /**
+     * @var PubliccodeService
+     */
     private PubliccodeService $publiccodeService;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
 
     /**

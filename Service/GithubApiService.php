@@ -22,19 +22,69 @@ use Symfony\Component\Yaml\Yaml;
 
 class GithubApiService
 {
+    /**
+     * @var ParameterBagInterface
+     */
     private ParameterBagInterface $parameterBag;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var Source
+     */
     private Source $source;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
 
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $repositoryMapping;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $organizationMapping;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $componentMapping;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $repositoryEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $organizationEntity;
+
+    /**
+     * @var Source|null
+     */
     private ?Source $githubApiSource;
 
     // private ?Client $githubClient;

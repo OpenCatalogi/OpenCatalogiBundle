@@ -19,9 +19,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstallationService implements InstallerInterface
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CatalogiService
+     */
     private CatalogiService $catalogiService;
 
     public const OBJECTS_THAT_SHOULD_HAVE_CARDS = [

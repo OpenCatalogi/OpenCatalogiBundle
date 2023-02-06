@@ -19,15 +19,54 @@ use Symfony\Component\Yaml\Yaml;
  */
 class FindGithubRepositoryThroughOrganizationService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Source
+     */
     private Source $githubApi;
+
+    /**
+     * @var Source
+     */
     private Source $rawGithubusercontent;
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
 
     /**
