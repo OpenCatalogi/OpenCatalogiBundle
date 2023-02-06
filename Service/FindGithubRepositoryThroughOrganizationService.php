@@ -31,9 +31,9 @@ class FindGithubRepositoryThroughOrganizationService
     private GithubPubliccodeService $githubPubliccodeService;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
-     * @param CallService $callService CallService
+     * @param CallService             $callService             CallService
      */
     public function __construct(
         EntityManagerInterface $entityManager,

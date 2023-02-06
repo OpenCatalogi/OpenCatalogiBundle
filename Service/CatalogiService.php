@@ -111,13 +111,13 @@ class CatalogiService
     private $actionRepo;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param SessionInterface $session SessionInterface
-     * @param CommonGroundService $commonGroundService CommonGroundService
-     * @param CallService $callService CallService
-     * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param EventDispatcherInterface $eventDispatcher EventDispatcherInterface
-     * @param GithubApiService $githubApiService GithubApiService
+     * @param EntityManagerInterface   $entityManager          EntityManagerInterface
+     * @param SessionInterface         $session                SessionInterface
+     * @param CommonGroundService      $commonGroundService    CommonGroundService
+     * @param CallService              $callService            CallService
+     * @param SynchronizationService   $synchronizationService SynchronizationService
+     * @param EventDispatcherInterface $eventDispatcher        EventDispatcherInterface
+     * @param GithubApiService         $githubApiService       GithubApiService
      */
     public function __construct(
         EntityManagerInterface $entityManager,

@@ -73,10 +73,10 @@ class DeveloperOverheidService
     private SymfonyStyle $io;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param CallService $callService CallService
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     * @param CallService            $callService            CallService
      * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param MappingService $mappingService MappingService
+     * @param MappingService         $mappingService         MappingService
      */
     public function __construct(
         EntityManagerInterface $entityManager,

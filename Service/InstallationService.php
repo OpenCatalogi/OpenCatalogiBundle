@@ -54,9 +54,9 @@ class InstallationService implements InstallerInterface
     ];
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param ContainerInterface $container ContainerInterface
-     * @param CatalogiService $catalogiService CatalogiService
+     * @param EntityManagerInterface $entityManager   EntityManagerInterface
+     * @param ContainerInterface     $container       ContainerInterface
+     * @param CatalogiService        $catalogiService CatalogiService
      */
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
     {
