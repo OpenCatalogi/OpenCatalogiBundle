@@ -10,8 +10,14 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
  */
 class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterface
 {
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
 
+    /**
+     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     */
     public function __construct(GithubPubliccodeService $githubPubliccodeService)
     {
         $this->githubPubliccodeService = $githubPubliccodeService;

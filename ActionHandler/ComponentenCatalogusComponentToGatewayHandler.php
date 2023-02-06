@@ -10,8 +10,14 @@ use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
  */
 class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInterface
 {
+    /**
+     * @var ComponentenCatalogusService
+     */
     private ComponentenCatalogusService $componentenCatalogusService;
 
+    /**
+     * @param ComponentenCatalogusService $componentenCatalogusService ComponentenCatalogusService
+     */
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;

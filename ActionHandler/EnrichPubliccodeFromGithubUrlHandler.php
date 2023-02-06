@@ -10,8 +10,14 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService
  */
 class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 {
+    /**
+     * @var EnrichPubliccodeFromGithubUrlService
+     */
     private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
+    /**
+     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService EnrichPubliccodeFromGithubUrlService
+     */
     public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
     {
         $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
@@ -51,6 +57,14 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
         return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);

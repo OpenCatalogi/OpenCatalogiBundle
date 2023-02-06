@@ -10,8 +10,14 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
  */
 class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
 {
+    /**
+     * @var DeveloperOverheidService
+     */
     private DeveloperOverheidService $developerOverheidService;
 
+    /**
+     * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
+     */
     public function __construct(DeveloperOverheidService $developerOverheidService)
     {
         $this->developerOverheidService = $developerOverheidService;

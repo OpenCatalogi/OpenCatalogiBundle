@@ -10,13 +10,22 @@ use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
  */
 class RatingHandler implements ActionHandlerInterface
 {
+    /**
+     * @var RatingService
+     */
     private RatingService $ratingService;
 
+    /**
+     * @param RatingService $ratingService RatingService
+     */
     public function __construct(RatingService $ratingService)
     {
         $this->ratingService = $ratingService;
     }
 
+    /**
+     * @return array
+     */
     public function getConfiguration()
     {
         return [
@@ -44,6 +53,14 @@ class RatingHandler implements ActionHandlerInterface
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
         return $this->ratingService->ratingHandler($data, $configuration);

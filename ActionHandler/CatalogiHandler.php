@@ -10,8 +10,15 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
  */
 class CatalogiHandler implements ActionHandlerInterface
 {
+
+    /**
+     * @var FederalizationService
+     */
     private FederalizationService $federalizationiService;
 
+    /**
+     * @param FederalizationService $federalizationiService FederalizationService
+     */
     public function __construct(FederalizationService $federalizationiService)
     {
         $this->federalizationiService = $federalizationiService;
