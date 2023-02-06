@@ -9,9 +9,6 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- *
- */
 class RatingService
 {
     /**
@@ -51,7 +48,7 @@ class RatingService
 
     /**
      * @param EntityManagerInterface $entityManager
-     * @param GithubApiService $githubApiService
+     * @param GithubApiService       $githubApiService
      */
     public function __construct(
         EntityManagerInterface $entityManager,

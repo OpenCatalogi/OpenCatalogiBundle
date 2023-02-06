@@ -12,7 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FederalizationRegisterCommand extends Command
 {
     /**
-     * The name of the command (the part after "bin/console")
+     * The name of the command (the part after "bin/console").
      *
      * @var string
      */
@@ -29,8 +29,8 @@ class FederalizationRegisterCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService $federalizationiService FederalizationService
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     * @param FederalizationService  $federalizationiService FederalizationService
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
      */
     public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
     {
@@ -51,8 +51,9 @@ class FederalizationRegisterCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The style input
-     * @param OutputInterface $output  The style output
+     * @param InputInterface  $input  The style input
+     * @param OutputInterface $output The style output
+     *
      * @return int The result of this command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -34,10 +34,10 @@ class EnrichPubliccodeService
     private Source $source;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param CallService $callService CallService
-     * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param MappingService $mappingService MappingService
+     * @param EntityManagerInterface  $entityManager           EntityManagerInterface
+     * @param CallService             $callService             CallService
+     * @param SynchronizationService  $synchronizationService  SynchronizationService
+     * @param MappingService          $mappingService          MappingService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
      */
     public function __construct(
