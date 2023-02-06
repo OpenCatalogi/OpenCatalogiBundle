@@ -220,7 +220,7 @@ class GithubApiService
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
      *
-     * @param string $slug
+     * @param string $slug The slug
      *
      * @throws GuzzleException
      *
@@ -235,8 +235,6 @@ class GithubApiService
         try {
             $response = $this->callService->call('GET', 'repos/'.$slug);
         } catch (ClientException $exception) {
-            var_dump($exception->getMessage());
-
             return null;
         }
 
@@ -256,8 +254,8 @@ class GithubApiService
     /**
      * This function gets the content of the given url.
      *
-     * @param string      $url
-     * @param string|null $path
+     * @param string      $url The Url
+     * @param string|null $path The path
      *
      * @throws GuzzleException
      *
@@ -282,7 +280,7 @@ class GithubApiService
         // }
 
         return null;
-    }
+    }//end getGithubOwnerRepositories()
 
     /**
      * This function gets the github owner details.
@@ -309,106 +307,12 @@ class GithubApiService
             'phone'       => null,
             'email'       => null,
         ];
-    }
-
-    // /**
-    //  * This function is searching for repositories containing a publiccode.yaml file.
-    //  *
-    //  * @param string $organizationName
-    //  * @param string $repositoryName
-    //  *
-    //  * @throws GuzzleException
-    //  *
-    //  * @return array|null
-    //  */
-    // public function getPubliccodeForGithubEvent(string $organizationName, string $repositoryName): ?array
-    // {
-    //     $response = null;
-
-    //     try {
-    //         $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yaml');
-    //     } catch (ClientException $exception) {
-    //         var_dump($exception->getMessage());
-    //     }
-
-    //     if ($response == null) {
-    //         try {
-    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yaml');
-    //         } catch (ClientException $exception) {
-    //             var_dump($exception->getMessage());
-
-    //             return null;
-    //         }
-    //     }
-
-    //     if ($response == null) {
-    //         try {
-    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/main/publiccode.yml');
-    //         } catch (ClientException $exception) {
-    //             var_dump($exception->getMessage());
-
-    //             return null;
-    //         }
-    //     }
-
-    //     if ($response == null) {
-    //         try {
-    //             $response = $this->githubusercontentClient->request('GET', $organizationName.'/'.$repositoryName.'/master/publiccode.yml');
-    //         } catch (ClientException $exception) {
-    //             var_dump($exception->getMessage());
-
-    //             return null;
-    //         }
-    //     }
-
-    //     try {
-    //         $publiccode = Yaml::parse($response->getBody()->getContents());
-    //     } catch (ParseException $exception) {
-    //         var_dump($exception->getMessage());
-
-    //         return null;
-    //     }
-
-    //     return $publiccode;
-    // }
-
-    // /**
-    //  * This function is searching for repositories containing a publiccode.yaml file.
-    //  *
-    //  * @param string $url
-    //  *
-    //  * @throws GuzzleException
-    //  *
-    //  * @return array|null|Response
-    //  */
-    // public function getPubliccode(string $url)
-    // {
-    //     $parseUrl = parse_url($url);
-    //     $code = explode('/blob/', $parseUrl['path']);
-
-    //     try {
-    //         $response = $this->githubusercontentClient->request('GET', $code[0].'/'.$code[1]);
-    //     } catch (ClientException $exception) {
-    //         var_dump($exception->getMessage());
-
-    //         return null;
-    //     }
-
-    //     try {
-    //         $publiccode = Yaml::parse($response->getBody()->getContents());
-    //     } catch (ParseException $exception) {
-    //         var_dump($exception->getMessage());
-
-    //         return null;
-    //     }
-
-    //     return $publiccode;
-    // }
+    }//end getGithubOwnerInfo()
 
     /**
      * This function checks if a github repository is public.
      *
-     * @param string $slug
+     * @param string $slug The slug
      *
      * @return bool
      */
@@ -435,7 +339,7 @@ class GithubApiService
         }
 
         return $repository['private'] === false;
-    }
+    }//end checkPublicRepository()
 
     /**
      * Makes sure this action has all the gateway objects it needs.
@@ -481,13 +385,13 @@ class GithubApiService
 
             return null;
         }
-    }
+    }//end getRequiredGatewayObjects()
 
     /**
      * Searches github for publiccode files @TODO testing.
      *
-     * @param $data
-     * @param $configuration
+     * @param array $data The data
+     * @param array $configuration The configuration
      *
      * @return ?array
      */
@@ -533,13 +437,13 @@ class GithubApiService
         $this->entityManager->flush();
 
         return $data;
-    }
+    }//end handleFindRepositoriesContainingPubliccode()
 
     /**
      * Turn an repro array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
+     * @param array   $repro The reprop
+     * @param Mapping $mapping The mapping object
      *
      * @return ?ObjectEntity
      */
@@ -568,13 +472,13 @@ class GithubApiService
         }
 
         return $repositoryObject;
-    }
+    }//end handleRepositoryArray()
 
     /**
      * Turn an organisation array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
+     * @param array   $repro The Repro
+     * @param Mapping $mapping The mapping object
      *
      * @return ObjectEntity
      */
@@ -607,5 +511,5 @@ class GithubApiService
         }
 
         return $organisationObject;
-    }
+    }//end handleOrganizationArray()
 }
