@@ -395,7 +395,7 @@ class GithubApiService
             return null;
         }
 
-        // Mapp the repro to something ussefull
+        // Map the repro to something usefull.
         // @TODO mapping aint right
         $mappedRepository = $this->mappingService->mapping($this->repositoryMapping ?? $mapping, $repository);
 
@@ -431,7 +431,7 @@ class GithubApiService
             return null;
         }
 
-        // Mapp the repro to something ussefull
+        // Map the repro to something usefull.
         $mappedOrganisation = $this->mappingService->mapping($this->organizationMapping ?? $mapping, $organisation);
 
         // Turn the organisation into a synchronyzed object

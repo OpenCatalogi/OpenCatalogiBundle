@@ -109,12 +109,12 @@ class GithubPubliccodeService
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $io SymfonyStyle
      *
      * @return self
      */
@@ -125,7 +125,7 @@ class GithubPubliccodeService
         $this->mappingService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get the github api source.
@@ -141,7 +141,7 @@ class GithubPubliccodeService
         }
 
         return $this->source;
-    }
+    }//end getSource()
 
     /**
      * Get the repository entity.
@@ -157,7 +157,7 @@ class GithubPubliccodeService
         }
 
         return $this->repositoryEntity;
-    }
+    }//end getRepositoryEntity()
 
     /**
      * Get the component entity.
@@ -173,7 +173,7 @@ class GithubPubliccodeService
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the repositories mapping.
@@ -189,7 +189,7 @@ class GithubPubliccodeService
         }
 
         return $this->repositoriesMapping;
-    }
+    }//end getRepositoriesMapping()
 
     /**
      * Get the repository mapping.
@@ -205,7 +205,7 @@ class GithubPubliccodeService
         }
 
         return $this->repositoryMapping;
-    }
+    }//end getRepositoryMapping()
 
     /**
      * Get the application entity.
@@ -219,7 +219,7 @@ class GithubPubliccodeService
         }
 
         return $this->applicationEntity;
-    }
+    }//end getApplicationEntity()
 
     /**
      * Get the repository entity.
@@ -235,7 +235,7 @@ class GithubPubliccodeService
         }
 
         return $this->organisationEntity;
-    }
+    }//end getOrganisationEntity()
 
     /**
      * Get the legal entity.
@@ -251,7 +251,7 @@ class GithubPubliccodeService
         }
 
         return $this->legalEntity;
-    }
+    }//end getLegalEntity()
 
     /**
      * Get the maintenance entity.
@@ -267,7 +267,7 @@ class GithubPubliccodeService
         }
 
         return $this->maintenanceEntity;
-    }
+    }//end getMaintenanceEntity()
 
     /**
      * Get the contractors entity.
@@ -281,7 +281,7 @@ class GithubPubliccodeService
         }
 
         return $this->contractorsEntity;
-    }
+    }//end getContractorEntity()
 
     /**
      * Get the contact entity.
@@ -295,7 +295,7 @@ class GithubPubliccodeService
         }
 
         return $this->contactsEntity;
-    }
+    }//end getContactEntity()
 
     /**
      * Get the repository mapping.
@@ -311,7 +311,7 @@ class GithubPubliccodeService
         }
 
         return true;
-    }
+    }//end checkGithubAuth()
 
     /**
      * Get repositories through the repositories of https://api.github.com/search/code
@@ -348,12 +348,12 @@ class GithubPubliccodeService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end getRepositories()
 
     /**
      * Get a repository trough the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $id
+     * @param string $id The id
      *
      * @return array|null
      *
@@ -392,16 +392,16 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->toArray();
-    }
+    }//end getRepository()
 
     /**
      * Maps a repository object and creates/updates a Synchronization.
      *
-     * @param $repository
+     * @param array $repository The repository
      *
      * @return ?ObjectEntity
      */
-    public function importPubliccodeRepository($repository): ?ObjectEntity
+    public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
@@ -431,16 +431,16 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
-    }
+    }//end importPubliccodeRepository()
 
     /**
-     * @param $repository
+     * @param array $repository The repository
      *
      * @return ObjectEntity|null
      *
      * @todo duplicate with DeveloperOverheidService ?
      */
-    public function importRepository($repository): ?ObjectEntity
+    public function importRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
         if (!$source = $this->getSource()) {
@@ -470,11 +470,11 @@ class GithubPubliccodeService
         isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
-    }
+    }//end importRepository()
 
     /**
-     * @param array        $publiccode
-     * @param ObjectEntity $component
+     * @param array        $publiccode The public code
+     * @param ObjectEntity $component The Component object
      *
      * @return ObjectEntity|null
      */
@@ -501,11 +501,11 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end createApplicationSuite()
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
+     * @param array        $componentArray The component array
+     * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
      */
@@ -522,7 +522,8 @@ class GithubPubliccodeService
 
             return null;
         }
-        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+
+        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) &&
             key_exists('mainCopyrightOwner', $publiccode['legal']) &&
             key_exists('name', $publiccode['legal']['mainCopyrightOwner'])) {
@@ -561,11 +562,11 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end createMainCopyrightOwner()
 
     /**
-     * @param array        $publiccode
-     * @param ObjectEntity $componentObject
+     * @param array        $publiccode The publiccode array
+     * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
      */
@@ -582,7 +583,8 @@ class GithubPubliccodeService
 
             return null;
         }
-        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+
+        // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) &&
             key_exists('repoOwner', $publiccode['legal']) &&
             key_exists('name', $publiccode['legal']['repoOwner'])) {
@@ -596,7 +598,7 @@ class GithubPubliccodeService
 
             if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('repoOwner')) {
-                    // if the component is already set to a repoOwner return the component object
+                    // If the component is already set to a repoOwner return the component object.
                     return $componentObject;
                 }
 
@@ -621,11 +623,11 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end createRepoOwner()
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
+     * @param array        $componentArray The Component array
+     * @param ObjectEntity $componentObject The Component Object
      *
      * @return ObjectEntity|null
      */
@@ -685,11 +687,11 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end createContractors()
 
     /**
-     * @param array        $publiccode
-     * @param ObjectEntity $componentObject
+     * @param array        $publiccode The publiccode array
+     * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
      */
@@ -749,12 +751,12 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end createContacts()
 
     /**
-     * @param ObjectEntity $repository
-     * @param array        $publiccode
-     * @param $repositoryMapping
+     * @param ObjectEntity $repository The repository object
+     * @param array        $publiccode The publiccode array
+     * @param Mapping      $repositoryMapping The mapping object
      *
      * @return ObjectEntity|null dataset at the end of the handler
      *
@@ -798,8 +800,14 @@ class GithubPubliccodeService
         $this->entityManager->flush();
 
         return $repository;
-    }
+    }//end mapPubliccode()
 
+    /**
+     * @param string $repositoryUrl The url of the repository
+     * @param $response
+     *
+     * @return array|null
+     */
     public function parsePubliccode(string $repositoryUrl, $response): ?array
     {
         if (!$source = $this->getSource()) {
@@ -828,5 +836,5 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+    }//end parsePubliccode()
 }
