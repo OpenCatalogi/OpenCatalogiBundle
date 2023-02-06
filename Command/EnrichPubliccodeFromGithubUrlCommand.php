@@ -60,9 +60,9 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
+        if ($repositoryId === false) {
             $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler();
-        } elseif (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
+        } elseif ($this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 

@@ -60,9 +60,9 @@ class EnrichPubliccodeCommand extends Command
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
+        if ($repositoryId === false) {
             $this->enrichPubliccodeService->enrichPubliccodeHandler();
-        } elseif (!$this->enrichPubliccodeService->enrichPubliccodeHandler([], [], $repositoryId)) {
+        } elseif ($this->enrichPubliccodeService->enrichPubliccodeHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 

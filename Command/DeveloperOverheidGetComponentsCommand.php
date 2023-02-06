@@ -60,11 +60,11 @@ class DeveloperOverheidGetComponentsCommand extends Command
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
-        if (!$componentId) {
-            if (!$this->developerOverheidService->getComponents()) {
+        if ($componentId === false) {
+            if ($this->developerOverheidService->getComponents() === false) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getComponent($componentId)) {
+        } elseif ($this->developerOverheidService->getComponent($componentId) === false) {
             return Command::FAILURE;
         }
 

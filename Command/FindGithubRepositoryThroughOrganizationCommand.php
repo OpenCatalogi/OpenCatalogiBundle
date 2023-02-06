@@ -60,11 +60,11 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        if (!$organisationId) {
+        if ($organisationId === false) {
             if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) {
+        } elseif ($this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId) === false) {
             return Command::FAILURE;
         }
 
