@@ -33,7 +33,7 @@ class DeveloperOverheidGetComponentsCommand extends Command
     {
         $this->developerOverheidService = $developerOverheidService;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class DeveloperOverheidGetComponentsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all components or one component from developer.overheid.nl/apis')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class DeveloperOverheidGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->developerOverheidService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->developerOverheidService->setStyle($style);
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
@@ -68,5 +68,5 @@ class DeveloperOverheidGetComponentsCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

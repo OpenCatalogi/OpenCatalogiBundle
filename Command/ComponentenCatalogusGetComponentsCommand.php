@@ -33,7 +33,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all components or one component from componentencatalogus.commonground.nl/api/components')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->componentenCatalogusService->setStyle($style);
 
         // Handle the command optiosn
         $componentId = $input->getOption('component', false);
@@ -68,5 +68,5 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

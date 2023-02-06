@@ -33,7 +33,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     {
         $this->developerOverheidService = $developerOverheidService;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->developerOverheidService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->developerOverheidService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
@@ -68,5 +68,5 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

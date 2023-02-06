@@ -33,7 +33,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     {
         $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeFromGithubUrlService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->enrichPubliccodeFromGithubUrlService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
@@ -66,5 +66,5 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

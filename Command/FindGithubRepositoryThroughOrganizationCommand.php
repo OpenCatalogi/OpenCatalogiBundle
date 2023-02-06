@@ -33,7 +33,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     {
         $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
         parent::__construct();
-    }
+    }//end __construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update create owned repositories from organisation')
             ->addOption('organisationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findGithubRepositoryThroughOrganizationService->setStyle($style);
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
@@ -68,5 +68,5 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

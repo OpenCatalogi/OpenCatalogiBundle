@@ -35,7 +35,7 @@ class PublicCodeRatingCommand extends Command
     {
         $this->ratingService = $ratingService;
         parent::__construct();
-    }
+    }//end __construct()
 
     /**
      * @return void
@@ -46,7 +46,7 @@ class PublicCodeRatingCommand extends Command
             ->setDescription('This command triggers OpenCatalogi RatingService')
             ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Rate a single component by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -55,8 +55,8 @@ class PublicCodeRatingCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->ratingService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->ratingService->setStyle($style);
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
@@ -70,5 +70,5 @@ class PublicCodeRatingCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

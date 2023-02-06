@@ -33,7 +33,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all applications or one application from componentencatalogus.commonground.nl/api/products')
             ->addOption('application', 'a', InputOption::VALUE_OPTIONAL, 'Get a single application by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->componentenCatalogusService->setStyle($style);
 
         // Handle the command optiosn
         $applicationId = $input->getOption('application', false);
@@ -68,5 +68,5 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

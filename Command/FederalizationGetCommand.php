@@ -37,7 +37,7 @@ class FederalizationGetCommand extends Command
         $this->federalizationiService = $federalizationiService;
         $this->entityManager = $entityManager;
         parent::__construct();
-    }
+    }//end construct()
 
     /**
      * @return void
@@ -58,8 +58,8 @@ class FederalizationGetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
-        $io = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->federalizationService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
@@ -69,11 +69,11 @@ class FederalizationGetCommand extends Command
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if (!$catalogusObject) {
-                $io->debug('Could not find object entity by id, trying on name');
+                $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
             if (!$catalogusObject) {
-                $io->error('Could not find object entity by id or name '.$catalogusId);
+                $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
             }
@@ -81,5 +81,5 @@ class FederalizationGetCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

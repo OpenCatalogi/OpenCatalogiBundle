@@ -37,7 +37,7 @@ class FederalizationRegisterCommand extends Command
         $this->federalizationiService = $federalizationiService;
         $this->entityManager = $entityManager;
         parent::__construct();
-    }
+    }//end __construct()
 
     /**
      * @return void
@@ -48,7 +48,7 @@ class FederalizationRegisterCommand extends Command
             ->setDescription('This command gets al or a single catalogi from the federalized network')
             ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -58,8 +58,8 @@ class FederalizationRegisterCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
-        $io = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->federalizationService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
@@ -81,5 +81,5 @@ class FederalizationRegisterCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

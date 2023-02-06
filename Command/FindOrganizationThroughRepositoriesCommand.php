@@ -33,7 +33,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     {
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
         parent::__construct();
-    }
+    }//end __construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find an organization for a specific repository by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,8 +53,8 @@ class FindOrganizationThroughRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findOrganizationThroughRepositoriesService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findOrganizationThroughRepositoriesService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
@@ -68,5 +68,5 @@ class FindOrganizationThroughRepositoriesCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

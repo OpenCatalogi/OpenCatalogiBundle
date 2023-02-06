@@ -33,7 +33,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     {
         $this->githubPubliccodeService = $githubPubliccodeService;
         parent::__construct();
-    }
+    }//end __construct()
 
     /**
      * @return void
@@ -44,7 +44,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
             ->setDescription('This command triggers OpenCatalogi GithubPubliccodeService')
             ->setHelp('This command allows you to get all repositories or one repository from https://api.github.com/search/code')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface $input The style input
@@ -53,10 +53,10 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->githubPubliccodeService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->githubPubliccodeService->setStyle($style);
 
-        $io->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
+        $style->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
 
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);
@@ -70,5 +70,5 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }
