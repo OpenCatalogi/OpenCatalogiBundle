@@ -69,12 +69,12 @@ class FederalizationRegisterCommand extends Command
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
-            if (!$catalogusObject) {
-                $io->debug('Could not find object entity by id, trying on name');
+            if ($catalogusObject === false) {
+                $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            if (!$catalogusObject) {
-                $io->error('Could not find object entity by id or name '.$catalogusId);
+            if ($catalogusObject === false) {
+                $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return Command::FAILURE;
             }

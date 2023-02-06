@@ -65,15 +65,15 @@ class FederalizationGetCommand extends Command
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
-        if (!$catalogusId) {
+        if ($catalogusId === false) {
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
-            if (!$catalogusObject) {
+            if ($catalogusObject === false) {
                 $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            if (!$catalogusObject) {
+            if ($catalogusObject === false) {
                 $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
