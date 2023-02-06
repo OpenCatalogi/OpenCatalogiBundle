@@ -147,48 +147,6 @@ class GithubApiService
         return $this->source;
     }
 
-    // /**
-    //  * This function check if the github key is provided.
-    //  *
-    //  * @return Response|null
-    //  */
-    // public function checkGithubKey(): ?Response
-    // {
-    //     if (!$this->githubClient) {
-    //         return new Response(
-    //             'Missing github_key in env',
-    //             Response::HTTP_BAD_REQUEST,
-    //             ['content-type' => 'json']
-    //         );
-    //     }
-
-    //     return null;
-    // }
-
-    // /**
-    //  * This function gets the content of the given url.
-    //  *
-    //  * @param string      $url
-    //  * @param string|null $path
-    //  *
-    //  * @throws GuzzleException
-    //  *
-    //  * @return array|null
-    //  */
-    // public function requestFromUrl(string $url, ?string $path = null): ?array
-    // {
-    //     if ($path !== null) {
-    //         $parse = parse_url($url);
-    //         $url = str_replace([$path], '', $parse['path']);
-    //     }
-
-    //     if ($response = $this->githubClient->request('GET', $url)) {
-    //         return json_decode($response->getBody()->getContents(), true);
-    //     }
-
-    //     return null;
-    // }
-
     /**
      * This function gets all the github repository details.
      *
@@ -238,14 +196,6 @@ class GithubApiService
             return null;
         }
 
-        // try {
-        //     $response = $this->githubClient->request('GET', 'repos/'.$slug);
-        // } catch (ClientException $exception) {
-        //     var_dump($exception->getMessage());
-
-        //     return null;
-        // }
-
         $response = json_decode($response->getBody()->getContents(), true);
 
         return $this->getGithubRepositoryInfo($response);
@@ -267,17 +217,6 @@ class GithubApiService
             $parse = parse_url($url);
             $url = str_replace([$path], '', $parse['path']);
         }
-
-        // if ($response = $this->githubClient->request('GET', $url)) {
-        //     $responses = json_decode($response->getBody()->getContents(), true);
-
-        //     $urls = [];
-        //     foreach ($responses as $item) {
-        //         $urls[] = $item['html_url'];
-        //     }
-
-        //     return $urls;
-        // }
 
         return null;
     }//end getGithubOwnerRepositories()
