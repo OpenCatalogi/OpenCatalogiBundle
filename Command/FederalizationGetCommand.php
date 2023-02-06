@@ -58,7 +58,6 @@ class FederalizationGetCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
         $style = new SymfonyStyle($input, $output);
         $this->federalizationService->setStyle($style);
 
@@ -73,11 +72,13 @@ class FederalizationGetCommand extends Command
                 $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
+
             if ($catalogusObject === false) {
                 $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
             }
+
             $this->federalizationService->readCatalogus($catalogusObject);
         }
 
