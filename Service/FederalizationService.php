@@ -31,10 +31,10 @@ class FederalizationService
     private Entity $applicationEntity;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param SessionInterface $session SessionInterface
-     * @param CommonGroundService $commonGroundService CommonGroundService
-     * @param CallService $callService CallService
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     * @param SessionInterface       $session                SessionInterface
+     * @param CommonGroundService    $commonGroundService    CommonGroundService
+     * @param CallService            $callService            CallService
      * @param SynchronizationService $synchronizationService SynchronizationService
      */
     public function __construct(

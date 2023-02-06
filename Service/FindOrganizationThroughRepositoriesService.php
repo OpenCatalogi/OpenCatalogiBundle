@@ -38,12 +38,12 @@ class FindOrganizationThroughRepositoriesService
     private ?Entity $componentEntity;
 
     /**
-     * @param CallService $callService CallService
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param GithubApiService $githubApiService GithubApiService
+     * @param CallService             $callService             CallService
+     * @param EntityManagerInterface  $entityManager           EntityManagerInterface
+     * @param GithubApiService        $githubApiService        GithubApiService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
-     * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param MappingService $mappingService MappingService
+     * @param SynchronizationService  $synchronizationService  SynchronizationService
+     * @param MappingService          $mappingService          MappingService
      */
     public function __construct(
         CallService $callService,

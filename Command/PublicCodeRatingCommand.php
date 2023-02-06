@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class PublicCodeRatingCommand extends Command
 {
     /**
-     * The name of the command (the part after "bin/console")
+     * The name of the command (the part after "bin/console").
      *
      * @var string
      */
@@ -49,8 +49,9 @@ class PublicCodeRatingCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The style input
-     * @param OutputInterface $output  The style output
+     * @param InputInterface  $input  The style input
+     * @param OutputInterface $output The style output
+     *
      * @return int The result of this command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

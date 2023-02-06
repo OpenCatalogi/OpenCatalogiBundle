@@ -10,7 +10,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
  */
 class CatalogiHandler implements ActionHandlerInterface
 {
-
     /**
      * @var FederalizationService
      */

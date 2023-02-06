@@ -88,10 +88,10 @@ class ComponentenCatalogusService
     private DeveloperOverheidService $developerOverheidService;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param CallService $callService CallService
-     * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param MappingService $mappingService MappingService
+     * @param EntityManagerInterface   $entityManager            EntityManagerInterface
+     * @param CallService              $callService              CallService
+     * @param SynchronizationService   $synchronizationService   SynchronizationService
+     * @param MappingService           $mappingService           MappingService
      * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
      */
     public function __construct(

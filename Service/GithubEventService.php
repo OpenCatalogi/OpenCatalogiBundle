@@ -20,13 +20,13 @@ class GithubEventService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager EntityManagerInterface
-     * @param GithubApiService $githubService GithubApiService
-     * @param CheckRepositoriesForPubliccodeService $checkRepositoriesForPubliccodeService CheckRepositoriesForPubliccodeService
+     * @param EntityManagerInterface                     $entityManager                              EntityManagerInterface
+     * @param GithubApiService                           $githubService                              GithubApiService
+     * @param CheckRepositoriesForPubliccodeService      $checkRepositoriesForPubliccodeService      CheckRepositoriesForPubliccodeService
      * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService FindOrganizationThroughRepositoriesService
      * @param FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService FindRepositoriesThroughOrganizationService
-     * @param RatingService $ratingService RatingService
-     * @param PubliccodeService $publiccodeService PubliccodeService
+     * @param RatingService                              $ratingService                              RatingService
+     * @param PubliccodeService                          $publiccodeService                          PubliccodeService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
