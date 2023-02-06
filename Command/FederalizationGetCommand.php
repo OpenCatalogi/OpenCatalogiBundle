@@ -11,10 +11,27 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FederalizationGetCommand extends Command
 {
+    /**
+     * The name of the command (the part after "bin/console")
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:fedaralization:get';
+
+    /**
+     * @var FederalizationService
+     */
     private FederalizationService  $federalizationiService;
+
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param FederalizationService $federalizationiService FederalizationService
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
+     */
     public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
     {
         $this->federalizationiService = $federalizationiService;
@@ -22,6 +39,9 @@ class FederalizationGetCommand extends Command
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -30,6 +50,11 @@ class FederalizationGetCommand extends Command
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
     }
 
+    /**
+     * @param InputInterface $input The style input
+     * @param OutputInterface $output  The style output
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));

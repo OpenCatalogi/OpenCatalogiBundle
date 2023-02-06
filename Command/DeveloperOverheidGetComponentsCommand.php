@@ -14,16 +14,30 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DeveloperOverheidGetComponentsCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
+    /**
+     * The name of the command (the part after "bin/console")
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:developeroverheid:components';
+
+    /**
+     * @var DeveloperOverheidService
+     */
     private DeveloperOverheidService  $developerOverheidService;
 
+    /**
+     * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
+     */
     public function __construct(DeveloperOverheidService $developerOverheidService)
     {
         $this->developerOverheidService = $developerOverheidService;
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -32,6 +46,11 @@ class DeveloperOverheidGetComponentsCommand extends Command
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
     }
 
+    /**
+     * @param InputInterface $input The style input
+     * @param OutputInterface $output  The style output
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

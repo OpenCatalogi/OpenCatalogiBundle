@@ -14,15 +14,30 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class EnrichPubliccodeCommand extends Command
 {
+    /**
+     * The name of the command (the part after "bin/console")
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:enrichPubliccode:execute';
+
+    /**
+     * @var EnrichPubliccodeService
+     */
     private EnrichPubliccodeService $enrichPubliccodeService;
 
+    /**
+     * @param EnrichPubliccodeService $enrichPubliccodeService EnrichPubliccodeService
+     */
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
         $this->enrichPubliccodeService = $enrichPubliccodeService;
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -31,6 +46,11 @@ class EnrichPubliccodeCommand extends Command
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
     }
 
+    /**
+     * @param InputInterface $input The style input
+     * @param OutputInterface $output  The style output
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

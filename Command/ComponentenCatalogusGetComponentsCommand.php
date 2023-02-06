@@ -14,15 +14,30 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetComponentsCommand extends Command
 {
+    /**
+     * The name of the command (the part after "bin/console")
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:componentencatalogus:components';
+
+    /**
+     * @var ComponentenCatalogusService
+     */
     private ComponentenCatalogusService  $componentenCatalogusService;
 
+    /**
+     * @param ComponentenCatalogusService $componentenCatalogusService ComponentenCatalogusService
+     */
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -31,6 +46,11 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
     }
 
+    /**
+     * @param InputInterface $input The style input
+     * @param OutputInterface $output  The style output
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

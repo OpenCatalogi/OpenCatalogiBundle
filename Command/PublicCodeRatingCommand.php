@@ -11,19 +11,35 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the RatingService.
+ *
+ * ```cli $ opencatalogi:publiccode:rating```
  */
 class PublicCodeRatingCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
+    /**
+     * The name of the command (the part after "bin/console")
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:publiccode:rating';
+
+    /**
+     * @var RatingService
+     */
     private RatingService  $ratingService;
 
+    /**
+     * @param RatingService $ratingService RatingService
+     */
     public function __construct(RatingService $ratingService)
     {
         $this->ratingService = $ratingService;
         parent::__construct();
     }
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -32,6 +48,11 @@ class PublicCodeRatingCommand extends Command
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Rate a single component by id');
     }
 
+    /**
+     * @param InputInterface $input The style input
+     * @param OutputInterface $output  The style output
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
