@@ -22,9 +22,11 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
         $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
-    }
+    }//end __construct()
 
     /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
      * @return array
      */
     public function getConfiguration()
@@ -52,7 +54,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -65,5 +67,5 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     public function run(array $data, array $configuration): array
     {
         return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
-    }
+    }//end run()
 }

@@ -21,9 +21,11 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
         $this->enrichPubliccodeService = $enrichPubliccodeService;
-    }
+    }//end __construct()
 
     /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
      * @return array
      */
     public function getConfiguration()
@@ -58,7 +60,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -71,5 +73,5 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
-    }
+    }//end run()
 }

@@ -21,8 +21,13 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
     {
         $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
-    }
+    }//end __construct()
 
+    /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array
+     */
     public function getConfiguration()
     {
         return [
@@ -55,7 +60,7 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -68,5 +73,5 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
-    }
+    }//end run()
 }

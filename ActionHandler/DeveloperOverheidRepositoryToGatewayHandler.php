@@ -21,12 +21,12 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
     public function __construct(DeveloperOverheidService $developerOverheidService)
     {
         $this->developerOverheidService = $developerOverheidService;
-    }
+    }//end __construct()
 
     /**
-     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
      *
-     * @throws array a [json-schema](https://json-schema.org/) that this  action should comply to
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
     public function getConfiguration(): array
     {
@@ -38,7 +38,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
             'required'   => [],
             'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +51,5 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
     public function run(array $data, array $configuration): array
     {
         return $this->developerOverheidService->getRepositories();
-    }
+    }//end run()
 }

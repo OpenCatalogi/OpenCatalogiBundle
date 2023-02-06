@@ -21,9 +21,11 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
-    }
+    }//end __construct()
 
     /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
      * @return array
      */
     public function getConfiguration()
@@ -51,7 +53,7 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -64,5 +66,5 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function run(array $data, array $configuration): array
     {
         return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
-    }
+    }//end run()
 }
