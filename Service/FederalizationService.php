@@ -15,21 +15,74 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class FederalizationService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SessionInterface
+     */
     private SessionInterface $session;
+
+    /**
+     * @var CommonGroundService
+     */
     private CommonGroundService $commonGroundService;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
 
     // Lets prevent unnesecery database calls
+    /**
+     * @var Entity
+     */
     private Entity $catalogusEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $componentEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $applicationEntity;
 
+    /**
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     * @param SessionInterface       $session                SessionInterface
+     * @param CommonGroundService    $commonGroundService    CommonGroundService
+     * @param CallService            $callService            CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,

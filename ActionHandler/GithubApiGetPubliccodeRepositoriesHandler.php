@@ -10,17 +10,23 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
  */
 class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterface
 {
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
 
+    /**
+     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     */
     public function __construct(GithubPubliccodeService $githubPubliccodeService)
     {
         $this->githubPubliccodeService = $githubPubliccodeService;
-    }
+    }//end __construct()
 
     /**
-     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
      *
-     * @throws array a [json-schema](https://json-schema.org/) that this  action should comply to
+     * @return  array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
     public function getConfiguration(): array
     {
@@ -32,7 +38,7 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
             'required'   => [],
             'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.
@@ -45,5 +51,5 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     public function run(array $data, array $configuration): array
     {
         return $this->githubPubliccodeService->getRepositories();
-    }
+    }//end run()
 }

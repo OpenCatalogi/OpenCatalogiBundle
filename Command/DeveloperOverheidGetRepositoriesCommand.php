@@ -14,40 +14,60 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DeveloperOverheidGetRepositoriesCommand extends Command
 {
-    // the name of the command (the part after "bin/console")
+    /**
+     * The name of the command (the part after "bin/console").
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:developeroverheid:repositories';
+
+    /**
+     * @var DeveloperOverheidService
+     */
     private DeveloperOverheidService  $developerOverheidService;
 
+    /**
+     * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
+     */
     public function __construct(DeveloperOverheidService $developerOverheidService)
     {
         $this->developerOverheidService = $developerOverheidService;
         parent::__construct();
-    }
+    }//end construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all repositories or one repository from developer.overheid.nl/repositories')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The style input
+     * @param OutputInterface $output The style output
+     *
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->developerOverheidService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->developerOverheidService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
 
-        if (!$repositoryId) {
-            if (!$this->developerOverheidService->getRepositories()) {
+        if ($repositoryId === false) {
+            if ($this->developerOverheidService->getRepositories() === false) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
+        } elseif ($this->developerOverheidService->getRepository($repositoryId) === false) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

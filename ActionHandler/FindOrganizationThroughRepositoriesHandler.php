@@ -10,13 +10,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesS
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
+    /**
+     * @var FindOrganizationThroughRepositoriesService
+     */
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
 
+    /**
+     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService FindOrganizationThroughRepositoriesService
+     */
     public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
-    }
+    }//end __construct()
 
+    /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array
+     */
     public function getConfiguration()
     {
         return [
@@ -42,10 +53,18 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
         return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
-    }
+    }//end run()
 }

@@ -11,14 +11,45 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RatingService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $ratingEntity;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
 
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param GithubApiService       $githubApiService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService
@@ -27,7 +58,7 @@ class RatingService
         $this->githubApiService = $githubApiService;
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end  __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -42,7 +73,7 @@ class RatingService
         $this->githubApiService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get the component entity.
@@ -58,7 +89,7 @@ class RatingService
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the rating entity.
@@ -74,7 +105,7 @@ class RatingService
         }
 
         return $this->ratingEntity;
-    }
+    }//end getRatingEntity()
 
     /**
      * Create Rating for all components.
@@ -93,7 +124,7 @@ class RatingService
             return null;
         }
 
-        if (!$componentEntity = $this->getComponentEntity()) {
+        if ($componentEntity = $this->getComponentEntity() === false) {
             isset($this->io) && $this->io->error('No ComponentEntity found when trying to create ratings for all component ObjectEntities');
 
             return null;
@@ -109,7 +140,7 @@ class RatingService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end enrichComponentsWithRating()
 
     /**
      * Create Rating for a single component.
@@ -144,7 +175,7 @@ class RatingService
         $this->entityManager->flush();
 
         return $component->toArray();
-    }
+    }//end enrichComponentWithRating()
 
     /**
      * Create Rating for a single component when action for this handler is triggered.
@@ -200,7 +231,7 @@ class RatingService
         isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
-    }
+    }//end rateComponent()
 
     /**
      * Rates a component.
@@ -458,5 +489,5 @@ class RatingService
             'maxRating' => $maxRating,
             'results'   => $description,
         ];
-    }
+    }//end ratingList()
 }

@@ -11,17 +11,37 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FederalizationGetCommand extends Command
 {
+    /**
+     * The name of the command (the part after "bin/console").
+     *
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:fedaralization:get';
+
+    /**
+     * @var FederalizationService
+     */
     private FederalizationService  $federalizationiService;
+
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param FederalizationService  $federalizationiService FederalizationService
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     */
     public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
     {
         $this->federalizationiService = $federalizationiService;
         $this->entityManager = $entityManager;
         parent::__construct();
-    }
+    }//end construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
@@ -30,31 +50,38 @@ class FederalizationGetCommand extends Command
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
     }
 
+    /**
+     * @param InputInterface  $input  The style input
+     * @param OutputInterface $output The style output
+     *
+     * @return int The result of this command
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
-        $io = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->federalizationService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
-        if (!$catalogusId) {
+        if ($catalogusId === false) {
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
-            if (!$catalogusObject) {
-                $io->debug('Could not find object entity by id, trying on name');
+            if ($catalogusObject === false) {
+                $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            if (!$catalogusObject) {
-                $io->error('Could not find object entity by id or name '.$catalogusId);
+
+            if ($catalogusObject === false) {
+                $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
             }
+
             $this->federalizationService->readCatalogus($catalogusObject);
         }
 
         return Command::SUCCESS;
-    }
+    }//end execute()
 }

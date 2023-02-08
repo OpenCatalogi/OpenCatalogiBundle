@@ -11,13 +11,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizat
  */
 class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
+    /**
+     * @var FindGithubRepositoryThroughOrganizationService
+     */
     private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
 
+    /**
+     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService FindGithubRepositoryThroughOrganizationService
+     */
     public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
         $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
-    }
+    }//end __construct()
 
+    /**
+     * This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array
+     */
     public function getConfiguration()
     {
         return [
@@ -43,10 +54,18 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
         return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
-    }
+    }//end run()
 }

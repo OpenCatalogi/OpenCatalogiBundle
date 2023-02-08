@@ -17,18 +17,67 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class DeveloperOverheidService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var Source
+     */
     private Source $source;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $repositoryEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Mapping|null
+     */
     private ?Mapping $componentMapping;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $legalEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
 
+    /**
+     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     * @param CallService            $callService            CallService
+     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param MappingService         $mappingService         MappingService
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
