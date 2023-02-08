@@ -109,7 +109,8 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getSource(): ?Source
     {
-        if (!$this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+        $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
+        if ($this->githubApi === false) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
 
             return null;
@@ -125,7 +126,8 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getRawGithubSource(): ?Source
     {
-        if (!$this->rawGithubusercontent = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://raw.githubusercontent.com'])) {
+        $this->rawGithubusercontent = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://raw.githubusercontent.com']);
+        if ($this->rawGithubusercontent === false) {
             isset($this->io) && $this->io->error('No source found for https://raw.githubusercontent.com');
 
             return null;
@@ -141,7 +143,8 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getOrganisationEntity(): ?Entity
     {
-        if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+        $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
+        if ($this->organisationEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
@@ -157,7 +160,8 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getRepositoryEntity(): ?Entity
     {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json']);
+        if ($this->repositoryEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
@@ -173,7 +177,8 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getComponentEntity(): ?Entity
     {
-        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
+        $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json']);
+        if ($this->componentEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
@@ -189,7 +194,7 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function checkGithubAuth(): ?bool
     {
-        if (!$this->githubApi->getApiKey()) {
+        if ($this->githubApi->getApiKey() === false) {
             isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
 
             return false;
@@ -210,7 +215,7 @@ class FindGithubRepositoryThroughOrganizationService
     private function getOpenCatalogiFromGithubRepo(string $organizationName): ?array
     {
         // make sync object
-        if (!$source = $this->getRawGithubSource()) {
+        if ($source = $this->getRawGithubSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to get a openCatalogi.yaml from .github file with organisation name: '.$organizationName);
 
             return null;
@@ -222,7 +227,7 @@ class FindGithubRepositoryThroughOrganizationService
             isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yaml: '.$e->getMessage());
         }
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/main/openCatalogi.yml');
             } catch (Exception $e) {
@@ -230,7 +235,7 @@ class FindGithubRepositoryThroughOrganizationService
             }
         }
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/master/openCatalogi.yaml');
             } catch (Exception $e) {
@@ -238,7 +243,7 @@ class FindGithubRepositoryThroughOrganizationService
             }
         }
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/master/openCatalogi.yml');
             } catch (Exception $e) {
@@ -268,7 +273,8 @@ class FindGithubRepositoryThroughOrganizationService
     private function getGithubRepoFromOrganization(string $organizationName): ?array
     {
         // make sync object
-        if (!$source = $this->getSource()) {
+        $source = $this->getSource();
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to get an Organisation .github file with name: '.$organizationName);
 
             return null;
@@ -305,7 +311,8 @@ class FindGithubRepositoryThroughOrganizationService
             return $component;
         }
 
-        if (!$componentEntity = $this->getComponentEntity()) {
+        $componentEntity = $this->getComponentEntity();
+        if ($componentEntity === false) {
             isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
@@ -338,12 +345,13 @@ class FindGithubRepositoryThroughOrganizationService
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
+        $source = $this->getSource();
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to get an Organisation with name: '.$url);
 
             return null;
         }
-        if (!$this->checkGithubAuth()) {
+        if ($this->checkGithubAuth() === false) {
             return null;
         }
 
@@ -359,7 +367,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repository) {
+        if ($repository === false) {
             isset($this->io) && $this->io->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
@@ -386,7 +394,7 @@ class FindGithubRepositoryThroughOrganizationService
             if ($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
                 isset($this->io) && $this->io->success('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
-                if (!$openCatalogi) {
+                if ($openCatalogi === false) {
                     return;
                 }
                 // we dont want to set the name, this has to be the login property from the github api
@@ -439,7 +447,8 @@ class FindGithubRepositoryThroughOrganizationService
                 return null;
             }
         } else {
-            if (!$organisationEntity = $this->getOrganisationEntity()) {
+            $organisationEntity = $this->getOrganisationEntity();
+            if ($organisationEntity === false) {
                 isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import an Organisation');
 
                 return null;
