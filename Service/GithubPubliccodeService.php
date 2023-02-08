@@ -134,7 +134,8 @@ class GithubPubliccodeService
      */
     public function getSource(): ?Source
     {
-        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+        $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
+        if ($this->source === false) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
 
             return null;
@@ -150,7 +151,8 @@ class GithubPubliccodeService
      */
     public function getRepositoryEntity(): ?Entity
     {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
+        if ($this->repositoryEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
@@ -166,7 +168,8 @@ class GithubPubliccodeService
      */
     public function getComponentEntity(): ?Entity
     {
-        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
+        $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
+        if ($this->componentEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
@@ -182,7 +185,8 @@ class GithubPubliccodeService
      */
     public function getRepositoriesMapping(): ?Mapping
     {
-        if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
+        $this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code']);
+        if ($this->repositoriesMapping === false) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
 
             return null;
@@ -198,7 +202,8 @@ class GithubPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
+        $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories']);
+        if ($this->repositoryMapping === false) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
 
             return null;
@@ -214,7 +219,8 @@ class GithubPubliccodeService
      */
     public function getApplicationEntity(): ?Entity
     {
-        if (!$this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json'])) {
+        $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
+        if ($this->applicationEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
         }
 
@@ -228,7 +234,8 @@ class GithubPubliccodeService
      */
     public function getOrganisationEntity(): ?Entity
     {
-        if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
+        $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
+        if ($this->organisationEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
@@ -244,7 +251,8 @@ class GithubPubliccodeService
      */
     public function getLegalEntity(): ?Entity
     {
-        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.legal.schema.json'])) {
+        $this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.legal.schema.json']);
+        if ($this->legalEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
 
             return null;
@@ -260,7 +268,8 @@ class GithubPubliccodeService
      */
     public function getMaintenanceEntity(): ?Entity
     {
-        if (!$this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.maintenance.schema.json'])) {
+        $this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.maintenance.schema.json']);
+        if ($this->maintenanceEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.maintenance.schema.json');
 
             return null;
@@ -276,7 +285,8 @@ class GithubPubliccodeService
      */
     public function getContractorEntity(): ?Entity
     {
-        if (!$this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json'])) {
+        $this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json']);
+        if ($this->contractorsEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
         }
 
@@ -290,7 +300,8 @@ class GithubPubliccodeService
      */
     public function getContactEntity(): ?Entity
     {
-        if (!$this->contactsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contact.schema.json'])) {
+        $this->contactsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contact.schema.json']);
+        if ($this->contactsEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
         }
 
@@ -304,7 +315,7 @@ class GithubPubliccodeService
      */
     public function checkGithubAuth(): ?bool
     {
-        if (!$this->source->getApiKey()) {
+        if ($this->source->getApiKey() === false) {
             isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
 
             return false;
@@ -325,12 +336,12 @@ class GithubPubliccodeService
     {
         $result = [];
         // Do we have a source
-        if (!$source = $this->getSource()) {
+        if ($source = $this->getSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to get all Repositories');
 
             return null;
         }
-        if (!$this->checkGithubAuth()) {
+        if ($this->checkGithubAuth() === false) {
             return null;
         }
 
@@ -362,13 +373,13 @@ class GithubPubliccodeService
     public function getRepository(string $id): ?array
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
+        if ($source = $this->getSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
 
-        if (!$this->checkGithubAuth()) {
+        if ($this->checkGithubAuth() === false) {
             return null;
         }
 
@@ -377,7 +388,7 @@ class GithubPubliccodeService
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repository) {
+        if ($repository === false) {
             isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
@@ -404,17 +415,17 @@ class GithubPubliccodeService
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
+        if ($source = $this->getSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+        if ($repositoryEntity = $this->getRepositoryEntity() === false) {
             isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
-        if (!$repositoriesMapping = $this->getRepositoriesMapping()) {
+        if ($repositoriesMapping = $this->getRepositoriesMapping() === false) {
             isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
@@ -443,17 +454,17 @@ class GithubPubliccodeService
     public function importRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
+        if ($source = $this->getSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
+        if ($repositoryEntity = $this->getRepositoryEntity() === false) {
             isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
-        if (!$repositoryMapping = $this->getRepositoryMapping()) {
+        if ($repositoryMapping = $this->getRepositoryMapping() === false) {
             isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
@@ -480,14 +491,15 @@ class GithubPubliccodeService
      */
     public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
     {
-        if (!$applicationEntity = $this->getApplicationEntity()) {
+        if ($applicationEntity = $this->getApplicationEntity() === false) {
             isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
 
             return null;
         }
 
         if (key_exists('applicationSuite', $publiccode)) {
-            if (!$application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']])) {
+            $application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']]);
+            if ($application === false) {
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate([
                     'name'       => $publiccode['applicationSuite'],
@@ -511,13 +523,15 @@ class GithubPubliccodeService
      */
     public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        if (!$organisationEntity = $this->getOrganisationEntity()) {
+        $organisationEntity = $this->getOrganisationEntity();
+        if ($organisationEntity === false) {
             isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
 
             return null;
         }
 
-        if (!$legalEntity = $this->getLegalEntity()) {
+        $legalEntity = $this->getLegalEntity();
+        if ($legalEntity === false) {
             isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
 
             return null;
@@ -572,13 +586,15 @@ class GithubPubliccodeService
      */
     public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        if (!$organisationEntity = $this->getOrganisationEntity()) {
+        $organisationEntity = $this->getOrganisationEntity();
+        if ($organisationEntity === false) {
             isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
 
             return null;
         }
 
-        if (!$legalEntity = $this->getLegalEntity()) {
+        $legalEntity = $this->getLegalEntity();
+        if ($legalEntity === false) {
             isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
 
             return null;
@@ -633,13 +649,15 @@ class GithubPubliccodeService
      */
     public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        if (!$maintenanceEntity = $this->getMaintenanceEntity()) {
+        $maintenanceEntity = $this->getMaintenanceEntity();
+        if ($maintenanceEntity === false) {
             isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
 
             return null;
         }
 
-        if (!$contractorsEntity = $this->getContractorEntity()) {
+        $contractorsEntity = $this->getContractorEntity();
+        if ($contractorsEntity === false) {
             isset($this->io) && $this->io->error('No ContractorEntity found when trying to import an Contractor ');
 
             return null;
@@ -697,13 +715,15 @@ class GithubPubliccodeService
      */
     public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        if (!$maintenanceEntity = $this->getMaintenanceEntity()) {
+        $maintenanceEntity = $this->getMaintenanceEntity();
+        if ($maintenanceEntity === false) {
             isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
 
             return null;
         }
 
-        if (!$contactEntity = $this->getContactEntity()) {
+        $contactEntity = $this->getContactEntity();
+        if ($contactEntity === false) {
             isset($this->io) && $this->io->error('No ContactEntity found when trying to import an Contact ');
 
             return null;
@@ -764,13 +784,15 @@ class GithubPubliccodeService
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, $repositoryMapping): ?ObjectEntity
     {
-        if (!$componentEntity = $this->getComponentEntity()) {
+        $componentEntity = $this->getComponentEntity();
+        if ($componentEntity === false) {
             isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
 
             return null;
         }
 
-        if (!$component = $repository->getValue('component')) {
+        $component = $repository->getValue('component');
+        if ($component === false) {
             $component = new ObjectEntity($componentEntity);
         }
 
@@ -810,7 +832,8 @@ class GithubPubliccodeService
      */
     public function parsePubliccode(string $repositoryUrl, $response): ?array
     {
-        if (!$source = $this->getSource()) {
+        $source = $this->getSource();
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository ');
 
             return null;

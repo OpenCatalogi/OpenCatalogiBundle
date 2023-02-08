@@ -114,7 +114,7 @@ class InstallationService implements InstallerInterface
         $defaultConfig = [];
 
         // What if there are no properties?
-        if (!isset($actionHandler->getConfiguration()['properties'])) {
+        if (isset($actionHandler->getConfiguration()['properties']) === false) {
             return $defaultConfig;
         }
 
@@ -161,7 +161,8 @@ class InstallationService implements InstallerInterface
                 continue;
             }
 
-            if (!$schema = $actionHandler->getConfiguration()) {
+            $schema = $actionHandler->getConfiguration();
+            if ($schema === false) {
                 continue;
             }
 
@@ -171,10 +172,10 @@ class InstallationService implements InstallerInterface
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
                 $action->setConditions([[1 => 1]]);
-            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+            } else if (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
                 $action->setListens(['opencatalogi.github']);
                 $action->setConditions([[1 => 1]]);
-            } elseif (
+            } else if (
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
             ) {
@@ -200,7 +201,7 @@ class InstallationService implements InstallerInterface
         $endpoints = [];
         foreach ($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
-            if (!$endpointRepository->findOneBy(['name' => $entity->getName()])) {
+            if ($endpointRepository->findOneBy(['name' => $entity->getName()]) === false) {
                 $endpoint = new Endpoint($entity, $objectThatShouldHaveEndpoint['path'], $objectThatShouldHaveEndpoint['methods']);
 
                 $this->entityManager->persist($endpoint);
@@ -257,7 +258,7 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: '.$object) : '');
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
             if (
-                !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()])
+                $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()]) === false
             ) {
                 $dashboardCard = new DashboardCard();
                 $dashboardCard->setType('schema');
@@ -278,8 +279,9 @@ class InstallationService implements InstallerInterface
     public function createCronjobs()
     {
         (isset($this->io) ? $this->io->writeln(['', '<info>Looking for cronjobs</info>']) : '');
-        // We only need 1 cronjob so lets set that
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi'])) {
+        // We only need 1 cronjob so lets set that.
+        $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi']);
+        if ($cronjob === false) {
             $cronjob = new Cronjob();
             $cronjob->setName('Open Catalogi');
             $cronjob->setDescription('This cronjob fires all the open catalogi actions ever 5 minutes');
@@ -293,7 +295,8 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger'])) {
+        $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger']);
+        if ($cronjob === false) {
             $cronjob = new Cronjob();
             $cronjob->setName('Bronnen trigger');
             $cronjob->setDescription('This cronjob fires all the open catalogi bronnen actions ever 5 minutes');
@@ -307,7 +310,8 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
+        $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper']);
+        if ($cronjob === false) {
             $cronjob = new Cronjob();
             $cronjob->setName('Github scrapper');
             $cronjob->setDescription('This cronjob fires all the open catalogi github actions ever 5 minutes');
@@ -322,7 +326,8 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation'])) {
+        $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation']);
+        if ($cronjob === false) {
             $cronjob = new Cronjob();
             $cronjob->setName('Federation');
             $cronjob->setDescription('This cronjob fires all the open catalogi federation actions ever 5 minutes');
@@ -437,8 +442,9 @@ class InstallationService implements InstallerInterface
             }
         }
 
-        // Lets see if there is a generic search endpoint
-        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
+        // Lets see if there is a generic search endpoint.
+        $searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$']);
+        if ($searchEnpoint === false) {
             $searchEnpoint = new Endpoint();
             $searchEnpoint->setName('Search');
             $searchEnpoint->setDescription('Generic Search Endpoint');
