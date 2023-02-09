@@ -64,7 +64,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
             if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
                 return Command::FAILURE;
             }
-        } elseif ($this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId) === false) {
+        } else if ($this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId) === false) {
             return Command::FAILURE;
         }
 

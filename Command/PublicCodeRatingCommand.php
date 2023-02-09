@@ -66,7 +66,7 @@ class PublicCodeRatingCommand extends Command
             if ($this->ratingService->enrichComponentsWithRating() === false) {
                 return Command::FAILURE;
             }
-        } elseif ($this->ratingService->enrichComponentWithRating($componentId) === false) {
+        } else if ($this->ratingService->enrichComponentWithRating($componentId) === false) {
             return Command::FAILURE;
         }
 

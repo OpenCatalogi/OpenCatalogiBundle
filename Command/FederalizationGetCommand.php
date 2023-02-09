@@ -48,7 +48,7 @@ class FederalizationGetCommand extends Command
             ->setDescription('This command gets al or a single catalogi from the federalized network')
             ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
-    }
+    }//end configure()
 
     /**
      * @param InputInterface  $input  The style input
