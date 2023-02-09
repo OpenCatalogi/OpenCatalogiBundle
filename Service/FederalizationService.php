@@ -10,9 +10,8 @@ use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use Conduction\CommonGroundBundle\Service\CommonGroundService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class FederalizationService
 {
@@ -73,7 +72,7 @@ class FederalizationService
      * @param CommonGroundService    $commonGroundService    CommonGroundService
      * @param CallService            $callService            CallService
      * @param SynchronizationService $synchronizationService SynchronizationService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param LoggerInterface        $mappingLogger          The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -94,7 +93,7 @@ class FederalizationService
     /**
      * Handles the sync all catalogi action from the catalogi handler.
      *
-     * @param array $data The data
+     * @param array $data          The data
      * @param array $configuration The configuration
      *
      * @return array
@@ -183,7 +182,6 @@ class FederalizationService
                 $counter = 0;
                 $this->entityManager->flush();
             }
-
         }
 
         $this->entityManager->flush();
@@ -276,7 +274,7 @@ class FederalizationService
         if (isset($this->catalogusEntity) === false) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
 
-            if ($this->applicationEntity === null){
+            if ($this->applicationEntity === null) {
                 $this->logger->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json');
             }
         }

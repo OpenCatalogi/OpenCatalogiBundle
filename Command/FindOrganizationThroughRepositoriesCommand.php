@@ -64,7 +64,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             if ($this->orgThroughGitService->findOrganizationThroughRepositoriesHandler() === false) {
                 return Command::FAILURE;
             }
-        } else if ($this->orgThroughGitService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId) === false) {
+        } elseif ($this->orgThroughGitService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 

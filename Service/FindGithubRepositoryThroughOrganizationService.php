@@ -9,10 +9,9 @@ use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
-use Psr\Log\LoggerInterface;
 
 /**
  * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
@@ -74,7 +73,7 @@ class FindGithubRepositoryThroughOrganizationService
      * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
      * @param CallService             $callService             CallService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param LoggerInterface         $mappingLogger           The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -213,8 +212,6 @@ class FindGithubRepositoryThroughOrganizationService
         try {
             $response = $this->callService->call($source, '/'.$organizationName.'/.github/main/openCatalogi.yaml');
         } catch (Exception $e) {
-
-
             $this->logger->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yaml: '.$e->getMessage());
         }
 
@@ -222,8 +219,6 @@ class FindGithubRepositoryThroughOrganizationService
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/main/openCatalogi.yml');
             } catch (Exception $e) {
-
-
                 $this->logger->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yml: '.$e->getMessage());
             }
         }
@@ -232,8 +227,6 @@ class FindGithubRepositoryThroughOrganizationService
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/master/openCatalogi.yaml');
             } catch (Exception $e) {
-
-
                 $this->logger->error('Error found trying to fetch /'.$organizationName.'/github/master/openCatalogi.yaml: '.$e->getMessage());
             }
         }
@@ -310,6 +303,7 @@ class FindGithubRepositoryThroughOrganizationService
         $componentEntity = $this->getComponentEntity();
         if ($componentEntity === false) {
             $this->logger->error('No ComponentEntity found when trying to import a Component ');
+
             return null;
         }
 
@@ -343,6 +337,7 @@ class FindGithubRepositoryThroughOrganizationService
         $source = $this->getSource();
         if ($source === false) {
             $this->logger->error('No source found when trying to get an Organisation with name: '.$url);
+
             return null;
         }
         if ($this->checkGithubAuth() === false) {
@@ -438,12 +433,14 @@ class FindGithubRepositoryThroughOrganizationService
                 $this->getOrganizationCatalogi($organisation);
             } else {
                 $this->logger->error('Could not find given organisation');
+
                 return null;
             }
         } else {
             $organisationEntity = $this->getOrganisationEntity();
             if ($organisationEntity === false) {
                 $this->logger->error('No OrganisationEntity found when trying to import an Organisation');
+
                 return null;
             }
 

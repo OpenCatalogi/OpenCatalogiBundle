@@ -10,8 +10,8 @@ use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Yaml\Yaml;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  *  This class handles the interaction with github.com.
@@ -94,11 +94,11 @@ class GithubPubliccodeService
     private Entity $legalEntity;
 
     /**
-     * @param EntityManagerInterface $entityManager          EntityManagerInterface
-     * @param CallService            $callService            CallService
-     * @param SynchronizationService $syncService SynchronizationService
-     * @param MappingService         $mappingService         MappingService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param EntityManagerInterface $entityManager  EntityManagerInterface
+     * @param CallService            $callService    CallService
+     * @param SynchronizationService $syncService    SynchronizationService
+     * @param MappingService         $mappingService MappingService
+     * @param LoggerInterface        $mappingLogger  The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -433,12 +433,12 @@ class GithubPubliccodeService
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
-
-        $this->logger->info('Repository synchronization created with id: '.$synchronization->getId()->toString(),
+        $this->logger->info(
+            'Repository synchronization created with id: '.$synchronization->getId()->toString(),
             [
-                "Mapping object"=>$repository['repository']['name'],
-                "The mapping object"=>$repositoriesMapping,
-                "Checking repository"=>$repository['repository']['name']
+                'Mapping object'     => $repository['repository']['name'],
+                'The mapping object' => $repositoriesMapping,
+                'Checking repository'=> $repository['repository']['name'],
             ]
         );
 
@@ -481,11 +481,12 @@ class GithubPubliccodeService
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
-        $this->logger->info('Repository synchronization created with id: '.$synchronization->getId()->toString(),
+        $this->logger->info(
+            'Repository synchronization created with id: '.$synchronization->getId()->toString(),
             [
-                "Mapping object"=>$repository['repository']['name'],
-                "The mapping object"=>$repositoryMapping,
-                "Checking repository"=>$repository['repository']['name']
+                'Mapping object'     => $repository['repository']['name'],
+                'The mapping object' => $repositoryMapping,
+                'Checking repository'=> $repository['repository']['name'],
             ]
         );
 
@@ -825,16 +826,16 @@ class GithubPubliccodeService
             $component = new ObjectEntity($componentEntity);
         }
 
-        $this->logger->info('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'), ["The mapping object"=>$repositoryMapping]);
+        $this->logger->info('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'), ['The mapping object'=>$repositoryMapping]);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
         // set the name
         $component->hydrate(
             [
-            'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
-            ])
-        ;
+                'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
+            ]
+        );
 
         $component = $this->createApplicationSuite($publiccode, $component);
         $component = $this->createMainCopyrightOwner($publiccode, $component);
@@ -856,7 +857,7 @@ class GithubPubliccodeService
 
     /**
      * @param string $repositoryUrl The url of the repository
-     * @param mixed $response The responce
+     * @param mixed  $response      The responce
      *
      * @return array|null
      */

@@ -75,7 +75,6 @@ class CatalogiHandler implements ActionHandlerInterface
             ],
         ];
         */
-
     }//end getConfiguration()
 
     /**

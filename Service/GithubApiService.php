@@ -14,10 +14,10 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
-use Psr\Log\LoggerInterface;
 
 class GithubApiService
 {
@@ -90,12 +90,12 @@ class GithubApiService
     // private ?Client $githubusercontentClient;
 
     /**
-     * @param ParameterBagInterface $parameterBag The ParameterBagInterface
-     * @param CallService $callService The CallService
-     * @param EntityManagerInterface $entityManager The EntityManagerInterface
-     * @param SynchronizationService $syncService The SynchronizationService
-     * @param MappingService $mappingService The MappingService
-     * @param LoggerInterface $pluginLogger The LoggerInterface
+     * @param ParameterBagInterface  $parameterBag   The ParameterBagInterface
+     * @param CallService            $callService    The CallService
+     * @param EntityManagerInterface $entityManager  The EntityManagerInterface
+     * @param SynchronizationService $syncService    The SynchronizationService
+     * @param MappingService         $mappingService The MappingService
+     * @param LoggerInterface        $pluginLogger   The LoggerInterface
      */
     public function __construct(
         ParameterBagInterface $parameterBag,
@@ -127,6 +127,7 @@ class GithubApiService
         !isset($this->source) && $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com/']);
         if (!isset($this->source)) {
             $this->logger->error('Could not find a Source for the Github API');
+
             return [];
         }
 
@@ -244,7 +245,6 @@ class GithubApiService
     public function checkPublicRepository(string $slug): bool
     {
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-
             $this->logger->error('Could not find Source: Github API');
 
             return false;

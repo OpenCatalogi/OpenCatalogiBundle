@@ -73,10 +73,10 @@ class DeveloperOverheidService
     private SymfonyStyle $style;
 
     /**
-     * @param EntityManagerInterface $entityManager          EntityManagerInterface
-     * @param CallService            $callService            CallService
-     * @param SynchronizationService $syncService SynchronizationService
-     * @param MappingService         $mappingService         MappingService
+     * @param EntityManagerInterface $entityManager  EntityManagerInterface
+     * @param CallService            $callService    CallService
+     * @param SynchronizationService $syncService    SynchronizationService
+     * @param MappingService         $mappingService MappingService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -415,7 +415,7 @@ class DeveloperOverheidService
     }//end handleRepositoryArray()
 
     /**
-     * @param array        $componentArray The component array
+     * @param array        $componentArray  The component array
      * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
@@ -438,17 +438,17 @@ class DeveloperOverheidService
 
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
         if (key_exists('legal', $componentArray) === true &&
-            key_exists('repoOwner', $componentArray['legal']) === true  &&
-            key_exists('name', $componentArray['legal']['repoOwner']) === true ) {
+            key_exists('repoOwner', $componentArray['legal']) === true &&
+            key_exists('name', $componentArray['legal']['repoOwner']) === true) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(
                     [
-                    'name'     => $componentArray['legal']['repoOwner']['name'],
-                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
-                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
-                    'website'  => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
-                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
+                        'name'     => $componentArray['legal']['repoOwner']['name'],
+                        'email'    => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
+                        'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
+                        'website'  => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
+                        'type'     => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
                     ]
                 );
             }
@@ -475,7 +475,7 @@ class DeveloperOverheidService
             $legal = new ObjectEntity($legalEntity);
             $legal->hydrate(
                 [
-                'repoOwner' => $organisation,
+                    'repoOwner' => $organisation,
                 ]
             );
             $this->entityManager->persist($legal);
