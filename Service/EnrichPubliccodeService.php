@@ -83,7 +83,7 @@ class EnrichPubliccodeService
     private Mapping $repositoryMapping;
 
     /**
-     * @var Source 
+     * @var Source
      */
     private Source $source;
 

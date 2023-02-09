@@ -110,7 +110,7 @@ class GithubEventService
             if (is_array($publiccode = $this->githubService->getPubliccode($publiccodeUrl))) {
                 $this->checkRepositoriesForPubliccodeService->enrichRepositoryWithPubliccode($repository, $componentEntity, $descriptionEntity, $publiccode);
             }
-        } else if ($publiccode = $this->githubService->getPubliccodeForGithubEvent($content['organization']['login'], $content['repository']['name'])) {
+        } elseif ($publiccode = $this->githubService->getPubliccodeForGithubEvent($content['organization']['login'], $content['repository']['name'])) {
             $this->checkRepositoriesForPubliccodeService->enrichRepositoryWithPubliccode($repository, $componentEntity, $descriptionEntity, $publiccode);
         }
 

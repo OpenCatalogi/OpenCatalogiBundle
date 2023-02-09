@@ -446,7 +446,7 @@ class ComponentenCatalogusService
         $response = $this->callService->call($source, '/components/'.$id);
 
         $component = json_decode($response->getBody()->getContents(), true);
-        if($component === false) {
+        if ($component === false) {
             isset($this->io) && $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
 
             return null;

@@ -131,7 +131,7 @@ class DeveloperOverheidService
     public function getRepositoryEntity(): ?Entity
     {
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json']);
-        if ( $this->repositoryEntity === false) {
+        if ($this->repositoryEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
