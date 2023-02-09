@@ -90,21 +90,21 @@ class EnrichPubliccodeService
     /**
      * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param CallService             $callService             CallService
-     * @param SynchronizationService  $synchronizationService  SynchronizationService
+     * @param SynchronizationService  $syncService  SynchronizationService
      * @param MappingService          $mappingService          MappingService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         MappingService $mappingService,
         GithubPubliccodeService $githubPubliccodeService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->syncService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->configuration = [];
         $this->data = [];

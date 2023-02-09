@@ -100,7 +100,7 @@ class FindOrganizationThroughRepositoriesService
      * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param GithubApiService        $githubApiService        GithubApiService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
-     * @param SynchronizationService  $synchronizationService  SynchronizationService
+     * @param SynchronizationService  $syncService  SynchronizationService
      * @param MappingService          $mappingService          MappingService
      */
     public function __construct(
@@ -108,14 +108,14 @@ class FindOrganizationThroughRepositoriesService
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
         GithubPubliccodeService $githubPubliccodeService,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         MappingService $mappingService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubApiService = $githubApiService;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->syncService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
 
         $this->configuration = [];

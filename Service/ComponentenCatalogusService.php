@@ -90,20 +90,20 @@ class ComponentenCatalogusService
     /**
      * @param EntityManagerInterface   $entityManager            EntityManagerInterface
      * @param CallService              $callService              CallService
-     * @param SynchronizationService   $synchronizationService   SynchronizationService
+     * @param SynchronizationService   $syncService   SynchronizationService
      * @param MappingService           $mappingService           MappingService
      * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         MappingService $mappingService,
         DeveloperOverheidService $developerOverheidService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->syncService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->developerOverheidService = $developerOverheidService;
     }//end __construct()

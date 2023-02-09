@@ -93,20 +93,20 @@ class GithubApiService
      * @param ParameterBagInterface  $parameterBag           ParameterBagInterface
      * @param CallService            $callService            CallService
      * @param EntityManagerInterface $entityManager          EntityManagerInterface
-     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param SynchronizationService $syncService SynchronizationService
      * @param MappingService         $mappingService         MappingService
      */
     public function __construct(
         ParameterBagInterface $parameterBag,
         CallService $callService,
         EntityManagerInterface $entityManager,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         MappingService $mappingService
     ) {
         $this->parameterBag = $parameterBag;
         $this->callService = $callService;
         $this->entityManager = $entityManager;
-        $this->syncService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
 
         $this->repositoryMapping = null;

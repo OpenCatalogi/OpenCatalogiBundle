@@ -75,18 +75,18 @@ class DeveloperOverheidService
     /**
      * @param EntityManagerInterface $entityManager          EntityManagerInterface
      * @param CallService            $callService            CallService
-     * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param SynchronizationService $syncService SynchronizationService
      * @param MappingService         $mappingService         MappingService
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         MappingService $mappingService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->syncService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
     }//end __construct()
 
