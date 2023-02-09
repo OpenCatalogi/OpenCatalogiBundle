@@ -276,7 +276,7 @@ class FederalizationService
         if (isset($this->catalogusEntity) === false) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
 
-            if($this->applicationEntity === null){
+            if ($this->applicationEntity === null){
                 $this->logger->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json');
             }
         }
@@ -284,7 +284,7 @@ class FederalizationService
         if (isset($this->componentEntity) === false) {
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
 
-            if($this->componentEntity === null){
+            if ($this->componentEntity === null) {
                 $this->logger->error('Could not find a entity for https://opencatalogi.nl/component.schema.json');
             }
         }
@@ -292,7 +292,7 @@ class FederalizationService
         if (isset($this->organisationEntity) === false) {
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
 
-            if($this->organisationEntity === null){
+            if ($this->organisationEntity === null) {
                 $this->logger->error('Could not find a entity for https://opencatalogi.nl/organisation.schema.json');
             }
         }
@@ -300,7 +300,7 @@ class FederalizationService
         if (isset($this->applicationEntity) === false) {
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
 
-            if($this->applicationEntity === null){
+            if ($this->applicationEntity === null) {
                 $this->logger->error('Could not find a entity for https://opencatalogi.nl/application.schema.json');
             }
         }
