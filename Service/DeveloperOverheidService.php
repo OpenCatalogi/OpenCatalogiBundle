@@ -208,7 +208,7 @@ class DeveloperOverheidService
      *
      * @todo duplicate with GithubPubliccodeService ?
      *
-     * @param string $id
+     * @param string $id The id
      *
      * @return array|null
      */
@@ -231,6 +231,7 @@ class DeveloperOverheidService
 
             return null;
         }
+
         $repository = $this->importRepository($repository);
         if ($repository === null) {
             return null;
@@ -246,7 +247,7 @@ class DeveloperOverheidService
     /**
      * @todo duplicate with GithubPubliccodeService ?
      *
-     * @param $repository
+     * @param $repository The repository
      *
      * @return ObjectEntity|null
      */
@@ -259,6 +260,7 @@ class DeveloperOverheidService
 
             return null;
         }
+
         if ($repositoryEntity = $this->getRepositoryEntity() === false) {
             isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
@@ -344,7 +346,7 @@ class DeveloperOverheidService
      *
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @param string $id
+     * @param string $id The id
      *
      * @return array|null
      */
@@ -362,7 +364,6 @@ class DeveloperOverheidService
         $response = $this->callService->call($source, '/apis/'.$id);
 
         $component = json_decode($response->getBody()->getContents(), true);
-
         if ($component === false) {
             isset($this->style) && $this->style->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
 
@@ -384,7 +385,7 @@ class DeveloperOverheidService
     /**
      * Turn a repo array into an object we can handle.
      *
-     * @param array $repository
+     * @param array $repository The repository
      *
      * @return ?ObjectEntity
      */
@@ -414,8 +415,8 @@ class DeveloperOverheidService
     }//end handleRepositoryArray()
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
+     * @param array        $componentArray The component array
+     * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
      */
@@ -436,23 +437,27 @@ class DeveloperOverheidService
         }
 
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
-        if (key_exists('legal', $componentArray) &&
-            key_exists('repoOwner', $componentArray['legal']) &&
-            key_exists('name', $componentArray['legal']['repoOwner'])) {
+        if (key_exists('legal', $componentArray) === true &&
+            key_exists('repoOwner', $componentArray['legal']) === true  &&
+            key_exists('name', $componentArray['legal']['repoOwner']) === true ) {
             if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
                 $organisation = new ObjectEntity($organisationEntity);
-                $organisation->hydrate([
+                $organisation->hydrate(
+                    [
                     'name'     => $componentArray['legal']['repoOwner']['name'],
-                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
-                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['phone'] : null,
-                    'website'  => key_exists('website', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['website'] : null,
-                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['type'] : null,
-                ]);
+                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
+                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
+                    'website'  => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
+                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
+                    ]
+                );
             }
             $this->entityManager->persist($organisation);
 
-            if ($legal = $componentObject->getValue('legal')) {
-                if ($repoOwner = $legal->getValue('repoOwner')) {
+            $legal = $componentObject->getValue('legal');
+            if ($legal === true) {
+                $repoOwner = $legal->getValue('repoOwner');
+                if ($repoOwner === true) {
                     // if the component is already set to a repoOwner return the component object
                     return $componentObject;
                 }
@@ -468,14 +473,16 @@ class DeveloperOverheidService
             }
 
             $legal = new ObjectEntity($legalEntity);
-            $legal->hydrate([
+            $legal->hydrate(
+                [
                 'repoOwner' => $organisation,
-            ]);
+                ]
+            );
             $this->entityManager->persist($legal);
             $componentObject->setValue('legal', $legal);
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
-        }
+        }//end if
 
         return null;
     }//end importLegalRepoOwnerThroughComponent()
@@ -483,7 +490,7 @@ class DeveloperOverheidService
     /**
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @param $component
+     * @param $component The component
      *
      * @return ObjectEntity|null
      */
