@@ -93,7 +93,7 @@ class DeveloperOverheidService
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $io The symfony style
      *
      * @return self
      */
@@ -121,7 +121,7 @@ class DeveloperOverheidService
         }
 
         return $this->source;
-    }
+    }//end getSource()
 
     /**
      * Get the repository entity.
@@ -253,7 +253,8 @@ class DeveloperOverheidService
     public function importRepository($repository): ?ObjectEntity
     {
         // Do we have a source.
-        if ($source = $this->getSource() === false) {
+        $source = $this->getSource();
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;

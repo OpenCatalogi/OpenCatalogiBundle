@@ -341,13 +341,14 @@ class GithubPubliccodeService
 
             return null;
         }
+
         if ($this->checkGithubAuth() === false) {
             return null;
         }
 
-        $config['query'] = [
+        $config = ['query' => [
             'q' => 'publiccode in:path path:/ extension:yaml extension:yml',
-        ];
+        ]];
 
         // Find on publiccode.yaml
         $repositories = $this->callService->getAllResults($source, '/search/code', $config);
@@ -414,18 +415,23 @@ class GithubPubliccodeService
      */
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
-        // Do we have a source
-        if ($source = $this->getSource() === false) {
+        // Do we have a source.
+        $source = $this->getSource();
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
-        if ($repositoryEntity = $this->getRepositoryEntity() === false) {
+
+        $repositoryEntity = $this->getRepositoryEntity();
+        if ($repositoryEntity === false) {
             isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
-        if ($repositoriesMapping = $this->getRepositoriesMapping() === false) {
+
+        $repositoriesMapping = $this->getRepositoriesMapping();
+        if ($repositoriesMapping === false) {
             isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
@@ -454,17 +460,22 @@ class GithubPubliccodeService
     public function importRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
-        if ($source = $this->getSource() === false) {
+        $source = $this->getSource();
+        if ($source=== false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
-        if ($repositoryEntity = $this->getRepositoryEntity() === false) {
+
+        $repositoryEntity = $this->getRepositoryEntity();
+        if ($repositoryEntity === false) {
             isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
-        if ($repositoryMapping = $this->getRepositoryMapping() === false) {
+
+        $repositoryMapping = $this->getRepositoryMapping();
+        if ($repositoryMapping === false) {
             isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
@@ -491,7 +502,8 @@ class GithubPubliccodeService
      */
     public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
     {
-        if ($applicationEntity = $this->getApplicationEntity() === false) {
+        $applicationEntity = $this->getApplicationEntity();
+        if ($applicationEntity === false) {
             isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
 
             return null;
@@ -516,7 +528,7 @@ class GithubPubliccodeService
     }//end createApplicationSuite()
 
     /**
-     * @param array        $componentArray The component array
+     * @param array        $publiccode The publiccode
      * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
