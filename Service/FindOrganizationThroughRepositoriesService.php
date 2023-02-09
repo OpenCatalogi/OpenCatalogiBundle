@@ -14,6 +14,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 /**
  * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
@@ -36,9 +37,9 @@ class FindOrganizationThroughRepositoriesService
     private array $data;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     /**
      * @var CallService
@@ -102,6 +103,7 @@ class FindOrganizationThroughRepositoriesService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
      * @param SynchronizationService  $syncService  SynchronizationService
      * @param MappingService          $mappingService          MappingService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         CallService $callService,
@@ -109,7 +111,8 @@ class FindOrganizationThroughRepositoriesService
         GithubApiService $githubApiService,
         GithubPubliccodeService $githubPubliccodeService,
         SynchronizationService $syncService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
@@ -120,24 +123,8 @@ class FindOrganizationThroughRepositoriesService
 
         $this->configuration = [];
         $this->data = [];
-    }
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $style The symfony style
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $style): self
-    {
-        $this->style = $style;
-        $this->githubPubliccodeService->setStyle($style);
-        $this->syncService->setStyle($style);
-        $this->mappingService->setStyle($style);
-
-        return $this;
-    }
+        $this->logger = $pluginLogger;
+    }//end  __construct()
 
     /**
      * Get the github api source.
@@ -148,13 +135,12 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
         if ($this->githubApi === false) {
-            isset($this->style) && $this->style->error('No source found for https://api.github.com');
-
+            $this->logger->error('No source found for https://api.github.com');
             return null;
         }
 
         return $this->githubApi;
-    }
+    }//end getSource()
 
     /**
      * Get the repository entity.
@@ -165,13 +151,12 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if ($this->organisationEntity === false) {
-            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
-
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
             return null;
         }
 
         return $this->organisationEntity;
-    }
+    }//end getOrganisationEntity()
 
     /**
      * Get the repository entity.
@@ -182,13 +167,12 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity) {
-            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
-
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
             return null;
         }
 
         return $this->repositoryEntity;
-    }
+    }//end getRepositoryEntity()
 
     /**
      * Get the repositories mapping.
@@ -199,13 +183,13 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->organisationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/organisation']);
         if ($this->organisationMapping === false) {
-            isset($this->style) && $this->style->error('No mapping found for https://api.github.com/organisation');
+            $this->logger->error('No mapping found for https://api.github.com/organisation');
 
             return null;
         }
 
         return $this->organisationMapping;
-    }
+    }//end getOrganisationMapping()
 
     /**
      * Get the component entity.
@@ -216,13 +200,13 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json']);
         if ($this->componentEntity === false) {
-            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the repository mapping.
@@ -232,13 +216,13 @@ class FindOrganizationThroughRepositoriesService
     public function checkGithubAuth(): ?bool
     {
         if ($this->githubApi->getApiKey() === false) {
-            isset($this->style) && $this->style->error('No auth set for Source: GitHub API');
+            $this->logger->error('No auth set for Source: GitHub API');
 
             return false;
         }
 
         return true;
-    }
+    }//end checkGithubAuth()
 
     /**
      * This function fetches repository data.
@@ -253,7 +237,7 @@ class FindOrganizationThroughRepositoriesService
     {
         // make sync object
         if ($source = $this->getSource() === false) {
-            isset($this->style) && $this->style->error('No source found when trying to get a Repository with slug: '.$slug);
+            $this->logger->error('No source found when trying to get a Repository with slug: '.$slug);
 
             return null;
         }
@@ -261,18 +245,17 @@ class FindOrganizationThroughRepositoriesService
         try {
             $response = $this->callService->call($source, '/repos/'.$slug);
         } catch (Exception $e) {
-            isset($this->style) && $this->style->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage());
+            $this->logger->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage());
         }
 
         if (isset($response)) {
             $repository = $this->callService->decodeResponse($source, $response, 'application/json');
-            isset($this->style) && $this->style->info("Fetch and decode went succesfull for /repos/$slug");
-
+            $this->logger->info("Fetch and decode went succesfull for /repos/$slug");
             return $repository;
         }
 
         return null;
-    }
+    }//end getRepositoryFromUrl()
 
     /**
      * Get an organisation from https://api.github.com/orgs/{org}.
@@ -285,7 +268,7 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if ($source = $this->getSource() === false) {
-            isset($this->style) && $this->style->error('No source found when trying to get an Organisation with name: '.$name);
+            $this->logger->error('No source found when trying to get an Organisation with name: '.$name);
 
             return null;
         }
@@ -294,13 +277,13 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
 
-        isset($this->style) && $this->style->info('Getting organisation '.$name);
+        $this->logger->info('Getting organisation '.$name);
         $response = $this->callService->call($source, '/orgs/'.$name);
 
         $organisation = json_decode($response->getBody()->getContents(), true);
 
         if ($organisation === false) {
-            isset($this->style) && $this->style->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName());
+            $this->logger->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }
@@ -311,10 +294,10 @@ class FindOrganizationThroughRepositoriesService
 
         $this->entityManager->flush();
 
-        isset($this->style) && $this->style->success('Found organisation with name: '.$name);
+        $this->logger->info('Found organisation with name: '.$name);
 
         return $organisation;
-    }
+    }//end getOrganisation()
 
     /**
      * @param $organisation
@@ -325,33 +308,36 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if ($source = $this->getSource() === false) {
-            isset($this->style) && $this->style->error('No source found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
+
+            $this->logger->error('No source found when trying to import an Organisation ');
 
             return null;
         }
         if ($organisationEntity = $this->getOrganisationEntity() === false) {
-            isset($this->style) && $this->style->error('No organisationEntity found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
+            $this->logger->error('No organisationEntity found when trying to import an Organisation ');
 
             return null;
         }
         if ($organisationMapping = $this->getOrganisationMapping() === false) {
-            isset($this->style) && $this->style->error('No organisationMapping found when trying to import an Organisation '.isset($organisation['login']) ? $organisation['login'] : '');
+            $this->logger->error('No organisationMapping found when trying to import an Organisation ');
 
             return null;
         }
 
         $synchronization = $this->syncService->findSyncBySource($source, $organisationEntity, $organisation['id']);
 
-        isset($this->style) && $this->style->comment('Mapping object'.$organisation['login']);
-        isset($this->style) && $this->style->comment('The mapping object '.$organisationMapping);
-
-        isset($this->style) && $this->style->comment('Checking organisation '.$organisation['login']);
         $synchronization->setMapping($organisationMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $organisation);
-        isset($this->style) && $this->style->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
+
+        $this->logger->info('Organisation synchronization created with id: '.$synchronization->getId()->toString(),
+            [
+                "Checking organisation"=>$organisation['login'],
+                "The mapping object"=> $organisationMapping
+            ]
+        );
 
         return $synchronization->getObject();
-    }
+    }//end importOrganisation()
 
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
@@ -365,14 +351,14 @@ class FindOrganizationThroughRepositoriesService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->style) && $this->style->error('No source found when trying to get an Organisation with name: '.$name);
+            $this->logger->error('No source found when trying to get an Organisation with name: '.$name);
 
             return null;
         }
 
         $repositoryEntity = $this->getRepositoryEntity();
         if ($repositoryEntity === false) {
-            isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Component '.$name);
+            $this->logger->error('No RepositoryEntity found when trying to import a Component '.$name);
 
             return null;
         }
@@ -381,13 +367,13 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
 
-        isset($this->style) && $this->style->info('Getting repos from organisation '.$name);
+        $this->logger->info('Getting repos from organisation '.$name);
         $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
 
         if ($repositories === false) {
-            isset($this->style) && $this->style->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
+            $this->logger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }
@@ -405,8 +391,7 @@ class FindOrganizationThroughRepositoriesService
 
             $componentEntity = $this->getComponentEntity();
             if ($componentEntity === false) {
-                isset($this->style) && $this->style->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
+                $this->logger->error('No ComponentEntity found when trying to import a Component ');
                 return null;
             }
 
@@ -423,10 +408,10 @@ class FindOrganizationThroughRepositoriesService
             $owns[] = $component;
         }
 
-        isset($this->style) && $this->style->success('Found '.count($owns).' repos from organisation with name: '.$name);
+        $this->logger->info('Found '.count($owns).' repos from organisation with name: '.$name);
 
         return $owns;
-    }
+    }//end getOrganisationRepos()
 
     /**
      * @param ObjectEntity $repository           the repository where we want to find an organisation for
@@ -435,7 +420,7 @@ class FindOrganizationThroughRepositoriesService
     public function enrichRepositoryWithOrganisation(ObjectEntity $repository, array &$createdOrganizations = []): ?ObjectEntity
     {
         if ($repository->getValue('url') === false) {
-            isset($this->style) && $this->style->error('Repository url not set');
+            $this->logger->error('Repository url not set');
 
             return null;
         }
@@ -453,7 +438,7 @@ class FindOrganizationThroughRepositoriesService
         switch ($source) {
             case 'github':
                 // let's get the repository datar
-                isset($this->style) && $this->style->info("Trying to fetch repository from: $url");
+                $this->logger->info("Trying to fetch repository from: $url");
 
                 $github = $this->getRepositoryFromUrl($url);
                 if ($github === false) {
@@ -462,7 +447,7 @@ class FindOrganizationThroughRepositoriesService
 
                 // Check if we didnt already loop through this organization during this loop
                 if (isset($github['owner']['login']) && in_array($github['owner']['login'], $createdOrganizations)) {
-                    isset($this->style) && $this->style->info('Organization already created/updated during this loop, continuing.');
+                    $this->logger->debug('Organization already created/updated during this loop, continuing.');
 
                     return null;
                 }
@@ -486,23 +471,23 @@ class FindOrganizationThroughRepositoriesService
 
                     $createdOrganizations[] = $github['owner']['login'];
                 } else {
-                    isset($this->style) && $this->style->error('No organisation found for fetched repository');
+                    $this->logger->error('No organisation found for fetched repository');
                 }
                 break;
             case 'gitlab':
                 // hetzelfde maar dan voor gitlab
                 // @TODO code for gitlab as we do for github repositories
-                isset($this->style) && $this->style->error("We dont do gitlab yet ($url)");
+                $this->logger->error("We dont do gitlab yet ($url)");
                 break;
             default:
-                isset($this->style) && $this->style->error("We dont know this type source yet ($source)");
+                $this->logger->error("We dont know this type source yet ($source)");
                 break;
         }
 
         isset($repositoryObject) && $this->entityManager->persist($repositoryObject);
 
         return null;
-    }
+    }//end enrichRepositoryWithOrganisation()
 
     /**
      * Makes sure the action the action can actually runs and then executes functions to update a repository with fetched organization info.
@@ -521,15 +506,15 @@ class FindOrganizationThroughRepositoriesService
         if ($repositoryId) {
             // If we are testing for one repository
             ($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) && $this->enrichRepositoryWithOrganisation($repository);
-            !$repository && $this->style->error('Could not find given repository');
+            $this->logger->error('Could not find given repository');
         } else {
             $repositoryEntity = $this->getRepositoryEntity();
             if ($repositoryEntity === false) {
-                isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Repository ');
+                $this->logger->error('No RepositoryEntity found when trying to import a Repository ');
             }
 
             // If we want to do it for al repositories
-            isset($this->style) && $this->style->info('Looping through repositories');
+            $this->logger->info('Looping through repositories');
             $createdOrganizations = [];
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
@@ -537,8 +522,8 @@ class FindOrganizationThroughRepositoriesService
         }
         $this->entityManager->flush();
 
-        isset($this->style) && $this->style->success('findOrganizationThroughRepositoriesHandler finished');
+        $this->logger->info('findOrganizationThroughRepositoriesHandler finished');
 
         return $this->data;
-    }
+    }//end findOrganizationThroughRepositoriesHandler()
 }
