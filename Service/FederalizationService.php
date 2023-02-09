@@ -12,6 +12,7 @@ use Conduction\CommonGroundBundle\Service\CommonGroundService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Psr\Log\LoggerInterface;
 
 class FederalizationService
 {
@@ -41,9 +42,9 @@ class FederalizationService
     private SynchronizationService $syncService;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     // Lets prevent unnesecery database calls
     /**
@@ -72,34 +73,23 @@ class FederalizationService
      * @param CommonGroundService    $commonGroundService    CommonGroundService
      * @param CallService            $callService            CallService
      * @param SynchronizationService $synchronizationService SynchronizationService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,
         CommonGroundService $commonGroundService,
         CallService $callService,
-        SynchronizationService $syncService
+        SynchronizationService $syncService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->session = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->syncService = $syncService;
+        $this->logger = $pluginLogger;
     }//end __construct()
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $style The symfony style
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $style): self
-    {
-        $this->style = $style;
-
-        return $this;
-    }//end setStyle()
 
     /**
      * Handles the sync all catalogi action from the catalogi handler.
@@ -117,7 +107,7 @@ class FederalizationService
 
         // Saverty cheek
         if ($this->catalogusEntity === null) {
-            (isset($this->style) ? $this->style->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json') : '');
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json');
 
             return $data;
         }
@@ -148,7 +138,7 @@ class FederalizationService
 
         // Check if the past object is a.
         if ($catalogus->getEntity->getReference() !== 'https://opencatalogi.nl/catalogi.schema.json') {
-            (isset($this->style) ? $this->style->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json') : '');
+            $this->logger->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json');
 
             return $reportOut;
         }
@@ -156,12 +146,12 @@ class FederalizationService
         // Lets get the source for the catalogus.
         $source = $catalogus->getValue('source');
         if ($source === null) {
-            (isset($this->style) ? $this->style->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source') : '');
+            $this->logger->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source');
 
             return $reportOut;
         }
 
-        (isset($this->style) ? $this->style->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')') : '');
+        $this->logger->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')');
 
         // Lets grap ALL the objects for an external source.
         $objects = json_decode($this->callService->call(
@@ -171,11 +161,10 @@ class FederalizationService
             ['query'=> ['limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
 
-        (isset($this->style) ? $this->style->writeln(['Found '.count($objects).' objects']) : '');
+        $this->logger->debug('Found '.count($objects).' objects');
 
         $synchonizedObjects = [];
 
-        (isset($this->style) === true ? $this->style->progressStart(count($objects)) : '');
         // Handle new objects
         $counter = 0;
         foreach ($objects as $object) {
@@ -195,10 +184,7 @@ class FederalizationService
                 $this->entityManager->flush();
             }
 
-            (isset($this->style) ? $this->style->progressAdvance() : '');
         }
-
-        (isset($this->style) ? $this->style->progressFinish() : '');
 
         $this->entityManager->flush();
 
@@ -289,22 +275,34 @@ class FederalizationService
     {
         if (isset($this->catalogusEntity) === false) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/catalogi.schema.json']);
-            ($this->applicationEntity === null && isset($this->style) === true ? $this->style->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json') : '');
+
+            if($this->applicationEntity === null){
+                $this->logger->error('Could not find a entity for https://opencatalogi.nl/catalogi.schema.json');
+            }
         }
 
         if (isset($this->componentEntity) === false) {
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/component.schema.json']);
-            ($this->applicationEntity === null && isset($this->style) === true ? $this->style->error('Could not find a entity for https://opencatalogi.nl/component.schema.json') : '');
+
+            if($this->componentEntity === null){
+                $this->logger->error('Could not find a entity for https://opencatalogi.nl/component.schema.json');
+            }
         }
 
         if (isset($this->organisationEntity) === false) {
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/organisation.schema.json']);
-            ($this->applicationEntity === null && isset($this->style) === true ? $this->style->error('Could not find a entity for https://opencatalogi.nl/organisation.schema.json') : '');
+
+            if($this->organisationEntity === null){
+                $this->logger->error('Could not find a entity for https://opencatalogi.nl/organisation.schema.json');
+            }
         }
 
         if (isset($this->applicationEntity) === false) {
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/application.schema.json']);
-            ($this->applicationEntity === null && isset($this->style) === true ? $this->style->error('Could not find a entity for https://opencatalogi.nl/application.schema.json') : '');
+
+            if($this->applicationEntity === null){
+                $this->logger->error('Could not find a entity for https://opencatalogi.nl/application.schema.json');
+            }
         }
     }//end prepareObjectEntities()
 }

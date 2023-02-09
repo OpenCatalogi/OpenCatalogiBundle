@@ -14,6 +14,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 class EnrichPubliccodeService
 {
@@ -23,9 +24,9 @@ class EnrichPubliccodeService
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     /**
      * @var CallService
@@ -93,13 +94,15 @@ class EnrichPubliccodeService
      * @param SynchronizationService  $syncService  SynchronizationService
      * @param MappingService          $mappingService          MappingService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $syncService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService
+        GithubPubliccodeService $githubPubliccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
@@ -108,24 +111,8 @@ class EnrichPubliccodeService
         $this->mappingService = $mappingService;
         $this->configuration = [];
         $this->data = [];
-    }
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $style The symfony style
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $style): self
-    {
-        $this->style = $style;
-        $this->syncService->setStyle($style);
-        $this->mappingService->setStyle($style);
-        $this->githubPubliccodeService->setStyle($style);
-
-        return $this;
-    }
+        $this->logger = $pluginLogger;
+    }//end  __construct()
 
     /**
      * Get the github api source.
@@ -136,11 +123,11 @@ class EnrichPubliccodeService
     {
         $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
         if ($this->source === false) {
-            isset($this->style) && $this->style->error('No source found for https://api.github.com');
+            $this->logger->error('No source found for https://api.github.com');
         }
 
         return $this->source;
-    }
+    }//end getGithubSource()
 
     /**
      * Get the repository entity.
@@ -151,11 +138,12 @@ class EnrichPubliccodeService
     {
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity === false) {
+            $this->logger->error('No source found for https://api.github.com');
             isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
         return $this->repositoryEntity;
-    }
+    }//end getRepositoryEntity()
 
     /**
      * Get the repository mapping.
@@ -166,13 +154,14 @@ class EnrichPubliccodeService
     {
         $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component']);
         if ($this->repositoryMapping === false) {
+            $this->logger->error('No source found for https://api.github.com');
             isset($this->style) && $this->style->error('No mapping found for https://api.github.com/publiccode/component');
 
             return null;
         }
 
         return $this->repositoryMapping;
-    }
+    }//end getRepositoryMapping()
 
     /**
      * Get the component entity.
@@ -183,11 +172,12 @@ class EnrichPubliccodeService
     {
         $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
         if ($this->componentEntity === false) {
+            $this->logger->error('No source found for https://api.github.com');
             isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the description entity.
@@ -198,11 +188,11 @@ class EnrichPubliccodeService
     {
         $this->descriptionEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.description.schema.json']);
         if ($this->descriptionEntity === false) {
-            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.description.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.description.schema.json');
         }
 
         return $this->descriptionEntity;
-    }
+    }//end getDescriptionEntity()
 
     /**
      * This function fetches repository data.
@@ -217,7 +207,7 @@ class EnrichPubliccodeService
     {
         // make sync object
         if ($source = $this->getGithubSource() === false) {
-            isset($this->style) && $this->style->error('No source found when trying to get a Repository with publiccode url: '.$publiccodeUrl);
+            $this->logger->error('No source found when trying to get a Repository with publiccode url: '.$publiccodeUrl);
 
             return null;
         }
@@ -225,7 +215,7 @@ class EnrichPubliccodeService
         try {
             $response = $this->callService->call($source, '/'.$publiccodeUrl);
         } catch (Exception $e) {
-            isset($this->style) && $this->style->error('Error found trying to fetch '.$publiccodeUrl.' '.$e->getMessage());
+            $this->logger->error('Error found trying to fetch '.$publiccodeUrl.' '.$e->getMessage());
         }
 
         if (isset($response)) {
@@ -233,7 +223,7 @@ class EnrichPubliccodeService
         }
 
         return null;
-    }
+    }//end enrichRepositoryWithPubliccode()
 
     /**
      * @param ObjectEntity $repository
@@ -244,7 +234,7 @@ class EnrichPubliccodeService
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
         if ($repositoryMapping = $this->getRepositoryMapping() === false) {
-            isset($this->style) && $this->style->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            $this->logger->error('No repositoriesMapping found when trying to import a Repository');
 
             return null;
         }
@@ -255,7 +245,7 @@ class EnrichPubliccodeService
         }
 
         return $repository;
-    }
+    }// enrichRepositoryWithPubliccode()
 
     /**
      * @param array|null  $data          data set at the start of the handler
@@ -276,7 +266,7 @@ class EnrichPubliccodeService
                     $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
                 }
             } else {
-                isset($this->style) && $this->style->error('Could not find given repository');
+                $this->logger->error('Could not find given repository');
             }
         } else {
             if ($repositoryEntity = $this->getRepositoryEntity() === false) {
@@ -284,7 +274,7 @@ class EnrichPubliccodeService
             }
 
             // If we want to do it for al repositories
-            isset($this->style) && $this->style->info('Looping through repositories');
+            $this->logger->info('Looping through repositories');
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 if ($publiccodeUrl = $repository->getValue('publiccode_url')) {
                     $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
@@ -293,8 +283,8 @@ class EnrichPubliccodeService
         }
         $this->entityManager->flush();
 
-        isset($this->style) && $this->style->success('enrichPubliccodeHandler finished');
+        $this->logger->info('enrichPubliccodeHandler finished');
 
         return $this->data;
-    }
+    }//end enrichPubliccodeHandler()
 }
