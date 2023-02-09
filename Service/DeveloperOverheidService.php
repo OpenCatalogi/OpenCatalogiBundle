@@ -70,7 +70,7 @@ class DeveloperOverheidService
     /**
      * @var SymfonyStyle
      */
-    private SymfonyStyle $io;
+    private SymfonyStyle $style;
 
     /**
      * @param EntityManagerInterface $entityManager          EntityManagerInterface
@@ -99,7 +99,7 @@ class DeveloperOverheidService
      */
     public function setStyle(SymfonyStyle $io): self
     {
-        $this->io = $io;
+        $this->style = $io;
         $this->synchronizationService->setStyle($io);
         $this->mappingService->setStyle($io);
 
@@ -115,7 +115,7 @@ class DeveloperOverheidService
     {
         $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://developer.overheid.nl/api']);
         if ($this->source === false) {
-            isset($this->io) && $this->io->error('No source found for https://developer.overheid.nl/api');
+            isset($this->style) && $this->style->error('No source found for https://developer.overheid.nl/api');
 
             return null;
         }
@@ -132,7 +132,7 @@ class DeveloperOverheidService
     {
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
         }
@@ -149,7 +149,7 @@ class DeveloperOverheidService
     {
         $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if ($this->organisationEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
         }
@@ -166,7 +166,7 @@ class DeveloperOverheidService
     {
         $this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.legal.schema.json']);
         if ($this->legalEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
 
             return null;
         }
@@ -186,14 +186,14 @@ class DeveloperOverheidService
         $result = [];
         // Do we have a source
         if ($source = $this->getSource() === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get Repositories');
+            isset($this->style) && $this->style->error('No source found when trying to get Repositories');
 
             return null;
         }
 
         $repositories = $this->callService->getAllResults($source, '/repositories');
 
-        isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
+        isset($this->style) && $this->style->success('Found '.count($repositories).' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importRepository($repository);
         }
@@ -216,18 +216,18 @@ class DeveloperOverheidService
     {
         // Do we have a source.
         if ($source = $this->getSource() === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            isset($this->style) && $this->style->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repository '.$id);
+        isset($this->style) && $this->style->success('Getting repository '.$id);
         $response = $this->callService->call($source, '/repositories/'.$id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if ($repository === false) {
-            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
+            isset($this->style) && $this->style->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
@@ -238,7 +238,7 @@ class DeveloperOverheidService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found repository with id: '.$id);
+        isset($this->style) && $this->style->success('Found repository with id: '.$id);
 
         return $repository->getObject();
     }//end getRepository()
@@ -255,17 +255,17 @@ class DeveloperOverheidService
         // Do we have a source.
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->style) && $this->style->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
         if ($repositoryEntity = $this->getRepositoryEntity() === false) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
-        isset($this->io) && $this->io->success('Checking repository '.$repository['name']);
+        isset($this->style) && $this->style->success('Checking repository '.$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
@@ -281,7 +281,7 @@ class DeveloperOverheidService
     {
         $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json']);
         if ($this->componentEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
         }
@@ -298,7 +298,7 @@ class DeveloperOverheidService
     {
         $this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://developer.overheid.nl/api/components']);
         if ($this->componentMapping === false) {
-            isset($this->io) && $this->io->error('No mapping found for https://developer.overheid.nl/api/components');
+            isset($this->style) && $this->style->error('No mapping found for https://developer.overheid.nl/api/components');
 
             return null;
         }
@@ -320,16 +320,16 @@ class DeveloperOverheidService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get Components');
+            isset($this->style) && $this->style->error('No source found when trying to get Components');
 
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
+        isset($this->style) && $this->style->comment('Trying to get all components from source '.$source->getName());
 
         $components = $this->callService->getAllResults($source, '/apis');
 
-        isset($this->io) && $this->io->success('Found '.count($components).' components');
+        isset($this->style) && $this->style->success('Found '.count($components).' components');
         foreach ($components as $component) {
             $result[] = $this->importComponent($component);
         }
@@ -353,18 +353,18 @@ class DeveloperOverheidService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Component with id: '.$id);
+            isset($this->style) && $this->style->error('No source found when trying to get a Component with id: '.$id);
 
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Trying to get component with id: '.$id);
+        isset($this->style) && $this->style->comment('Trying to get component with id: '.$id);
         $response = $this->callService->call($source, '/apis/'.$id);
 
         $component = json_decode($response->getBody()->getContents(), true);
 
         if ($component === false) {
-            isset($this->io) && $this->io->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
+            isset($this->style) && $this->style->error('Could not find a component with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
@@ -376,7 +376,7 @@ class DeveloperOverheidService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found component with id: '.$id);
+        isset($this->style) && $this->style->success('Found component with id: '.$id);
 
         return $component->toArray();
     }//end getComponent()
@@ -393,21 +393,21 @@ class DeveloperOverheidService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository: ');
+            isset($this->style) && $this->style->error('No source found when trying to get a Repository: ');
 
             return null;
         }
 
         $repositoryEntity = $this->getRepositoryEntity();
         if ($repositoryEntity === false) {
-            isset($this->io) && $this->io->error('No repositoryEntity found when trying to import a Repository');
+            isset($this->style) && $this->style->error('No repositoryEntity found when trying to import a Repository');
 
             return null;
         }
 
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
+        isset($this->style) && $this->style->comment('Checking component '.$repository['name']);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
@@ -423,14 +423,14 @@ class DeveloperOverheidService
     {
         $organisationEntity = $this->getOrganisationEntity();
         if ($organisationEntity === false) {
-            isset($this->io) && $this->io->error('No organisationEntity found when trying to import an Organisation ');
+            isset($this->style) && $this->style->error('No organisationEntity found when trying to import an Organisation ');
 
             return null;
         }
 
         $legalEntity = $this->getLegalEntity();
         if ($legalEntity === false) {
-            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+            isset($this->style) && $this->style->error('No LegalEntity found when trying to import an Legal ');
 
             return null;
         }
@@ -492,21 +492,21 @@ class DeveloperOverheidService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+            isset($this->style) && $this->style->error('No source found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
         }
 
         $componentEntity = $this->getComponentEntity();
         if ($componentEntity === false) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+            isset($this->style) && $this->style->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
         }
 
         $mapping = $this->getComponentMapping();
         if ($mapping === false) {
-            isset($this->io) && $this->io->error('No ComponentMapping found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
+            isset($this->style) && $this->style->error('No ComponentMapping found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
 
             return null;
         }
@@ -515,10 +515,10 @@ class DeveloperOverheidService
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$component['service_name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
+        isset($this->style) && $this->style->comment('Mapping object'.$component['service_name']);
+        isset($this->style) && $this->style->comment('The mapping object '.$mapping);
 
-        isset($this->io) && $this->io->comment('Checking component '.$component['service_name']);
+        isset($this->style) && $this->style->comment('Checking component '.$component['service_name']);
 
         // do the mapping of the component set two variables
         $componentMapping = $componentArray = $this->mappingService->mapping($mapping, $component);

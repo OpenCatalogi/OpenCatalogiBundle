@@ -71,7 +71,7 @@ class GithubPubliccodeService
     /**
      * @var SymfonyStyle
      */
-    private SymfonyStyle $io;
+    private SymfonyStyle $style;
 
     /**
      * @var Entity
@@ -120,7 +120,7 @@ class GithubPubliccodeService
      */
     public function setStyle(SymfonyStyle $io): self
     {
-        $this->io = $io;
+        $this->style = $io;
         $this->synchronizationService->setStyle($io);
         $this->mappingService->setStyle($io);
 
@@ -136,7 +136,7 @@ class GithubPubliccodeService
     {
         $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
         if ($this->source === false) {
-            isset($this->io) && $this->io->error('No source found for https://api.github.com');
+            isset($this->style) && $this->style->error('No source found for https://api.github.com');
 
             return null;
         }
@@ -153,7 +153,7 @@ class GithubPubliccodeService
     {
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
         }
@@ -170,7 +170,7 @@ class GithubPubliccodeService
     {
         $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
         if ($this->componentEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
         }
@@ -187,7 +187,7 @@ class GithubPubliccodeService
     {
         $this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code']);
         if ($this->repositoriesMapping === false) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
+            isset($this->style) && $this->style->error('No mapping found for https://api.github.com/search/code');
 
             return null;
         }
@@ -204,7 +204,7 @@ class GithubPubliccodeService
     {
         $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories']);
         if ($this->repositoryMapping === false) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+            isset($this->style) && $this->style->error('No mapping found for https://api.github.com/repositories');
 
             return null;
         }
@@ -221,7 +221,7 @@ class GithubPubliccodeService
     {
         $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
         if ($this->applicationEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
         }
 
         return $this->applicationEntity;
@@ -236,7 +236,7 @@ class GithubPubliccodeService
     {
         $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if ($this->organisationEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
         }
@@ -253,7 +253,7 @@ class GithubPubliccodeService
     {
         $this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.legal.schema.json']);
         if ($this->legalEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
 
             return null;
         }
@@ -270,7 +270,7 @@ class GithubPubliccodeService
     {
         $this->maintenanceEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.maintenance.schema.json']);
         if ($this->maintenanceEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.maintenance.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.maintenance.schema.json');
 
             return null;
         }
@@ -287,7 +287,7 @@ class GithubPubliccodeService
     {
         $this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json']);
         if ($this->contractorsEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
         }
 
         return $this->contractorsEntity;
@@ -302,7 +302,7 @@ class GithubPubliccodeService
     {
         $this->contactsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contact.schema.json']);
         if ($this->contactsEntity === false) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
         }
 
         return $this->contactsEntity;
@@ -316,7 +316,7 @@ class GithubPubliccodeService
     public function checkGithubAuth(): ?bool
     {
         if ($this->source->getApiKey() === false) {
-            isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
+            isset($this->style) && $this->style->error('No auth set for Source: GitHub API');
 
             return false;
         }
@@ -337,7 +337,7 @@ class GithubPubliccodeService
         $result = [];
         // Do we have a source
         if ($source = $this->getSource() === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get all Repositories');
+            isset($this->style) && $this->style->error('No source found when trying to get all Repositories');
 
             return null;
         }
@@ -353,7 +353,7 @@ class GithubPubliccodeService
         // Find on publiccode.yaml
         $repositories = $this->callService->getAllResults($source, '/search/code', $config);
 
-        isset($this->io) && $this->io->success('Found '.count($repositories).' repositories');
+        isset($this->style) && $this->style->success('Found '.count($repositories).' repositories');
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -376,7 +376,7 @@ class GithubPubliccodeService
     {
         // Do we have a source
         if ($source = $this->getSource() === false) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Repository with id: '.$id);
+            isset($this->style) && $this->style->error('No source found when trying to get a Repository with id: '.$id);
 
             return null;
         }
@@ -385,13 +385,13 @@ class GithubPubliccodeService
             return null;
         }
 
-        isset($this->io) && $this->io->success('Getting repository '.$id);
+        isset($this->style) && $this->style->success('Getting repository '.$id);
         $response = $this->callService->call($source, '/repositories/'.$id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if ($repository === false) {
-            isset($this->io) && $this->io->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
+            isset($this->style) && $this->style->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName());
 
             return null;
         }
@@ -402,7 +402,7 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found repository with id: '.$id);
+        isset($this->style) && $this->style->success('Found repository with id: '.$id);
 
         return $repository->toArray();
     }//end getRepository()
@@ -419,34 +419,34 @@ class GithubPubliccodeService
         // Do we have a source.
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->style) && $this->style->error('No source found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
 
         $repositoryEntity = $this->getRepositoryEntity();
         if ($repositoryEntity === false) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
 
         $repositoriesMapping = $this->getRepositoriesMapping();
         if ($repositoriesMapping === false) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
+            isset($this->style) && $this->style->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['repository']['name']) ? $repository['repository']['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$repository['repository']['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$repositoriesMapping);
+        isset($this->style) && $this->style->comment('Mapping object'.$repository['repository']['name']);
+        isset($this->style) && $this->style->comment('The mapping object '.$repositoriesMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['repository']['name']);
+        isset($this->style) && $this->style->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        isset($this->style) && $this->style->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }//end importPubliccodeRepository()
@@ -463,34 +463,34 @@ class GithubPubliccodeService
         // Do we have a source
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->style) && $this->style->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
         $repositoryEntity = $this->getRepositoryEntity();
         if ($repositoryEntity === false) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->style) && $this->style->error('No RepositoryEntity found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
         $repositoryMapping = $this->getRepositoryMapping();
         if ($repositoryMapping === false) {
-            isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
+            isset($this->style) && $this->style->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$repository['name']);
-        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
+        isset($this->style) && $this->style->comment('Mapping object'.$repository['name']);
+        isset($this->style) && $this->style->comment('The mapping object '.$repositoryMapping);
 
-        isset($this->io) && $this->io->comment('Checking repository '.$repository['name']);
+        isset($this->style) && $this->style->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        isset($this->style) && $this->style->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
     }//end importRepository()
@@ -505,7 +505,7 @@ class GithubPubliccodeService
     {
         $applicationEntity = $this->getApplicationEntity();
         if ($applicationEntity === false) {
-            isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application');
+            isset($this->style) && $this->style->error('No ApplicationEntity found when trying to import a Application');
 
             return null;
         }
@@ -540,14 +540,14 @@ class GithubPubliccodeService
     {
         $organisationEntity = $this->getOrganisationEntity();
         if ($organisationEntity === false) {
-            isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+            isset($this->style) && $this->style->error('No OrganisationEntity found when trying to import a Organisation');
 
             return null;
         }
 
         $legalEntity = $this->getLegalEntity();
         if ($legalEntity === false) {
-            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+            isset($this->style) && $this->style->error('No LegalEntity found when trying to import an Legal ');
 
             return null;
         }
@@ -608,14 +608,14 @@ class GithubPubliccodeService
     {
         $organisationEntity = $this->getOrganisationEntity();
         if ($organisationEntity === false) {
-            isset($this->io) && $this->io->error('No OrganisationEntity found when trying to import a Organisation');
+            isset($this->style) && $this->style->error('No OrganisationEntity found when trying to import a Organisation');
 
             return null;
         }
 
         $legalEntity = $this->getLegalEntity();
         if ($legalEntity === false) {
-            isset($this->io) && $this->io->error('No LegalEntity found when trying to import an Legal ');
+            isset($this->style) && $this->style->error('No LegalEntity found when trying to import an Legal ');
 
             return null;
         }
@@ -672,14 +672,14 @@ class GithubPubliccodeService
     {
         $maintenanceEntity = $this->getMaintenanceEntity();
         if ($maintenanceEntity === false) {
-            isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
+            isset($this->style) && $this->style->error('No MaintenanceEntity found when trying to import a Maintenance');
 
             return null;
         }
 
         $contractorsEntity = $this->getContractorEntity();
         if ($contractorsEntity === false) {
-            isset($this->io) && $this->io->error('No ContractorEntity found when trying to import an Contractor ');
+            isset($this->style) && $this->style->error('No ContractorEntity found when trying to import an Contractor ');
 
             return null;
         }
@@ -744,14 +744,14 @@ class GithubPubliccodeService
     {
         $maintenanceEntity = $this->getMaintenanceEntity();
         if ($maintenanceEntity === false) {
-            isset($this->io) && $this->io->error('No MaintenanceEntity found when trying to import a Maintenance');
+            isset($this->style) && $this->style->error('No MaintenanceEntity found when trying to import a Maintenance');
 
             return null;
         }
 
         $contactEntity = $this->getContactEntity();
         if ($contactEntity === false) {
-            isset($this->io) && $this->io->error('No ContactEntity found when trying to import an Contact ');
+            isset($this->style) && $this->style->error('No ContactEntity found when trying to import an Contact ');
 
             return null;
         }
@@ -818,7 +818,7 @@ class GithubPubliccodeService
     {
         $componentEntity = $this->getComponentEntity();
         if ($componentEntity === false) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component ');
+            isset($this->style) && $this->style->error('No ComponentEntity found when trying to import a Component ');
 
             return null;
         }
@@ -828,8 +828,8 @@ class GithubPubliccodeService
             $component = new ObjectEntity($componentEntity);
         }
 
-        isset($this->io) && $this->io->comment('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
-        isset($this->io) && $this->io->comment('The mapping object '.$repositoryMapping);
+        isset($this->style) && $this->style->comment('Mapping object'.key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'));
+        isset($this->style) && $this->style->comment('The mapping object '.$repositoryMapping);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
@@ -866,7 +866,7 @@ class GithubPubliccodeService
     {
         $source = $this->getSource();
         if ($source === false) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository ');
+            isset($this->style) && $this->style->error('No source found when trying to import a Repository ');
 
             return null;
         }
@@ -881,11 +881,11 @@ class GithubPubliccodeService
         try {
             $parsedPubliccode = Yaml::parse($publiccode);
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Not able to parse '.$publiccode.' '.$e->getMessage());
+            isset($this->style) && $this->style->error('Not able to parse '.$publiccode.' '.$e->getMessage());
         }
 
         if (isset($parsedPubliccode)) {
-            isset($this->io) && $this->io->success("Fetch and decode went succesfull for $repositoryUrl");
+            isset($this->style) && $this->style->success("Fetch and decode went succesfull for $repositoryUrl");
 
             return $parsedPubliccode;
         }

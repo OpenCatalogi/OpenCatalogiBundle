@@ -44,7 +44,7 @@ class RatingService
     /**
      * @var SymfonyStyle
      */
-    private SymfonyStyle $io;
+    private SymfonyStyle $style;
 
     /**
      * @param EntityManagerInterface $entityManager
@@ -69,7 +69,7 @@ class RatingService
      */
     public function setStyle(SymfonyStyle $io): self
     {
-        $this->io = $io;
+        $this->style = $io;
         $this->githubApiService->setStyle($io);
 
         return $this;
@@ -83,7 +83,7 @@ class RatingService
     public function getComponentEntity(): ?Entity
     {
         if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
 
             return null;
         }
@@ -99,7 +99,7 @@ class RatingService
     public function getRatingEntity(): ?Entity
     {
         if (!$this->ratingEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.rating.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.rating.schema.json');
+            isset($this->style) && $this->style->error('No entity found for https://opencatalogi.nl/oc.rating.schema.json');
 
             return null;
         }
@@ -119,20 +119,20 @@ class RatingService
         $result = [];
 
         if (!$ratingEntity = $this->getRatingEntity()) {
-            isset($this->io) && $this->io->error('No RatingEntity found when trying to create ratings for all component ObjectEntities');
+            isset($this->style) && $this->style->error('No RatingEntity found when trying to create ratings for all component ObjectEntities');
 
             return null;
         }
 
         if ($componentEntity = $this->getComponentEntity() === false) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to create ratings for all component ObjectEntities');
+            isset($this->style) && $this->style->error('No ComponentEntity found when trying to create ratings for all component ObjectEntities');
 
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Trying to create ratings for all component ObjectEntities');
+        isset($this->style) && $this->style->comment('Trying to create ratings for all component ObjectEntities');
 
-        isset($this->io) && is_countable($componentEntity->getObjectEntities()) ? $this->io->success('Found '.count($componentEntity->getObjectEntities()).' components') : $this->io->success('Found 0 components');
+        isset($this->style) && is_countable($componentEntity->getObjectEntities()) ? $this->style->success('Found '.count($componentEntity->getObjectEntities()).' components') : $this->style->success('Found 0 components');
         foreach ($componentEntity->getObjectEntities() as $component) {
             $result[] = $this->rateComponent($component, $ratingEntity);
         }
@@ -154,15 +154,15 @@ class RatingService
     public function enrichComponentWithRating(string $id): ?array
     {
         if (!$ratingEntity = $this->getRatingEntity()) {
-            isset($this->io) && $this->io->error('No RatingEntity found when trying to create a Rating for Component ObjectEntity with id: '.$id);
+            isset($this->style) && $this->style->error('No RatingEntity found when trying to create a Rating for Component ObjectEntity with id: '.$id);
 
             return null;
         }
 
-        isset($this->io) && $this->io->comment('Trying to get component ObjectEntity with id: '.$id);
+        isset($this->style) && $this->style->comment('Trying to get component ObjectEntity with id: '.$id);
         $component = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$id]);
         if (!$component instanceof ObjectEntity) {
-            isset($this->io) && $this->io->error('No component ObjectEntity found with id: '.$id);
+            isset($this->style) && $this->style->error('No component ObjectEntity found with id: '.$id);
 
             return null;
         }
@@ -228,7 +228,7 @@ class RatingService
         $component->setValue('rating', $rating);
         $this->entityManager->persist($component);
 
-        isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
+        isset($this->style) && $this->style->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
     }//end rateComponent()

@@ -39,7 +39,7 @@ class GithubApiService
     /**
      * @var SymfonyStyle
      */
-    private SymfonyStyle $io;
+    private SymfonyStyle $style;
 
     /**
      * @var Source
@@ -128,7 +128,7 @@ class GithubApiService
      */
     public function setStyle(SymfonyStyle $io): self
     {
-        $this->io = $io;
+        $this->style = $io;
 
         return $this;
     }
@@ -138,7 +138,7 @@ class GithubApiService
         !isset($this->source) && $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com/']);
         if (!isset($this->source)) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a Source for the Github API');
+            isset($this->style) && $this->style->error('Could not find a Source for the Github API');
 
             return [];
         }
@@ -258,7 +258,7 @@ class GithubApiService
     {
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find Source: Github API');
+            isset($this->style) && $this->style->error('Could not find Source: Github API');
 
             return false;
         }
@@ -271,7 +271,7 @@ class GithubApiService
             $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
         } catch (Exception $exception) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error("Exception while checking if public repository: {$exception->getMessage()}");
+            isset($this->style) && $this->style->error("Exception while checking if public repository: {$exception->getMessage()}");
 
             return false;
         }
@@ -287,39 +287,39 @@ class GithubApiService
         // get github source
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find Source: Github API');
+            isset($this->style) && $this->style->error('Could not find Source: Github API');
 
             return null;
         }
         if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
+            isset($this->style) && $this->style->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
         }
         if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
+            isset($this->style) && $this->style->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
         }
 
         if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
+            isset($this->style) && $this->style->error('Could not find a repository for reference https://api.github.com/search/code');
 
             return null;
         }
 
         if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+            isset($this->style) && $this->style->error('No mapping found for https://api.github.com/repositories');
 
             return null;
         }
 
         // check if github source has authkey
         if (!$this->githubApiSource->getApiKey()) {
-            isset($this->io) && $this->io->error('No auth set for Source: GitHub API');
+            isset($this->style) && $this->style->error('No auth set for Source: GitHub API');
 
             return null;
         }
@@ -389,7 +389,7 @@ class GithubApiService
     {
         // check for mapping
         if (!$this->repositoryMapping && !$mapping) {
-            $this->io->error('Repository mapping not set/given');
+            $this->style->error('Repository mapping not set/given');
 
             return null;
         }
@@ -425,7 +425,7 @@ class GithubApiService
 
         // check for mapping
         if (!$this->organizationMapping && !$mapping) {
-            $this->io->error('Organization mapping not set/given');
+            $this->style->error('Organization mapping not set/given');
 
             return null;
         }
