@@ -462,7 +462,7 @@ class GithubPubliccodeService
     {
         // Do we have a source
         $source = $this->getSource();
-        if ($source=== false) {
+        if ($source === false) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
@@ -497,7 +497,7 @@ class GithubPubliccodeService
 
     /**
      * @param array        $publiccode The public code
-     * @param ObjectEntity $component The Component object
+     * @param ObjectEntity $component  The Component object
      *
      * @return ObjectEntity|null
      */
@@ -516,8 +516,8 @@ class GithubPubliccodeService
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate(
                     [
-                    'name'       => $publiccode['applicationSuite'],
-                    'components' => [$component],
+                        'name'       => $publiccode['applicationSuite'],
+                        'components' => [$component],
                     ]
                 );
             }
@@ -531,7 +531,7 @@ class GithubPubliccodeService
     }//end createApplicationSuite()
 
     /**
-     * @param array        $publiccode The publiccode
+     * @param array        $publiccode      The publiccode
      * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
@@ -554,14 +554,14 @@ class GithubPubliccodeService
 
         // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) === true &&
-            key_exists('mainCopyrightOwner', $publiccode['legal'])  === true &&
-            key_exists('name', $publiccode['legal']['mainCopyrightOwner'])  === true) {
+            key_exists('mainCopyrightOwner', $publiccode['legal']) === true &&
+            key_exists('name', $publiccode['legal']['mainCopyrightOwner']) === true) {
             $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['mainCopyrightOwner']['name']]);
             if ($organisation === null) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(
                     [
-                    'name' => $publiccode['legal']['mainCopyrightOwner']['name'],
+                        'name' => $publiccode['legal']['mainCopyrightOwner']['name'],
                     ]
                 );
             }
@@ -586,7 +586,7 @@ class GithubPubliccodeService
             $legal = new ObjectEntity($legalEntity);
             $legal->hydrate(
                 [
-                'mainCopyrightOwner' => $organisation,
+                    'mainCopyrightOwner' => $organisation,
                 ]
             );
             $this->entityManager->persist($legal);
@@ -599,7 +599,7 @@ class GithubPubliccodeService
     }//end createMainCopyrightOwner()
 
     /**
-     * @param array        $publiccode The publiccode array
+     * @param array        $publiccode      The publiccode array
      * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
@@ -663,7 +663,7 @@ class GithubPubliccodeService
     }//end createRepoOwner()
 
     /**
-     * @param array        $publiccode The Publiccode
+     * @param array        $publiccode      The Publiccode
      * @param ObjectEntity $componentObject The Component Object
      *
      * @return ObjectEntity|null
@@ -684,7 +684,7 @@ class GithubPubliccodeService
             return null;
         }
         if (key_exists('maintenance', $publiccode) === true &&
-            key_exists('contractors', $publiccode['maintenance']) === true ) {
+            key_exists('contractors', $publiccode['maintenance']) === true) {
             $contractors = [];
             foreach ($publiccode['maintenance']['contractors'] as $contractor) {
                 if (key_exists('name', $contractor)) {
@@ -693,7 +693,7 @@ class GithubPubliccodeService
                         $contractor = new ObjectEntity($contractorsEntity);
                         $contractor->hydrate(
                             [
-                            'name' => $contractor['name'],
+                                'name' => $contractor['name'],
                             ]
                         );
                     }
@@ -722,7 +722,7 @@ class GithubPubliccodeService
             $maintenance = new ObjectEntity($contractorsEntity);
             $maintenance->hydrate(
                 [
-                'contractors' => $contractors,
+                    'contractors' => $contractors,
                 ]
             );
             $this->entityManager->persist($maintenance);
@@ -735,7 +735,7 @@ class GithubPubliccodeService
     }//end createContractors()
 
     /**
-     * @param array        $publiccode The publiccode array
+     * @param array        $publiccode      The publiccode array
      * @param ObjectEntity $componentObject The component object
      *
      * @return ObjectEntity|null
@@ -756,7 +756,7 @@ class GithubPubliccodeService
             return null;
         }
         if (key_exists('maintenance', $publiccode) === true &&
-            key_exists('contacts', $publiccode['maintenance']) === true ) {
+            key_exists('contacts', $publiccode['maintenance']) === true) {
             $contacts = [];
             foreach ($publiccode['maintenance']['contacts'] as $contact) {
                 if (key_exists('name', $contact)) {
@@ -764,7 +764,7 @@ class GithubPubliccodeService
                         $contact = new ObjectEntity($contactEntity);
                         $contact->hydrate(
                             [
-                            'name' => $contact['name'],
+                                'name' => $contact['name'],
                             ]
                         );
                     }
@@ -793,7 +793,7 @@ class GithubPubliccodeService
             $maintenance = new ObjectEntity($maintenanceEntity);
             $maintenance->hydrate(
                 [
-                'contacts' => $contacts,
+                    'contacts' => $contacts,
                 ]
             );
             $this->entityManager->persist($maintenance);
@@ -806,8 +806,8 @@ class GithubPubliccodeService
     }//end createContacts()
 
     /**
-     * @param ObjectEntity $repository The repository object
-     * @param array        $publiccode The publiccode array
+     * @param ObjectEntity $repository        The repository object
+     * @param array        $publiccode        The publiccode array
      * @param Mapping      $repositoryMapping The mapping object
      *
      * @return ObjectEntity|null dataset at the end of the handler

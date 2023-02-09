@@ -95,8 +95,9 @@ class InstallationService implements InstallerInterface
     }//end setStyle()
 
     /**
-     * @return void
      * @throws Exception
+     *
+     * @return void
      */
     public function install()
     {
@@ -104,8 +105,9 @@ class InstallationService implements InstallerInterface
     }//end install()()
 
     /**
-     * @return void
      * @throws Exception
+     *
+     * @return void
      */
     public function update()
     {
@@ -122,6 +124,7 @@ class InstallationService implements InstallerInterface
 
     /**
      * @param $actionHandler
+     *
      * @return array
      */
     public function addActionConfiguration($actionHandler): array
@@ -187,10 +190,10 @@ class InstallationService implements InstallerInterface
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
                 $action->setConditions([[1 => 1]]);
-            } else if (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
                 $action->setListens(['opencatalogi.github']);
                 $action->setConditions([[1 => 1]]);
-            } else if (
+            } elseif (
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
                 strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
             ) {
@@ -212,6 +215,7 @@ class InstallationService implements InstallerInterface
 
     /**
      * @param $objectsThatShouldHaveEndpoints
+     *
      * @return array
      */
     private function createEndpoints($objectsThatShouldHaveEndpoints): array
@@ -235,7 +239,8 @@ class InstallationService implements InstallerInterface
 
     /**
      * @param CollectionEntity $collection
-     * @param string $schemaPrefix
+     * @param string           $schemaPrefix
+     *
      * @return CollectionEntity
      */
     private function addSchemasToCollection(CollectionEntity $collection, string $schemaPrefix): CollectionEntity
@@ -281,6 +286,7 @@ class InstallationService implements InstallerInterface
 
     /**
      * @param $objectsThatShouldHaveCards
+     *
      * @return void
      */
     public function createDashboardCards($objectsThatShouldHaveCards)
@@ -324,9 +330,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger']);
@@ -339,9 +345,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper']);
@@ -355,9 +361,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation']);
@@ -371,9 +377,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
         } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for ' . $cronjob->getName()]) : '');
+            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
         }
     }//end createCronjobs()
 

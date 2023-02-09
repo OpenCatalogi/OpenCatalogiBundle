@@ -170,7 +170,7 @@ class EnrichPubliccodeFromGithubUrlService
     public function getRepositoryEntity(): ?Entity
     {
         $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
-        if ($this->repositoryEntity === false ) {
+        if ($this->repositoryEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
@@ -230,7 +230,7 @@ class EnrichPubliccodeFromGithubUrlService
     public function getContractorEntity(): ?Entity
     {
         $this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json']);
-        if ( $this->contractorsEntity === null) {
+        if ($this->contractorsEntity === null) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
         }
 
@@ -275,7 +275,7 @@ class EnrichPubliccodeFromGithubUrlService
     public function getRepositoryMapping(): ?Mapping
     {
         $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component']);
-        if ( $this->repositoryMapping === null) {
+        if ($this->repositoryMapping === null) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/publiccode/component');
 
             return null;

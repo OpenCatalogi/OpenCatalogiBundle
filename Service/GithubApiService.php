@@ -17,7 +17,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 class GithubApiService
@@ -204,7 +203,7 @@ class GithubApiService
     /**
      * This function gets the content of the given url.
      *
-     * @param string      $url The Url
+     * @param string      $url  The Url
      * @param string|null $path The path
      *
      * @throws GuzzleException
@@ -329,7 +328,7 @@ class GithubApiService
     /**
      * Searches github for publiccode files @TODO testing.
      *
-     * @param array $data The data
+     * @param array $data          The data
      * @param array $configuration The configuration
      *
      * @return ?array
@@ -381,7 +380,7 @@ class GithubApiService
     /**
      * Turn an repro array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro The reprop
+     * @param array   $repro   The reprop
      * @param Mapping $mapping The mapping object
      *
      * @return ?ObjectEntity
@@ -416,7 +415,7 @@ class GithubApiService
     /**
      * Turn an organisation array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro The Repro
+     * @param array   $repro   The Repro
      * @param Mapping $mapping The mapping object
      *
      * @return ObjectEntity

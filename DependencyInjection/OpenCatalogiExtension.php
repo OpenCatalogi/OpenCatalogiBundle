@@ -10,8 +10,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OpenCatalogiExtension extends Extension
 {
     /**
-     * @param array $configs array
+     * @param array            $configs   array
      * @param ContainerBuilder $container ContainerBuilder
+     *
      * @return void
      */
     public function load(array $configs, ContainerBuilder $container)

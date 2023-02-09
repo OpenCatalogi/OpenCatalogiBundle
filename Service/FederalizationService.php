@@ -239,7 +239,7 @@ class FederalizationService
     /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
-     * @param array $object The object
+     * @param array   $object The object
      * @param Gateway $source The Source
      *
      * @return void
