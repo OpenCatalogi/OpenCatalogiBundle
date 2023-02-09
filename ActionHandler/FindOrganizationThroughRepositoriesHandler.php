@@ -13,14 +13,14 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     /**
      * @var FindOrganizationThroughRepositoriesService
      */
-    private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
+    private FindOrganizationThroughRepositoriesService $orgThroughRepService;
 
     /**
-     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService FindOrganizationThroughRepositoriesService
+     * @param FindOrganizationThroughRepositoriesService $OrgThroughRepService FindOrganizationThroughRepositoriesService
      */
-    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
+    public function __construct(FindOrganizationThroughRepositoriesService $OrgThroughRepService)
     {
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
+        $this->orgThroughRepService = $OrgThroughRepService;
     }//end __construct()
 
     /**
@@ -65,6 +65,6 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
+        return $this->OorgThroughRepService->findOrganizationThroughRepositoriesHandler($data, $configuration);
     }//end run()
 }

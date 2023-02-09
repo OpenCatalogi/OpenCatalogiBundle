@@ -13,14 +13,14 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $gitPubService;
 
     /**
-     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     * @param GithubPubliccodeService $gitPubService GithubPubliccodeService
      */
-    public function __construct(GithubPubliccodeService $githubPubliccodeService)
+    public function __construct(GithubPubliccodeService $gitPubService)
     {
-        $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->gitPubService = $gitPubService;
     }//end __construct()
 
     /**
@@ -50,6 +50,6 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->githubPubliccodeService->getRepositories();
+        return $this->gitPubService->getRepositories();
     }//end run()
 }

@@ -13,14 +13,14 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService $developerOverheidService;
+    private DeveloperOverheidService $devOverService;
 
     /**
-     * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
+     * @param DeveloperOverheidService $devOverService DeveloperOverheidService
      */
-    public function __construct(DeveloperOverheidService $developerOverheidService)
+    public function __construct(DeveloperOverheidService $devOverService)
     {
-        $this->developerOverheidService = $developerOverheidService;
+        $this->devOverService = $devOverService;
     }//end __construct()
 
     /**
@@ -50,6 +50,6 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->developerOverheidService->getRepositories();
+        return $this->devOverService->getRepositories();
     }//end run()
 }

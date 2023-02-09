@@ -14,14 +14,14 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     /**
      * @var FindGithubRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
+    private FindGithubRepositoryThroughOrganizationService $githubThroughOrgService;
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService FindGithubRepositoryThroughOrganizationService
+     * @param FindGithubRepositoryThroughOrganizationService $githubThroughOrgService FindGithubRepositoryThroughOrganizationService
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $githubThroughOrgService)
     {
-        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
+        $this->githubThroughOrgService = $githubThroughOrgService;
     }//end __construct()
 
     /**
@@ -66,6 +66,6 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
+        return $this->githubThroughOrgService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
     }//end run()
 }

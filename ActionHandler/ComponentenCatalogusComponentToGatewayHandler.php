@@ -13,14 +13,14 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService $componentenCatalogusService;
+    private ComponentenCatalogusService $compCatService;
 
     /**
-     * @param ComponentenCatalogusService $componentenCatalogusService ComponentenCatalogusService
+     * @param ComponentenCatalogusService $compCatService ComponentenCatalogusService
      */
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(ComponentenCatalogusService $compCatService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->compCatService = $compCatService;
     }//end __construct()
 
     /**
@@ -50,6 +50,6 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->componentenCatalogusService->getComponents();
+        return $this->compCatService->getComponents();
     }//end run()
 }
