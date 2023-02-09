@@ -134,7 +134,8 @@ class EnrichPubliccodeService
      */
     public function getGithubSource(): ?Source
     {
-        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
+        $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
+        if ($this->source === false) {
             isset($this->io) && $this->io->error('No source found for https://api.github.com');
         }
 
@@ -148,7 +149,8 @@ class EnrichPubliccodeService
      */
     public function getRepositoryEntity(): ?Entity
     {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
+        $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
+        if ($this->repositoryEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
@@ -162,7 +164,8 @@ class EnrichPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component'])) {
+        $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component']);
+        if ($this->repositoryMapping === false) {
             isset($this->io) && $this->io->error('No mapping found for https://api.github.com/publiccode/component');
 
             return null;
@@ -178,7 +181,8 @@ class EnrichPubliccodeService
      */
     public function getComponentEntity(): ?Entity
     {
-        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json'])) {
+        $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
+        if ($this->componentEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
         }
 
@@ -192,7 +196,8 @@ class EnrichPubliccodeService
      */
     public function getDescriptionEntity(): ?Entity
     {
-        if (!$this->descriptionEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.description.schema.json'])) {
+        $this->descriptionEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.description.schema.json']);
+        if ($this->descriptionEntity === false) {
             isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.description.schema.json');
         }
 
@@ -211,7 +216,7 @@ class EnrichPubliccodeService
     public function getPubliccodeFromUrl(string $publiccodeUrl)
     {
         // make sync object
-        if (!$source = $this->getGithubSource()) {
+        if ($source = $this->getGithubSource() === false) {
             isset($this->io) && $this->io->error('No source found when trying to get a Repository with publiccode url: '.$publiccodeUrl);
 
             return null;
@@ -238,7 +243,7 @@ class EnrichPubliccodeService
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
-        if (!$repositoryMapping = $this->getRepositoryMapping()) {
+        if ($repositoryMapping = $this->getRepositoryMapping() === false) {
             isset($this->io) && $this->io->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
 
             return null;
@@ -274,7 +279,7 @@ class EnrichPubliccodeService
                 isset($this->io) && $this->io->error('Could not find given repository');
             }
         } else {
-            if (!$repositoryEntity = $this->getRepositoryEntity()) {
+            if ($repositoryEntity = $this->getRepositoryEntity() === false) {
                 isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository ');
             }
 
