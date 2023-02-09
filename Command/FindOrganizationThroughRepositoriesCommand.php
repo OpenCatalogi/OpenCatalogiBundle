@@ -24,14 +24,14 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     /**
      * @var FindOrganizationThroughRepositoriesService
      */
-    private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
+    private FindOrganizationThroughRepositoriesService  $orgThroughGitService;
 
     /**
-     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService FindOrganizationThroughRepositoriesService
+     * @param FindOrganizationThroughRepositoriesService $orgThroughGitService FindOrganizationThroughRepositoriesService
      */
-    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
+    public function __construct(FindOrganizationThroughRepositoriesService $orgThroughGitService)
     {
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
+        $this->orgThroughGitService = $orgThroughGitService;
         parent::__construct();
     }//end __construct()
 
@@ -55,16 +55,16 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->findOrganizationThroughRepositoriesService->setStyle($style);
+        $this->orgThroughGitService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
         if ($repositoryId === false) {
-            if ($this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler() === false) {
+            if ($this->orgThroughGitService->findOrganizationThroughRepositoriesHandler() === false) {
                 return Command::FAILURE;
             }
-        } els if ($this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId) === false) {
+        } else if ($this->orgThroughGitService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 

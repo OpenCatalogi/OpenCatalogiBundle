@@ -21,7 +21,7 @@ class FederalizationGetCommand extends Command
     /**
      * @var FederalizationService
      */
-    private FederalizationService  $federalizationiService;
+    private FederalizationService  $fedService;
 
     /**
      * @var EntityManagerInterface
@@ -29,12 +29,12 @@ class FederalizationGetCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService  $federalizationiService FederalizationService
+     * @param FederalizationService  $fedService FederalizationService
      * @param EntityManagerInterface $entityManager          EntityManagerInterface
      */
-    public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
+    public function __construct(FederalizationService $fedService, EntityManagerInterface $entityManager)
     {
-        $this->federalizationiService = $federalizationiService;
+        $this->fedService = $fedService;
         $this->entityManager = $entityManager;
         parent::__construct();
     }//end construct()
@@ -59,13 +59,13 @@ class FederalizationGetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($style);
+        $this->fedService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
         if ($catalogusId === false) {
-            $this->federalizationService->catalogiHandler();
+            $this->fedService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if ($catalogusObject === false) {
@@ -79,7 +79,7 @@ class FederalizationGetCommand extends Command
                 return 1;
             }
 
-            $this->federalizationService->readCatalogus($catalogusObject);
+            $this->fedService->readCatalogus($catalogusObject);
         }
 
         return Command::SUCCESS;

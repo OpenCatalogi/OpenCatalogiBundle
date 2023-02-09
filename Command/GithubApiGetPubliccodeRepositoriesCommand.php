@@ -24,14 +24,14 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService  $githubPubliccodeService;
+    private GithubPubliccodeService  $githubPubService;
 
     /**
-     * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     * @param GithubPubliccodeService $githubPubService GithubPubliccodeService
      */
-    public function __construct(GithubPubliccodeService $githubPubliccodeService)
+    public function __construct(GithubPubliccodeService $githubPubService)
     {
-        $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->githubPubService = $githubPubService;
         parent::__construct();
     }//end __construct()
 
@@ -55,7 +55,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->githubPubliccodeService->setStyle($style);
+        $this->githubPubService->setStyle($style);
 
         $style->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
 
@@ -63,10 +63,10 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         $repositoryId = $input->getOption('repository', false);
 
         if ($repositoryId === false) {
-            if ($this->githubPubliccodeService->getRepositories() === false) {
+            if ($this->githubPubService->getRepositories() === false) {
                 return Command::FAILURE;
             }
-        } else if ($this->githubPubliccodeService->getRepository($repositoryId) === false) {
+        } else if ($this->githubPubService->getRepository($repositoryId) === false) {
             return Command::FAILURE;
         }
 

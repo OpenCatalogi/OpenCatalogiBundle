@@ -24,14 +24,14 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     /**
      * @var FindGithubRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
+    private FindGithubRepositoryThroughOrganizationService  $githubThroughOrgService;
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService FindGithubRepositoryThroughOrganizationService
+     * @param FindGithubRepositoryThroughOrganizationService $githubThroughOrgService FindGithubRepositoryThroughOrganizationService
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $githubThroughOrgService)
     {
-        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
+        $this->githubThroughOrgService = $githubThroughOrgService;
         parent::__construct();
     }//end __construct()
 
@@ -55,16 +55,16 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($style);
+        $this->githubThroughOrgService->setStyle($style);
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
         if ($organisationId === false) {
-            if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
+            if (!$this->githubThroughOrgService->findGithubRepositoryThroughOrganizationHandler()) {
                 return Command::FAILURE;
             }
-        } else if ($this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId) === false) {
+        } else if ($this->githubThroughOrgService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId) === false) {
             return Command::FAILURE;
         }
 
