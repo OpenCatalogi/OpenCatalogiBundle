@@ -35,7 +35,7 @@ class ComponentenCatalogusService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var Entity|null
@@ -103,7 +103,7 @@ class ComponentenCatalogusService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->developerOverheidService = $developerOverheidService;
     }//end __construct()
@@ -119,7 +119,7 @@ class ComponentenCatalogusService
     {
         $this->style = $style;
         $this->developerOverheidService->setStyle($style);
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
 
         return $this;
@@ -323,14 +323,14 @@ class ComponentenCatalogusService
             return null;
         }
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $applicationEntity, $application['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $applicationEntity, $application['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$application['name']);
         isset($this->style) && $this->style->comment('The mapping object '.$mapping);
 
         isset($this->style) && $this->style->success('Checking application '.$application['name']);
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $application);
+        $synchronization = $this->syncService->synchronize($synchronization, $application);
 
         $applicationObject = $synchronization->getObject();
 
@@ -532,7 +532,7 @@ class ComponentenCatalogusService
         }
 
         // Handle sync.
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$component['name']);
         isset($this->style) && $this->style->comment('The mapping object '.$mapping);
@@ -547,7 +547,7 @@ class ComponentenCatalogusService
             unset($component['legal']['repoOwner']);
         }
 
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
+        $synchronization = $this->syncService->synchronize($synchronization, $component);
         $componentObject = $synchronization->getObject();
 
         $this->importRepositoryThroughComponent($componentArray, $componentObject);

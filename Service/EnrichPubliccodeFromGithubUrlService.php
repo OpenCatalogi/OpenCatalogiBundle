@@ -35,7 +35,7 @@ class EnrichPubliccodeFromGithubUrlService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -124,7 +124,7 @@ class EnrichPubliccodeFromGithubUrlService
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->configuration = [];
         $this->data = [];
@@ -140,7 +140,7 @@ class EnrichPubliccodeFromGithubUrlService
     public function setStyle(SymfonyStyle $style): self
     {
         $this->symfonyStyle = $style;
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
         $this->githubPubliccodeService->setStyle($style);
 

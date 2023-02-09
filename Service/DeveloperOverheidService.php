@@ -35,7 +35,7 @@ class DeveloperOverheidService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var Entity|null
@@ -86,7 +86,7 @@ class DeveloperOverheidService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
     }//end __construct()
 
@@ -100,7 +100,7 @@ class DeveloperOverheidService
     public function setStyle(SymfonyStyle $style): self
     {
         $this->style = $style;
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
 
         return $this;
@@ -266,8 +266,8 @@ class DeveloperOverheidService
         }
 
         isset($this->style) && $this->style->success('Checking repository '.$repository['name']);
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
     }//end importRepository()
@@ -406,9 +406,9 @@ class DeveloperOverheidService
         }
 
         // Handle sync
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         isset($this->style) && $this->style->comment('Checking component '.$repository['name']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
     }//end handleRepositoryArray()
@@ -513,7 +513,7 @@ class DeveloperOverheidService
 
         // repoOwner
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$component['service_name']);
         isset($this->style) && $this->style->comment('The mapping object '.$mapping);
@@ -527,7 +527,7 @@ class DeveloperOverheidService
             unset($componentMapping['legal']['repoOwner']);
         }
 
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $componentMapping);
+        $synchronization = $this->syncService->synchronize($synchronization, $componentMapping);
         $componentObject = $synchronization->getObject();
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);

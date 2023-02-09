@@ -36,7 +36,7 @@ class GithubPubliccodeService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var Entity|null
@@ -107,7 +107,7 @@ class GithubPubliccodeService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
     }//end __construct()
 
@@ -121,7 +121,7 @@ class GithubPubliccodeService
     public function setStyle(SymfonyStyle $style): self
     {
         $this->style = $style;
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
 
         return $this;
@@ -438,14 +438,14 @@ class GithubPubliccodeService
             return null;
         }
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$repository['repository']['name']);
         isset($this->style) && $this->style->comment('The mapping object '.$repositoriesMapping);
 
         isset($this->style) && $this->style->comment('Checking repository '.$repository['repository']['name']);
         $synchronization->setMapping($repositoriesMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
         isset($this->style) && $this->style->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
@@ -482,14 +482,14 @@ class GithubPubliccodeService
             return null;
         }
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$repository['name']);
         isset($this->style) && $this->style->comment('The mapping object '.$repositoryMapping);
 
         isset($this->style) && $this->style->comment('Checking repository '.$repository['name']);
         $synchronization->setMapping($repositoryMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
         isset($this->style) && $this->style->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();

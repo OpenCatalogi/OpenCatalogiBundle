@@ -49,7 +49,7 @@ class GithubApiService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -106,7 +106,7 @@ class GithubApiService
         $this->parameterBag = $parameterBag;
         $this->callService = $callService;
         $this->entityManager = $entityManager;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
 
         $this->repositoryMapping = null;
@@ -399,8 +399,8 @@ class GithubApiService
         $mappedRepository = $this->mappingService->mapping($this->repositoryMapping ?? $mapping, $repository);
 
         // Handle sync
-        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->repositoryEntity ?? $repositoryEntity, $mappedRepository['url']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $mappedRepository);
+        $synchronization = $this->syncService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->repositoryEntity ?? $repositoryEntity, $mappedRepository['url']);
+        $synchronization = $this->syncService->synchronize($synchronization, $mappedRepository);
         $repositoryObject = $synchronization->getObject();
         $repository = $repositoryObject->toArray();
 
@@ -435,7 +435,7 @@ class GithubApiService
 
         // Turn the organisation into a synchronyzed object
         // $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $mappedOrganisation);
+        $synchronization = $this->syncService->synchronize($synchronization, $mappedOrganisation);
         $organisationObject = $synchronization->getObject();
         $organisation = $organisationObject->toArray();
 

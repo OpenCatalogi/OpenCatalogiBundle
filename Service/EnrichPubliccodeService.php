@@ -35,7 +35,7 @@ class EnrichPubliccodeService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -104,7 +104,7 @@ class EnrichPubliccodeService
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->configuration = [];
         $this->data = [];
@@ -120,7 +120,7 @@ class EnrichPubliccodeService
     public function setStyle(SymfonyStyle $style): self
     {
         $this->style = $style;
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
         $this->githubPubliccodeService->setStyle($style);
 

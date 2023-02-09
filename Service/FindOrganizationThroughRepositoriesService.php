@@ -58,7 +58,7 @@ class FindOrganizationThroughRepositoriesService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -115,7 +115,7 @@ class FindOrganizationThroughRepositoriesService
         $this->entityManager = $entityManager;
         $this->githubApiService = $githubApiService;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
         $this->mappingService = $mappingService;
 
         $this->configuration = [];
@@ -133,7 +133,7 @@ class FindOrganizationThroughRepositoriesService
     {
         $this->style = $style;
         $this->githubPubliccodeService->setStyle($style);
-        $this->synchronizationService->setStyle($style);
+        $this->syncService->setStyle($style);
         $this->mappingService->setStyle($style);
 
         return $this;
@@ -340,14 +340,14 @@ class FindOrganizationThroughRepositoriesService
             return null;
         }
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $organisationEntity, $organisation['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $organisationEntity, $organisation['id']);
 
         isset($this->style) && $this->style->comment('Mapping object'.$organisation['login']);
         isset($this->style) && $this->style->comment('The mapping object '.$organisationMapping);
 
         isset($this->style) && $this->style->comment('Checking organisation '.$organisation['login']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
+        $synchronization = $this->syncService->synchronize($synchronization, $organisation);
         isset($this->style) && $this->style->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
 
         return $synchronization->getObject();
