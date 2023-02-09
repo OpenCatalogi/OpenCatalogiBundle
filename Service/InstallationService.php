@@ -14,8 +14,8 @@ use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstallationService implements InstallerInterface
 {
@@ -72,13 +72,14 @@ class InstallationService implements InstallerInterface
      * @param EntityManagerInterface $entityManager   EntityManagerInterface
      * @param ContainerInterface     $container       ContainerInterface
      * @param CatalogiService        $catalogiService CatalogiService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param LoggerInterface        $mappingLogger   The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         ContainerInterface $container,
         CatalogiService $catalogiService,
-        LoggerInterface $pluginLogger)
+        LoggerInterface $pluginLogger
+    )
     {
         $this->entityManager = $entityManager;
         $this->container = $container;
@@ -168,7 +169,6 @@ class InstallationService implements InstallerInterface
             $actionHandler = $this->container->get($handler);
 
             if ($this->entityManager->getRepository('App:Action')->findOneBy(['class' => get_class($actionHandler)])) {
-
                 $this->logger->error('Action found for '.$handler);
                 continue;
             }
@@ -202,7 +202,6 @@ class InstallationService implements InstallerInterface
             $action->setAsync(false);
 
             $this->entityManager->persist($action);
-
 
             $this->logger->debug('Action created for '.$handler);
         }
@@ -289,8 +288,6 @@ class InstallationService implements InstallerInterface
     public function createDashboardCards($objectsThatShouldHaveCards)
     {
         foreach ($objectsThatShouldHaveCards as $object) {
-
-
             $this->logger->debug('Looking for a dashboard card for: '.$object);
 
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);

@@ -66,7 +66,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
             if ($this->githubPubService->getRepositories() === false) {
                 return Command::FAILURE;
             }
-        } else if ($this->githubPubService->getRepository($repositoryId) === false) {
+        } elseif ($this->githubPubService->getRepository($repositoryId) === false) {
             return Command::FAILURE;
         }
 

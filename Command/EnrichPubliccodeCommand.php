@@ -62,7 +62,7 @@ class EnrichPubliccodeCommand extends Command
 
         if ($repositoryId === false) {
             $this->publiccodeService->enrichPubliccodeHandler();
-        } else if ($this->publiccodeService->enrichPubliccodeHandler([], [], $repositoryId) === false) {
+        } elseif ($this->publiccodeService->enrichPubliccodeHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 

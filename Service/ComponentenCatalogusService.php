@@ -90,7 +90,7 @@ class ComponentenCatalogusService
     /**
      * @param EntityManagerInterface   $entityManager            EntityManagerInterface
      * @param CallService              $callService              CallService
-     * @param SynchronizationService   $syncService   SynchronizationService
+     * @param SynchronizationService   $syncService              SynchronizationService
      * @param MappingService           $mappingService           MappingService
      * @param DeveloperOverheidService $developerOverheidService DeveloperOverheidService
      */

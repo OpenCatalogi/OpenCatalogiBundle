@@ -29,8 +29,8 @@ class FederalizationGetCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService  $fedService FederalizationService
-     * @param EntityManagerInterface $entityManager          EntityManagerInterface
+     * @param FederalizationService  $fedService    FederalizationService
+     * @param EntityManagerInterface $entityManager EntityManagerInterface
      */
     public function __construct(FederalizationService $fedService, EntityManagerInterface $entityManager)
     {

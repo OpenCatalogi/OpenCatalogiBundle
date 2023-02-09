@@ -12,9 +12,8 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnrichPubliccodeService
 {
@@ -91,10 +90,10 @@ class EnrichPubliccodeService
     /**
      * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param CallService             $callService             CallService
-     * @param SynchronizationService  $syncService  SynchronizationService
+     * @param SynchronizationService  $syncService             SynchronizationService
      * @param MappingService          $mappingService          MappingService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param LoggerInterface         $mappingLogger           The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,

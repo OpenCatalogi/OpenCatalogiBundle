@@ -12,9 +12,8 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
@@ -101,9 +100,9 @@ class FindOrganizationThroughRepositoriesService
      * @param EntityManagerInterface  $entityManager           EntityManagerInterface
      * @param GithubApiService        $githubApiService        GithubApiService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
-     * @param SynchronizationService  $syncService  SynchronizationService
+     * @param SynchronizationService  $syncService             SynchronizationService
      * @param MappingService          $mappingService          MappingService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param LoggerInterface         $mappingLogger           The logger
      */
     public function __construct(
         CallService $callService,
@@ -136,6 +135,7 @@ class FindOrganizationThroughRepositoriesService
         $this->githubApi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
         if ($this->githubApi === false) {
             $this->logger->error('No source found for https://api.github.com');
+
             return null;
         }
 
@@ -152,6 +152,7 @@ class FindOrganizationThroughRepositoriesService
         $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if ($this->organisationEntity === false) {
             $this->logger->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+
             return null;
         }
 
@@ -168,6 +169,7 @@ class FindOrganizationThroughRepositoriesService
         $this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity) {
             $this->logger->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+
             return null;
         }
 
@@ -251,6 +253,7 @@ class FindOrganizationThroughRepositoriesService
         if (isset($response)) {
             $repository = $this->callService->decodeResponse($source, $response, 'application/json');
             $this->logger->info("Fetch and decode went succesfull for /repos/$slug");
+
             return $repository;
         }
 
@@ -308,7 +311,6 @@ class FindOrganizationThroughRepositoriesService
     {
         // Do we have a source
         if ($source = $this->getSource() === false) {
-
             $this->logger->error('No source found when trying to import an Organisation ');
 
             return null;
@@ -329,10 +331,11 @@ class FindOrganizationThroughRepositoriesService
         $synchronization->setMapping($organisationMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $organisation);
 
-        $this->logger->info('Organisation synchronization created with id: '.$synchronization->getId()->toString(),
+        $this->logger->info(
+            'Organisation synchronization created with id: '.$synchronization->getId()->toString(),
             [
-                "Checking organisation"=>$organisation['login'],
-                "The mapping object"=> $organisationMapping
+                'Checking organisation'=> $organisation['login'],
+                'The mapping object'   => $organisationMapping,
             ]
         );
 
@@ -392,6 +395,7 @@ class FindOrganizationThroughRepositoriesService
             $componentEntity = $this->getComponentEntity();
             if ($componentEntity === false) {
                 $this->logger->error('No ComponentEntity found when trying to import a Component ');
+
                 return null;
             }
 

@@ -31,7 +31,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
      */
     public function __construct(EnrichPubliccodeFromGithubUrlService $publiccodeService)
     {
-        $this->publiccodeService= $publiccodeService;
+        $this->publiccodeService = $publiccodeService;
         parent::__construct();
     }//end construct()
 
@@ -62,7 +62,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
 
         if ($repositoryId === false) {
             $this->publiccodeService->enrichPubliccodeFromGithubUrlHandler();
-        } else if ($this->publiccodeService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId) === false) {
+        } elseif ($this->publiccodeService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId) === false) {
             return Command::FAILURE;
         }
 
