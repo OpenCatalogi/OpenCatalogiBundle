@@ -14,10 +14,10 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
+use Psr\Log\LoggerInterface;
 
 class GithubApiService
 {
@@ -37,9 +37,9 @@ class GithubApiService
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     /**
      * @var Source
@@ -95,19 +95,22 @@ class GithubApiService
      * @param EntityManagerInterface $entityManager          EntityManagerInterface
      * @param SynchronizationService $syncService SynchronizationService
      * @param MappingService         $mappingService         MappingService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         ParameterBagInterface $parameterBag,
         CallService $callService,
         EntityManagerInterface $entityManager,
         SynchronizationService $syncService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $pluginLogger
     ) {
         $this->parameterBag = $parameterBag;
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->syncService = $syncService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
 
         $this->repositoryMapping = null;
         $this->organizationMapping = null;
@@ -119,27 +122,13 @@ class GithubApiService
         // $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
     }
 
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $style The symfony style
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $style): self
-    {
-        $this->style = $style;
 
-        return $this;
-    }
 
     public function getSource()
     {
         !isset($this->source) && $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com/']);
         if (!isset($this->source)) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find a Source for the Github API');
-
+            $this->logger->error('Could not find a Source for the Github API');
             return [];
         }
 
@@ -257,8 +246,8 @@ class GithubApiService
     public function checkPublicRepository(string $slug): bool
     {
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find Source: Github API');
+
+            $this->logger->error('Could not find Source: Github API');
 
             return false;
         }
@@ -270,8 +259,7 @@ class GithubApiService
             $response = $this->callService->call($this->githubApiSource, '/repos/'.$slug);
             $repository = $this->callService->decodeResponse($this->githubApiSource, $response);
         } catch (Exception $exception) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error("Exception while checking if public repository: {$exception->getMessage()}");
+            $this->logger->error("Exception while checking if public repository: {$exception->getMessage()}");
 
             return false;
         }
@@ -286,40 +274,36 @@ class GithubApiService
     {
         // get github source
         if (!isset($this->githubApiSource) && !$this->githubApiSource = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find Source: Github API');
+            $this->logger->error('Could not find Source: Github API');
 
             return null;
         }
         if (!isset($this->repositoryEntity) && !$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json'])) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
+            $this->logger->error('Could not find a entity for reference https://opencatalogi.nl/oc.repository.schema.json');
 
             return null;
         }
         if (!isset($this->organizationEntity) && !$this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
+            $this->logger->error('Could not find a entity for reference https://opencatalogi.nl/oc.organisation.schema.json');
 
             return null;
         }
 
         if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
-            // @TODO Monolog ?
-            isset($this->style) && $this->style->error('Could not find a repository for reference https://api.github.com/search/code');
+            $this->logger->error('Could not find a repository for reference https://api.github.com/search/code');
 
             return null;
         }
 
         if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
-            isset($this->style) && $this->style->error('No mapping found for https://api.github.com/repositories');
+            $this->logger->error('No mapping found for https://api.github.com/repositories');
 
             return null;
         }
 
         // check if github source has authkey
         if (!$this->githubApiSource->getApiKey()) {
-            isset($this->style) && $this->style->error('No auth set for Source: GitHub API');
+            $this->logger->error('No auth set for Source: GitHub API');
 
             return null;
         }
@@ -389,7 +373,7 @@ class GithubApiService
     {
         // check for mapping
         if (!$this->repositoryMapping && !$mapping) {
-            $this->style->error('Repository mapping not set/given');
+            $this->logger->error('Repository mapping not set/given');
 
             return null;
         }
@@ -425,7 +409,7 @@ class GithubApiService
 
         // check for mapping
         if (!$this->organizationMapping && !$mapping) {
-            $this->style->error('Organization mapping not set/given');
+            $this->logger->error('Organization mapping not set/given');
 
             return null;
         }
@@ -434,7 +418,7 @@ class GithubApiService
         $mappedOrganisation = $this->mappingService->mapping($this->organizationMapping ?? $mapping, $organisation);
 
         // Turn the organisation into a synchronyzed object
-        // $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
         $synchronization = $this->syncService->synchronize($synchronization, $mappedOrganisation);
         $organisationObject = $synchronization->getObject();
         $organisation = $organisationObject->toArray();
