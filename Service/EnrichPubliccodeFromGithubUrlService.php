@@ -14,6 +14,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 class EnrichPubliccodeFromGithubUrlService
 {
@@ -23,9 +24,9 @@ class EnrichPubliccodeFromGithubUrlService
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $symfonyStyle;
+    private LoggerInterface $logger;
 
     /**
      * @var CallService
@@ -113,13 +114,15 @@ class EnrichPubliccodeFromGithubUrlService
      * @param SynchronizationService  $syncService  SynchronizationService
      * @param MappingService          $mappingService          MappingService
      * @param GithubPubliccodeService $githubPubliccodeService GithubPubliccodeService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $syncService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService
+        GithubPubliccodeService $githubPubliccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
@@ -128,24 +131,9 @@ class EnrichPubliccodeFromGithubUrlService
         $this->mappingService = $mappingService;
         $this->configuration = [];
         $this->data = [];
+        $this->logger = $pluginLogger;
     }
 
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $style The symfony style
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $style): self
-    {
-        $this->symfonyStyle = $style;
-        $this->syncService->setStyle($style);
-        $this->mappingService->setStyle($style);
-        $this->githubPubliccodeService->setStyle($style);
-
-        return $this;
-    }
 
     /**
      * Get the github api source.
@@ -156,7 +144,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com']);
         if ($this->source === false) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No source found for https://api.github.com');
+            $this->logger->error('No source found for https://api.github.com');
         }
 
         return $this->source;
@@ -171,7 +159,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
         if ($this->repositoryEntity === false) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
         }
 
         return $this->repositoryEntity;
@@ -186,7 +174,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
         if ($this->componentEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
         }
 
         return $this->componentEntity;
@@ -201,7 +189,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
         if ($this->applicationEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
         }
 
         return $this->applicationEntity;
@@ -216,7 +204,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->organizationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
         if ($this->organizationEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
         }
 
         return $this->organizationEntity;
@@ -231,7 +219,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->contractorsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contractor.schema.json']);
         if ($this->contractorsEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.contractor.schema.json');
         }
 
         return $this->contractorsEntity;
@@ -246,7 +234,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->contactsEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.contact.schema.json']);
         if ($this->contactsEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.contact.schema.json');
         }
 
         return $this->contactsEntity;
@@ -261,7 +249,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->dependencyEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.dependency.schema.json']);
         if ($this->dependencyEntity === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No entity found for https://opencatalogi.nl/oc.dependency.schema.json');
+            $this->logger->error('No entity found for https://opencatalogi.nl/oc.dependency.schema.json');
         }
 
         return $this->dependencyEntity;
@@ -276,7 +264,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component']);
         if ($this->repositoryMapping === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No mapping found for https://api.github.com/publiccode/component');
+            $this->logger->error('No mapping found for https://api.github.com/publiccode/component');
 
             return null;
         }
@@ -298,7 +286,7 @@ class EnrichPubliccodeFromGithubUrlService
         // Make sync object.
         $source = $this->getGithubSource();
         if ($source === false) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No source found when trying to get a Repository with publiccode url: '.$repositoryUrl);
+            $this->logger->error('No source found when trying to get a Repository with publiccode url: '.$repositoryUrl);
 
             return null;
         }
@@ -306,14 +294,14 @@ class EnrichPubliccodeFromGithubUrlService
         try {
             $response = $this->callService->call($source, '/repos/'.$repositoryUrl.'/contents/publiccode.yaml');
         } catch (Exception $e) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yaml '.$e->getMessage());
+            $this->logger->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yaml '.$e->getMessage());
         }
 
         if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/repos/'.$repositoryUrl.'/contents/publiccode.yml');
             } catch (Exception $e) {
-                isset($this->symfonyStyle) && $this->symfonyStyle->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yml '.$e->getMessage());
+                $this->logger->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yml '.$e->getMessage());
             }
         }
 
@@ -334,8 +322,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $repositoryMapping = $this->getRepositoryMapping();
         if ($repositoryMapping === null) {
-            isset($this->symfonyStyle) && $this->symfonyStyle->error('No repositoriesMapping found when trying to import a Repository '.isset($repository['name']) ? $repository['name'] : '');
-
+            $this->logger->error('No repositoriesMapping found when trying to import a Repository ');
             return null;
         }
 
@@ -367,15 +354,15 @@ class EnrichPubliccodeFromGithubUrlService
                     $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
                 }
             } else {
-                isset($this->symfonyStyle) && $this->symfonyStyle->error('Could not find given repository');
+                $this->logger->error('Could not find given repository');
             }
         } else {
             if ($repositoryEntity = $this->getRepositoryEntity() === false) {
-                isset($this->symfonyStyle) && $this->symfonyStyle->error('No RepositoryEntity found when trying to import a Repository ');
+                $this->logger->error('No RepositoryEntity found when trying to import a Repository ');
             }
 
             // If we want to do it for al repositories
-            isset($this->symfonyStyle) && $this->symfonyStyle->info('Looping through repositories');
+            $this->logger->debug('Looping through repositories');
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 if ($repository->getValue('publiccode_url') === false) {
                     $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
@@ -384,7 +371,7 @@ class EnrichPubliccodeFromGithubUrlService
         }
         $this->entityManager->flush();
 
-        isset($this->symfonyStyle) && $this->symfonyStyle->success('enrichPubliccodeFromGithubUrlHandler finished');
+        $this->logger->info('enrichPubliccodeFromGithubUrlHandler finished');
 
         return $this->data;
     }//end enrichPubliccodeFromGithubUrlHandler()
