@@ -90,12 +90,12 @@ class GithubApiService
     // private ?Client $githubusercontentClient;
 
     /**
-     * @param ParameterBagInterface  $parameterBag           ParameterBagInterface
-     * @param CallService            $callService            CallService
-     * @param EntityManagerInterface $entityManager          EntityManagerInterface
-     * @param SynchronizationService $syncService SynchronizationService
-     * @param MappingService         $mappingService         MappingService
-     * @param LoggerInterface  $mappingLogger The logger
+     * @param ParameterBagInterface $parameterBag The ParameterBagInterface
+     * @param CallService $callService The CallService
+     * @param EntityManagerInterface $entityManager The EntityManagerInterface
+     * @param SynchronizationService $syncService The SynchronizationService
+     * @param MappingService $mappingService The MappingService
+     * @param LoggerInterface $pluginLogger The LoggerInterface
      */
     public function __construct(
         ParameterBagInterface $parameterBag,
@@ -120,9 +120,7 @@ class GithubApiService
 
         // $this->githubClient = $this->parameterBag->get('github_key') ? new Client(['base_uri' => 'https://api.github.com/', 'headers' => ['Authorization' => 'Bearer '.$this->parameterBag->get('github_key')]]) : null;
         // $this->githubusercontentClient = new Client(['base_uri' => 'https://raw.githubusercontent.com/']);
-    }
-
-
+    }//end __construct()
 
     public function getSource()
     {
@@ -133,7 +131,7 @@ class GithubApiService
         }
 
         return $this->source;
-    }
+    }//end getSource()
 
     /**
      * This function gets all the github repository details.
@@ -161,7 +159,7 @@ class GithubApiService
             //            'topics' => $this->requestFromUrl($item['topics'], '{/name}'),
             //                'related_apis' => //
         ];
-    }
+    }//end getGithubRepositoryInfo()
 
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
@@ -187,7 +185,7 @@ class GithubApiService
         $response = json_decode($response->getBody()->getContents(), true);
 
         return $this->getGithubRepositoryInfo($response);
-    }
+    }//end getRepositoryFromUrl()
 
     /**
      * This function gets the content of the given url.
