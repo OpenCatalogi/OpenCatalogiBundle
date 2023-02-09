@@ -395,6 +395,7 @@ class GithubPubliccodeService
 
             return null;
         }
+
         $repository = $this->importRepository($repository);
         if ($repository === null) {
             return null;
@@ -775,7 +776,7 @@ class GithubPubliccodeService
 
             $maintenance = $componentObject->getValue('maintenance');
             if ($maintenance === true) {
-                if ($maintenance->getValue('contacts')) {
+                if ($maintenance->getValue('contacts') === true) {
                     // if the component is already set to a contractors return the component object
                     return $componentObject;
                 }
@@ -834,9 +835,11 @@ class GithubPubliccodeService
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
         // set the name
-        $component->hydrate([
+        $component->hydrate(
+            [
             'name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'),
-        ]);
+            ])
+        ;
 
         $component = $this->createApplicationSuite($publiccode, $component);
         $component = $this->createMainCopyrightOwner($publiccode, $component);
@@ -858,7 +861,7 @@ class GithubPubliccodeService
 
     /**
      * @param string $repositoryUrl The url of the repository
-     * @param $response
+     * @param mixed $response The responce
      *
      * @return array|null
      */
@@ -884,7 +887,7 @@ class GithubPubliccodeService
             isset($this->style) && $this->style->error('Not able to parse '.$publiccode.' '.$e->getMessage());
         }
 
-        if (isset($parsedPubliccode)) {
+        if (isset($parsedPubliccode) === true) {
             isset($this->style) && $this->style->success("Fetch and decode went succesfull for $repositoryUrl");
 
             return $parsedPubliccode;
