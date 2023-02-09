@@ -88,7 +88,7 @@ class DeveloperOverheidService
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -104,7 +104,7 @@ class DeveloperOverheidService
         $this->mappingService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get the developer overheid source.
@@ -138,7 +138,7 @@ class DeveloperOverheidService
         }
 
         return $this->repositoryEntity;
-    }
+    }//end getRepositoryEntity()
 
     /**
      * Get the repository entity.
@@ -155,7 +155,7 @@ class DeveloperOverheidService
         }
 
         return $this->organisationEntity;
-    }
+    }//end getOrganisationEntity()
 
     /**
      * Get the legal entity.
@@ -172,7 +172,7 @@ class DeveloperOverheidService
         }
 
         return $this->legalEntity;
-    }
+    }//end getLegalEntity()
 
     /**
      * Get repositories through the repositories of developer.overheid.nl/repositories.
@@ -201,7 +201,7 @@ class DeveloperOverheidService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end getRepositories()
 
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
@@ -241,7 +241,7 @@ class DeveloperOverheidService
         isset($this->io) && $this->io->success('Found repository with id: '.$id);
 
         return $repository->getObject();
-    }
+    }//end getRepository()
 
     /**
      * @todo duplicate with GithubPubliccodeService ?
@@ -270,7 +270,7 @@ class DeveloperOverheidService
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
-    }
+    }//end importRepository()
 
     /**
      * Get the component entity.
@@ -287,7 +287,7 @@ class DeveloperOverheidService
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the component mapping.
@@ -304,7 +304,7 @@ class DeveloperOverheidService
         }
 
         return $this->componentMapping;
-    }
+    }//end getComponentMapping()
 
     /**
      * Get components through the components of developer.overheid.nl/apis.
@@ -337,7 +337,7 @@ class DeveloperOverheidService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end getComponents()
 
     /**
      * Get a component trough the components of developer.overheid.nl/apis/{id}.
@@ -379,7 +379,7 @@ class DeveloperOverheidService
         isset($this->io) && $this->io->success('Found component with id: '.$id);
 
         return $component->toArray();
-    }
+    }//end getComponent()
 
     /**
      * Turn a repo array into an object we can handle.
@@ -411,7 +411,7 @@ class DeveloperOverheidService
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
-    }
+    }//end handleRepositoryArray()
 
     /**
      * @param array        $componentArray
@@ -478,7 +478,7 @@ class DeveloperOverheidService
         }
 
         return null;
-    }
+    }//end importLegalRepoOwnerThroughComponent()
 
     /**
      * @todo duplicate with ComponentenCatalogusService ?
@@ -543,5 +543,5 @@ class DeveloperOverheidService
         $this->entityManager->persist($componentObject);
 
         return $componentObject;
-    }
+    }//end importComponent()
 }
