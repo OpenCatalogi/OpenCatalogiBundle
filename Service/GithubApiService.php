@@ -416,7 +416,7 @@ class GithubApiService
         $mappedOrganisation = $this->mappingService->mapping($this->organizationMapping ?? $mapping, $organisation);
 
         // Turn the organisation into a synchronyzed object
-        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
+        //$synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId);
         $synchronization = $this->syncService->synchronize($synchronization, $mappedOrganisation);
         $organisationObject = $synchronization->getObject();
         $organisation = $organisationObject->toArray();
