@@ -14,8 +14,8 @@ use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class InstallationService implements InstallerInterface
 {
@@ -30,9 +30,9 @@ class InstallationService implements InstallerInterface
     private ContainerInterface $container;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     /**
      * @var CatalogiService
@@ -72,27 +72,19 @@ class InstallationService implements InstallerInterface
      * @param EntityManagerInterface $entityManager   EntityManagerInterface
      * @param ContainerInterface     $container       ContainerInterface
      * @param CatalogiService        $catalogiService CatalogiService
+     * @param LoggerInterface  $mappingLogger The logger
      */
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ContainerInterface $container,
+        CatalogiService $catalogiService,
+        LoggerInterface $pluginLogger)
     {
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->catalogiService = $catalogiService;
+        $this->logger = $pluginLogger;
     }//end __construct()
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->style = $io;
-
-        return $this;
-    }//end setStyle()
 
     /**
      * @throws Exception
@@ -169,13 +161,15 @@ class InstallationService implements InstallerInterface
         $sourceRepository = $this->entityManager->getRepository('App:Gateway');
 
         $actionHandlers = $this::ACTION_HANDLERS;
-        (isset($this->style) ? $this->style->writeln(['', '<info>Looking for actions</info>']) : '');
+
+        $this->logger->debug('Looking for actions');
 
         foreach ($actionHandlers as $handler) {
             $actionHandler = $this->container->get($handler);
 
             if ($this->entityManager->getRepository('App:Action')->findOneBy(['class' => get_class($actionHandler)])) {
-                (isset($this->style) ? $this->style->writeln(['Action found for '.$handler]) : '');
+
+                $this->logger->error('Action found for '.$handler);
                 continue;
             }
 
@@ -209,7 +203,8 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($action);
 
-            (isset($this->style) ? $this->style->writeln(['Action created for '.$handler]) : '');
+
+            $this->logger->debug('Action created for '.$handler);
         }
     }//end addActions()
 
@@ -232,7 +227,8 @@ class InstallationService implements InstallerInterface
                 $endpoints[] = $endpoint;
             }
         }
-        (isset($this->style) ? $this->style->writeln(count($endpoints).' Endpoints Created') : '');
+
+        $this->logger->info(count($endpoints).' Endpoints Created');
 
         return $endpoints;
     }//end createEndpoints()
@@ -279,7 +275,8 @@ class InstallationService implements InstallerInterface
             $this->entityManager->flush();
             $collections[$collectionConfig['name']] = $collection;
         }
-        (isset($this->style) ? $this->style->writeln(count($collections).' Collections Created') : '');
+
+        $this->logger->info(count($collections).' Collections Created');
 
         return $collections;
     }//end createCollections()
@@ -292,7 +289,10 @@ class InstallationService implements InstallerInterface
     public function createDashboardCards($objectsThatShouldHaveCards)
     {
         foreach ($objectsThatShouldHaveCards as $object) {
-            (isset($this->style) ? $this->style->writeln('Looking for a dashboard card for: '.$object) : '');
+
+
+            $this->logger->debug('Looking for a dashboard card for: '.$object);
+
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
             if (
                 $dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()]) === false
@@ -306,10 +306,11 @@ class InstallationService implements InstallerInterface
                 $dashboardCard->setEntityId($entity->getId());
                 $dashboardCard->setOrdering(1);
                 $this->entityManager->persist($dashboardCard);
-                (isset($this->style) ? $this->style->writeln('Dashboard card created') : '');
+                $this->logger->debug('Dashboard card created');
                 continue;
             }
-            (isset($this->style) ? $this->style->writeln('Dashboard card found') : '');
+
+            $this->logger->debug('Dashboard card found');
         }
     }//end createDashboardCards()
 
@@ -318,7 +319,8 @@ class InstallationService implements InstallerInterface
      */
     public function createCronjobs()
     {
-        (isset($this->style) ? $this->style->writeln(['', '<info>Looking for cronjobs</info>']) : '');
+        $this->logger->debug('Looking for cronjobs');
+
         // We only need 1 cronjob so lets set that.
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi']);
         if ($cronjob === false) {
@@ -330,9 +332,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->style) ? $this->style->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('Created a cronjob for '.$cronjob->getName());
         } else {
-            (isset($this->style) ? $this->style->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('There is alreade a cronjob for '.$cronjob->getName());
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger']);
@@ -345,9 +347,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->style) ? $this->style->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('Created a cronjob for '.$cronjob->getName());
         } else {
-            (isset($this->style) ? $this->style->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('There is alreade a cronjob for '.$cronjob->getName());
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper']);
@@ -361,9 +363,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->style) ? $this->style->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('Created a cronjob for '.$cronjob->getName());
         } else {
-            (isset($this->style) ? $this->style->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('There is alreade a cronjob for '.$cronjob->getName());
         }
 
         $cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation']);
@@ -377,9 +379,9 @@ class InstallationService implements InstallerInterface
 
             $this->entityManager->persist($cronjob);
 
-            (isset($this->style) ? $this->style->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('Created a cronjob for '.$cronjob->getName());
         } else {
-            (isset($this->style) ? $this->style->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
+            $this->logger->debug('There is alreade a cronjob for '.$cronjob->getName());
         }
     }//end createCronjobs()
 
@@ -397,7 +399,7 @@ class InstallationService implements InstallerInterface
         $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
         $componentenCatalogusSource->setIsEnabled(true);
         $this->entityManager->persist($componentenCatalogusSource);
-        isset($this->style) && $this->style->writeln('Gateway: '.$componentenCatalogusSource->getName().' created');
+        $this->logger->debug('Gateway: '.$componentenCatalogusSource->getName().' created');
 
         // developer.overheid
         $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
@@ -406,7 +408,7 @@ class InstallationService implements InstallerInterface
         $developerOverheid->setLocation('https://developer.overheid.nl/api');
         $developerOverheid->setIsEnabled(true);
         $this->entityManager->persist($developerOverheid);
-        isset($this->style) && $this->style->writeln('Gateway: '.$developerOverheid->getName().' created');
+        $this->logger->debug('Gateway: '.$developerOverheid->getName().' created');
 
         // GitHub API
         $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
@@ -420,7 +422,7 @@ class InstallationService implements InstallerInterface
         $this->entityManager->persist($gitHubAPI);
         $dashboardCard = new DashboardCard($gitHubAPI);
         $this->entityManager->persist($dashboardCard);
-        isset($this->style) && $this->style->writeln('Gateway: '.$gitHubAPI->getName().' created');
+        $this->logger->debug('Gateway: '.$gitHubAPI->getName().' created');
 
         // GitHub usercontent
         $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
@@ -429,7 +431,7 @@ class InstallationService implements InstallerInterface
         $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
         $gitHubUserContentSource->setIsEnabled(true);
         $this->entityManager->persist($gitHubUserContentSource);
-        isset($this->style) && $this->style->writeln('Gateway: '.$gitHubUserContentSource->getName().' created');
+        $this->logger->debug('Gateway: '.$gitHubUserContentSource->getName().' created');
 
         // flush the sources before adding actions via the addActions function
         // we need the id of the sources
@@ -485,7 +487,7 @@ class InstallationService implements InstallerInterface
             if ($foundSchema instanceof Entity) {
                 $schemas[] = $foundSchema;
             } else {
-                isset($this->style) && $this->style->writeln('Schema: '.$schema.' could not be found. Installation failed');
+                $this->logger->error('Schema: '.$schema.' could not be found. Installation failed');
 
                 throw new Exception('Schema: '.$schema.' could not be found. Installation failed');
             }
@@ -518,8 +520,6 @@ class InstallationService implements InstallerInterface
         $this->addActions();
 
         // Now we kan do a first federation
-        $this->catalogiService->setStyle($this->style);
-        //$this->catalogiService->readCatalogi($opencatalogi);
 
         /*@todo register this catalogi to the federation*/
         // This requers a post to a pre set webhook
