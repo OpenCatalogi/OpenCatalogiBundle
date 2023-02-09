@@ -125,16 +125,16 @@ class FindOrganizationThroughRepositoriesService
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $style The symfony style
      *
      * @return self
      */
-    public function setStyle(SymfonyStyle $io): self
+    public function setStyle(SymfonyStyle $style): self
     {
-        $this->style = $io;
-        $this->githubPubliccodeService->setStyle($io);
-        $this->synchronizationService->setStyle($io);
-        $this->mappingService->setStyle($io);
+        $this->style = $style;
+        $this->githubPubliccodeService->setStyle($style);
+        $this->synchronizationService->setStyle($style);
+        $this->mappingService->setStyle($style);
 
         return $this;
     }

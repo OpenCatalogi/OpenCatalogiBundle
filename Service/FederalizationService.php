@@ -38,17 +38,7 @@ class FederalizationService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
-
-    /**
-     * @var array
-     */
-    private array $data;
-
-    /**
-     * @var array
-     */
-    private array $configuration;
+    private SynchronizationService $syncService;
 
     /**
      * @var SymfonyStyle
@@ -94,19 +84,19 @@ class FederalizationService
         $this->session = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $synchronizationService;
     }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $style The symfony style
      *
      * @return self
      */
-    public function setStyle(SymfonyStyle $io): self
+    public function setStyle(SymfonyStyle $style): self
     {
-        $this->style = $io;
+        $this->style = $style;
 
         return $this;
     }//end setStyle()
@@ -306,7 +296,7 @@ class FederalizationService
         }
 
         // Lets sync
-        return $this->synchronizationService->synchronize($synchonization, $object);
+        return $this->syncService->synchronize($synchonization, $object);
     }//end handleObject()
 
     /**
