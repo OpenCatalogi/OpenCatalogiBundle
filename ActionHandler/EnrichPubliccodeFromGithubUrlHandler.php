@@ -3,18 +3,18 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService;
 
 /**
  * Haalt publiccode bestanden op.
  */
-class EnrichPubliccodeHandler implements ActionHandlerInterface
+class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 {
-    private EnrichPubliccodeService $enrichPubliccodeService;
+    private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
-    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
+    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
     {
-        $this->enrichPubliccodeService = $enrichPubliccodeService;
+        $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
     }
 
     public function getConfiguration()
@@ -22,7 +22,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
         return [
             '$id'        => 'https://example.com/person.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'EnrichPubliccodeHandler',
+            'title'      => 'EnrichPubliccodeFromGithubUrlHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],
             'properties' => [
@@ -53,6 +53,6 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
+        return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
     }
 }

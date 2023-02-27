@@ -45,13 +45,17 @@ class InstallationService implements InstallerInterface
     ];
 
     public const ACTION_HANDLERS = [
-        //            'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindRepositoriesThroughOrganizationHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
+        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeFromGithubUrlHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
+        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
     ];
 
@@ -148,7 +152,19 @@ class InstallationService implements InstallerInterface
             $defaultConfig = $this->addActionConfiguration($actionHandler);
             $action = new Action($actionHandler);
 
-            if ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
+            if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
+                $action->setListens(['opencatalogi.rating.handler']);
+                $action->setConditions([[1 => 1]]);
+            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
+                $action->setListens(['opencatalogi.github']);
+                $action->setConditions([[1 => 1]]);
+            } elseif (
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
+                strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
+            ) {
+                $action->setListens(['opencatalogi.bronnen.trigger']);
+                $action->setConditions([[1 => 1]]);
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
                 $action->setListens(['opencatalogi.githubevents.trigger']);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);
@@ -171,7 +187,7 @@ class InstallationService implements InstallerInterface
         foreach ($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
             if (!$endpointRepository->findOneBy(['name' => $entity->getName()])) {
-                $endpoint = new Endpoint($entity, $objectThatShouldHaveEndpoint['path'], $objectThatShouldHaveEndpoint['methods']);
+                $endpoint = new Endpoint($entity, null, $objectThatShouldHaveEndpoint);
 
                 $this->entityManager->persist($endpoint);
                 $this->entityManager->flush();
@@ -220,6 +236,16 @@ class InstallationService implements InstallerInterface
         (isset($this->io) ? $this->io->writeln(count($endpoints).' Endpoints Created') : '');
 
         return $endpoints;
+    }
+
+    public function setEntityMaxDepth()
+    {
+        $entities = $this->entityManager->getRepository('App:Entity')->findAll();
+        foreach ($entities as $entity) {
+            // set maxDepth for an entity to 5
+            $entity->setMaxDepth(5);
+            $this->entityManager->persist($entity);
+        }
     }
 
     private function addSchemasToCollection(CollectionEntity $collection, string $schemaPrefix): CollectionEntity
@@ -418,6 +444,9 @@ class InstallationService implements InstallerInterface
 
     public function checkDataConsistency()
     {
+        // set all entity maxDepth to 5
+        $this->setEntityMaxDepth();
+
         // Lets create some genneric dashboard cards
         $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
 

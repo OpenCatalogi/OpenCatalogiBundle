@@ -3,18 +3,18 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
+use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 
 /**
  * Haalt applications op van de componenten catalogus.
  */
-class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerInterface
+class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
 {
-    private ComponentenCatalogusService $componentenCatalogusService;
+    private DeveloperOverheidService $developerOverheidService;
 
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(DeveloperOverheidService $developerOverheidService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->developerOverheidService = $developerOverheidService;
     }
 
     /**
@@ -25,9 +25,9 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.componentencatalogus.application.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.developeroverheid.api.schema.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
-            'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
+            'title'      => 'DeveloperOverheidApiToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'   => [],
             'properties' => [],
@@ -44,6 +44,6 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->componentenCatalogusService->getApplications();
+        return $this->developerOverheidService->getComponents();
     }
 }
