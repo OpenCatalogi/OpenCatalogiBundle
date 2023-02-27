@@ -11,7 +11,6 @@ use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\Mapping;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -39,13 +38,9 @@ class InstallationService implements InstallerInterface
         ['reference' => 'https://opencatalogi.nl/oc.repository.schema.json',       'path' => '/repositories',        'methods' => []],
     ];
 
-    public const ENDPOINTS = [
-        ['reference' => null, 'name' => 'Search', 'description' => 'Generic Search Endpoint', 'path' => 'search', 'methods' => ['GET']],
-        ['reference' => 'https://opencatalogi.nl/oc.repository.schema.json', 'name' => 'GithubEvents', 'description' => 'This endpoint gets the event from github if something has changed in a repository.', 'path' => 'github_events', 'methods' => ['POST']]
-    ];
-
     public const ACTION_HANDLERS = [
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
@@ -56,7 +51,6 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
     ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
@@ -134,6 +128,8 @@ class InstallationService implements InstallerInterface
      */
     public function addActions(): void
     {
+        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+
         $actionHandlers = $this::ACTION_HANDLERS;
         (isset($this->io) ? $this->io->writeln(['', '<info>Looking for actions</info>']) : '');
 
@@ -155,6 +151,9 @@ class InstallationService implements InstallerInterface
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
                 $action->setConditions([[1 => 1]]);
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.githubEvent.action.json') {
+                $action->setListens(['opencatalogi.githubevents.trigger']);
+                $action->setConditions([[1 => 1]]);
             } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
                 $action->setListens(['opencatalogi.github']);
                 $action->setConditions([[1 => 1]]);
@@ -164,8 +163,6 @@ class InstallationService implements InstallerInterface
             ) {
                 $action->setListens(['opencatalogi.bronnen.trigger']);
                 $action->setConditions([[1 => 1]]);
-            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
-                $action->setListens(['opencatalogi.githubevents.trigger']);
             } else {
                 $action->setListens(['opencatalogi.default.listens']);
             }
@@ -180,7 +177,7 @@ class InstallationService implements InstallerInterface
         }
     }
 
-    private function createEndpointsWithSchema($objectsThatShouldHaveEndpoints): array
+    private function createEndpoints($objectsThatShouldHaveEndpoints): array
     {
         $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
         $endpoints = [];
@@ -188,45 +185,6 @@ class InstallationService implements InstallerInterface
             $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
             if (!$endpointRepository->findOneBy(['name' => $entity->getName()])) {
                 $endpoint = new Endpoint($entity, null, $objectThatShouldHaveEndpoint);
-
-                $this->entityManager->persist($endpoint);
-                $this->entityManager->flush();
-                $endpoints[] = $endpoint;
-            }
-        }
-        (isset($this->io) ? $this->io->writeln(count($endpoints).' Endpoints Created') : '');
-
-        return $endpoints;
-    }
-
-    private function createEndpoints($objectsThatShouldHaveEndpoints): array
-    {
-        $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
-        $endpoints = [];
-        foreach ($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
-            $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
-            if (!$endpointRepository->findOneBy(['name' => $objectThatShouldHaveEndpoint['name']])) {
-
-                if ($entity instanceof Entity) {
-                    $endpoint = new Endpoint($entity, $objectThatShouldHaveEndpoint['path'], $objectThatShouldHaveEndpoint['methods']);
-                } else {
-
-                    $endpoint = new Endpoint();
-                    $endpoint->setDescription($objectThatShouldHaveEndpoint['description']);
-                    $endpoint->setPath([$objectThatShouldHaveEndpoint['path']]);
-                    $endpoint->setPathRegex('^('.$objectThatShouldHaveEndpoint['path'].')$');
-                    $endpoint->setMethod('GET');
-                    $endpoint->setMethods($objectThatShouldHaveEndpoint['methods'] !== [] ? $objectThatShouldHaveEndpoint['methods'] : ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
-                    /*@depricated kept here for lagacy */
-                    $endpoint->setOperationType('GET');
-                }
-
-                if ($objectThatShouldHaveEndpoint['reference'] == 'https://opencatalogi.nl/oc.repository.schema.json') {
-                    $endpoint->setThrows(['opencatalogi.githubevents.trigger']);
-                }
-
-                // set the given name as name for both ways otherwise the check on name will fale
-                $endpoint->setName($objectThatShouldHaveEndpoint['name']);
 
                 $this->entityManager->persist($endpoint);
                 $this->entityManager->flush();
@@ -454,8 +412,57 @@ class InstallationService implements InstallerInterface
         $this->createCollections();
 
         // cretae endpoints
-        $this->createEndpointsWithSchema($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
-        $this->createEndpoints($this::ENDPOINTS);
+        $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
+
+        // Doesnt work so lets let search endpoint return all
+        $schemasToAddToSearchEndpoint = [
+            'https://opencatalogi.nl/oc.application.schema.json',
+            'https://opencatalogi.nl/oc.organisation.schema.json',
+            'https://opencatalogi.nl/oc.component.schema.json',
+        ];
+
+        $schemas = [];
+        foreach ($schemasToAddToSearchEndpoint as $schema) {
+            $foundSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $schema]);
+            if ($foundSchema instanceof Entity) {
+                $schemas[] = $foundSchema;
+            } else {
+                isset($this->io) && $this->io->writeln('Schema: '.$schema.' could not be found. Installation failed');
+
+                throw new Exception('Schema: '.$schema.' could not be found. Installation failed');
+            }
+        }
+
+        // Lets see if there is a generic search endpoint
+        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
+            $searchEnpoint = new Endpoint();
+            $searchEnpoint->setName('Search');
+            $searchEnpoint->setDescription('Generic Search Endpoint');
+            $searchEnpoint->setPath(['search']);
+            $searchEnpoint->setPathRegex('^(search)$');
+            $searchEnpoint->setMethod('GET');
+            $searchEnpoint->setMethods(['GET']);
+            $searchEnpoint->setOperationType('collection');
+            foreach ($schemas as $schema) {
+                $searchEnpoint->addEntity($schema);
+            }
+            $this->entityManager->persist($searchEnpoint);
+        }
+
+        if (!$githubEventEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(github_events)$'])) {
+            $githubEventEndpoint = new Endpoint();
+            $githubEventEndpoint->setName('Github Event');
+            $githubEventEndpoint->setDescription('Github Event Endpoint');
+            $githubEventEndpoint->setPath(['github_events']);
+            $githubEventEndpoint->setPathRegex('^(github_events)$');
+            $githubEventEndpoint->setMethod('POST');
+            $githubEventEndpoint->setMethods(['POST']);
+            $githubEventEndpoint->setThrows(['opencatalogi.githubevents.trigger']);
+            $githubEventEndpoint->setOperationType('collection');
+//            $repoSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
+//            $githubEventEndpoint->addEntity($repoSchema);
+            $this->entityManager->persist($githubEventEndpoint);
+        }
 
         // create cronjobs
         $this->createCronjobs();

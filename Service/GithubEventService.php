@@ -92,9 +92,10 @@ class GithubEventService
         $this->configuration = $configuration;
         $this->data = $data;
 
-        $request = $this->data['parameters'];
-        if (!$githubEvent = json_decode($request->get('payload'), true)) {
-            $githubEvent = $this->data['request'];
+        if (key_exists('payload', $this->data)) {
+            $githubEvent = $this->data['payload'];
+        } else {
+            $githubEvent = $this->data['body'];
         }
 
         $repositoryName = $githubEvent['repository']['name'];
@@ -102,17 +103,23 @@ class GithubEventService
         if (!$source = $this->getSource()) {
             isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
 
-            return null;
+            $this->data['response'] = 'No source found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
+
+            return $this->data;
         }
         if (!$repositoryEntity = $this->getRepositoryEntity()) {
             isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
 
-            return null;
+            $this->data['response'] = 'No RepositoryEntity found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
+
+            return $this->data;
         }
         if (!$mapping = $this->getRepositoryMapping()) {
             isset($this->io) && $this->io->error('No RepositoryMapping found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
 
-            return null;
+            $this->data['response'] = 'No RepositoryMapping found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
+
+            return $this->data;
         }
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $githubEvent['repository']['id']);
@@ -130,7 +137,7 @@ class GithubEventService
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 
-        $this->data['response'] = $repository->toArray();
+        $this->data['response'] = new Response(json_encode($repository->toArray()), 200);
 
         return $this->data;
     }

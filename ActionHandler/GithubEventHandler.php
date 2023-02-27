@@ -7,7 +7,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService;
 use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 
 /**
- * Berkent de rating van het component.
+ * ...
  */
 class GithubEventHandler implements ActionHandlerInterface
 {
@@ -21,7 +21,7 @@ class GithubEventHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.repository.schema.json',
+            '$id'        => 'https://opencatalogi.nl/oc.githubEvent.action.json',
             '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
             'title'      => 'GithubEventHandler',
             'description'=> 'This handler gets the github event and creates or updates the repository',
