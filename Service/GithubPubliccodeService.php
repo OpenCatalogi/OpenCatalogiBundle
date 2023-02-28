@@ -117,8 +117,8 @@ class GithubPubliccodeService
      */
     public function getRepositoriesMapping(): ?Mapping
     {
-        if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/search/code');
+        if (!$this->repositoriesMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/oc.githubPubliccodeRepository.mapping.json');
 
             return null;
         }
@@ -133,8 +133,8 @@ class GithubPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubRepository.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/oc.githubRepository.mapping.json');
 
             return null;
         }

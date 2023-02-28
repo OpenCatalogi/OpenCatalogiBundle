@@ -1,6 +1,6 @@
 {
   "title": "ComponentenCatalogusComponentToOpenCatalogiComponent",
-  "$id": "https://componentencatalogus.commonground.nl/api/components",
+  "$id": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
   "version": "0.0.3",
   "passTrough": false,

@@ -101,8 +101,8 @@ class EnrichPubliccodeService
      */
     public function getRepositoryMapping(): ?Mapping
     {
-        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/publiccode/component'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/publiccode/component');
+        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/oc.githubPubliccodeComponent.mapping.json');
 
             return null;
         }

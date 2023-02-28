@@ -241,8 +241,8 @@ class DeveloperOverheidService
      */
     public function getComponentMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://developer.overheid.nl/api/components'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://developer.overheid.nl/api/components');
+        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json');
 
             return null;
         }

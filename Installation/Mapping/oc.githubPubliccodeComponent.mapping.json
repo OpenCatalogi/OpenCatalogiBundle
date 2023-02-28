@@ -1,6 +1,6 @@
 {
   "title": "GithubPubliccodeToComponent",
-  "$id": "https://api.github.com/publiccode/component",
+  "$id": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
   "version": "0.0.1",
   "passTrough": false,

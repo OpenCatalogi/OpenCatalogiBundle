@@ -128,8 +128,8 @@ class FindOrganizationThroughRepositoriesService
      */
     public function getOrganisationMapping(): ?Mapping
     {
-        if (!$this->organisationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/organisation'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/organisation');
+        if (!$this->organisationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubOrganisation.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/oc.githubOrganisation.mapping.json');
 
             return null;
         }

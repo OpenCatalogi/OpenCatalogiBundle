@@ -405,15 +405,15 @@ class GithubApiService
             return null;
         }
 
-        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/search/code'])) {
+        if (!isset($this->repositoryMapping) && !$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json'])) {
             // @TODO Monolog ?
-            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/search/code');
+            isset($this->io) && $this->io->error('Could not find a repository for reference https://api.github.com/oc.githubPubliccodeRepository.mapping.json');
 
             return null;
         }
 
-        if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
+        if (!isset($this->componentMapping) && !$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/oc.githubRepository.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/oc.githubRepository.mapping.json');
 
             return null;
         }

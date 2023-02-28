@@ -118,8 +118,8 @@ class ComponentenCatalogusService
      */
     public function getApplicationMapping(): ?Mapping
     {
-        if (!$this->applicationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/applications'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/applications');
+        if (!$this->applicationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json');
 
             return null;
         }
@@ -305,8 +305,8 @@ class ComponentenCatalogusService
      */
     public function getComponentMapping(): ?Mapping
     {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/components'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/components');
+        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json'])) {
+            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json');
 
             return null;
         }
