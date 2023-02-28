@@ -6,6 +6,7 @@ use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
@@ -55,6 +56,11 @@ class GithubEventService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface                     $entityManager                              EntityManagerInterface
      * @param GithubApiService                           $githubService                              GithubApiService
      * @param CheckRepositoriesForPubliccodeService      $checkRepositoriesForPubliccodeService      CheckRepositoriesForPubliccodeService
@@ -62,6 +68,7 @@ class GithubEventService
      * @param FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService FindRepositoriesThroughOrganizationService
      * @param RatingService                              $ratingService                              RatingService
      * @param PubliccodeService                          $publiccodeService                          PubliccodeService
+     * @param LoggerInterface  $mappingLogger The logger
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -70,7 +77,8 @@ class GithubEventService
         FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService,
         FindRepositoriesThroughOrganizationService $findRepositoriesThroughOrganizationService,
         RatingService $ratingService,
-        PubliccodeService $publiccodeService
+        PubliccodeService $publiccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->githubService = $githubService;
@@ -81,6 +89,7 @@ class GithubEventService
         $this->publiccodeService = $publiccodeService;
         $this->configuration = [];
         $this->data = [];
+        $this->logger = $pluginLogger;
     }
 
     /**

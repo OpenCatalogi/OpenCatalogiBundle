@@ -42,9 +42,9 @@ class RatingService
     private ?Entity $ratingEntity;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $style;
+    private LoggerInterface $logger;
 
     /**
      * @param EntityManagerInterface $entityManager
