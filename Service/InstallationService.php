@@ -4,7 +4,6 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Action;
 use App\Entity\Cronjob;
 use App\Entity\Endpoint;
 use App\Entity\Entity;
@@ -21,21 +20,6 @@ class InstallationService implements InstallerInterface
     private ContainerInterface $container;
     private SymfonyStyle $io;
     private CatalogiService $catalogiService;
-
-    public const ACTION_HANDLERS = [
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidRepositoryToGatewayHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeFromGithubUrlHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\EnrichPubliccodeHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindGithubRepositoryThroughOrganizationHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\FindOrganizationThroughRepositoriesHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubApiGetPubliccodeRepositoriesHandler',
-        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
-    ];
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
     {
@@ -71,91 +55,6 @@ class InstallationService implements InstallerInterface
     public function uninstall()
     {
         // Do some cleanup
-    }
-
-    public function addActionConfiguration($actionHandler): array
-    {
-        $defaultConfig = [];
-
-        // What if there are no properties?
-        if (!isset($actionHandler->getConfiguration()['properties'])) {
-            return $defaultConfig;
-        }
-
-        foreach ($actionHandler->getConfiguration()['properties'] as $key => $value) {
-            switch ($value['type']) {
-                case 'string':
-                case 'array':
-                    $defaultConfig[$key] = $value['example'];
-                    break;
-                case 'object':
-                    break;
-                case 'uuid':
-                    if (key_exists('$ref', $value)) {
-                        if ($entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=> $value['$ref']])) {
-                            $defaultConfig[$key] = $entity->getId()->toString();
-                        }
-                    }
-                    break;
-                default:
-                    return $defaultConfig;
-            }
-        }
-
-        return $defaultConfig;
-    }
-
-    /**
-     * This function creates actions for all the actionHandlers in OpenCatalogi.
-     *
-     * @return void
-     */
-    public function addActions(): void
-    {
-        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
-
-        $actionHandlers = $this::ACTION_HANDLERS;
-        (isset($this->io) ? $this->io->writeln(['', '<info>Looking for actions</info>']) : '');
-
-        foreach ($actionHandlers as $handler) {
-            $actionHandler = $this->container->get($handler);
-
-            if ($this->entityManager->getRepository('App:Action')->findOneBy(['class' => get_class($actionHandler)])) {
-                (isset($this->io) ? $this->io->writeln(['Action found for '.$handler]) : '');
-                continue;
-            }
-
-            if (!$schema = $actionHandler->getConfiguration()) {
-                continue;
-            }
-
-            $defaultConfig = $this->addActionConfiguration($actionHandler);
-            $action = new Action($actionHandler);
-
-            if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
-                $action->setListens(['opencatalogi.rating.handler']);
-                $action->setConditions([[1 => 1]]);
-            } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
-                $action->setListens(['opencatalogi.github']);
-                $action->setConditions([[1 => 1]]);
-            } elseif (
-                strpos($schema['$id'], 'https://opencatalogi.nl/oc.developeroverheid') === 0 ||
-                strpos($schema['$id'], 'https://opencatalogi.nl/oc.componentencatalogus') === 0
-            ) {
-                $action->setListens(['opencatalogi.bronnen.trigger']);
-                $action->setConditions([[1 => 1]]);
-            } else {
-                $action->setListens(['opencatalogi.default.listens']);
-            }
-
-            // set the configuration of the action
-            $action->setConfiguration($defaultConfig);
-            $action->setAsync(false);
-
-            $this->entityManager->persist($action);
-
-            (isset($this->io) ? $this->io->writeln(['Action created for '.$handler]) : '');
-        }
     }
     
     /**
@@ -289,25 +188,6 @@ class InstallationService implements InstallerInterface
         $this->entityManager->flush();
     }
 
-    public function setApplicationSchemaId()
-    {
-        $schemaRepository = $this->entityManager->getRepository('App:Entity');
-
-        $applicationSyncSchema = $schemaRepository->findOneBy(['name' => 'ApplicationSync']);
-        $applicationSyncSchemaID = $applicationSyncSchema ? $applicationSyncSchema->getId()->toString() : '';
-
-        // Make ApplicationSync.components and owner a
-        foreach ($applicationSyncSchema->getAttributes() as $attr) {
-            if ($attr->getName() == 'components' || $attr->getName() == 'owner') {
-                $attr->setType('array');
-                $attr->setMultiple(false);
-                $this->entityManager->persist($attr);
-            }
-        }
-
-        return $applicationSyncSchemaID;
-    }
-
     public function checkDataConsistency()
     {
         // set all entity maxDepth to 5
@@ -353,9 +233,6 @@ class InstallationService implements InstallerInterface
 
         // create sources
         $this->createSources();
-
-        // create actions from the given actionHandlers
-        $this->addActions();
 
         // Now we kan do a first federation
         $this->catalogiService->setStyle($this->io);
