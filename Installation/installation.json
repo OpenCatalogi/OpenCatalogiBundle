@@ -12,5 +12,34 @@
       "https://opencatalogi.nl/oc.application.schema.json",
       "https://opencatalogi.nl/oc.catalogi.schema.json"
     ]
+  },
+  "endpoints": {
+    "schemas": [
+      {
+        "reference": "https://opencatalogi.nl/oc.component.schema.json",
+        "path": "components",
+        "methods": []
+      },
+      {
+        "reference": "https://opencatalogi.nl/oc.organisation.schema.json",
+        "path": "organizations",
+        "methods": []
+      },
+      {
+        "reference": "https://opencatalogi.nl/oc.application.schema.json",
+        "path": "applications",
+        "methods": []
+      },
+      {
+        "reference": "https://opencatalogi.nl/oc.catalogi.schema.json",
+        "path": "catalogi",
+        "methods": []
+      },
+      {
+        "reference": "https://opencatalogi.nl/oc.repository.schema.json",
+        "path": "repositories",
+        "methods": []
+      }
+    ]
   }
 }

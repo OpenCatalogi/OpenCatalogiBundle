@@ -5,9 +5,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Action;
-use App\Entity\CollectionEntity;
 use App\Entity\Cronjob;
-use App\Entity\DashboardCard;
 use App\Entity\Endpoint;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
@@ -23,14 +21,6 @@ class InstallationService implements InstallerInterface
     private ContainerInterface $container;
     private SymfonyStyle $io;
     private CatalogiService $catalogiService;
-
-    public const SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS = [
-        ['reference' => 'https://opencatalogi.nl/oc.component.schema.json',        'path' => '/components',        'methods' => []],
-        ['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json',     'path' => '/organizations',     'methods' => []],
-        ['reference' => 'https://opencatalogi.nl/oc.application.schema.json',      'path' => '/applications',      'methods' => []],
-        ['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json',         'path' => '/catalogi',        'methods' => []],
-        ['reference' => 'https://opencatalogi.nl/oc.repository.schema.json',       'path' => '/repositories',        'methods' => []],
-    ];
 
     public const ACTION_HANDLERS = [
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
@@ -167,25 +157,6 @@ class InstallationService implements InstallerInterface
             (isset($this->io) ? $this->io->writeln(['Action created for '.$handler]) : '');
         }
     }
-
-    private function createEndpoints($objectsThatShouldHaveEndpoints): array
-    {
-        $endpointRepository = $this->entityManager->getRepository('App:Endpoint');
-        $endpoints = [];
-        foreach ($objectsThatShouldHaveEndpoints as $objectThatShouldHaveEndpoint) {
-            $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $objectThatShouldHaveEndpoint['reference']]);
-            if (!$endpointRepository->findOneBy(['name' => $entity->getName()])) {
-                $endpoint = new Endpoint($entity, null, $objectThatShouldHaveEndpoint);
-
-                $this->entityManager->persist($endpoint);
-                $this->entityManager->flush();
-                $endpoints[] = $endpoint;
-            }
-        }
-        (isset($this->io) ? $this->io->writeln(count($endpoints).' Endpoints Created') : '');
-
-        return $endpoints;
-    }
     
     /**
      * Sets the max depth of all entities to 5 because OC has a lot of nested objects.
@@ -203,16 +174,6 @@ class InstallationService implements InstallerInterface
                 $this->entityManager->persist($entity);
             }
         }
-    }
-
-    private function addSchemasToCollection(CollectionEntity $collection, string $schemaPrefix): CollectionEntity
-    {
-        $entities = $this->entityManager->getRepository('App:Entity')->findByReferencePrefix($schemaPrefix);
-        foreach ($entities as $entity) {
-            $entity->addCollection($collection);
-        }
-
-        return $collection;
     }
 
     public function createCronjobs()
@@ -352,10 +313,7 @@ class InstallationService implements InstallerInterface
         // set all entity maxDepth to 5
         $this->setEntityMaxDepth();
 
-        // cretae endpoints
-        $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
-
-        // Doesnt work so lets let search endpoint return all
+        // Doesn't work so let's let search endpoint return all
         $schemasToAddToSearchEndpoint = [
             'https://opencatalogi.nl/oc.application.schema.json',
             'https://opencatalogi.nl/oc.organisation.schema.json',
@@ -375,19 +333,19 @@ class InstallationService implements InstallerInterface
         }
 
         // Lets see if there is a generic search endpoint
-        if (!$searchEnpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
-            $searchEnpoint = new Endpoint();
-            $searchEnpoint->setName('Search');
-            $searchEnpoint->setDescription('Generic Search Endpoint');
-            $searchEnpoint->setPath(['search']);
-            $searchEnpoint->setPathRegex('^(search)$');
-            $searchEnpoint->setMethod('GET');
-            $searchEnpoint->setMethods(['GET']);
-            $searchEnpoint->setOperationType('collection');
+        if (!$searchEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
+            $searchEndpoint = new Endpoint();
+            $searchEndpoint->setName('Search');
+            $searchEndpoint->setDescription('Generic Search Endpoint');
+            $searchEndpoint->setPath(['search']);
+            $searchEndpoint->setPathRegex('^(search)$');
+            $searchEndpoint->setMethod('GET');
+            $searchEndpoint->setMethods(['GET']);
+            $searchEndpoint->setOperationType('collection');
             foreach ($schemas as $schema) {
-                $searchEnpoint->addEntity($schema);
+                $searchEndpoint->addEntity($schema);
             }
-            $this->entityManager->persist($searchEnpoint);
+            $this->entityManager->persist($searchEndpoint);
         }
 
         // create cronjobs
