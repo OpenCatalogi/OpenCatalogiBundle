@@ -1,3 +1,16 @@
 {
-  "installationService": "OpenCatalogi\\OpenCatalogiBundle\\Service\\InstallationService"
+  "installationService": "OpenCatalogi\\OpenCatalogiBundle\\Service\\InstallationService",
+  "collections": [
+    {
+      "reference": "https://opencatalogi.nl/collection/oc.default.collection.json",
+      "schemaPrefix": "https://opencatalogi.nl"
+    }
+  ],
+  "cards": {
+    "schemas": [
+      "https://opencatalogi.nl/oc.component.schema.json",
+      "https://opencatalogi.nl/oc.application.schema.json",
+      "https://opencatalogi.nl/oc.catalogi.schema.json"
+    ]
+  }
 }

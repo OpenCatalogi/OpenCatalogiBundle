@@ -477,12 +477,14 @@ class GithubApiService
 
         return $data;
     }
-
+    
     /**
      * Turn an repro array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
+     * @param array $repository
+     * @param Entity|null $repositoryEntity
+     * @param Mapping|null $mapping
+     * @param Source|null $githubApiSource
      *
      * @return ?ObjectEntity
      */
@@ -506,22 +508,28 @@ class GithubApiService
         $repository = $repositoryObject->toArray();
 
         if (isset($repository['organisation'])) {
-            $organisationObject = $this->handleOrganizationArray($repository['organisation']);
-            $repositoryObject->setValue('organization', $organisationObject->getId()->toString());
+            // todo: remove this or test / fix it...
+//            $organisationObject = $this->handleOrganizationArray($repository['organisation']);
+//            if ($organisationObject === null) {
+//                return $repositoryObject;
+//            }
+//            $repositoryObject->setValue('organization', $organisationObject->getId()->toString());
         }
 
         return $repositoryObject;
     }
-
+    
     /**
      * Turn an organisation array into an object we can handle @TODO OLD CHECK GithubPubliccodeService.
      *
-     * @param array   $repro
-     * @param Mapping $mapping
+     * @param array $organisation
+     * @param Entity|null $organizationEntity
+     * @param Mapping|null $mapping
+     * @param Source|null $githubApiSource
      *
-     * @return ObjectEntity
+     * @return ObjectEntity|null
      */
-    public function handleOrganizationArray(array $organisation, ?Entity $organizationEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ObjectEntity
+    public function handleOrganizationArray(array $organisation, ?Entity $organizationEntity = null, ?Mapping $mapping = null, ?Source $githubApiSource = null): ?ObjectEntity
     {
 
         // check for mapping
@@ -535,7 +543,9 @@ class GithubApiService
         $mappedOrganisation = $this->mappingService->mapping($this->organizationMapping ?? $mapping, $organisation);
 
         // Turn the organisation into a synchronyzed object
-        // $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
+        // todo: remove this or test / fix it...
+        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, '');
+//        $synchronization = $this->synchronizationService->findSyncBySource($this->githubApiSource ?? $githubApiSource, $this->organizationEntity ?? $organizationEntity, $organizatioNameOrId?);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $mappedOrganisation);
         $organisationObject = $synchronization->getObject();
         $organisation = $organisationObject->toArray();

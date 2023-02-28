@@ -24,12 +24,6 @@ class InstallationService implements InstallerInterface
     private SymfonyStyle $io;
     private CatalogiService $catalogiService;
 
-    public const OBJECTS_THAT_SHOULD_HAVE_CARDS = [
-        'https://opencatalogi.nl/oc.component.schema.json',
-        'https://opencatalogi.nl/oc.application.schema.json',
-        'https://opencatalogi.nl/oc.catalogi.schema.json',
-    ];
-
     public const SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS = [
         ['reference' => 'https://opencatalogi.nl/oc.component.schema.json',        'path' => '/components',        'methods' => []],
         ['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json',     'path' => '/organizations',     'methods' => []],
@@ -192,14 +186,22 @@ class InstallationService implements InstallerInterface
 
         return $endpoints;
     }
-
+    
+    /**
+     * Sets the max depth of all entities to 5 because OC has a lot of nested objects.
+     * @TODO: find a better solution for this?
+     *
+     * @return void
+     */
     public function setEntityMaxDepth()
     {
         $entities = $this->entityManager->getRepository('App:Entity')->findAll();
         foreach ($entities as $entity) {
-            // set maxDepth for an entity to 5
-            $entity->setMaxDepth(5);
-            $this->entityManager->persist($entity);
+            if ($entity->getMaxDepth() !== 5) {
+                // set maxDepth for an entity to 5
+                $entity->setMaxDepth(5);
+                $this->entityManager->persist($entity);
+            }
         }
     }
 
@@ -211,58 +213,6 @@ class InstallationService implements InstallerInterface
         }
 
         return $collection;
-    }
-
-    private function createCollections(): array
-    {
-        $collectionConfigs = [
-            [
-                'name' => 'OpenCatalogi',
-                //  Might be added later
-                // 'prefix' => 'oc',
-                'prefix'       => null,
-                'schemaPrefix' => 'https://opencatalogi.nl', ],
-        ];
-        $collections = [];
-        foreach ($collectionConfigs as $collectionConfig) {
-            $collectionsFromEntityManager = $this->entityManager->getRepository('App:CollectionEntity')->findBy(['name' => $collectionConfig['name']]);
-            if (count($collectionsFromEntityManager) == 0) {
-                $collection = new CollectionEntity($collectionConfig['name'], $collectionConfig['prefix'], 'OpenCatalogiBundle');
-            } else {
-                $collection = $collectionsFromEntityManager[0];
-            }
-            $collection = $this->addSchemasToCollection($collection, $collectionConfig['schemaPrefix']);
-            $this->entityManager->persist($collection);
-            $this->entityManager->flush();
-            $collections[$collectionConfig['name']] = $collection;
-        }
-        (isset($this->io) ? $this->io->writeln(count($collections).' Collections Created') : '');
-
-        return $collections;
-    }
-
-    public function createDashboardCards($objectsThatShouldHaveCards)
-    {
-        foreach ($objectsThatShouldHaveCards as $object) {
-            (isset($this->io) ? $this->io->writeln('Looking for a dashboard card for: '.$object) : '');
-            $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $object]);
-            if (
-                !$dashboardCard = $this->entityManager->getRepository('App:DashboardCard')->findOneBy(['entityId' => $entity->getId()])
-            ) {
-                $dashboardCard = new DashboardCard();
-                $dashboardCard->setType('schema');
-                $dashboardCard->setEntity('App:Entity');
-                $dashboardCard->setObject('App:Entity');
-                $dashboardCard->setName($entity->getName());
-                $dashboardCard->setDescription($entity->getDescription());
-                $dashboardCard->setEntityId($entity->getId());
-                $dashboardCard->setOrdering(1);
-                $this->entityManager->persist($dashboardCard);
-                (isset($this->io) ? $this->io->writeln('Dashboard card created') : '');
-                continue;
-            }
-            (isset($this->io) ? $this->io->writeln('Dashboard card found') : '');
-        }
     }
 
     public function createCronjobs()
@@ -401,12 +351,6 @@ class InstallationService implements InstallerInterface
     {
         // set all entity maxDepth to 5
         $this->setEntityMaxDepth();
-
-        // Lets create some genneric dashboard cards
-        $this->createDashboardCards($this::OBJECTS_THAT_SHOULD_HAVE_CARDS);
-
-        // create collection prefix
-        $this->createCollections();
 
         // cretae endpoints
         $this->createEndpoints($this::SCHEMAS_THAT_SHOULD_HAVE_ENDPOINTS);
