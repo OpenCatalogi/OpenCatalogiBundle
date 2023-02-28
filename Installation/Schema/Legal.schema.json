@@ -1,7 +1,7 @@
 {
   "title": "Legal",
   "$id": "https://opencatalogi.nl/oc.legal.schema.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
   "version": "0.1.0",
   "type": "object",
   "description": "This section provides information on the legalstatus of the software, useful to evaluate whether the software can be used or not.\n\nIn the following part of the document, all keys are assumed to be in a sub-section with the name of the language (we will note this with [lang]).",

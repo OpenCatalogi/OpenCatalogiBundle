@@ -21,7 +21,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     {
         return [
             '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'EnrichPubliccodeHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],

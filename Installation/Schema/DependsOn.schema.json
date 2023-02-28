@@ -1,7 +1,7 @@
 {
   "title": "DependsOn",
   "$id": "https://opencatalogi.nl/oc.dependson.schema.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
   "version": "0.1.0",
   "type": "object",
   "description": "This section provides an overview on the system-level dependencies required to install and use this software.\n\nNOTE: do not list dependencies at the source code level (e.g.: software libraries being used), and focus only on runtime and/or system-level dependencies that must be installed and maintained separately. For instance, a database is a good example of such dependencies.",

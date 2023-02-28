@@ -26,7 +26,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     {
         return [
             '$id'        => 'https://opencatalogi.nl/oc.componentencatalogus.application.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'   => [],

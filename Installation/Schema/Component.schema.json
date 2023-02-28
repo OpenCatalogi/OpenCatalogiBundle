@@ -1,7 +1,7 @@
 {
   "title": "Component",
   "$id": "https://opencatalogi.nl/oc.component.schema.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
   "version": "0.1.0",
   "type": "object",
   "description": "Based on the [top level component](https://yml.publiccode.tools/schema.core.html#top-level-keys-and-sections) of public code. represent a pease of software that may iether be  standalone or part of a larger application.\n\n**The PublicCode standard has been extenden for this API in te following way's**\n- To the `type` property the following enums where added\n- - Api\n- - Schema\n- - Data\n- The `inputType` property was used (its depracticed in PublicCode)\n- The `outputType` property was uses (its depracticed in PublicCode)\n- The `nl` country exenstion was added in line with the [PublicCode country extensions](https://yml.publiccode.tools/country.html) guidelines\n- applicationId was added for the codebase repository (like a github repository id).",

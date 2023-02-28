@@ -1,7 +1,7 @@
 {
   "title": "Installation",
   "$id": "https://opencatalogi.nl/oc.installation.schema.json",
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
   "version": "0.1.0",
   "type": "object",
   "description": "[extension of the publiccode standard] This object defines an installation of a given component within an environement",

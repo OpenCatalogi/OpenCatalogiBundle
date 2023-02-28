@@ -21,7 +21,7 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     {
         return [
             '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'FindOrganizationThroughRepositoriesHandler',
             'description'=> 'This handler finds organizations through repositories',
             'required'   => ['repositoryEntityId', 'organisationEntityId'],
