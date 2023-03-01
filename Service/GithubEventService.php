@@ -4,18 +4,18 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\ObjectEntity;
 use App\Entity\Mapping;
+use App\Entity\ObjectEntity;
 use App\Exception\GatewayException;
+use App\Service\HandlerService;
+use App\Service\SynchronizationService;
+use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
-use App\Service\SynchronizationService;
-use App\Service\HandlerService;
-use CommonGateway\CoreBundle\Service\MappingService;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -48,7 +48,7 @@ class GithubEventService
     private MappingService $mappingService;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param SynchronizationService $synchronizationService The Synchronization Service
      */
     public function __construct(
@@ -97,7 +97,6 @@ class GithubEventService
         return $entity;
     }//end getEntity()
 
-
     /**
      * Get a mapping by reference.
      *
@@ -117,13 +116,14 @@ class GithubEventService
     }//end getMapping()
 
     /**
-     * This function creates/updates the repository with the github event response
+     * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data data set at the start of the handler
+     * @param ?array $data          data set at the start of the handler
      * @param ?array $configuration configuration of the action
      *
-     * @return array|null The data with the repository in the response array
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     *
+     * @return array|null The data with the repository in the response array
      */
     public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
     {
