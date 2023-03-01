@@ -11,7 +11,6 @@ use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -57,10 +56,10 @@ class DeveloperOverheidService
     /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param CallService            $callService            The Call Service
-     * @param CacheService $cacheService The Cache Service
+     * @param CacheService           $cacheService           The Cache Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
-     * @param GithubApiService $githubApiService The Github Api Service
+     * @param GithubApiService       $githubApiService       The Github Api Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,

@@ -54,11 +54,11 @@ class GithubPubliccodeService
     private GithubApiService $githubApiService;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
-     * @param CallService $callService The Call Service
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
+     * @param CallService            $callService            The Call Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param MappingService $mappingService The Mapping Service
-     * @param GithubApiService $githubApiService The Github Api Service
+     * @param MappingService         $mappingService         The Mapping Service
+     * @param GithubApiService       $githubApiService       The Github Api Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -126,7 +126,6 @@ class GithubPubliccodeService
         return $entity;
     }//end getEntity()
 
-
     /**
      * Get a mapping by reference.
      *
@@ -146,9 +145,10 @@ class GithubPubliccodeService
     }//end getMapping()
 
     /**
-     * Check the auth of the github source
+     * Check the auth of the github source.
      *
      * @param Source $source The given source to check the api key
+     *
      * @return bool|null If the api key is set or not
      */
     public function checkGithubAuth(Source $source): ?bool
@@ -191,11 +191,11 @@ class GithubPubliccodeService
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
                 //Set your auth headers
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
                     'Content-Type: application/json',
-                    'Authorization: ' . $source->getApiKey(),
-                    'User-Agent: smisidjan' // @TODO this is for everyone different set this to the github api sourc?
-                ));
+                    'Authorization: '.$source->getApiKey(),
+                    'User-Agent: smisidjan', // @TODO this is for everyone different set this to the github api sourc?
+                ]);
 
                 // get stringified data/output. See CURLOPT_RETURNTRANSFER
                 $data = curl_exec($ch);
@@ -228,8 +228,9 @@ class GithubPubliccodeService
      * Get repositories through the repositories of https://api.github.com/search/code
      * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
      *
-     * @return array All imported repositories
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return array All imported repositories
      *
      * @todo duplicate with DeveloperOverheidService ?
      */
@@ -264,9 +265,9 @@ class GithubPubliccodeService
      *
      * @param string $id The id of the repository from developer.overheid.nl
      *
-     * @return array|null The imported repository as array
-     *
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return array|null The imported repository as array
      *
      * @todo duplicate with DeveloperOverheidService ?
      */
@@ -305,8 +306,9 @@ class GithubPubliccodeService
      *
      * @param array $repository The repository array that will be imported
      *
-     * @return ObjectEntity|null The repository object
      * @throws GuzzleException|LoaderError|SyntaxError|Exception
+     *
+     * @return ObjectEntity|null The repository object
      */
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
@@ -342,9 +344,10 @@ class GithubPubliccodeService
      *
      * @param array $repository The repository array that will be imported
      *
+     * @throws GuzzleException|LoaderError|SyntaxError
+     *
      * @return ObjectEntity|null The repository object
      *
-     * @throws GuzzleException|LoaderError|SyntaxError
      * @todo duplicate with DeveloperOverheidService ?
      */
     public function importRepository(array $repository): ?ObjectEntity
@@ -383,11 +386,12 @@ class GithubPubliccodeService
     }//end importRepository()
 
     /**
-     * @param array $publiccode The publiccode array for updating the component object
-     * @param ObjectEntity $component The component object that is being updated
+     * @param array        $publiccode The publiccode array for updating the component object
+     * @param ObjectEntity $component  The component object that is being updated
+     *
+     * @throws Exception
      *
      * @return ObjectEntity|null The updated component object
-     * @throws Exception
      */
     public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
     {
@@ -413,11 +417,12 @@ class GithubPubliccodeService
     }//end createApplicationSuite()
 
     /**
-     * @param array $publiccode The publiccode array for updating the component object
+     * @param array        $publiccode      The publiccode array for updating the component object
      * @param ObjectEntity $componentObject The component object that is being updated
      *
-     * @return ObjectEntity|null The updated component object
      * @throws Exception
+     *
+     * @return ObjectEntity|null The updated component object
      */
     public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
@@ -468,11 +473,12 @@ class GithubPubliccodeService
     }//end createMainCopyrightOwner()
 
     /**
-     * @param array $publiccode The publiccode array for updating the component object
+     * @param array        $publiccode      The publiccode array for updating the component object
      * @param ObjectEntity $componentObject The component object that is being updated
      *
-     * @return ObjectEntity|null The updated component object
      * @throws Exception
+     *
+     * @return ObjectEntity|null The updated component object
      */
     public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
@@ -523,11 +529,12 @@ class GithubPubliccodeService
     }//end createRepoOwner()
 
     /**
-     * @param array $publiccode The publiccode array for updating the component object
+     * @param array        $publiccode      The publiccode array for updating the component object
      * @param ObjectEntity $componentObject The component object that is being updated
      *
-     * @return ObjectEntity|null The updated component object
      * @throws Exception
+     *
+     * @return ObjectEntity|null The updated component object
      */
     public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
@@ -582,11 +589,12 @@ class GithubPubliccodeService
     }//end createContractors()
 
     /**
-     * @param array $publiccode The publiccode array for updating the component object
+     * @param array        $publiccode      The publiccode array for updating the component object
      * @param ObjectEntity $componentObject The component object that is being updated
      *
-     * @return ObjectEntity|null The updated component object
      * @throws Exception
+     *
+     * @return ObjectEntity|null The updated component object
      */
     public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
@@ -641,14 +649,15 @@ class GithubPubliccodeService
     }//end createContacts()
 
     /**
-     * This function maps the publiccode to a component
+     * This function maps the publiccode to a component.
      *
      * @param ObjectEntity $repository The repository object
-     * @param array $publiccode The publiccode array for updating the component object
+     * @param array        $publiccode The publiccode array for updating the component object
+     *
+     * @throws Exception
      *
      * @return ObjectEntity|null The repository with the updated component from the publiccode url
      *
-     * @throws Exception
      * @todo
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode): ?ObjectEntity
@@ -693,9 +702,11 @@ class GithubPubliccodeService
      *
      * @param string $repositoryUrl The repository url
      * @param $response The response of the get publiccode call
-     * @return array|null The parsed publiccode of the given repository
      *
      * @throws Exception
+     *
+     * @return array|null The parsed publiccode of the given repository
+     *
      * @todo
      */
     public function parsePubliccode(string $repositoryUrl, $response): ?array

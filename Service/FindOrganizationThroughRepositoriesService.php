@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -130,9 +129,10 @@ class FindOrganizationThroughRepositoriesService
     }//end getMapping()
 
     /**
-     * Check the auth of the github source
+     * Check the auth of the github source.
      *
      * @param Source $source The given source to check the api key
+     *
      * @return bool|null If the api key is set or not
      */
     public function checkGithubAuth(Source $source): ?bool
@@ -151,9 +151,9 @@ class FindOrganizationThroughRepositoriesService
      *
      * @param string $slug endpoint to request
      *
-     * @return array|null
      * @throws GuzzleException|Exception
      *
+     * @return array|null
      */
     public function getRepositoryFromUrl(string $slug)
     {
@@ -181,8 +181,9 @@ class FindOrganizationThroughRepositoriesService
      *
      * @param string $name
      *
-     * @return ObjectEntity|null
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return ObjectEntity|null
      */
     public function getOrganisation(string $name): ?ObjectEntity
     {
@@ -217,8 +218,9 @@ class FindOrganizationThroughRepositoriesService
     /**
      * @param $organisation
      *
-     * @return ObjectEntity|null
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return ObjectEntity|null
      */
     public function importOrganisation($organisation): ?ObjectEntity
     {
@@ -245,8 +247,9 @@ class FindOrganizationThroughRepositoriesService
      *
      * @param string $name
      *
-     * @return array|null
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return array|null
      */
     public function getOrganisationRepos(string $name): ?array
     {
@@ -301,10 +304,12 @@ class FindOrganizationThroughRepositoriesService
     }//end getOrganisationRepos()
 
     /**
-     * @param ObjectEntity $repository the repository where we want to find an organisation for
-     * @param ?array $createdOrganizations the already created organizations during a parent loop so we dont waste time/performance on the same organizations
-     * @return ObjectEntity|null
+     * @param ObjectEntity $repository           the repository where we want to find an organisation for
+     * @param ?array       $createdOrganizations the already created organizations during a parent loop so we dont waste time/performance on the same organizations
+     *
      * @throws GuzzleException|LoaderError|SyntaxError
+     *
+     * @return ObjectEntity|null
      */
     public function enrichRepositoryWithOrganisation(ObjectEntity $repository, array &$createdOrganizations = []): ?ObjectEntity
     {
@@ -380,12 +385,13 @@ class FindOrganizationThroughRepositoriesService
     /**
      * Makes sure the action the action can actually runs and then executes functions to update a repository with fetched organization info.
      *
-     * @param ?array $data data set at the start of the handler (not needed here)
-     * @param ?array $configuration configuration of the action          (not needed here)
-     * @param string|null $repositoryId optional repository id for testing for a single repository
+     * @param ?array      $data          data set at the start of the handler (not needed here)
+     * @param ?array      $configuration configuration of the action          (not needed here)
+     * @param string|null $repositoryId  optional repository id for testing for a single repository
+     *
+     * @throws GuzzleException|LoaderError|SyntaxError
      *
      * @return array dataset at the end of the handler                   (not needed here)
-     * @throws GuzzleException|LoaderError|SyntaxError
      */
     public function findOrganizationThroughRepositoriesHandler(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): array
     {

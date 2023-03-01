@@ -52,9 +52,9 @@ class FindGithubRepositoryThroughOrganizationService
     private array $configuration;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
+     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
-     * @param CallService $callService The Call Service
+     * @param CallService             $callService             The Call Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -121,9 +121,10 @@ class FindGithubRepositoryThroughOrganizationService
     }//end getEntity()
 
     /**
-     * Check the auth of the github source
+     * Check the auth of the github source.
      *
      * @param Source $source The given source to check the api key
+     *
      * @return bool|null If the api key is set or not
      */
     public function checkGithubAuth(Source $source): ?bool
@@ -141,6 +142,7 @@ class FindGithubRepositoryThroughOrganizationService
      * This function is searching for repositories containing a publiccode.yaml file.
      *
      * @param string $organizationName
+     *
      * @return array|null|Response
      */
     private function getOpenCatalogiFromGithubRepo(string $organizationName): ?array
@@ -195,8 +197,9 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @param string $organizationName used as path to fetch from
      *
-     * @return array|null
      * @throws Exception
+     *
+     * @return array|null
      */
     private function getGithubRepoFromOrganization(string $organizationName): ?array
     {
@@ -223,10 +226,11 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @param ObjectEntity $repositoryObject
      * @param ObjectEntity $organization
-     * @param string $type
+     * @param string       $type
+     *
+     * @throws Exception
      *
      * @return array|null
-     * @throws Exception
      */
     public function setRepositoryComponent(ObjectEntity $repositoryObject, ObjectEntity $organization, string $type): ?ObjectEntity
     {
@@ -254,12 +258,13 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
-     * @param string $url
+     * @param string       $url
      * @param ObjectEntity $organization
-     * @param string $type
+     * @param string       $type
+     *
+     * @throws GuzzleException|LoaderError|SyntaxError
      *
      * @return array|null
-     * @throws GuzzleException|LoaderError|SyntaxError
      */
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
     {
@@ -299,8 +304,9 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      *
-     * @return void
      * @throws GuzzleException
+     *
+     * @return void
      */
     private function getOrganizationCatalogi(ObjectEntity $organization): void
     {
@@ -341,11 +347,12 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Makes sure the action the action can actually runs and then executes functions to update an organization with fetched opencatalogi.yaml info.
      *
-     * @param ?array $data data set at the start of the handler (not needed here)
+     * @param ?array $data          data set at the start of the handler (not needed here)
      * @param ?array $configuration configuration of the action          (not needed here)
      *
-     * @return array|null dataset at the end of the handler              (not needed here)
      * @throws GuzzleException
+     *
+     * @return array|null dataset at the end of the handler              (not needed here)
      */
     public function findGithubRepositoryThroughOrganizationHandler(?array $data = [], ?array $configuration = [], ?string $organisationId = null): ?array
     {

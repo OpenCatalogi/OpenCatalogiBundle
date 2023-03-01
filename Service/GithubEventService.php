@@ -4,21 +4,17 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\ObjectEntity;
 use App\Entity\Mapping;
 use App\Exception\GatewayException;
+use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
-use App\Service\SynchronizationService;
-use App\Service\HandlerService;
-use CommonGateway\CoreBundle\Service\MappingService;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -60,11 +56,11 @@ class GithubEventService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param CallService $callService The Call Service
-     * @param CacheService $cacheService The Cache Service
-     * @param GithubApiService $githubApiService The Github Api Service
+     * @param CallService            $callService            The Call Service
+     * @param CacheService           $cacheService           The Cache Service
+     * @param GithubApiService       $githubApiService       The Github Api Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -137,9 +133,10 @@ class GithubEventService
     }//end getMapping()
 
     /**
-     * Check the auth of the github source
+     * Check the auth of the github source.
      *
      * @param Source $source The given source to check the api key
+     *
      * @return bool|null If the api key is set or not
      */
     public function checkGithubAuth(Source $source): ?bool
@@ -158,6 +155,7 @@ class GithubEventService
      *
      * @param string $name
      * @param $source
+     *
      * @return array|null The imported repository as array
      */
     public function getRepository(string $name, $source): ?array
@@ -182,13 +180,14 @@ class GithubEventService
     }//end getRepository()
 
     /**
-     * This function creates/updates the repository with the github event response
+     * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data data set at the start of the handler
+     * @param ?array $data          data set at the start of the handler
      * @param ?array $configuration configuration of the action
      *
-     * @return array|null The data with the repository in the response array
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     *
+     * @return array|null The data with the repository in the response array
      */
     public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
     {

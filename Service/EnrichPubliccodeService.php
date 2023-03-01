@@ -162,10 +162,11 @@ class EnrichPubliccodeService
 
     /**
      * @param ObjectEntity $repository
-     * @param string $publiccodeUrl
+     * @param string       $publiccodeUrl
+     *
+     * @throws GuzzleException
      *
      * @return ObjectEntity|null dataset at the end of the handler
-     * @throws GuzzleException
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
