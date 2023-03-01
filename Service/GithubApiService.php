@@ -12,10 +12,7 @@ use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
-
 
 class GithubApiService
 {
@@ -60,11 +57,11 @@ class GithubApiService
     private array $data;
 
     /**
-     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
-     * @param CallService             $callService             The Call Service
-     * @param CacheService $cacheService The Cache Service
-     * @param SynchronizationService  $synchronizationService  The Synchronization Service
-     * @param MappingService          $mappingService          The Mapping Service
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
+     * @param CallService            $callService            The Call Service
+     * @param CacheService           $cacheService           The Cache Service
+     * @param SynchronizationService $synchronizationService The Synchronization Service
+     * @param MappingService         $mappingService         The Mapping Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -153,13 +150,14 @@ class GithubApiService
         return $mapping;
     }//end getMapping()
 
-
     /**
-     * This function create or get the component of the repository
+     * This function create or get the component of the repository.
      *
      * @param ObjectEntity $repository
-     * @return ObjectEntity|null
+     *
      * @throws Exception
+     *
+     * @return ObjectEntity|null
      */
     public function connectComponent(ObjectEntity $repository): ?ObjectEntity
     {
