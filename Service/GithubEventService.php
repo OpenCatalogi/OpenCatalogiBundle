@@ -6,17 +6,39 @@ use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use App\Entity\Mapping;
+use App\Exception\GatewayException;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
+use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Service\SynchronizationService;
 use App\Service\HandlerService;
 use CommonGateway\CoreBundle\Service\MappingService;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 class GithubEventService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SynchronizationService
+     */
+    private SynchronizationService $synchronizationService;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
     private ?Entity $repositoryEntity;
     private ?Mapping $repositoriesMapping;
@@ -25,67 +47,83 @@ class GithubEventService
     private HandlerService $handlerService;
     private MappingService $mappingService;
 
+    /**
+     * @param EntityManagerInterface $entityManager The Entity Manager Interface
+     * @param SynchronizationService $synchronizationService The Synchronization Service
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
-        SynchronizationService $synchronizationService,
-        HandlerService $handlerService,
-        MappingService $mappingService
+        SynchronizationService $synchronizationService
     ) {
         $this->entityManager = $entityManager;
         $this->configuration = [];
         $this->data = [];
         $this->synchronizationService = $synchronizationService;
-        $this->handlerService = $handlerService;
-        $this->mappingService = $mappingService;
     }
 
     /**
-     * Get the github api source.
+     * Get a source by reference.
      *
-     * @return ?Source
-     */
-    public function getSource(): ?Source
-    {
-        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://api.github.com'])) {
-            isset($this->io) && $this->io->error('No source found for https://api.github.com');
-        }
-
-        return $this->source;
-    }
-
-    /**
-     * Get the repository entity.
+     * @param string $location The location to look for
      *
-     * @return ?Entity
+     * @return Source|null
      */
-    public function getRepositoryEntity(): ?Entity
+    public function getSource(string $location): ?Source
     {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
-        }
+        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
+        if ($source === null) {
+//            $this->logger->error("No source found for $location");
+            isset($this->io) && $this->io->error("No source found for $location");
+        }//end if
 
-        return $this->repositoryEntity;
-    }
+        return $source;
+    }//end getSource()
 
     /**
-     * Get the repository mapping.
+     * Get an entity by reference.
      *
-     * @return ?Mapping
+     * @param string $reference The reference to look for
+     *
+     * @return Entity|null
      */
-    public function getRepositoryMapping(): ?Mapping
+    public function getEntity(string $reference): ?Entity
     {
-        if (!$this->repositoryMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => 'https://api.github.com/repositories'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://api.github.com/repositories');
-        }
+        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
+        if ($entity === null) {
+//            $this->logger->error("No entity found for $reference");
+            isset($this->io) && $this->io->error("No entity found for $reference");
+        }//end if
 
-        return $this->repositoryMapping;
-    }
+        return $entity;
+    }//end getEntity()
+
 
     /**
-     * @param ?array $data          data set at the start of the handler
+     * Get a mapping by reference.
+     *
+     * @param string $reference The reference to look for
+     *
+     * @return Mapping|null
+     */
+    public function getMapping(string $reference): ?Mapping
+    {
+        $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
+        if ($mapping === null) {
+//            $this->logger->error("No mapping found for $reference");
+            isset($this->io) && $this->io->error("No mapping found for $reference");
+        }//end if
+
+        return $mapping;
+    }//end getMapping()
+
+    /**
+     * This function creates/updates the repository with the github event response
+     *
+     * @param ?array $data data set at the start of the handler
      * @param ?array $configuration configuration of the action
      *
-     * @return array|null
+     * @return array|null The data with the repository in the response array
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      */
     public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
     {
@@ -100,27 +138,10 @@ class GithubEventService
 
         $repositoryName = $githubEvent['repository']['name'];
 
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
-
-            $this->data['response'] = 'No source found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
-
-            return $this->data;
-        }
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
-
-            $this->data['response'] = 'No RepositoryEntity found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
-
-            return $this->data;
-        }
-        if (!$mapping = $this->getRepositoryMapping()) {
-            isset($this->io) && $this->io->error('No RepositoryMapping found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '');
-
-            $this->data['response'] = 'No RepositoryMapping found when trying to import a Repository '.isset($repositoryName) ? $repositoryName : '';
-
-            return $this->data;
-        }
+        $source = $this->getSource('https://api.github.com');
+        $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
+        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+        $mapping = $this->getMapping('https://api.github.com/repositories');
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $githubEvent['repository']['id']);
 
@@ -134,6 +155,15 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
+        if (!($component = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $componentEntity, 'name' => $repositoryName]))) {
+            $component = new ObjectEntity($componentEntity);
+            $component->hydrate([
+                'name' => $repositoryName,
+                'url'  => $repository,
+            ]);
+            $this->entityManager->persist($component);
+        }
+        $repository->setValue('component', $component);
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 
