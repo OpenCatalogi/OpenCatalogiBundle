@@ -17,21 +17,43 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
-    private Source $source;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
-    private ?Entity $applicationEntity;
-    private ?Mapping $applicationMapping;
-    private ?Entity $componentEntity;
-    private ?Entity $legalEntity;
-    private ?Mapping $componentMapping;
-    private ?Entity $repositoryEntity;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
-    private Entity $organisationEntity;
+
+    /**
+     * @var DeveloperOverheidService
+     */
     private DeveloperOverheidService $developerOverheidService;
 
+    /**
+     * @param EntityManagerInterface $entityManager The Entity Manager Interface
+     * @param CallService $callService The Call Service
+     * @param SynchronizationService $synchronizationService The Synchronization Service
+     * @param MappingService $mappingService The Mapping Service
+     * @param DeveloperOverheidService $developerOverheidService The Developer Overheid Service
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
@@ -64,100 +86,59 @@ class ComponentenCatalogusService
     }
 
     /**
-     * Get the componentencatalogus source.
+     * Get a source by reference.
      *
-     * @return ?Source
+     * @param string $location The location to look for
+     *
+     * @return Source|null
      */
-    public function getSource(): ?Source
+    public function getSource(string $location): ?Source
     {
-        if (!$this->source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location'=>'https://componentencatalogus.commonground.nl/api'])) {
-            isset($this->io) && $this->io->error('No source found for https://componentencatalogus.commonground.nl/api');
+        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
+        if ($source === null) {
+//            $this->logger->error("No source found for $location");
+            isset($this->io) && $this->io->error("No source found for $location");
+        }//end if
 
-            return null;
-        }
-
-        return $this->source;
-    }
+        return $source;
+    }//end getSource()
 
     /**
-     * Get the application entity.
+     * Get an entity by reference.
      *
-     * @return ?Entity
+     * @param string $reference The reference to look for
+     *
+     * @return Entity|null
      */
-    public function getApplicationEntity(): ?Entity
+    public function getEntity(string $reference): ?Entity
     {
-        if (!$this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.application.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.application.schema.json');
+        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
+        if ($entity === null) {
+//            $this->logger->error("No entity found for $reference");
+            isset($this->io) && $this->io->error("No entity found for $reference");
+        }//end if
 
-            return null;
-        }
+        return $entity;
+    }//end getEntity()
 
-        return $this->applicationEntity;
-    }
 
     /**
-     * Get the repository entity.
+     * Get a mapping by reference.
      *
-     * @return ?Entity
-     */
-    public function getOrganisationEntity(): ?Entity
-    {
-        if (!$this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.organisation.schema.json');
-
-            return null;
-        }
-
-        return $this->organisationEntity;
-    }
-
-    /**
-     * Get the application mapping.
+     * @param string $reference The reference to look for
      *
-     * @return ?Mapping
+     * @return Mapping|null
      */
-    public function getApplicationMapping(): ?Mapping
+    public function getMapping(string $reference): ?Mapping
     {
-        if (!$this->applicationMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/applications'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/applications');
+        $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
+        if ($mapping === null) {
+//            $this->logger->error("No mapping found for $reference");
+            isset($this->io) && $this->io->error("No mapping found for $reference");
+        }//end if
 
-            return null;
-        }
-
-        return $this->applicationMapping;
-    }
-
-    /**
-     * Get the repository entity.
-     *
-     * @return ?Entity
-     */
-    public function getRepositoryEntity(): ?Entity
-    {
-        if (!$this->repositoryEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.repository.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.repository.schema.json');
-
-            return null;
-        }
-
-        return $this->repositoryEntity;
-    }
-
-    /**
-     * Get the legal entity.
-     *
-     * @return ?Entity
-     */
-    public function getLegalEntity(): ?Entity
-    {
-        if (!$this->legalEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.legal.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.legal.schema.json');
-
-            return null;
-        }
-
-        return $this->legalEntity;
-    }
+        return $mapping;
+    }//end getMapping()
 
     /**
      * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
@@ -168,11 +149,7 @@ class ComponentenCatalogusService
     {
         $result = [];
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get Applications');
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         $applications = $this->callService->getAllResults($source, '/products');
 
@@ -184,7 +161,7 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end getApplications()
 
     /**
      * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}.
@@ -196,11 +173,7 @@ class ComponentenCatalogusService
     public function getApplication(string $id): ?array
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get an Application with id: '.$id);
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         isset($this->io) && $this->io->success('Getting application '.$id);
         $response = $this->callService->call($source, '/products/'.$id);
@@ -222,7 +195,7 @@ class ComponentenCatalogusService
         isset($this->io) && $this->io->success('Found application with id: '.$id);
 
         return $application->toArray();
-    }
+    }//end getApplication()
 
     /**
      * @todo
@@ -234,21 +207,9 @@ class ComponentenCatalogusService
     public function importApplication($application): ?ObjectEntity
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import an Application '.isset($application['name']) ? $application['name'] : '');
-
-            return null;
-        }
-        if (!$applicationEntity = $this->getApplicationEntity()) {
-            isset($this->io) && $this->io->error('No ApplicationEntity found when trying to import a Application '.isset($application['name']) ? $application['name'] : '');
-
-            return null;
-        }
-        if (!$mapping = $this->getApplicationMapping()) {
-            isset($this->io) && $this->io->error('No ApplicationMapping found when trying to import a Application '.isset($application['name']) ? $application['name'] : '');
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
+        $applicationEntity = $this->getEntity('https://opencatalogi.nl/oc.application.schema.json');
+        $mapping = $this->getMapping('https://componentencatalogus.commonground.nl/api/applications');
 
         $synchronization = $this->synchronizationService->findSyncBySource($source, $applicationEntity, $application['id']);
 
@@ -261,11 +222,7 @@ class ComponentenCatalogusService
 
         $applicationObject = $synchronization->getObject();
 
-        if (!$componentEntity = $this->getComponentEntity()) {
-            isset($this->io) && $this->io->error('No componentEntity found when trying to import a Component');
-
-            return null;
-        }
+        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
 
         if ($application['components']) {
             $components = [];
@@ -280,39 +237,7 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $applicationObject;
-    }
-
-    /**
-     * Get the component entity.
-     *
-     * @return ?Entity
-     */
-    public function getComponentEntity(): ?Entity
-    {
-        if (!$this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference'=>'https://opencatalogi.nl/oc.component.schema.json'])) {
-            isset($this->io) && $this->io->error('No entity found for https://opencatalogi.nl/oc.component.schema.json');
-
-            return null;
-        }
-
-        return $this->componentEntity;
-    }
-
-    /**
-     * Get the component mapping.
-     *
-     * @return ?Mapping
-     */
-    public function getComponentMapping(): ?Mapping
-    {
-        if (!$this->componentMapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference'=>'https://componentencatalogus.commonground.nl/api/components'])) {
-            isset($this->io) && $this->io->error('No mapping found for https://componentencatalogus.commonground.nl/api/components');
-
-            return null;
-        }
-
-        return $this->componentMapping;
-    }
+    }//end importApplication()
 
     /**
      * Get components through the components of https://componentencatalogus.commonground.nl/api/components.
@@ -326,11 +251,7 @@ class ComponentenCatalogusService
         $result = [];
 
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get Components');
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
 
@@ -344,7 +265,7 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end getComponents()
 
     /**
      * Get a component trough the components of https://componentencatalogus.commonground.nl/api/components/{id}.
@@ -358,11 +279,7 @@ class ComponentenCatalogusService
     public function getComponent(string $id): ?array
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to get a Component with id: '.$id);
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         isset($this->io) && $this->io->comment('Trying to get component with id: '.$id);
         $response = $this->callService->call($source, '/components/'.$id);
@@ -384,7 +301,7 @@ class ComponentenCatalogusService
         isset($this->io) && $this->io->success('Found component with id: '.$id);
 
         return $component->toArray();
-    }
+    }//end getComponent()
 
     /**
      * @param array        $componentArray
@@ -394,12 +311,7 @@ class ComponentenCatalogusService
      */
     public function importRepositoryThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
     {
-        if (!$repositoryEntity = $this->getRepositoryEntity()) {
-            isset($this->io) && $this->io->error('No RepositoryEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
-        // if the component isn't already set to a repository create or get the repo and set it to the component url
+        $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
         // if the component isn't already set to a repository create or get the repo and set it to the component url
         if (key_exists('url', $componentArray) &&
             key_exists('url', $componentArray['url']) &&
@@ -420,7 +332,7 @@ class ComponentenCatalogusService
         }
 
         return null;
-    }
+    }//end importRepositoryThroughComponent()
 
     /**
      * @todo duplicate with DeveloperOverheidService ?
@@ -432,21 +344,9 @@ class ComponentenCatalogusService
     public function importComponent($component): ?ObjectEntity
     {
         // Do we have a source
-        if (!$source = $this->getSource()) {
-            isset($this->io) && $this->io->error('No source found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
-        if (!$componentEntity = $this->getComponentEntity()) {
-            isset($this->io) && $this->io->error('No ComponentEntity found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
-        if (!$mapping = $this->getComponentMapping()) {
-            isset($this->io) && $this->io->error('No ComponentMapping found when trying to import a Component '.isset($component['name']) ? $component['name'] : '');
-
-            return null;
-        }
+        $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
+        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+        $mapping = $this->getMapping('https://componentencatalogus.commonground.nl/api/components');
 
         // Handle sync
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
@@ -474,5 +374,5 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $componentObject;
-    }
+    }//end importComponent()
 }
