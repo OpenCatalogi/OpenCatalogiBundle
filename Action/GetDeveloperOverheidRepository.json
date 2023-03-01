@@ -3,7 +3,7 @@
   "$id": "https://opencatalogi.nl/oc.developeroverheid.repository.action.json",
   "$schema": "https://json-schema.org/draft/2020-12/action",
   "version": "0.0.1",
-  "listens": [],
+  "listens": ["opencatalogi.default.listens"],
   "throws": [],
   "conditions": {
     "==": {"1":"1"}
