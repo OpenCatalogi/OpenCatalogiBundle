@@ -53,12 +53,6 @@ class GithubEventService
      * @var array
      */
     private array $data;
-    private ?Entity $repositoryEntity;
-    private ?Mapping $repositoriesMapping;
-    private ?Source $source;
-    private SynchronizationService $synchronizationService;
-    private HandlerService $handlerService;
-    private MappingService $mappingService;
 
     /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
@@ -78,7 +72,6 @@ class GithubEventService
         $this->cacheService = $cacheService;
         $this->configuration = [];
         $this->data = [];
-        $this->synchronizationService = $synchronizationService;
     }
 
     /**
