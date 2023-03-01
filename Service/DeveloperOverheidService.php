@@ -43,10 +43,10 @@ class DeveloperOverheidService
     private MappingService $mappingService;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
-     * @param CallService $callService The Call Service
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
+     * @param CallService            $callService            The Call Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param MappingService $mappingService The Mapping Service
+     * @param MappingService         $mappingService         The Mapping Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -111,7 +111,6 @@ class DeveloperOverheidService
 
         return $entity;
     }//end getEntity()
-
 
     /**
      * Get a mapping by reference.
@@ -321,7 +320,6 @@ class DeveloperOverheidService
      */
     public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
     {
-
         $organisationEntity = $this->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
         $legalEntity = $this->getEntity('https://opencatalogi.nl/oc.legal.schema.json');
 

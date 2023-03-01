@@ -58,10 +58,10 @@ class EnrichPubliccodeService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
-     * @param CallService $callService The Call Service
-     * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param MappingService $mappingService The Mapping Service
+     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
+     * @param CallService             $callService             The Call Service
+     * @param SynchronizationService  $synchronizationService  The Synchronization Service
+     * @param MappingService          $mappingService          The Mapping Service
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
      */
     public function __construct(
