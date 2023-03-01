@@ -48,10 +48,10 @@ class ComponentenCatalogusService
     private DeveloperOverheidService $developerOverheidService;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
-     * @param CallService $callService The Call Service
-     * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param MappingService $mappingService The Mapping Service
+     * @param EntityManagerInterface   $entityManager            The Entity Manager Interface
+     * @param CallService              $callService              The Call Service
+     * @param SynchronizationService   $synchronizationService   The Synchronization Service
+     * @param MappingService           $mappingService           The Mapping Service
      * @param DeveloperOverheidService $developerOverheidService The Developer Overheid Service
      */
     public function __construct(
@@ -120,7 +120,6 @@ class ComponentenCatalogusService
 
         return $entity;
     }//end getEntity()
-
 
     /**
      * Get a mapping by reference.
