@@ -40,7 +40,7 @@ class InstallationService implements InstallerInterface
 
     public const ACTION_HANDLERS = [
         //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\CatalogiHandler',
-        //        'OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler',
+        "OpenCatalogi\OpenCatalogiBundle\ActionHandler\GithubEventHandler",
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusApplicationToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\ComponentenCatalogusComponentToGatewayHandler',
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\DeveloperOverheidApiToGatewayHandler',
@@ -150,6 +150,9 @@ class InstallationService implements InstallerInterface
 
             if ($schema['$id'] == 'https://opencatalogi.nl/oc.rating.schema.json') {
                 $action->setListens(['opencatalogi.rating.handler']);
+                $action->setConditions([[1 => 1]]);
+            } elseif ($schema['$id'] == 'https://opencatalogi.nl/oc.githubEvent.action.json') {
+                $action->setListens(['opencatalogi.githubevents.trigger']);
                 $action->setConditions([[1 => 1]]);
             } elseif (strpos($schema['$id'], 'https://opencatalogi.nl/oc.github') === 0) {
                 $action->setListens(['opencatalogi.github']);
@@ -444,6 +447,21 @@ class InstallationService implements InstallerInterface
                 $searchEnpoint->addEntity($schema);
             }
             $this->entityManager->persist($searchEnpoint);
+        }
+
+        if (!$githubEventEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(github_events)$'])) {
+            $githubEventEndpoint = new Endpoint();
+            $githubEventEndpoint->setName('Github Event');
+            $githubEventEndpoint->setDescription('Github Event Endpoint');
+            $githubEventEndpoint->setPath(['github_events']);
+            $githubEventEndpoint->setPathRegex('^(github_events)$');
+            $githubEventEndpoint->setMethod('POST');
+            $githubEventEndpoint->setMethods(['POST']);
+            $githubEventEndpoint->setThrows(['opencatalogi.githubevents.trigger']);
+            $githubEventEndpoint->setOperationType('collection');
+//            $repoSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
+//            $githubEventEndpoint->addEntity($repoSchema);
+            $this->entityManager->persist($githubEventEndpoint);
         }
 
         // create cronjobs
