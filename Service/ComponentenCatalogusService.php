@@ -147,7 +147,7 @@ class ComponentenCatalogusService
     public function getApplications(): ?array
     {
         $result = [];
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         $applications = $this->callService->getAllResults($source, '/products');
@@ -171,7 +171,7 @@ class ComponentenCatalogusService
      */
     public function getApplication(string $id): ?array
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         isset($this->io) && $this->io->success('Getting application '.$id);
@@ -221,8 +221,6 @@ class ComponentenCatalogusService
 
         $applicationObject = $synchronization->getObject();
 
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
-
         if ($application['components']) {
             $components = [];
             foreach ($application['components'] as $component) {
@@ -249,7 +247,7 @@ class ComponentenCatalogusService
     {
         $result = [];
 
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
@@ -311,7 +309,7 @@ class ComponentenCatalogusService
     public function importRepositoryThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
     {
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        // if the component isn't already set to a repository create or get the repo and set it to the component url
+        // If the component isn't already set to a repository create or get the repo and set it to the component url.
         if (key_exists('url', $componentArray) &&
             key_exists('url', $componentArray['url']) &&
             key_exists('name', $componentArray['url'])) {
@@ -324,7 +322,7 @@ class ComponentenCatalogusService
             }
             $this->entityManager->persist($repository);
             if ($componentObject->getValue('url')) {
-                // if the component is already set to a repository return the component object
+                // If the component is already set to a repository return the component object.
                 return $componentObject;
             }
             $componentObject->setValue('url', $repository);
@@ -342,12 +340,12 @@ class ComponentenCatalogusService
      */
     public function importComponent($component): ?ObjectEntity
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://componentencatalogus.commonground.nl/api');
         $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
         $mapping = $this->getMapping('https://componentencatalogus.commonground.nl/api/components');
 
-        // Handle sync
+        // Handle sync.
         $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
 
         isset($this->io) && $this->io->comment('Mapping object'.$component['name']);
@@ -355,9 +353,9 @@ class ComponentenCatalogusService
 
         isset($this->io) && $this->io->comment('Checking component '.$component['name']);
 
-        // do the mapping of the component set two variables
+        // Do the mapping of the component set two variables.
         $component = $componentArray = $this->mappingService->mapping($mapping, $component);
-        // unset component url before creating object, we don't want duplicate repositories
+        // Unset component url before creating object, we don't want duplicate repositories.
         unset($component['url']);
         if (key_exists('legal', $component) && key_exists('repoOwner', $component['legal'])) {
             unset($component['legal']['repoOwner']);

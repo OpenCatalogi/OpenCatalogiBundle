@@ -7,9 +7,11 @@ use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
+use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -33,6 +35,11 @@ class DeveloperOverheidService
     private CallService $callService;
 
     /**
+     * @var CacheService
+     */
+    private CacheService $cacheService;
+
+    /**
      * @var SynchronizationService
      */
     private SynchronizationService $synchronizationService;
@@ -43,21 +50,32 @@ class DeveloperOverheidService
     private MappingService $mappingService;
 
     /**
+     * @var GithubApiService
+     */
+    private GithubApiService $githubApiService;
+
+    /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param CallService            $callService            The Call Service
+     * @param CacheService $cacheService The Cache Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
+     * @param GithubApiService $githubApiService The Github Api Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
+        CacheService $cacheService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
+        $this->cacheService = $cacheService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->githubApiService = $githubApiService;
     }
 
     /**
@@ -140,7 +158,7 @@ class DeveloperOverheidService
     public function getRepositories(): ?array
     {
         $result = [];
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
 
         $repositories = $this->callService->getAllResults($source, '/repositories');
@@ -166,7 +184,7 @@ class DeveloperOverheidService
      */
     public function getRepository(string $id): ?array
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
 
         isset($this->io) && $this->io->success('Getting repository '.$id);
@@ -200,10 +218,9 @@ class DeveloperOverheidService
      */
     public function importRepository($repository): ?ObjectEntity
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
 
         isset($this->io) && $this->io->success('Checking repository '.$repository['name']);
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
@@ -211,17 +228,12 @@ class DeveloperOverheidService
 
         $repositoryObject = $synchronization->getObject();
 
-        if (!($component = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $componentEntity, 'name' => $repository['name']]))) {
-            $component = new ObjectEntity($componentEntity);
-            $component->hydrate([
-                'name' => $repository['name'],
-                'url'  => $repositoryObject,
-            ]);
-            $this->entityManager->persist($component);
-        }
-        $repositoryObject->setValue('component', $component);
-        $this->entityManager->persist($repositoryObject);
-        $this->entityManager->flush();
+        $component = $this->githubApiService->connectComponent($repositoryObject);
+        if ($component !== null) {
+            $repositoryObject->setValue('component', $component);
+            $this->entityManager->persist($repositoryObject);
+            $this->entityManager->flush();
+        }//end if
 
         return $repositoryObject;
     }//end importRepository()
@@ -237,7 +249,7 @@ class DeveloperOverheidService
     {
         $result = [];
 
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
 
         isset($this->io) && $this->io->comment('Trying to get all components from source '.$source->getName());
@@ -265,7 +277,7 @@ class DeveloperOverheidService
      */
     public function getComponent(string $id): ?array
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
 
         isset($this->io) && $this->io->comment('Trying to get component with id: '.$id);
@@ -300,11 +312,11 @@ class DeveloperOverheidService
      */
     public function handleRepositoryArray(array $repository): ?ObjectEntity
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
 
-        // Handle sync
+        // Handle sync.
         $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         isset($this->io) && $this->io->comment('Checking component '.$repository['name']);
         $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
@@ -323,7 +335,7 @@ class DeveloperOverheidService
         $organisationEntity = $this->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
         $legalEntity = $this->getEntity('https://opencatalogi.nl/oc.legal.schema.json');
 
-        // if the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner
+        // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $componentArray) &&
             key_exists('repoOwner', $componentArray['legal']) &&
             key_exists('name', $componentArray['legal']['repoOwner'])) {
@@ -341,7 +353,7 @@ class DeveloperOverheidService
 
             if ($legal = $componentObject->getValue('legal')) {
                 if ($repoOwner = $legal->getValue('repoOwner')) {
-                    // if the component is already set to a repoOwner return the component object
+                    // If the component is already set to a repoOwner return the component object.
                     return $componentObject;
                 }
 
@@ -377,7 +389,7 @@ class DeveloperOverheidService
      */
     public function importComponent($component): ?ObjectEntity
     {
-        // Do we have a source
+        // Do we have a source?
         $source = $this->getSource('https://developer.overheid.nl/api');
         $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
         $mapping = $this->getMapping('https://developer.overheid.nl/api/components');
@@ -389,9 +401,9 @@ class DeveloperOverheidService
 
         isset($this->io) && $this->io->comment('Checking component '.$component['service_name']);
 
-        // do the mapping of the component set two variables
+        // Do the mapping of the component set two variables.
         $componentMapping = $componentArray = $this->mappingService->mapping($mapping, $component);
-        // unset component legal before creating object, we don't want duplicate organisations
+        // Unset component legal before creating object, we don't want duplicate organisations.
         if (key_exists('legal', $componentMapping) && key_exists('repoOwner', $componentMapping['legal'])) {
             unset($componentMapping['legal']['repoOwner']);
         }
