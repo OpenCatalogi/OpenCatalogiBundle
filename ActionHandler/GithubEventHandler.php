@@ -4,7 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService;
-use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 
 /**
  * ...
@@ -33,7 +32,7 @@ class GithubEventHandler implements ActionHandlerInterface
                     'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
                     'required'    => true,
                     '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
-                ]
+                ],
             ],
         ];
     }
