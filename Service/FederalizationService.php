@@ -270,19 +270,19 @@ class FederalizationService
         }
 
         // Lets se if we already have an synchronisation
-        if (!$synchonization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])) {
-            $synchonization = new Synchronization($source, $entity);
-            $synchonization->setSourceId($object['id']);
+        if (!$synchronization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])) {
+            $synchronization = new Synchronization($source, $entity);
+            $synchronization->setSourceId($object['id']);
         }
 
-        $this->entityManager->persist($synchonization);
+        $this->entityManager->persist($synchronization);
 
-        if (isset($sourceObject['_self']['synchronizations'][0])) {
-            $synchronization = $this->setSourcesSource($synchronization, $sourceObject['_self']['synchronizations'][0]);
+        if(isset($object['_self']['synchronizations'][0])) {
+            $synchronization = $this->setSourcesSource($synchronization, $object['_self']['synchronizations'][0]);
         }
 
         // Lets sync
-        return $this->synchronizationService->synchronize($synchonization, $object);
+        return $this->synchronizationService->synchronize($synchronization, $object);
     }
 
     /**
