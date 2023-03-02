@@ -474,7 +474,7 @@ class InstallationService implements InstallerInterface
         $this->addActions();
 
         // Now we kan do a first federation
-        $this->catalogiService->setStyle($this->io);
+        isset($this->io) && $this->catalogiService->setStyle($this->io);
         //$this->catalogiService->readCatalogi($opencatalogi);
 
         /*@todo register this catalogi to the federation*/
