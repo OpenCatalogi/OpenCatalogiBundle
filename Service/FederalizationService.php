@@ -80,7 +80,8 @@ class FederalizationService
         }
 
         // Get al the catalogi
-        $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity'=>$this->catalogusEntity->getId()->toString()]);
+        $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity'=>$this->catalogusEntity]);
+        var_dump(count($catalogi));
 
         // Sync them
         foreach ($catalogi as $catalogus) {
@@ -189,6 +190,31 @@ class FederalizationService
     }
 
     /**
+     * Checks if the source object contains a source, and if so, set the source that has been found
+     *
+     * @param Synchronization $synchronization The synchronization to update
+     * @param array           $sourceSync      The synchronization in the original data
+     *
+     * @return Synchronization The updated synchronization
+     */
+    private function setSourcesSource (Synchronization $synchronization, array $sourceSync): Synchronization
+    {
+        $synchronization->setEndpoint($sourceSync['endpoint']);
+        $synchronization->setSourceId($sourceSync['sourceId']);
+
+        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSync['gateway']['location']]);
+        if($sourceSync === null) {
+            $source = new Source();
+            $source->setName($sourceSync['gateway']['name']);
+            $source->setLocation($sourceSync['gateway']['location']);
+        }
+        $synchronization->setSource($source);
+
+
+        return $synchronization;
+    }//end setSourcesSource()
+
+    /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
      * @param array $object
@@ -250,10 +276,12 @@ class FederalizationService
             $synchonization->setSourceId($object['id']);
         }
 
-        if (isset($object['_self'])) {
-            unset($object['_self']);
-        }
         $this->entityManager->persist($synchonization);
+
+
+        if(isset($sourceObject['_self']['synchronizations'][0])) {
+            $synchronization = $this->setSourcesSource($synchronization, $sourceObject['_self']['synchronizations'][0]);
+        }
 
         // Lets sync
         return $this->synchronizationService->synchronize($synchonization, $object);
