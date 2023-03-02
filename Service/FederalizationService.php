@@ -119,7 +119,7 @@ class FederalizationService
         }
 
         (isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')') : '');
-        if(!$sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')])) {
+        if (!$sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')])) {
             $sourceObject = new Source();
             $sourceObject->setLocation($source->getValue('location'));
         }
@@ -146,7 +146,7 @@ class FederalizationService
                 continue;
             }
             $synchronization = $this->handleObject($object, $sourceObject);
-            if($synchronization === null) {
+            if ($synchronization === null) {
                 continue;
             }
             $synchonizedObjects[] = $synchronization->getSourceId();
@@ -190,26 +190,25 @@ class FederalizationService
     }
 
     /**
-     * Checks if the source object contains a source, and if so, set the source that has been found
+     * Checks if the source object contains a source, and if so, set the source that has been found.
      *
      * @param Synchronization $synchronization The synchronization to update
      * @param array           $sourceSync      The synchronization in the original data
      *
      * @return Synchronization The updated synchronization
      */
-    private function setSourcesSource (Synchronization $synchronization, array $sourceSync): Synchronization
+    private function setSourcesSource(Synchronization $synchronization, array $sourceSync): Synchronization
     {
         $synchronization->setEndpoint($sourceSync['endpoint']);
         $synchronization->setSourceId($sourceSync['sourceId']);
 
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSync['gateway']['location']]);
-        if($sourceSync === null) {
+        if ($sourceSync === null) {
             $source = new Source();
             $source->setName($sourceSync['gateway']['name']);
             $source->setLocation($sourceSync['gateway']['location']);
         }
         $synchronization->setSource($source);
-
 
         return $synchronization;
     }//end setSourcesSource()
@@ -278,8 +277,7 @@ class FederalizationService
 
         $this->entityManager->persist($synchonization);
 
-
-        if(isset($sourceObject['_self']['synchronizations'][0])) {
+        if (isset($sourceObject['_self']['synchronizations'][0])) {
             $synchronization = $this->setSourcesSource($synchronization, $sourceObject['_self']['synchronizations'][0]);
         }
 
