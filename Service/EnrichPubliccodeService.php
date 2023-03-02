@@ -162,7 +162,9 @@ class EnrichPubliccodeService
 
     /**
      * @param ObjectEntity $repository
-     * @param array        $publiccodeUrl
+     * @param string       $publiccodeUrl
+     *
+     * @throws GuzzleException
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
@@ -189,7 +191,7 @@ class EnrichPubliccodeService
         $this->data = $data;
 
         if ($repositoryId) {
-            // If we are testing for one repository
+            // If we are testing for one repository.
             if ($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) {
                 if ($publiccodeUrl = $repository->getValue('publiccode_url')) {
                     $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
@@ -200,7 +202,7 @@ class EnrichPubliccodeService
         } else {
             $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
 
-            // If we want to do it for al repositories
+            // If we want to do it for al repositories.
             isset($this->io) && $this->io->info('Looping through repositories');
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 if ($publiccodeUrl = $repository->getValue('publiccode_url')) {

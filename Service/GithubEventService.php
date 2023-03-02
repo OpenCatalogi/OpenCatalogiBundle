@@ -5,13 +5,11 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
-use App\Entity\ObjectEntity;
 use App\Exception\GatewayException;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
@@ -43,6 +41,11 @@ class GithubEventService
     private CacheService $cacheService;
 
     /**
+     * @var GithubApiService
+     */
+    private GithubApiService $githubApiService;
+
+    /**
      * @var array
      */
     private array $configuration;
@@ -57,17 +60,20 @@ class GithubEventService
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param CallService            $callService            The Call Service
      * @param CacheService           $cacheService           The Cache Service
+     * @param GithubApiService       $githubApiService       The Github Api Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         SynchronizationService $synchronizationService,
         CallService $callService,
-        CacheService $cacheService
+        CacheService $cacheService,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager = $entityManager;
         $this->synchronizationService = $synchronizationService;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
+        $this->githubApiService = $githubApiService;
         $this->configuration = [];
         $this->data = [];
     }
@@ -174,40 +180,6 @@ class GithubEventService
     }//end getRepository()
 
     /**
-     * This function create or get the component of the repository.
-     *
-     * @param ObjectEntity $repository
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null
-     */
-    public function connectComponent(ObjectEntity $repository): ?ObjectEntity
-    {
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
-        $components = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
-
-        if ($components === []) {
-            $component = new ObjectEntity($componentEntity);
-            $component->hydrate([
-                'name' => $repository->getValue('name'),
-                'url'  => $repository,
-            ]);
-            $this->entityManager->persist($component);
-        }//end if
-
-        if (count($components) === 1) {
-            $component = $this->entityManager->find('App:ObjectEntity', $components[0]['_self']['id']);
-        }//end if
-
-        if (isset($component) === true) {
-            return $component;
-        }//end if
-
-        return null;
-    }//end connectComponent()
-
-    /**
      * This function creates/updates the repository with the github event response.
      *
      * @param ?array $data          data set at the start of the handler
@@ -255,7 +227,7 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
-        $component = $this->connectComponent($repository);
+        $component = $this->githubApiService->connectComponent($repository);
         if ($component !== null) {
             $repository->setValue('component', $component);
             $this->entityManager->persist($repository);
