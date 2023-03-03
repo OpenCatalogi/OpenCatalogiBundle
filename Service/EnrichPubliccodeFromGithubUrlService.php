@@ -144,7 +144,6 @@ class EnrichPubliccodeFromGithubUrlService
      */
     public function getPubliccodeFromUrl(string $repositoryUrl)
     {
-        // make sync object
         $source = $this->getSource('https://api.github.com');
 
         try {
@@ -197,7 +196,7 @@ class EnrichPubliccodeFromGithubUrlService
         $this->data = $data;
 
         if ($repositoryId) {
-            // If we are testing for one repository
+            // If we are testing for one repository.
             if ($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) {
                 if (!$repository->getValue('publiccode_url')) {
                     $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
@@ -208,7 +207,7 @@ class EnrichPubliccodeFromGithubUrlService
         } else {
             $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
 
-            // If we want to do it for al repositories
+            // If we want to do it for al repositories.
             isset($this->io) && $this->io->info('Looping through repositories');
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 if (!$repository->getValue('publiccode_url')) {
