@@ -277,7 +277,7 @@ class FederalizationService
 
         $this->entityManager->persist($synchronization);
 
-        if(isset($object['_self']['synchronizations'][0])) {
+        if (isset($object['_self']['synchronizations'][0])) {
             $synchronization = $this->setSourcesSource($synchronization, $object['_self']['synchronizations'][0]);
         }
 
