@@ -126,41 +126,6 @@ class InstallationService implements InstallerInterface
         // set all entity maxDepth to 5
         $this->setEntityMaxDepth();
 
-//        // Doesn't work so let's let search endpoint return all
-//        $schemasToAddToSearchEndpoint = [
-//            'https://opencatalogi.nl/oc.application.schema.json',
-//            'https://opencatalogi.nl/oc.organisation.schema.json',
-//            'https://opencatalogi.nl/oc.component.schema.json',
-//        ];
-//
-//        $schemas = [];
-//        foreach ($schemasToAddToSearchEndpoint as $schema) {
-//            $foundSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $schema]);
-//            if ($foundSchema instanceof Entity) {
-//                $schemas[] = $foundSchema;
-//            } else {
-//                isset($this->io) && $this->io->writeln('Schema: '.$schema.' could not be found. Installation failed');
-//
-//                throw new Exception('Schema: '.$schema.' could not be found. Installation failed');
-//            }
-//        }
-//
-//        // Lets see if there is a generic search endpoint
-//        if (!$searchEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(search)$'])) {
-//            $searchEndpoint = new Endpoint();
-//            $searchEndpoint->setName('Search');
-//            $searchEndpoint->setDescription('Generic Search Endpoint');
-//            $searchEndpoint->setPath(['search']);
-//            $searchEndpoint->setPathRegex('^(search)$');
-//            $searchEndpoint->setMethod('GET');
-//            $searchEndpoint->setMethods(['GET']);
-//            $searchEndpoint->setOperationType('collection');
-//            foreach ($schemas as $schema) {
-//                $searchEndpoint->addEntity($schema);
-//            }
-//            $this->entityManager->persist($searchEndpoint);
-//        }
-
         if (!$githubEventEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(github_events)$'])) {
             $githubEventEndpoint = new Endpoint();
             $githubEventEndpoint->setName('Github Event');
