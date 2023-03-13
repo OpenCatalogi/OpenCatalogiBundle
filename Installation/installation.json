@@ -76,6 +76,22 @@
     ]
   },
   "endpoints": {
+    "multipleSchemas": [
+      {
+        "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.search.endpoint.json",
+        "version": "0.0.1",
+        "name": "Search",
+        "description": "Generic Search Endpoint",
+        "schemas": [
+          "https://opencatalogi.nl/oc.application.schema.json",
+          "https://opencatalogi.nl/oc.organisation.schema.json",
+          "https://opencatalogi.nl/oc.component.schema.json"
+        ],
+        "path": ["search"],
+        "pathRegex": "^(search)$",
+        "methods": ["GET"]
+      }
+    ],
     "schemas": [
       {
         "reference": "https://opencatalogi.nl/oc.component.schema.json",
