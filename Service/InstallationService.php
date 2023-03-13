@@ -18,7 +18,6 @@ class InstallationService implements InstallerInterface
 {
     private EntityManagerInterface $entityManager;
     private ContainerInterface $container;
-    private SymfonyStyle $io;
     private CatalogiService $catalogiService;
 
     public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
@@ -26,20 +25,6 @@ class InstallationService implements InstallerInterface
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->catalogiService = $catalogiService;
-    }
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->io = $io;
-
-        return $this;
     }
 
     public function install()
@@ -138,57 +123,57 @@ class InstallationService implements InstallerInterface
         }
     }
 
-    public function createSources()
-    {
-        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
-
-        // componentencatalogus
-        $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
-        $componentenCatalogusSource->setName('componentencatalogus');
-        $componentenCatalogusSource->setAuth('none');
-        $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
-        $componentenCatalogusSource->setIsEnabled(true);
-        $this->entityManager->persist($componentenCatalogusSource);
-        isset($this->io) && $this->io->writeln('Gateway: '.$componentenCatalogusSource->getName().' created');
-
-        // developer.overheid
-        $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
-        $developerOverheid->setName('developerOverheid');
-        $developerOverheid->setAuth('none');
-        $developerOverheid->setLocation('https://developer.overheid.nl/api');
-        $developerOverheid->setIsEnabled(true);
-        $this->entityManager->persist($developerOverheid);
-        isset($this->io) && $this->io->writeln('Gateway: '.$developerOverheid->getName().' created');
-
-        // GitHub API
-        $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
-        $gitHubAPI->setName('GitHub API');
-        $gitHubAPI->setAuth('apikey');
-        $gitHubAPI->setHeaders(['Accept' => 'application/vnd.github+json']);
-        $gitHubAPI->setAuthorizationHeader('Authorization');
-        $gitHubAPI->setAuthorizationPassthroughMethod('header');
-        $gitHubAPI->setLocation('https://api.github.com');
-        $gitHubAPI->setIsEnabled(true);
-        $this->entityManager->persist($gitHubAPI);
-        
-        // TODO: move this to installation.json!!!
-//        $dashboardCard = new DashboardCard($gitHubAPI);
-//        $this->entityManager->persist($dashboardCard);
-        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubAPI->getName().' created');
-
-        // GitHub usercontent
-        $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
-        $gitHubUserContentSource->setName('GitHub usercontent');
-        $gitHubUserContentSource->setAuth('none');
-        $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
-        $gitHubUserContentSource->setIsEnabled(true);
-        $this->entityManager->persist($gitHubUserContentSource);
-        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubUserContentSource->getName().' created');
-
-        // flush the sources before adding actions via the addActions function
-        // we need the id of the sources
-        $this->entityManager->flush();
-    }
+//    public function createSources()
+//    {
+//        $sourceRepository = $this->entityManager->getRepository('App:Gateway');
+//
+//        // componentencatalogus
+//        $componentenCatalogusSource = $sourceRepository->findOneBy(['name' => 'componentencatalogus']) ?? new Source();
+//        $componentenCatalogusSource->setName('componentencatalogus');
+//        $componentenCatalogusSource->setAuth('none');
+//        $componentenCatalogusSource->setLocation('https://componentencatalogus.commonground.nl/api');
+//        $componentenCatalogusSource->setIsEnabled(true);
+//        $this->entityManager->persist($componentenCatalogusSource);
+//        isset($this->io) && $this->io->writeln('Gateway: '.$componentenCatalogusSource->getName().' created');
+//
+//        // developer.overheid
+//        $developerOverheid = $sourceRepository->findOneBy(['name' => 'developerOverheid']) ?? new Source();
+//        $developerOverheid->setName('developerOverheid');
+//        $developerOverheid->setAuth('none');
+//        $developerOverheid->setLocation('https://developer.overheid.nl/api');
+//        $developerOverheid->setIsEnabled(true);
+//        $this->entityManager->persist($developerOverheid);
+//        isset($this->io) && $this->io->writeln('Gateway: '.$developerOverheid->getName().' created');
+//
+//        // GitHub API
+//        $gitHubAPI = $sourceRepository->findOneBy(['name' => 'GitHub API']) ?? new Source();
+//        $gitHubAPI->setName('GitHub API');
+//        $gitHubAPI->setAuth('apikey');
+//        $gitHubAPI->setHeaders(['Accept' => 'application/vnd.github+json']);
+//        $gitHubAPI->setAuthorizationHeader('Authorization');
+//        $gitHubAPI->setAuthorizationPassthroughMethod('header');
+//        $gitHubAPI->setLocation('https://api.github.com');
+//        $gitHubAPI->setIsEnabled(true);
+//        $this->entityManager->persist($gitHubAPI);
+//
+//        // TODO: move this to installation.json!!!
+////        $dashboardCard = new DashboardCard($gitHubAPI);
+////        $this->entityManager->persist($dashboardCard);
+//        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubAPI->getName().' created');
+//
+//        // GitHub usercontent
+//        $gitHubUserContentSource = $sourceRepository->findOneBy(['name' => 'GitHub usercontent']) ?? new Source();
+//        $gitHubUserContentSource->setName('GitHub usercontent');
+//        $gitHubUserContentSource->setAuth('none');
+//        $gitHubUserContentSource->setLocation('https://raw.githubusercontent.com');
+//        $gitHubUserContentSource->setIsEnabled(true);
+//        $this->entityManager->persist($gitHubUserContentSource);
+//        isset($this->io) && $this->io->writeln('Gateway: '.$gitHubUserContentSource->getName().' created');
+//
+//        // flush the sources before adding actions via the addActions function
+//        // we need the id of the sources
+//        $this->entityManager->flush();
+//    }
 
     public function checkDataConsistency()
     {
@@ -248,8 +233,8 @@ class InstallationService implements InstallerInterface
         // create cronjobs
         $this->createCronjobs();
 
-        // create sources
-        $this->createSources();
+//        // create sources
+//        $this->createSources();
 
         // Now we kan do a first federation
         isset($this->io) && $this->catalogiService->setStyle($this->io);

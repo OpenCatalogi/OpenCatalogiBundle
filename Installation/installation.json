@@ -11,6 +11,9 @@
       "https://opencatalogi.nl/oc.component.schema.json",
       "https://opencatalogi.nl/oc.application.schema.json",
       "https://opencatalogi.nl/oc.catalogi.schema.json"
+    ],
+    "sources": [
+      "https://opencatalogi.nl/source/oc.GitHubAPI.source.json"
     ]
   },
   "actions": {
