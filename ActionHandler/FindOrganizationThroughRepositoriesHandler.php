@@ -20,7 +20,7 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/FindOrganizationThroughRepositoriesHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'FindOrganizationThroughRepositoriesHandler',
             'description'=> 'This handler finds organizations through repositories',

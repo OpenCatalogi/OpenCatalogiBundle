@@ -25,7 +25,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.componentencatalogus.application.schema.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/ComponentenCatalogusApplicationToGatewayHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',

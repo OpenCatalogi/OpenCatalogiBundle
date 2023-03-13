@@ -20,7 +20,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'EnrichPubliccodeHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',

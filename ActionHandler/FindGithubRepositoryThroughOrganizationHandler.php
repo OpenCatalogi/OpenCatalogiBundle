@@ -21,7 +21,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://example.com/person.schema.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/FindGithubRepositoryThroughOrganizationHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'FindGithubRepositoryThroughOrganizationHandler',
             'description'=> 'This handler finds the .github repository through organizations',

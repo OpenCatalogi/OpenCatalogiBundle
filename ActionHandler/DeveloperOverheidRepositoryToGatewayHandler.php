@@ -25,7 +25,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.developeroverheid.repository.schema.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/DeveloperOverheidRepositoryToGatewayHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'DeveloperOverheidRepositoryToGatewayHandler',
             'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',

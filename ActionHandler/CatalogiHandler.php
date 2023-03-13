@@ -25,7 +25,7 @@ class CatalogiHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://example.com/person.schema.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/CatalogiHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'CatalogiHandler',
             'description' => 'Syncs  all the know catalogi',

@@ -20,7 +20,7 @@ class GithubEventHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.githubEvent.action.json',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/GithubEventHandler.ActionHandler.json',
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'GithubEventHandler',
             'description'=> 'This handler gets the github event and creates or updates the repository',
