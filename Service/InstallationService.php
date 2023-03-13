@@ -228,6 +228,21 @@ class InstallationService implements InstallerInterface
             $this->entityManager->persist($searchEndpoint);
         }
 
+        if (!$githubEventEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(github_events)$'])) {
+            $githubEventEndpoint = new Endpoint();
+            $githubEventEndpoint->setName('Github Event');
+            $githubEventEndpoint->setDescription('Github Event Endpoint');
+            $githubEventEndpoint->setPath(['github_events']);
+            $githubEventEndpoint->setPathRegex('^(github_events)$');
+            $githubEventEndpoint->setMethod('POST');
+            $githubEventEndpoint->setMethods(['POST']);
+            $githubEventEndpoint->setThrows(['opencatalogi.githubevents.trigger']);
+            $githubEventEndpoint->setOperationType('collection');
+//            $repoSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
+//            $githubEventEndpoint->addEntity($repoSchema);
+            $this->entityManager->persist($githubEventEndpoint);
+        }
+
         // create cronjobs
         $this->createCronjobs();
 
@@ -235,7 +250,7 @@ class InstallationService implements InstallerInterface
         $this->createSources();
 
         // Now we kan do a first federation
-        $this->catalogiService->setStyle($this->io);
+        isset($this->io) && $this->catalogiService->setStyle($this->io);
         //$this->catalogiService->readCatalogi($opencatalogi);
 
         /*@todo register this catalogi to the federation*/

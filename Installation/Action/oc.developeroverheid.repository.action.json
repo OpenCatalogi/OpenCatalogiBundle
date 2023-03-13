@@ -6,8 +6,9 @@
   "listens": ["opencatalogi.default.listens"],
   "throws": [],
   "conditions": {
-    "==": {"1":"1"}
+    "==": [1,1]
   },
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidRepositoryToGatewayHandler",
   "configuration": [],
   "isLockable": true,
   "isEnabled": true
