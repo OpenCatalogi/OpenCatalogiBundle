@@ -64,6 +64,11 @@
         "reference": "https://opencatalogi.nl/action/oc.RatingAction.action.json",
         "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\RatingHandler",
         "listens": ["opencatalogi.rating.handler"]
+      },
+      {
+        "reference": "https://opencatalogi.nl/action/oc.GithubEventAction.action.json",
+        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubEventHandler",
+        "listens": ["opencatalogi.githubevents.trigger"]
       }
     ]
   },

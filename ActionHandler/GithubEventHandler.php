@@ -21,7 +21,7 @@ class GithubEventHandler implements ActionHandlerInterface
     {
         return [
             '$id'        => 'https://opencatalogi.nl/oc.githubEvent.action.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'GithubEventHandler',
             'description'=> 'This handler gets the github event and creates or updates the repository',
             'required'   => ['repositoryEntityId'],
