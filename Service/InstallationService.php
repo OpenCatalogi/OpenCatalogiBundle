@@ -170,8 +170,10 @@ class InstallationService implements InstallerInterface
         $gitHubAPI->setLocation('https://api.github.com');
         $gitHubAPI->setIsEnabled(true);
         $this->entityManager->persist($gitHubAPI);
-        $dashboardCard = new DashboardCard($gitHubAPI);
-        $this->entityManager->persist($dashboardCard);
+        
+        // TODO: move this to installation.json!!!
+//        $dashboardCard = new DashboardCard($gitHubAPI);
+//        $this->entityManager->persist($dashboardCard);
         isset($this->io) && $this->io->writeln('Gateway: '.$gitHubAPI->getName().' created');
 
         // GitHub usercontent
