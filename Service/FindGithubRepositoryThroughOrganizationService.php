@@ -9,6 +9,7 @@ use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
@@ -52,22 +53,30 @@ class FindGithubRepositoryThroughOrganizationService
     private array $configuration;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
      * @param CallService             $callService             The Call Service
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         GithubPubliccodeService $githubPubliccodeService,
-        CallService $callService
+        CallService $callService,
+        LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->logger = $pluginLogger;
 
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -82,7 +91,7 @@ class FindGithubRepositoryThroughOrganizationService
         $this->githubPubliccodeService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get a source by reference.
@@ -273,12 +282,12 @@ class FindGithubRepositoryThroughOrganizationService
             return null;
         }//end if
 
-        $domain = parse_url($url, PHP_URL_HOST);
+        $domain = \Safe\parse_url($url, PHP_URL_HOST);
         if (!$domain == 'github.com') {
             return null;
         }//end if
 
-        $name = trim(parse_url($url, PHP_URL_PATH), '/');
+        $name = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
 
         isset($this->io) && $this->io->info('Getting repo from organisation '.$name);
         $response = $this->callService->call($source, '/repos/'.$name);
@@ -290,6 +299,7 @@ class FindGithubRepositoryThroughOrganizationService
 
             return null;
         }//end if
+
         $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
@@ -326,6 +336,7 @@ class FindGithubRepositoryThroughOrganizationService
                     // Get organisation repos and set the property.
                     $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
                 }
+
                 $organization->setValue('uses', $uses);
 
                 $supports = [];
@@ -385,4 +396,4 @@ class FindGithubRepositoryThroughOrganizationService
 
         return $this->data;
     }//end findGithubRepositoryThroughOrganizationHandler()
-}
+}//end class

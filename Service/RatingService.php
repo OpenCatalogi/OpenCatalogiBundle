@@ -7,32 +7,73 @@ use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RatingService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $ratingEntity;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
 
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
+     * @param EntityManagerInterface $entityManager    The Entity Manager
+     * @param GithubApiService       $githubApiService The githubApiService
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->githubApiService = $githubApiService;
+        $this->logger = $pluginLogger;
+
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $io The symfony style element
      *
      * @return self
      */
@@ -42,7 +83,7 @@ class RatingService
         $this->githubApiService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get the component entity.
@@ -58,7 +99,7 @@ class RatingService
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the rating entity.
@@ -74,7 +115,7 @@ class RatingService
         }
 
         return $this->ratingEntity;
-    }
+    }//end getRatingEntity()
 
     /**
      * Create Rating for all components.
@@ -109,12 +150,12 @@ class RatingService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end enrichComponentsWithRating()
 
     /**
      * Create Rating for a single component.
      *
-     * @param string $id
+     * @param string $id The id of the component to enrich
      *
      * @throws Exception
      *
@@ -144,7 +185,7 @@ class RatingService
         $this->entityManager->flush();
 
         return $component->toArray();
-    }
+    }//end enrichComponentWithRating()
 
     /**
      * Create Rating for a single component when action for this handler is triggered.
@@ -168,11 +209,13 @@ class RatingService
         }
 
         return $this->data;
-    }
+    }//end ratingHandler()
 
     /**
-     * @param ObjectEntity $component
-     * @param Entity       $ratingEntity
+     * Rate a component.
+     *
+     * @param ObjectEntity $component    The component to rate
+     * @param Entity       $ratingEntity The rating entity
      *
      * @throws Exception
      *
@@ -200,12 +243,12 @@ class RatingService
         isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
-    }
+    }//end rateComponent()
 
     /**
      * Rates a component.
      *
-     * @param ObjectEntity $component
+     * @param ObjectEntity $component The component to rate
      *
      * @throws Exception|GuzzleException
      *
@@ -223,6 +266,7 @@ class RatingService
         } else {
             $description[] = 'Cannot rate the name because it is not set';
         }
+
         $maxRating++;
 
         if ($repository = $component->getValue('url')) {
@@ -231,7 +275,7 @@ class RatingService
                 $description[] = 'The url: '.$url.' rated';
                 $rating++;
 
-                $domain = parse_url($url, PHP_URL_HOST);
+                $domain = \Safe\parse_url($url, PHP_URL_HOST);
                 if ($domain !== 'github.com') {
                     $description[] = 'Cannot rate the repository because it is not a valid github repository';
                 } elseif ($this->githubApiService->checkPublicRepository($url)) {
@@ -458,5 +502,5 @@ class RatingService
             'maxRating' => $maxRating,
             'results'   => $description,
         ];
-    }
-}
+    }//end ratingList()
+}//end class

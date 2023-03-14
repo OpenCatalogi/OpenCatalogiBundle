@@ -12,6 +12,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -58,27 +59,36 @@ class EnrichPubliccodeService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param CallService             $callService             The Call Service
      * @param SynchronizationService  $synchronizationService  The Synchronization Service
      * @param MappingService          $mappingService          The Mapping Service
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService
+        GithubPubliccodeService $githubPubliccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
+
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -95,7 +105,7 @@ class EnrichPubliccodeService
         $this->githubPubliccodeService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle)
 
     /**
      * Get a source by reference.
@@ -170,7 +180,7 @@ class EnrichPubliccodeService
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
-        $url = trim(parse_url($publiccodeUrl, PHP_URL_PATH), '/');
+        $url = trim(\Safe\parse_url($publiccodeUrl, PHP_URL_PATH), '/');
         if ($publiccode = $this->getPubliccodeFromUrl($url)) {
             $this->githubPubliccodeService->mapPubliccode($repository, $publiccode);
         }
@@ -210,10 +220,11 @@ class EnrichPubliccodeService
                 }
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('enrichPubliccodeHandler finished');
 
         return $this->data;
     }//end enrichPubliccodeHandler()
-}
+}//end class

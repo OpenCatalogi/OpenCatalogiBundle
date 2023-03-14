@@ -14,39 +14,58 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetComponentsCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:componentencatalogus:components';
-    private ComponentenCatalogusService  $componentenCatalogusService;
 
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    /**
+     * @var ComponentenCatalogusService
+     */
+    private ComponentenCatalogusService  $compCatService;
+
+    /**
+     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
+     */
+    public function __construct(ComponentenCatalogusService $compCatService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->compCatService = $compCatService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all components or one component from componentencatalogus.commonground.nl/api/components')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->compCatService->setStyle($style);
 
         // Handle the command optiosn
         $componentId = $input->getOption('component', false);
 
-        if (!$componentId) {
-            if (!$this->componentenCatalogusService->getComponents()) {
+        if ($componentId === false) {
+            if (empty($this->compCatService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
+        } else if (empty($this->compCatService->getComponent($componentId)) === true) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

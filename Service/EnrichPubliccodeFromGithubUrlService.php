@@ -175,7 +175,7 @@ class EnrichPubliccodeFromGithubUrlService
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $repositoryUrl): ?ObjectEntity
     {
-        $url = trim(parse_url($repositoryUrl, PHP_URL_PATH), '/');
+        $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
         if ($publiccode = $this->getPubliccodeFromUrl($url)) {
             $this->githubPubliccodeService->mapPubliccode($repository, $publiccode);
         }
@@ -215,6 +215,7 @@ class EnrichPubliccodeFromGithubUrlService
                 }
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('enrichPubliccodeFromGithubUrlHandler finished');

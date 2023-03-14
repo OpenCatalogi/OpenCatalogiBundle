@@ -7,27 +7,42 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class InstallationService implements InstallerInterface
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param EntityManagerInterface $entityManager The entity manager
+     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     public function install()
     {
         $this->checkDataConsistency();
-    }
+    }//end install()
 
+    /**
+     * @return void
+     */
     public function update()
     {
         $this->checkDataConsistency();
-    }
+    }//end update()
 
+    /**
+     * @return void
+     */
     public function uninstall()
     {
         // Do some cleanup
-    }
+    }//end uninstall()
 
     /**
      * Sets the max depth of all entities to 5 because OC has a lot of nested objects.
@@ -46,13 +61,16 @@ class InstallationService implements InstallerInterface
                 $this->entityManager->persist($entity);
             }
         }
-    }
+    }//end setEntityMaxDepth()
 
+    /**
+     * @return void
+     */
     public function checkDataConsistency()
     {
         // set all entity maxDepth to 5
         $this->setEntityMaxDepth();
 
         $this->entityManager->flush();
-    }
-}
+    }//end checkDataConsistency()
+}//end class

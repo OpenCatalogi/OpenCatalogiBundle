@@ -10,17 +10,23 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
  */
 class CatalogiHandler implements ActionHandlerInterface
 {
-    private FederalizationService $federalizationiService;
+    /**
+     * @var FederalizationService
+     */
+    private FederalizationService $service;
 
-    public function __construct(FederalizationService $federalizationiService)
+    /**
+     * @param FederalizationService $service The federalization Service
+     */
+    public function __construct(FederalizationService $service)
     {
-        $this->federalizationiService = $federalizationiService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
      *
-     * @throws array a [json-schema](https://json-schema.org/) that this  action should comply to
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
     public function getConfiguration(): array
     {
@@ -82,6 +88,6 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->federalizationiService->catalogiHandler($data, $configuration);
-    }
-}
+        return $this->service->catalogiHandler($data, $configuration);
+    }//end run()
+}//end class

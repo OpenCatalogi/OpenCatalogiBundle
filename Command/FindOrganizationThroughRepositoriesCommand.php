@@ -14,39 +14,58 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class FindOrganizationThroughRepositoriesCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:findOrganizationThroughRepositories:execute';
-    private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
 
-    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
+    /**
+     * @var FindOrganizationThroughRepositoriesService
+     */
+    private FindOrganizationThroughRepositoriesService  $findOrgRepService;
+
+    /**
+     * @param FindOrganizationThroughRepositoriesService $findOrgRepService find Organization Through Repositories Service
+     */
+    public function __construct(FindOrganizationThroughRepositoriesService $findOrgRepService)
     {
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
+        $this->findOrgRepService = $findOrgRepService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find an organization for a specific repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findOrganizationThroughRepositoriesService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findOrgRepService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
-            if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
+        if ($repositoryId === false) {
+            if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
+        } else if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

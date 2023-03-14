@@ -10,17 +10,23 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
  */
 class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterface
 {
-    private DeveloperOverheidService $developerOverheidService;
+    /**
+     * @var DeveloperOverheidService
+     */
+    private DeveloperOverheidService $service;
 
-    public function __construct(DeveloperOverheidService $developerOverheidService)
+    /**
+     * @param DeveloperOverheidService $service The developer Overheid Service
+     */
+    public function __construct(DeveloperOverheidService $service)
     {
-        $this->developerOverheidService = $developerOverheidService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
      *
-     * @throws array a [json-schema](https://json-schema.org/) that this  action should comply to
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
     public function getConfiguration(): array
     {
@@ -44,6 +50,6 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->developerOverheidService->getRepositories();
-    }
-}
+        return $this->service->getRepositories();
+    }//end run()
+}//end class
