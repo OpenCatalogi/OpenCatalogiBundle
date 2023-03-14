@@ -179,7 +179,7 @@ class FederalizationService
 
         // Handle new objects
         $counter = 0;
-        foreach ($objects as $key => $object) {
+        foreach ($objects as $object) {
             $counter++;
             // Lets make sure we have a reference
             if (isset($object['_self']['schema']['ref']) === false) {
