@@ -700,7 +700,7 @@ class GithubPubliccodeService
         $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
 
         if (is_array($publiccode) === true && key_exists('content', $publiccode) === true) {
-            $publiccode = base64_decode($publiccode['content']);
+            $publiccode = \Safe\base64_decode($publiccode['content']);
         }//end if
 
         // @TODO Use decodeResponse from the callService.
