@@ -199,11 +199,10 @@ class FederalizationService
                 $counter = 0;
                 $this->entityManager->flush();
             }
-        }
+        }//end for each
 
         $this->entityManager->flush();
 
-        /*
         // Now we can check if any objects where removed ->  Don't do this for now
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
@@ -215,9 +214,9 @@ class FederalizationService
                 $counter++;
             }
         }
+        $this->logger->info('Removed '.count($counter).' objects', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $this->entityManager->flush();
-        */
 
         return $reportOut;
     }//end readCatalogus()
@@ -241,6 +240,7 @@ class FederalizationService
             $source->setName($sourceSync['gateway']['name']);
             $source->setLocation($sourceSync['gateway']['location']);
         }
+
         $synchronization->setSource($source);
 
         return $synchronization;
@@ -257,7 +257,7 @@ class FederalizationService
     public function handleObject(array $object, Source $source): ?Synchronization
     {
         // Lets make sure we have a reference, just in case this function gets ussed seperatly
-        if (!isset($object['_self']['schema']['ref'])) {
+        if (isset($object['_self']['schema']['ref']) === false) {
             return null;
         }
 
