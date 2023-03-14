@@ -11,6 +11,7 @@ use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -49,6 +50,11 @@ class DeveloperOverheidService
     private MappingService $mappingService;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @var GithubApiService
      */
     private GithubApiService $githubApiService;
@@ -60,6 +66,7 @@ class DeveloperOverheidService
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param GithubApiService       $githubApiService       The Github Api Service
+     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -67,7 +74,8 @@ class DeveloperOverheidService
         CacheService $cacheService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
@@ -75,6 +83,7 @@ class DeveloperOverheidService
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
+        $this->logger = $pluginLogger;
     }
 
     /**
@@ -423,4 +432,4 @@ class DeveloperOverheidService
 
         return $componentObject;
     }//end importComponent()
-}
+}//end class

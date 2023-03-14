@@ -14,15 +14,36 @@ use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstallationService implements InstallerInterface
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CatalogiService
+     */
     private CatalogiService $catalogiService;
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     public const OBJECTS_THAT_SHOULD_HAVE_CARDS = [
         'https://opencatalogi.nl/oc.component.schema.json',
@@ -53,11 +74,22 @@ class InstallationService implements InstallerInterface
         'OpenCatalogi\OpenCatalogiBundle\ActionHandler\RatingHandler',
     ];
 
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
-    {
+    /**
+     * @param EntityManagerInterface $entityManager
+     * @param ContainerInterface     $container
+     * @param CatalogiService        $catalogiService
+     * @param LoggerInterface        $pluginLogger    The plugin version of the loger interface
+     */
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        ContainerInterface $container,
+        CatalogiService $catalogiService,
+        LoggerInterface $pluginLogger
+    ) {
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->catalogiService = $catalogiService;
+        $this->logger = $pluginLogger;
     }
 
     /**
@@ -482,4 +514,4 @@ class InstallationService implements InstallerInterface
 
         $this->entityManager->flush();
     }
-}
+}//end class

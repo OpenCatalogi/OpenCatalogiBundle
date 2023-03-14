@@ -12,6 +12,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -58,27 +59,36 @@ class EnrichPubliccodeService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param CallService             $callService             The Call Service
      * @param SynchronizationService  $synchronizationService  The Synchronization Service
      * @param MappingService          $mappingService          The Mapping Service
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService
+        GithubPubliccodeService $githubPubliccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
+
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -95,7 +105,7 @@ class EnrichPubliccodeService
         $this->githubPubliccodeService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle)
 
     /**
      * Get a source by reference.
@@ -216,4 +226,4 @@ class EnrichPubliccodeService
 
         return $this->data;
     }//end enrichPubliccodeHandler()
-}
+}//end class

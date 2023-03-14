@@ -12,6 +12,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -21,30 +22,103 @@ use Twig\Error\SyntaxError;
  */
 class FindOrganizationThroughRepositoriesService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
 
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $organisationMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $repositoryEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $repositoryMapping;
+
+    /**
+     * @var Source
+     */
     private Source $githubApi;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
 
+    /**
+     * @param CallService             $callService             The call service
+     * @param EntityManagerInterface  $entityManager           The entity manager
+     * @param GithubApiService        $githubApiService        The github api service
+     * @param GithubPubliccodeService $githubPubliccodeService The Github publicode service
+     * @param SynchronizationService  $synchronizationService  The synchonization service
+     * @param MappingService          $mappingServiceThe       mapping service
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
+     */
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
         GithubPubliccodeService $githubPubliccodeService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
@@ -52,10 +126,11 @@ class FindOrganizationThroughRepositoriesService
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
 
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct)()
 
     /**
      * Set symfony style in order to output to the console.
@@ -72,7 +147,7 @@ class FindOrganizationThroughRepositoriesService
         $this->mappingService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get a source by reference.
@@ -417,4 +492,4 @@ class FindOrganizationThroughRepositoriesService
 
         return $this->data;
     }//end findOrganizationThroughRepositoriesHandler()
-}
+}//end class
