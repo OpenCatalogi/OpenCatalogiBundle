@@ -25,7 +25,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     private ComponentenCatalogusService  $componentenCatalogusService;
 
     /**
-     * @param ComponentenCatalogusService $componentenCatalogusService  componenten Catalogus Service
+     * @param ComponentenCatalogusService $componentenCatalogusService componenten Catalogus Service
      */
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
@@ -45,8 +45,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -61,7 +62,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             if (!$this->componentenCatalogusService->getComponents()) {
                 return Command::FAILURE;
             }
-        } else if (!$this->componentenCatalogusService->getComponent($componentId)) {
+        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
             return Command::FAILURE;
         }
 

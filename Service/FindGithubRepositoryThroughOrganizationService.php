@@ -181,7 +181,6 @@ class FindGithubRepositoryThroughOrganizationService
         }//end if
 
         if (isset($response)) {
-
             // @TODO use decodeResponse from the callService
             $openCatalogi = Yaml::parse($response->getBody()->getContents());
             isset($this->io) && $this->io->success("Fetch and decode went succesfull '/'.$organizationName.'/.github/master/openCatalogi.yml', '/'.$organizationName.'/.github/master/openCatalogi.yaml'");

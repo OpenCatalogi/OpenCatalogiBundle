@@ -46,10 +46,12 @@ class PublicCodeRatingCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
-     * @return int
+     *
      * @throws \Exception
+     *
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -63,7 +65,7 @@ class PublicCodeRatingCommand extends Command
             if ($this->ratingService->enrichComponentsWithRating() === false) {
                 return Command::FAILURE;
             }
-        } else if ($this->ratingService->enrichComponentWithRating($componentId) === false) {
+        } elseif ($this->ratingService->enrichComponentWithRating($componentId) === false) {
             return Command::FAILURE;
         }
 

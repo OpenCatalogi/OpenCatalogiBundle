@@ -101,7 +101,7 @@ class CatalogiService
         //(isset($this->io)?$this->io->writeln(['<info>Reading catalogus'.$catalogus->getName().'</info>']):'');
         // var_dump('hello darkness my old friend');
 
-        (isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')') : '');
+        isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getLocation().')') : '';
         // Lets grap ALL the objects for an external source
         $objects = json_decode($this->callService->call(
             $source,
@@ -110,7 +110,7 @@ class CatalogiService
             ['query' => ['limit' => 10000]]
         )->getBody()->getContents(), true)['results'];
 
-        (isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '');
+        isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '';
 
         // Now we can check if any objects where removed
         //if(!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$catalogus->getValue('location')])){
@@ -122,7 +122,7 @@ class CatalogiService
 
         $synchonizedObjects = [];
 
-        (isset($this->io) ? $this->io->progressStart(count($objects)) : '');
+        isset($this->io) ? $this->io->progressStart(count($objects)) : '';
         // Handle new objects
         $counter = 0;
         foreach ($objects as $key => $object) {
@@ -141,28 +141,28 @@ class CatalogiService
                 $this->entityManager->flush();
             }
 
-            (isset($this->io) ? $this->io->progressAdvance() : '');
+            isset($this->io) ? $this->io->progressAdvance() : '';
         }
 
-        (isset($this->io) ? $this->io->progressFinish() : '');
+        isset($this->io) ? $this->io->progressFinish() : '';
 
         $this->entityManager->flush();
 
-        (isset($this->io) ? $this->io->writeln(['', 'Looking for objects to remove']) : '');
+        isset($this->io) ? $this->io->writeln(['', 'Looking for objects to remove']) : '';
         // Now we can check if any objects where removed
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' => $source]);
 
-        (isset($this->io) ? $this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']) : '');
+        isset($this->io) ? $this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']) : '';
         $counter = 0;
         foreach ($synchonizations as $synchonization) {
             if (!in_array($synchonization->getSourceId(), $synchonizedObjects)) {
                 $this->entityManager->remove($synchonization->getObject());
 
-                (isset($this->io) ? $this->io->writeln(['Removed '.$synchonization->getSourceId()]) : '');
+                isset($this->io) ? $this->io->writeln(['Removed '.$synchonization->getSourceId()]) : '';
                 $counter++;
             }
         }
-        (isset($this->io) ? $this->io->writeln(['Removed '.$counter.' object attached to this source']) : '');
+        isset($this->io) ? $this->io->writeln(['Removed '.$counter.' object attached to this source']) : '';
 
         $this->entityManager->flush();
     }
@@ -272,7 +272,7 @@ class CatalogiService
 
         // Lets find the federation  and make a dashboard card
         if (!$opencatalogi = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => 'https://opencatalogi.nl/api'])) {
-            (isset($this->io) ? $this->io->writeln(['Creating Opencatalogi Source']) : '');
+            isset($this->io) ? $this->io->writeln(['Creating Opencatalogi Source']) : '';
             $opencatalogi = new Source();
             $opencatalogi->setName('OpenCatalogi.nl');
             $opencatalogi->setDescription('The open catalogi federated netwerk');
@@ -285,14 +285,14 @@ class CatalogiService
 
             $this->entityManager->flush();
 
-        /*
-        $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
-        $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
-        $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
-        $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
-        $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
-        $this->entityManager->persist($opencatalogiCatalog);
-        */
+            /*
+            $opencatalogiCatalog = new ObjectEntity($catalogiEntity);
+            $opencatalogiCatalog->setValue('source', (string) $opencatalogi->getId());
+            $opencatalogiCatalog->setValue('name', $opencatalogi->getName());
+            $opencatalogiCatalog->setValue('description', $opencatalogi->getDescription());
+            $opencatalogiCatalog->setValue('location', $opencatalogi->getLocation());
+            $this->entityManager->persist($opencatalogiCatalog);
+            */
         } else {
         }
 

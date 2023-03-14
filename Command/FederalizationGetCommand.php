@@ -28,8 +28,8 @@ class FederalizationGetCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService $federalizationiService The federalization Service
-     * @param EntityManagerInterface $entityManager The entity Manager
+     * @param FederalizationService  $federalizationiService The federalization Service
+     * @param EntityManagerInterface $entityManager          The entity Manager
      */
     public function __construct(FederalizationService $federalizationService, EntityManagerInterface $entityManager)
     {
@@ -50,8 +50,9 @@ class FederalizationGetCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -63,7 +64,7 @@ class FederalizationGetCommand extends Command
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
-        if ($catalogusId=== false) {
+        if ($catalogusId === false) {
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);

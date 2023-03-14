@@ -45,8 +45,9 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -57,9 +58,9 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if ($repositoryId=== false) {
+        if ($repositoryId === false) {
             $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler();
-        } else if (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
+        } elseif (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
             return Command::FAILURE;
         }
 
