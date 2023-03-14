@@ -23,16 +23,16 @@ class DeveloperOverheidGetComponentsCommand extends Command
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService  $developerOverheidService;
+    private DeveloperOverheidService  $devOverheidService;
 
     /**
-     * @param DeveloperOverheidService $developerOverheidService developer Overheid Service
+     * @param DeveloperOverheidService $devOverheidService developer Overheid Service
      */
-    public function __construct(DeveloperOverheidService $developerOverheidService)
+    public function __construct(DeveloperOverheidService $devOverheidService)
     {
-        $this->developerOverheidService = $developerOverheidService;
+        $this->devOverheidService = $devOverheidService;
         parent::__construct();
-    }//end __construct)
+    }//end __construct()
 
     /**
      * @return void
@@ -54,16 +54,16 @@ class DeveloperOverheidGetComponentsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->developerOverheidService->setStyle($style);
+        $this->devOverheidService->setStyle($style);
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
         if ($componentId === false) {
-            if (!$this->developerOverheidService->getComponents()) {
+            if (empty($this->devOverheidService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getComponent($componentId)) {
+        } else if (empty($this->devOverheidService->getComponent($componentId)) === true) {
             return Command::FAILURE;
         }
 

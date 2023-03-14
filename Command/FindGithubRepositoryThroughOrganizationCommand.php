@@ -23,14 +23,14 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     /**
      * @var FindGithubRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
+    private FindGithubRepositoryThroughOrganizationService  $findGitService;
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService find Github Repository Through Organization Service
+     * @param FindGithubRepositoryThroughOrganizationService $findGitService find Github Repository Through Organization Service
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGitService)
     {
-        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
+        $this->findGitService = $findGitService;
         parent::__construct();
     }//end __construct()
 
@@ -54,16 +54,16 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($style);
+        $this->findGitService->setStyle($style);
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
         if ($organisationId === false) {
-            if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
+            if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
                 return Command::FAILURE;
             }
-        } else if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) {
+        } else if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true) {
             return Command::FAILURE;
         }
 

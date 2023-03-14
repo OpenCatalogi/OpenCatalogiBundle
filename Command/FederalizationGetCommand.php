@@ -20,7 +20,7 @@ class FederalizationGetCommand extends Command
     /**
      * @var FederalizationService
      */
-    private FederalizationService  $federalizationService;
+    private FederalizationService  $fedService;
 
     /**
      * @var EntityManagerInterface
@@ -28,12 +28,15 @@ class FederalizationGetCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService  $federalizationiService The federalization Service
+     * @param FederalizationService  $fedService The federalization Service
      * @param EntityManagerInterface $entityManager          The entity Manager
      */
-    public function __construct(FederalizationService $federalizationService, EntityManagerInterface $entityManager)
+    public function __construct(
+        FederalizationService $fedService,
+        EntityManagerInterface $entityManager
+    )
     {
-        $this->federalizationService = $federalizationService;
+        $this->fedService = $fedService;
         $this->entityManager = $entityManager;
         parent::__construct();
     }//end __construct()
@@ -59,25 +62,27 @@ class FederalizationGetCommand extends Command
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
         $style = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($style);
+        $this->fedService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
         if ($catalogusId === false) {
-            $this->federalizationService->catalogiHandler();
+            $this->fedService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
-            if (!$catalogusObject) {
+            if ($catalogusObject === null) {
                 $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            if (!$catalogusObject) {
+
+            if ($catalogusObject === null) {
                 $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
             }
-            $this->federalizationService->readCatalogus($catalogusObject);
+
+            $this->fedService->readCatalogus($catalogusObject);
         }
 
         return Command::SUCCESS;

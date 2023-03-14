@@ -22,14 +22,14 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService  $componentenCatalogusService;
+    private ComponentenCatalogusService  $compCatService;
 
     /**
-     * @param ComponentenCatalogusService $componentenCatalogusService componenten Catalogus Service
+     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
      */
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(ComponentenCatalogusService $compCatService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->compCatService = $compCatService;
         parent::__construct();
     }//end __construct()
 
@@ -52,17 +52,17 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->compCatService->setStyle($style);
 
         // Handle the command optiosn
         $componentId = $input->getOption('component', false);
 
         if ($componentId === false) {
-            if (!$this->componentenCatalogusService->getComponents()) {
+            if (empty($this->compCatService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
+        } else if (empty($this->compCatService->getComponent($componentId)) === true) {
             return Command::FAILURE;
         }
 
