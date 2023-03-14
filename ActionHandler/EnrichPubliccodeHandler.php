@@ -10,12 +10,18 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
  */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
+    /**
+     * @var EnrichPubliccodeService
+     */
     private EnrichPubliccodeService $enrichPubliccodeService;
 
+    /**
+     * @param EnrichPubliccodeService $enrichPubliccodeService Thew enrichPubliccodeService
+     */
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
         $this->enrichPubliccodeService = $enrichPubliccodeService;
-    }
+    }//end __construct()
 
     public function getConfiguration()
     {
@@ -54,5 +60,5 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
-    }
-}
+    }//end run()
+}//end class

@@ -10,12 +10,18 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesS
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
+    /**
+     * @var FindOrganizationThroughRepositoriesService
+     */
     private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
 
+    /**
+     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService The findOrganizationThroughRepositoriesService
+     */
     public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
-    }
+    }//end __construct()
 
     public function getConfiguration()
     {
@@ -47,5 +53,5 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function run(array $data, array $configuration): array
     {
         return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
-    }
-}
+    }//end run()
+}//end class

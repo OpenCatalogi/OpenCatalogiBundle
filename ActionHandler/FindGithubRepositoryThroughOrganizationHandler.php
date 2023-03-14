@@ -11,12 +11,18 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizat
  */
 class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
+    /**
+     * @var FindGithubRepositoryThroughOrganizationService
+     */
     private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
 
+    /**
+     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService The findGithubRepositoryThroughOrganizationService
+     */
     public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
         $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
-    }
+    }//end __construct()
 
     public function getConfiguration()
     {
@@ -48,5 +54,5 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     public function run(array $data, array $configuration): array
     {
         return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
-    }
-}
+    }//end run()
+}//end class

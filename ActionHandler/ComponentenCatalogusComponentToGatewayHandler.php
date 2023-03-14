@@ -10,12 +10,18 @@ use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
  */
 class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInterface
 {
+    /**
+     * @var ComponentenCatalogusService
+     */
     private ComponentenCatalogusService $componentenCatalogusService;
 
+    /**
+     * @param ComponentenCatalogusService $componentenCatalogusService The componenten Catalogus Service
+     */
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
-    }
+    }//end __construct()
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -45,5 +51,5 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
     public function run(array $data, array $configuration): array
     {
         return $this->componentenCatalogusService->getComponents();
-    }
-}
+    }//end run()
+}//end class

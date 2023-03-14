@@ -10,12 +10,18 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService
  */
 class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 {
+    /**
+     * @var EnrichPubliccodeFromGithubUrlService
+     */
     private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
+    /**
+     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService The enrich Publiccode From Github Ur Service
+     */
     public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
     {
         $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
-    }
+    }//end __construct()
 
     public function getConfiguration()
     {
@@ -54,5 +60,5 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
-    }
-}
+    }//end run()
+}//end class
