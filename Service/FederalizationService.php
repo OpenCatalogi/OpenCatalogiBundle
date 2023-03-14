@@ -15,21 +15,74 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class FederalizationService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var SessionInterface
+     */
     private SessionInterface $session;
+
+    /**
+     * @var CommonGroundService
+     */
     private CommonGroundService $commonGroundService;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
 
     // Lets prevent unnesecery database calls
+    /**
+     * @var Entity
+     */
     private Entity $catalogusEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $componentEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Entity
+     */
     private Entity $applicationEntity;
 
+    /**
+     * @param EntityManagerInterface $entityManager The entity manager
+     * @param SessionInterface $session The session interface
+     * @param CommonGroundService $commonGroundService The commonground service
+     * @param CallService $callService The Call Service
+     * @param SynchronizationService $synchronizationService The synchronization service
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,
@@ -42,7 +95,7 @@ class FederalizationService
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -56,15 +109,15 @@ class FederalizationService
         $this->io = $io;
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Handles the sync all catalogi action from the catalogi handler.
      *
-     * @param array $data
-     * @param array $configuration
+     * @param array $data The data suplied to the handler
+     * @param array $configuration Optional configuration
      *
-     * @return array
+     * @return array THe result data from the handler
      */
     public function catalogiHandler(array $data = [], array $configuration = []): array
     {
@@ -80,7 +133,6 @@ class FederalizationService
 
         // Get al the catalogi
         $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity'=>$this->catalogusEntity]);
-        var_dump(count($catalogi));
 
         // Sync them
         foreach ($catalogi as $catalogus) {
@@ -88,7 +140,7 @@ class FederalizationService
         }
 
         return $data;
-    }
+    }//end catalogiHandler()
 
     /**
      * Get and handle oll the objects of an catalogi specific.
@@ -185,7 +237,7 @@ class FederalizationService
         */
 
         return $reportOut;
-    }
+    }//end readCatalogus()
 
     /**
      * Checks if the source object contains a source, and if so, set the source that has been found.
@@ -214,9 +266,9 @@ class FederalizationService
     /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
-     * @param array $object
+     * @param array $object THe object to handle
      *
-     * @return void
+     * @return void|Synchronization
      */
     public function handleObject(array $object, Source $source): ?Synchronization
     {
@@ -281,7 +333,7 @@ class FederalizationService
 
         // Lets sync
         return $this->synchronizationService->synchronize($synchronization, $object);
-    }
+    }//end handleObject()
 
     /**
      * Makes sure that we have the object entities that we need.
@@ -306,5 +358,5 @@ class FederalizationService
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
             !$this->applicationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json') : '';
         }
-    }
-}
+    }//end prepareObjectEntities()
+}//end class
