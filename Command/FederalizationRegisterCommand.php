@@ -28,12 +28,13 @@ class FederalizationRegisterCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService  $federalizationiService The federalization Service
+     * @param FederalizationService  $fedService The federalization Service
      * @param EntityManagerInterface $entityManager          The entity Manager
      */
     public function __construct(
         FederalizationService $fedService,
-        EntityManagerInterface $entityManager)
+        EntityManagerInterface $entityManager
+    )
     {
         $this->fedService = $fedService;
         $this->entityManager = $entityManager;
@@ -68,7 +69,7 @@ class FederalizationRegisterCommand extends Command
 
         if ($catalogusId === false) {
             $this->federalizationService->catalogiHandler();
-        } else {
+        } else if($catalogusId !== false){
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if ($catalogusObject === false) {
                 $style->debug('Could not find object entity by id, trying on name');

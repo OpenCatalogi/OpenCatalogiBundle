@@ -22,7 +22,12 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     {
         $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
     }//end __construct()
-
+    
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [

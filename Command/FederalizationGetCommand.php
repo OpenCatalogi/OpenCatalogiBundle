@@ -69,7 +69,7 @@ class FederalizationGetCommand extends Command
 
         if ($catalogusId === false) {
             $this->fedService->catalogiHandler();
-        } else {
+        } else if($catalogusId !== false){
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if ($catalogusObject === null) {
                 $style->debug('Could not find object entity by id, trying on name');

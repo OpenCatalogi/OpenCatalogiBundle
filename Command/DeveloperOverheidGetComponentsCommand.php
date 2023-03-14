@@ -69,4 +69,4 @@ class DeveloperOverheidGetComponentsCommand extends Command
 
         return Command::SUCCESS;
     }//end execute()
-}//end clas
+}//end class
