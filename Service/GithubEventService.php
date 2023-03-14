@@ -13,11 +13,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
@@ -62,12 +62,12 @@ class GithubEventService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface.
-     * @param SynchronizationService $syncService The Synchronization Service.
-     * @param CallService            $callService            The Call Service.
-     * @param CacheService           $cacheService           The Cache Service.
-     * @param GithubApiService       $githubApiService       The Github Api Service.
-     * @param LoggerInterface $logger The Logger Interface.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param CallService            $callService      The Call Service.
+     * @param CacheService           $cacheService     The Cache Service.
+     * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param LoggerInterface        $logger           The Logger Interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -159,7 +159,7 @@ class GithubEventService
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $name The name of the repository.
+     * @param string $name   The name of the repository.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported repository as array.

@@ -45,8 +45,9 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -61,7 +62,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             if ($this->componentenCatalogusService->getApplications() === null) {
                 return Command::FAILURE;
             }
-        } else if ($this->componentenCatalogusService->getApplication($applicationId)  === null) {
+        } elseif ($this->componentenCatalogusService->getApplication($applicationId) === null) {
             return Command::FAILURE;
         }
 

@@ -348,7 +348,6 @@ class FindOrganizationThroughRepositoriesService
                 $repository = $this->githubPubliccodeService->importRepository($github);
 
                 if ($github['owner']['type'] === 'Organization') {
-
                     // get organisation from github and set the property
                     $organisation = $this->getOrganisation($github['owner']['login']);
 

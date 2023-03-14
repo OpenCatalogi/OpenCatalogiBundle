@@ -46,8 +46,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -58,11 +59,11 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        if ($organisationId=== false) {
+        if ($organisationId === false) {
             if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
                 return Command::FAILURE;
             }
-        } else if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) {
+        } elseif (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) {
             return Command::FAILURE;
         }
 

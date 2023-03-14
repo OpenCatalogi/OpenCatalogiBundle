@@ -46,8 +46,9 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -62,7 +63,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
             if (!$this->developerOverheidService->getRepositories()) {
                 return Command::FAILURE;
             }
-        } else if (!$this->developerOverheidService->getRepository($repositoryId)) {
+        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }
 
