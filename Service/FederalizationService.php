@@ -53,16 +53,6 @@ class FederalizationService
     private SynchronizationService $syncService;
 
     /**
-     * @var array
-     */
-    private array $data;
-
-    /**
-     * @var array
-     */
-    private array $configuration;
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $logger;
@@ -93,7 +83,7 @@ class FederalizationService
      * @param SessionInterface $session The session interface
      * @param CommonGroundService $commonGroundService The commonground service
      * @param CallService $callService The Call Service
-     * @param SynchronizationService $synchronizationService The synchronization service
+     * @param SynchronizationService $syncService The synchronization service
      * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
@@ -126,7 +116,7 @@ class FederalizationService
         $this->prepareObjectEntities();
 
         // Savety cheek
-        if (!$this->catalogusEntity) {
+        if ($this->catalogusEntity === null) {
             $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $data;
@@ -156,14 +146,14 @@ class FederalizationService
         $reportOut = [];
 
         // Check if the past object is a
-        if ($catalogus->getEntity()->getReference() != 'https://opencatalogi.nl/oc.catalogi.schema.json') {
+        if ($catalogus->getEntity()->getReference() !== 'https://opencatalogi.nl/oc.catalogi.schema.json') {
             $this->logger->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $reportOut;
         }
 
         // Lets get the source for the catalogus
-        if (!$source = $catalogus->getValue('source')) {
+        if ($source = $catalogus->getValue('source') === null) {
             $this->logger->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $reportOut;
@@ -208,14 +198,12 @@ class FederalizationService
                 $counter = 0;
                 $this->entityManager->flush();
             }
-
         }
-
 
         $this->entityManager->flush();
 
-        /* Don't do this for now
-        // Now we can check if any objects where removed
+        /*
+        // Now we can check if any objects where removed ->  Don't do this for now
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
         $counter=0;
@@ -226,7 +214,6 @@ class FederalizationService
                 $counter++;
             }
         }
-
 
         $this->entityManager->flush();
         */
