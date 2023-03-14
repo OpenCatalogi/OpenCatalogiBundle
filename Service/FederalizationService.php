@@ -209,14 +209,13 @@ class FederalizationService
         // Now we can check if any objects where removed ->  Don't do this for now
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
-        $counter=0;
+        $counter = 0;
         foreach ($synchonizations as $synchonization) {
             if (in_array($synchonization->getSourceId(), $synchonizedObjects) === false) {
                 $this->entityManager->remove($synchonization->getObject());
 
                 $counter++;
             }
-
         }
         $this->logger->info('Removed '.count($counter).' objects', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
@@ -253,7 +252,7 @@ class FederalizationService
     /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
-     * @param array $object The object to handle
+     * @param array  $object The object to handle
      * @param Source $source The Source
      *
      * @return void|Synchronization
