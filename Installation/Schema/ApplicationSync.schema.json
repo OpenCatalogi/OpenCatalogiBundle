@@ -1,0 +1,43 @@
+{
+  "title": "ApplicationSync",
+  "$id": "https://opencatalogi.nl/application_sync.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "description": "",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "shortDescription": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "detailPageImageUrl": {
+      "type": "string"
+    },
+    "documentationUrl": {
+      "type": "string"
+    },
+    "demoUrl": {
+      "type": "string"
+    },
+    "bpmnProcessUrl": {
+      "type": "string"
+    },
+    "isPublished": {
+      "type": "boolean"
+    },
+    "owner": {
+      "type": "array"
+    },
+    "components": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

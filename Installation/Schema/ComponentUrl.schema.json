@@ -1,0 +1,12 @@
+{
+  "title": "ComponentUrl",
+  "$id": "https://opencatalogi.nl/oc.componenturl.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "properties": {
+    "repositoryUrl": {
+      "type": "string"
+    }
+  }
+}

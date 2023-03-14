@@ -1,0 +1,28 @@
+{
+  "title": "Installation",
+  "$id": "https://opencatalogi.nl/oc.installation.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "description": "[extension of the publiccode standard] This object defines an installation of a given component within an environement",
+  "properties": {
+    "organization": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The organization that installed the component"
+    },
+    "component": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The installed component"
+    },
+    "version": {
+      "type": "string",
+      "description": "The semantic version of the installation"
+    },
+    "environment": {
+      "type": "string",
+      "description": "The environement where the component is installed"
+    }
+  }
+}

@@ -31,8 +31,8 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://example.com/person.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeFromGithubUrlHandler.ActionHandler.json',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'EnrichPubliccodeFromGithubUrlHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],

@@ -1,0 +1,21 @@
+{
+  "title": "Rating",
+  "$id": "https://opencatalogi.nl/oc.rating.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "properties": {
+    "rating": {
+      "type": "integer"
+    },
+    "maxRating": {
+      "type": "integer"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

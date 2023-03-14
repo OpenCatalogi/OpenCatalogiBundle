@@ -1,0 +1,21 @@
+{
+  "title": "DeveloperOverheidApisToComponent",
+  "$id": "https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.2",
+  "passTrough": false,
+  "mapping": {
+    "name": "service_name",
+    "softwareType": "api",
+    "description.localisedName": "service_name",
+    "description.shortDescription": "description",
+    "description.longDescription": "description",
+    "description.documentation": "environments.0.documentation_url",
+    "description.apiDocumentation": "environments.0.specification_url",
+    "legal.repoOwner.name": "organization.name",
+    "legal.repoOwner.email": "contact.email",
+    "legal.repoOwner.phone": "contact.phone",
+    "legal.repoOwner.website": "contact.url",
+    "legal.repoOwner.type": "Organization"
+  }
+}

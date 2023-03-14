@@ -1,0 +1,13 @@
+{
+    "title": "GitHub API",
+    "$id": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "GitHub API",
+    "location": "https://api.github.com",
+    "headers": {
+        "Accept" : "application/vnd.github+json"
+    },
+    "auth": "apikey",
+    "apiKey": "!ChangeMe!"
+}
