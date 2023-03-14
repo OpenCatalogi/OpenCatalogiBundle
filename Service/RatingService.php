@@ -266,7 +266,7 @@ class RatingService
         } else {
             $description[] = 'Cannot rate the name because it is not set';
         }
-        
+
         $maxRating++;
 
         if ($repository = $component->getValue('url')) {
