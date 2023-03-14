@@ -1,0 +1,8 @@
+{
+    "title": "OpenCatalogi",
+    "$id": "https://opencatalogi.nl/collection/oc.default.collection.json",
+    "$schema": "https://docs.commongateway.nl/schemas/CollectionEntity.schema.json",
+    "version": "0.0.1",
+    "prefix": null,
+    "plugin": "OpenCatalogiBundle"
+}

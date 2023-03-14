@@ -1,0 +1,11 @@
+{
+    "title": "GitHub usercontent",
+    "$id": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "GitHub usercontent",
+    "location": "https://raw.githubusercontent.com",
+    "headers": {
+        "accept" : "application/json"
+    }
+}

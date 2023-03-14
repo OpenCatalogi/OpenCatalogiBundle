@@ -1,0 +1,16 @@
+{
+  "title": "GithubApiOrganisationToOrganisation",
+  "$id": "https://api.github.com/oc.githubOrganisation.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.2",
+  "passTrough": false,
+  "mapping": {
+    "name": "login",
+    "description": "description",
+    "logo": "avatar_url",
+    "github": "html_url",
+    "email": "email",
+    "source": "github",
+    "type": "type"
+  }
+}

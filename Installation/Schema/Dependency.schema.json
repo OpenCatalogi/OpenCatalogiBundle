@@ -1,0 +1,18 @@
+{
+  "title": "Dependency",
+  "$id": "https://opencatalogi.nl/oc.dependency.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  }
+}
