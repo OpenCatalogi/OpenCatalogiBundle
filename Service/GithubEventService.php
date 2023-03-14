@@ -98,7 +98,7 @@ class GithubEventService
     {
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
         if ($source === null) {
-            $this->logger->error("No source found for $location.");
+            $this->logger->error("No source found for $location.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $source;
@@ -115,7 +115,7 @@ class GithubEventService
     {
         $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
         if ($entity === null) {
-            $this->logger->error("No entity found for $reference.");
+            $this->logger->error("No entity found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $entity;
@@ -132,7 +132,7 @@ class GithubEventService
     {
         $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
         if ($mapping === null) {
-            $this->logger->error("No mapping found for $reference.");
+            $this->logger->error("No mapping found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $mapping;
@@ -148,7 +148,7 @@ class GithubEventService
     public function checkGithubAuth(Source $source): ?bool
     {
         if ($source->getApiKey() === null) {
-            $this->logger->error('No auth set for Source: '.$source->getName().'.');
+            $this->logger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
@@ -166,13 +166,13 @@ class GithubEventService
      */
     public function getRepository(string $name, Source $source): ?array
     {
-        $this->logger->debug('Getting repository '.$name.'.');
+        $this->logger->debug('Getting repository '.$name.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            $this->logger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.');
+            $this->logger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -224,13 +224,13 @@ class GithubEventService
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
 
-        $this->logger->debug('Mapping object '.$repositoryUrl.'.');
-        $this->logger->debug('The mapping object '.$mapping.'.');
-        $this->logger->debug('Checking repository '.$repositoryUrl.'.');
+        $this->logger->debug('Mapping object '.$repositoryUrl.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->logger->debug('The mapping object '.$mapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->logger->debug('Checking repository '.$repositoryUrl.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->handleSync($synchronization, $repositoryArray);
-        $this->logger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.');
+        $this->logger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $repository = $synchronization->getObject();
 
