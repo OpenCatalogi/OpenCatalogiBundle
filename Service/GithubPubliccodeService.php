@@ -61,7 +61,7 @@ class GithubPubliccodeService
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private LoggerInterface $pluginLogger;
 
     /**
      * @var Yaml
