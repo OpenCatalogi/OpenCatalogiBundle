@@ -28,9 +28,10 @@ class InstallationService implements InstallerInterface
     {
         // Do some cleanup
     }
-    
+
     /**
      * Sets the max depth of all entities to 5 because OC has a lot of nested objects.
+     *
      * @TODO: find a better solution for this?
      *
      * @return void
