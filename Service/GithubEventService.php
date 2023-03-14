@@ -195,7 +195,7 @@ class GithubEventService
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param array $githubEvent         The github event data from the request.
+     * @param array $githubEvent The github event data from the request.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
@@ -247,7 +247,7 @@ class GithubEventService
         $this->data['response'] = new Response(json_encode($repository->toArray()), 200);
 
         return $this->data;
-    }
+    }//end createRepository()
 
 
     /**
