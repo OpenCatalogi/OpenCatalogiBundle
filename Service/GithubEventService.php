@@ -86,7 +86,7 @@ class GithubEventService
 
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Get a source by reference.

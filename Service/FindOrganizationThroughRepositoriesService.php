@@ -72,20 +72,43 @@ class FindOrganizationThroughRepositoriesService
      */
     private LoggerInterface $logger;
 
+    /**
+     * @var Entity
+     */
     private Entity $organisationEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $organisationMapping;
+
+    /**
+     * @var Entity
+     */
     private Entity $repositoryEntity;
+
+    /**
+     * @var Mapping
+     */
     private Mapping $repositoryMapping;
+
+    /**
+     * @var Source
+     */
     private Source $githubApi;
+
+    /**
+     * @var Entity|null
+     */
     private ?Entity $componentEntity;
 
     /**
-     * @param CallService $callService
-     * @param EntityManagerInterface $entityManager
-     * @param GithubApiService $githubApiService
-     * @param GithubPubliccodeService $githubPubliccodeService
-     * @param SynchronizationService $synchronizationService
-     * @param MappingService $mappingService
+     * @param CallService $callService The call service
+     * @param EntityManagerInterface $entityManager The entity manager
+     * @param GithubApiService $githubApiService The github api service
+     * @param GithubPubliccodeService $githubPubliccodeService The Github publicode service
+     * @param SynchronizationService $synchronizationService The synchonization service
+     * @param MappingService $mappingServiceThe mapping service
      * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
@@ -107,7 +130,7 @@ class FindOrganizationThroughRepositoriesService
 
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct)()
 
     /**
      * Set symfony style in order to output to the console.
@@ -124,7 +147,7 @@ class FindOrganizationThroughRepositoriesService
         $this->mappingService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get a source by reference.
@@ -469,4 +492,4 @@ class FindOrganizationThroughRepositoriesService
 
         return $this->data;
     }//end findOrganizationThroughRepositoriesHandler()
-}
+}//end class

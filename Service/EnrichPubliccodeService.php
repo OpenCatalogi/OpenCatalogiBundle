@@ -85,10 +85,10 @@ class EnrichPubliccodeService
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->logger = $pluginLogger;
-        
+
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
@@ -105,7 +105,7 @@ class EnrichPubliccodeService
         $this->githubPubliccodeService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle)
 
     /**
      * Get a source by reference.

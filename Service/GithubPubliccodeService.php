@@ -81,7 +81,7 @@ class GithubPubliccodeService
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
         $this->logger = $pluginLogger;
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.

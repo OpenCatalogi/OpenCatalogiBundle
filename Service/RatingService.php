@@ -53,8 +53,8 @@ class RatingService
     private LoggerInterface $logger;
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param GithubApiService $githubApiService     *
+     * @param EntityManagerInterface $entityManager The Entity Manager
+     * @param GithubApiService $githubApiService     The githubApiService
      * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
@@ -68,7 +68,7 @@ class RatingService
 
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Set symfony style in order to output to the console.
