@@ -183,7 +183,7 @@ class GithubEventService
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repository) {
+        if ($repository === null) {
             $this->logger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return null;
@@ -202,17 +202,8 @@ class GithubEventService
      *
      * @return array|null The data with the repository in the response array.
      */
-    public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
+    public function createRepository(array $githubEvent): ?array
     {
-        $this->configuration = $configuration;
-        $this->data = $data;
-
-        if (key_exists('payload', $this->data) === true) {
-            $githubEvent = $this->data['payload'];
-        } else {
-            $githubEvent = $this->data['body'];
-        }
-
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
         $source = $this->getSource('https://api.github.com');
@@ -220,6 +211,7 @@ class GithubEventService
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
+
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
         $mapping = $this->getMapping('https://api.github.com/repositories');
 
@@ -256,5 +248,34 @@ class GithubEventService
         $this->data['response'] = new Response(json_encode($repository->toArray()), 200);
 
         return $this->data;
+    }
+
+
+    /**
+     * This function creates/updates the repository with the github event response.
+     *
+     * @param ?array $data          data set at the start of the handler.
+     * @param ?array $configuration configuration of the action.
+     *
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     *
+     * @return array|null The data with the repository in the response array.
+     */
+    public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
+    {
+        $this->configuration = $configuration;
+        $this->data = $data;
+
+        if (key_exists('payload', $this->data) === true) {
+            $githubEvent = $this->data['payload'];
+
+            // Create repository with the payload of the request.
+            return $this->createRepository($githubEvent);
+        }//end if
+
+        $githubEvent = $this->data['body'];
+
+        // Create repository with the body of the request.
+        return $this->createRepository($githubEvent);
     }//end updateRepositoryWithEventResponse()
 }//end class
