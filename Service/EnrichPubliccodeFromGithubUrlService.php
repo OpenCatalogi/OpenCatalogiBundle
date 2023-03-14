@@ -215,6 +215,7 @@ class EnrichPubliccodeFromGithubUrlService
                 }
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('enrichPubliccodeFromGithubUrlHandler finished');

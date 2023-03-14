@@ -10,13 +10,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
  */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
-    private EnrichPubliccodeService $enrichPubliccodeService;
+    /**
+     * @var EnrichPubliccodeService
+     */
+    private EnrichPubliccodeService $service;
 
-    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
+    /**
+     * @param EnrichPubliccodeService $service Thew enrichPubliccodeService
+     */
+    public function __construct(EnrichPubliccodeService $service)
     {
-        $this->enrichPubliccodeService = $enrichPubliccodeService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [
@@ -51,8 +62,16 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
-    }
-}
+        return $this->service->enrichPubliccodeHandler($data, $configuration);
+    }//end run()
+}//end class

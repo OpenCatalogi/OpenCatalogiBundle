@@ -10,13 +10,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService
  */
 class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 {
-    private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
+    /**
+     * @var EnrichPubliccodeFromGithubUrlService
+     */
+    private EnrichPubliccodeFromGithubUrlService $service;
 
-    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
+    /**
+     * @param EnrichPubliccodeFromGithubUrlService $service The enrich Publiccode From Github Ur Service
+     */
+    public function __construct(EnrichPubliccodeFromGithubUrlService $service)
     {
-        $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [
@@ -51,8 +62,16 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
-    }
-}
+        return $this->service->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
+    }//end run()
+}//end class

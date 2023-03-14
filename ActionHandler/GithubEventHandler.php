@@ -10,13 +10,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService;
  */
 class GithubEventHandler implements ActionHandlerInterface
 {
-    private GithubEventService $githubEventService;
+    /**
+     * @var GithubEventService
+     */
+    private GithubEventService $service;
 
-    public function __construct(GithubEventService $githubEventService)
+    /**
+     * @param GithubEventService $service The $githubEventService
+     */
+    public function __construct(GithubEventService $service)
     {
-        $this->githubEventService = $githubEventService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [
@@ -35,10 +46,18 @@ class GithubEventHandler implements ActionHandlerInterface
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
+    /**
+     * This function runs the email service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->githubEventService->updateRepositoryWithEventResponse($data, $configuration);
-    }
-}
+        return $this->service->updateRepositoryWithEventResponse($data, $configuration);
+    }//end run()
+}//end class

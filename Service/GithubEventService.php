@@ -28,7 +28,6 @@ use Twig\Error\SyntaxError;
  *
  * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
  *
- * @package open-catalogi/open-catalogi-bundle
  * @category Service
  */
 class GithubEventService
@@ -249,11 +248,10 @@ class GithubEventService
         return $this->data;
     }//end createRepository()
 
-
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data Data set at the start of the handler.
+     * @param ?array $data          Data set at the start of the handler.
      * @param ?array $configuration Configuration of the action.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError

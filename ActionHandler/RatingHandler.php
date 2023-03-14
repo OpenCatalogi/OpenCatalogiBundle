@@ -10,14 +10,25 @@ use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
  */
 class RatingHandler implements ActionHandlerInterface
 {
-    private RatingService $ratingService;
+    /**
+     * @var RatingService
+     */
+    private RatingService $service;
 
-    public function __construct(RatingService $ratingService)
+    /**
+     * @param RatingService $service The RatingService
+     */
+    public function __construct(RatingService $service)
     {
-        $this->ratingService = $ratingService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
-    public function getConfiguration()
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
+    public function getConfiguration(): array
     {
         return [
             '$id'        => 'https://opencatalogi.nl/ActionHandler/RatingHandler.ActionHandler.json',
@@ -42,10 +53,18 @@ class RatingHandler implements ActionHandlerInterface
                 ],
             ],
         ];
-    }
+    }//end getConfiguration()
 
+    /**
+     * This function runs the email service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->ratingService->ratingHandler($data, $configuration);
-    }
-}
+        return $this->service->ratingHandler($data, $configuration);
+    }//end run()
+}//end class

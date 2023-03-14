@@ -15,39 +15,58 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FindGithubRepositoryThroughOrganizationCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:github:discoverrepository';
-    private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
 
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    /**
+     * @var FindGithubRepositoryThroughOrganizationService
+     */
+    private FindGithubRepositoryThroughOrganizationService  $findGitService;
+
+    /**
+     * @param FindGithubRepositoryThroughOrganizationService $findGitService find Github Repository Through Organization Service
+     */
+    public function __construct(FindGithubRepositoryThroughOrganizationService $findGitService)
     {
-        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
+        $this->findGitService = $findGitService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update create owned repositories from organisation')
             ->addOption('organisationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findGitService->setStyle($style);
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        if (!$organisationId) {
-            if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
+        if ($organisationId === false) {
+            if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) {
+        } else if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class
