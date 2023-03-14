@@ -195,8 +195,7 @@ class GithubEventService
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data          data set at the start of the handler.
-     * @param ?array $configuration configuration of the action.
+     * @param array $githubEvent         The github event data from the request.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
@@ -254,8 +253,8 @@ class GithubEventService
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data          data set at the start of the handler.
-     * @param ?array $configuration configuration of the action.
+     * @param ?array $data          Data set at the start of the handler.
+     * @param ?array $configuration Configuration of the action.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
