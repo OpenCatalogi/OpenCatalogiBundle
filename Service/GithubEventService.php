@@ -248,4 +248,4 @@ class GithubEventService
 
         return $this->data;
     }//end updateRepositoryWithEventResponse()
-}
+}//end class

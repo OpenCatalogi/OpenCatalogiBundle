@@ -226,4 +226,4 @@ class EnrichPubliccodeService
 
         return $this->data;
     }//end enrichPubliccodeHandler()
-}
+}//end class

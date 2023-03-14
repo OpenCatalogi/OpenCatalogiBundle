@@ -193,4 +193,4 @@ class GithubApiService
 
         return null;
     }//end connectComponent()
-}
+}//end class

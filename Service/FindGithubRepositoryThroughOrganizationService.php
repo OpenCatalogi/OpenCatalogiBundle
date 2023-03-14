@@ -394,4 +394,4 @@ class FindGithubRepositoryThroughOrganizationService
 
         return $this->data;
     }//end findGithubRepositoryThroughOrganizationHandler()
-}
+}//end class

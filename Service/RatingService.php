@@ -73,7 +73,7 @@ class RatingService
     /**
      * Set symfony style in order to output to the console.
      *
-     * @param SymfonyStyle $io
+     * @param SymfonyStyle $io The symfony style element
      *
      * @return self
      */
@@ -83,7 +83,7 @@ class RatingService
         $this->githubApiService->setStyle($io);
 
         return $this;
-    }
+    }//end setStyle()
 
     /**
      * Get the component entity.
@@ -99,7 +99,7 @@ class RatingService
         }
 
         return $this->componentEntity;
-    }
+    }//end getComponentEntity()
 
     /**
      * Get the rating entity.
@@ -115,7 +115,7 @@ class RatingService
         }
 
         return $this->ratingEntity;
-    }
+    }//end getRatingEntity()
 
     /**
      * Create Rating for all components.
@@ -150,12 +150,12 @@ class RatingService
         $this->entityManager->flush();
 
         return $result;
-    }
+    }//end enrichComponentsWithRating()
 
     /**
      * Create Rating for a single component.
      *
-     * @param string $id
+     * @param string $id The id of the component to enrich
      *
      * @throws Exception
      *
@@ -185,7 +185,7 @@ class RatingService
         $this->entityManager->flush();
 
         return $component->toArray();
-    }
+    }//end enrichComponentWithRating()
 
     /**
      * Create Rating for a single component when action for this handler is triggered.
@@ -209,11 +209,13 @@ class RatingService
         }
 
         return $this->data;
-    }
+    }//end ratingHandler()
 
     /**
-     * @param ObjectEntity $component
-     * @param Entity       $ratingEntity
+     * Rate a component
+     *
+     * @param ObjectEntity $component The component to rate
+     * @param Entity       $ratingEntity The rating entity
      *
      * @throws Exception
      *
@@ -241,12 +243,12 @@ class RatingService
         isset($this->io) && $this->io->success("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
-    }
+    }//end rateComponent()
 
     /**
      * Rates a component.
      *
-     * @param ObjectEntity $component
+     * @param ObjectEntity $component The component to rate
      *
      * @throws Exception|GuzzleException
      *
@@ -499,5 +501,5 @@ class RatingService
             'maxRating' => $maxRating,
             'results'   => $description,
         ];
-    }
-}
+    }//end ratingList()
+}//end class

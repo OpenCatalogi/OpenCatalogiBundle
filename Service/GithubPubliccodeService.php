@@ -742,4 +742,4 @@ class GithubPubliccodeService
 
         return null;
     }//end parsePubliccode()
-}
+}//end class

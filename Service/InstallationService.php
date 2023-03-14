@@ -514,4 +514,4 @@ class InstallationService implements InstallerInterface
 
         $this->entityManager->flush();
     }
-}
+}//end class

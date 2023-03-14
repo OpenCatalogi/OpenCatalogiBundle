@@ -432,4 +432,4 @@ class DeveloperOverheidService
 
         return $componentObject;
     }//end importComponent()
-}
+}//end class
