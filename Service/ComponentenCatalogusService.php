@@ -257,8 +257,7 @@ class ComponentenCatalogusService
         // If the component isn't already set to a repository create or get the repo and set it to the component url.
         if (key_exists('url', $componentArray) === true
             && key_exists('url', $componentArray['url']) === true
-            && key_exists('name', $componentArray['url']) === true)
-        {
+            && key_exists('name', $componentArray['url']) === true) {
             $repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]);
             if (isset($repository) === true) {
                 $repository = new ObjectEntity($repositoryEntity);

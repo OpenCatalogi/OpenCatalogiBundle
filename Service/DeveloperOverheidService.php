@@ -281,8 +281,7 @@ class DeveloperOverheidService
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $componentArray) === true
             && key_exists('repoOwner', $componentArray['legal']) === true
-            && key_exists('name', $componentArray['legal']['repoOwner']) === true)
-        {
+            && key_exists('name', $componentArray['legal']['repoOwner']) === true) {
             $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]);
             if ($organisation !== null) {
                 $organisation = new ObjectEntity($organisationEntity);
