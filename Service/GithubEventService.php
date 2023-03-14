@@ -19,6 +19,18 @@ use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
+/**
+ * This class handles the github events.
+ *
+ * This service handles the incoming github event and creates a repository.
+ *
+ * @Author Sarai Misidjan <sarai@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @package open-catalogi/open-catalogi-bundle
+ * @category Service
+ */
 class GithubEventService
 {
     /**

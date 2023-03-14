@@ -19,9 +19,18 @@ use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
-/**
- *  This class handles the interaction with github.com.
- */
+/** 
+ * This class handles the interaction with github.com.
+ *
+ * This service get repositories from api.github.com.
+ *
+ * @Author Sarai Misidjan <sarai@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @package open-catalogi/open-catalogi-bundle
+* @category Service
+*/
 class GithubPubliccodeService
 {
     /**
