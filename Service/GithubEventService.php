@@ -17,6 +17,7 @@ use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
+use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
@@ -56,24 +57,33 @@ class GithubEventService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param CallService            $callService            The Call Service
      * @param CacheService           $cacheService           The Cache Service
      * @param GithubApiService       $githubApiService       The Github Api Service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         SynchronizationService $synchronizationService,
         CallService $callService,
         CacheService $cacheService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->synchronizationService = $synchronizationService;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
         $this->githubApiService = $githubApiService;
+        $this->logger = $pluginLogger;
+
         $this->configuration = [];
         $this->data = [];
     }

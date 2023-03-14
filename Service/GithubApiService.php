@@ -13,6 +13,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Psr\Log\LoggerInterface;
 
 class GithubApiService
 {
@@ -57,24 +58,33 @@ class GithubApiService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param CallService            $callService            The Call Service
      * @param CacheService           $cacheService           The Cache Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         CacheService $cacheService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
+
         $this->configuration = [];
         $this->data = [];
     }

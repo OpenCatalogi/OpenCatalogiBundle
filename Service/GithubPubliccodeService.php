@@ -17,6 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
+use Psr\Log\LoggerInterface;
 
 /**
  *  This class handles the interaction with github.com.
@@ -54,24 +55,32 @@ class GithubPubliccodeService
     private GithubApiService $githubApiService;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param CallService            $callService            The Call Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param GithubApiService       $githubApiService       The Github Api Service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
+        $this->logger = $pluginLogger;
     }
 
     /**

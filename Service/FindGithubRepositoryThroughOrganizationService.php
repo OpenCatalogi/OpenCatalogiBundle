@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
+use Psr\Log\LoggerInterface;
 
 /**
  * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
@@ -52,18 +53,26 @@ class FindGithubRepositoryThroughOrganizationService
     private array $configuration;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
      * @param CallService             $callService             The Call Service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         GithubPubliccodeService $githubPubliccodeService,
-        CallService $callService
+        CallService $callService,
+        LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->logger = $pluginLogger;
 
         $this->configuration = [];
         $this->data = [];

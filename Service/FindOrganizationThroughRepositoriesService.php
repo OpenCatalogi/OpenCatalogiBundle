@@ -15,21 +15,62 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
+use Psr\Log\LoggerInterface;
 
 /**
  * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
  */
 class FindOrganizationThroughRepositoriesService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
+
+    /**
+     * @var array
+     */
     private array $configuration;
+
+    /**
+     * @var array
+     */
     private array $data;
+
+    /**
+     * @var SymfonyStyle
+     */
     private SymfonyStyle $io;
+
+    /**
+     * @var CallService
+     */
     private CallService $callService;
+
+    /**
+     * @var GithubApiService
+     */
     private GithubApiService $githubApiService;
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService $githubPubliccodeService;
+
+    /**
+     * @var SynchronizationService
+     */
     private SynchronizationService $synchronizationService;
+
+    /**
+     * @var MappingService
+     */
     private MappingService $mappingService;
+
+    /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
 
     private Entity $organisationEntity;
     private Mapping $organisationMapping;
@@ -38,13 +79,23 @@ class FindOrganizationThroughRepositoriesService
     private Source $githubApi;
     private ?Entity $componentEntity;
 
+    /**
+     * @param CallService $callService
+     * @param EntityManagerInterface $entityManager
+     * @param GithubApiService $githubApiService
+     * @param GithubPubliccodeService $githubPubliccodeService
+     * @param SynchronizationService $synchronizationService
+     * @param MappingService $mappingService
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     */
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
         GithubPubliccodeService $githubPubliccodeService,
         SynchronizationService $synchronizationService,
-        MappingService $mappingService
+        MappingService $mappingService,
+        LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
@@ -52,6 +103,7 @@ class FindOrganizationThroughRepositoriesService
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
 
         $this->configuration = [];
         $this->data = [];

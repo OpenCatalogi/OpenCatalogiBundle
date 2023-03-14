@@ -14,6 +14,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
+use Psr\Log\LoggerInterface;
 
 class EnrichPubliccodeService
 {
@@ -58,24 +59,33 @@ class EnrichPubliccodeService
     private array $data;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param CallService             $callService             The Call Service
      * @param SynchronizationService  $synchronizationService  The Synchronization Service
      * @param MappingService          $mappingService          The Mapping Service
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService
+        GithubPubliccodeService $githubPubliccodeService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->githubPubliccodeService = $githubPubliccodeService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
+        $this->logger = $pluginLogger;
+        
         $this->configuration = [];
         $this->data = [];
     }
