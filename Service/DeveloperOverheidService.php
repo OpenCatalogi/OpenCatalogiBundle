@@ -11,8 +11,8 @@ use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  *  This class handles the interaction with developer.overheid.nl.
@@ -66,7 +66,7 @@ class DeveloperOverheidService
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param GithubApiService       $githubApiService       The Github Api Service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,

@@ -14,9 +14,9 @@ use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 class InstallationService implements InstallerInterface
 {
@@ -76,17 +76,16 @@ class InstallationService implements InstallerInterface
 
     /**
      * @param EntityManagerInterface $entityManager
-     * @param ContainerInterface $container
-     * @param CatalogiService $catalogiService
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param ContainerInterface     $container
+     * @param CatalogiService        $catalogiService
+     * @param LoggerInterface        $pluginLogger    The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         ContainerInterface $container,
         CatalogiService $catalogiService,
         LoggerInterface $pluginLogger
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->container = $container;
         $this->catalogiService = $catalogiService;

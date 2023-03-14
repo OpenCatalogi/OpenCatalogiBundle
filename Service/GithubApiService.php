@@ -12,8 +12,8 @@ use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GithubApiService
 {
@@ -68,7 +68,7 @@ class GithubApiService
      * @param CacheService           $cacheService           The Cache Service
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,

@@ -9,12 +9,12 @@ use CommonGateway\CoreBundle\Service\CallService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 /**
  * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
@@ -61,7 +61,7 @@ class FindGithubRepositoryThroughOrganizationService
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
      * @param CallService             $callService             The Call Service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,

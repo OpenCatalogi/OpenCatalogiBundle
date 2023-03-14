@@ -13,11 +13,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 /**
  *  This class handles the interaction with github.com.
@@ -65,7 +65,7 @@ class GithubPubliccodeService
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param GithubApiService       $githubApiService       The Github Api Service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
