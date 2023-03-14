@@ -13,14 +13,14 @@ class GithubEventHandler implements ActionHandlerInterface
     /**
      * @var GithubEventService
      */
-    private GithubEventService $githubEventService;
+    private GithubEventService $service;
 
     /**
-     * @param GithubEventService $githubEventService The $githubEventService
+     * @param GithubEventService $service The $githubEventService
      */
-    public function __construct(GithubEventService $githubEventService)
+    public function __construct(GithubEventService $service)
     {
-        $this->githubEventService = $githubEventService;
+        $this->service = $service;
     }
 
     /**
@@ -58,6 +58,6 @@ class GithubEventHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->githubEventService->updateRepositoryWithEventResponse($data, $configuration);
+        return $this->service->updateRepositoryWithEventResponse($data, $configuration);
     }//end run()
 }//end class

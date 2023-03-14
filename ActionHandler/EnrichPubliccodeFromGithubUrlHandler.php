@@ -13,14 +13,14 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     /**
      * @var EnrichPubliccodeFromGithubUrlService
      */
-    private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
+    private EnrichPubliccodeFromGithubUrlService $service;
 
     /**
-     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService The enrich Publiccode From Github Ur Service
+     * @param EnrichPubliccodeFromGithubUrlService $service The enrich Publiccode From Github Ur Service
      */
-    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
+    public function __construct(EnrichPubliccodeFromGithubUrlService $service)
     {
-        $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
+        $this->service = $service;
     }//end __construct()
 
     /**
@@ -64,6 +64,6 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
+        return $this->service->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
     }//end run()
 }//end class

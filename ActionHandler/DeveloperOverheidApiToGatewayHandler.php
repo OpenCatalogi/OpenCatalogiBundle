@@ -13,14 +13,14 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService $developerOverheidService;
+    private DeveloperOverheidService $service;
 
     /**
-     * @param DeveloperOverheidService $developerOverheidService The developer Overheid Service
+     * @param DeveloperOverheidService $service The developer Overheid Service
      */
-    public function __construct(DeveloperOverheidService $developerOverheidService)
+    public function __construct(DeveloperOverheidService $service)
     {
-        $this->developerOverheidService = $developerOverheidService;
+        $this->service = $service;
     }//end __construct()
 
     /**
@@ -50,6 +50,6 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->developerOverheidService->getComponents();
+        return $this->service->getComponents();
     }//end run()
 }//end class

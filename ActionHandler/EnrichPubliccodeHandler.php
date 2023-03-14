@@ -13,14 +13,14 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     /**
      * @var EnrichPubliccodeService
      */
-    private EnrichPubliccodeService $enrichPubliccodeService;
+    private EnrichPubliccodeService $service;
 
     /**
-     * @param EnrichPubliccodeService $enrichPubliccodeService Thew enrichPubliccodeService
+     * @param EnrichPubliccodeService $service Thew enrichPubliccodeService
      */
-    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
+    public function __construct(EnrichPubliccodeService $service)
     {
-        $this->enrichPubliccodeService = $enrichPubliccodeService;
+        $this->service = $service;
     }//end __construct()
 
     /**
@@ -64,6 +64,6 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
 
     public function run(array $data, array $configuration): array
     {
-        return $this->enrichPubliccodeService->enrichPubliccodeHandler($data, $configuration);
+        return $this->service->enrichPubliccodeHandler($data, $configuration);
     }//end run()
 }//end class

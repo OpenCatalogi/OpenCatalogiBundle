@@ -13,14 +13,14 @@ class RatingHandler implements ActionHandlerInterface
     /**
      * @var RatingService
      */
-    private RatingService $ratingService;
+    private RatingService $service;
 
     /**
-     * @param RatingService $ratingService The RatingService
+     * @param RatingService $service The RatingService
      */
-    public function __construct(RatingService $ratingService)
+    public function __construct(RatingService $service)
     {
-        $this->ratingService = $ratingService;
+        $this->service = $service;
     }//end __construct)
 
     /**
@@ -65,6 +65,6 @@ class RatingHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->ratingService->ratingHandler($data, $configuration);
+        return $this->service->ratingHandler($data, $configuration);
     }//end run()
 }//end class
