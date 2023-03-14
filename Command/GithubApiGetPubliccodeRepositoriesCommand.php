@@ -15,23 +15,41 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GithubApiGetPubliccodeRepositoriesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:githubapi:repositories';
+
+    /**
+     * @var GithubPubliccodeService
+     */
     private GithubPubliccodeService  $githubPubliccodeService;
 
+    /**
+     * @param GithubPubliccodeService $githubPubliccodeService
+     */
     public function __construct(GithubPubliccodeService $githubPubliccodeService)
     {
         $this->githubPubliccodeService = $githubPubliccodeService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi GithubPubliccodeService')
             ->setHelp('This command allows you to get all repositories or one repository from https://api.github.com/search/code')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -51,5 +69,5 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

@@ -14,23 +14,41 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class EnrichPubliccodeCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:enrichPubliccode:execute';
+
+    /**
+     * @var EnrichPubliccodeService
+     */
     private EnrichPubliccodeService $enrichPubliccodeService;
 
+    /**
+     * @param EnrichPubliccodeService $enrichPubliccodeService
+     */
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
         $this->enrichPubliccodeService = $enrichPubliccodeService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -46,5 +64,5 @@ class EnrichPubliccodeCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

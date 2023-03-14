@@ -12,25 +12,48 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FederalizationRegisterCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:fedaralization:register';
+
+    /**
+     * @var FederalizationService
+     */
     private FederalizationService  $federalizationiService;
+
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param FederalizationService $federalizationiService
+     * @param EntityManagerInterface $entityManager
+     */
     public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
     {
         $this->federalizationiService = $federalizationiService;
         $this->entityManager = $entityManager;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command gets al or a single catalogi from the federalized network')
             ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
@@ -57,5 +80,5 @@ class FederalizationRegisterCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class
