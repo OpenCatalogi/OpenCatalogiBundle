@@ -167,7 +167,7 @@ class GithubPubliccodeService
      * @TODO Loop through all the pages of the github api.
      *
      * Get repositories through the repositories of https://api.github.com/search/code
-     * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
+     * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml. Since native Guzzle dosn't support this we made the design decicion to allow curl
      *
      * @return array All imported repositories.
      */
@@ -202,9 +202,6 @@ class GithubPubliccodeService
 
                 // Get stringified data/output. See CURLOPT_RETURNTRANSFER.
                 $data = curl_exec($ch);
-
-                // Get info about the request.
-                $info = curl_getinfo($ch);
                 // Close curl resource to free up system resources.
                 curl_close($ch);
 

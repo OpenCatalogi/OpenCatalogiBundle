@@ -21,11 +21,6 @@ class InstallationService implements InstallerInterface
     private ContainerInterface $container;
 
     /**
-     * @var SymfonyStyle
-     */
-    private SymfonyStyle $io;
-
-    /**
      * @var CatalogiService
      */
     private CatalogiService $catalogiService;
