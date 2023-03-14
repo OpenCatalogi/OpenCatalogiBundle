@@ -17,6 +17,7 @@ use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
+use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
@@ -28,7 +29,7 @@ class GithubEventService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var CallService
@@ -46,6 +47,11 @@ class GithubEventService
     private GithubApiService $githubApiService;
 
     /**
+     * @var LoggerInterface
+     */
+    private LoggerInterface $logger;
+
+    /**
      * @var array
      */
     private array $configuration;
@@ -56,32 +62,35 @@ class GithubEventService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
-     * @param SynchronizationService $synchronizationService The Synchronization Service
-     * @param CallService            $callService            The Call Service
-     * @param CacheService           $cacheService           The Cache Service
-     * @param GithubApiService       $githubApiService       The Github Api Service
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface.
+     * @param SynchronizationService $syncService The Synchronization Service.
+     * @param CallService            $callService            The Call Service.
+     * @param CacheService           $cacheService           The Cache Service.
+     * @param GithubApiService       $githubApiService       The Github Api Service.
+     * @param LoggerInterface $logger The Logger Interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        SynchronizationService $synchronizationService,
+        SynchronizationService $syncService,
         CallService $callService,
         CacheService $cacheService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        LoggerInterface $logger
     ) {
         $this->entityManager = $entityManager;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
         $this->githubApiService = $githubApiService;
+        $this->logger = $logger;
         $this->configuration = [];
         $this->data = [];
-    }
+    }//end __construct()
 
     /**
      * Get a source by reference.
      *
-     * @param string $location The location to look for
+     * @param string $location The location to look for.
      *
      * @return Source|null
      */
@@ -89,8 +98,7 @@ class GithubEventService
     {
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
         if ($source === null) {
-//            $this->logger->error("No source found for $location");
-            isset($this->io) && $this->io->error("No source found for $location");
+            $this->logger->error("No source found for $location.");
         }//end if
 
         return $source;
@@ -99,7 +107,7 @@ class GithubEventService
     /**
      * Get an entity by reference.
      *
-     * @param string $reference The reference to look for
+     * @param string $reference The reference to look for.
      *
      * @return Entity|null
      */
@@ -107,8 +115,7 @@ class GithubEventService
     {
         $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
         if ($entity === null) {
-//            $this->logger->error("No entity found for $reference");
-            isset($this->io) && $this->io->error("No entity found for $reference");
+            $this->logger->error("No entity found for $reference.");
         }//end if
 
         return $entity;
@@ -117,7 +124,7 @@ class GithubEventService
     /**
      * Get a mapping by reference.
      *
-     * @param string $reference The reference to look for
+     * @param string $reference The reference to look for.
      *
      * @return Mapping|null
      */
@@ -125,8 +132,7 @@ class GithubEventService
     {
         $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
         if ($mapping === null) {
-//            $this->logger->error("No mapping found for $reference");
-            isset($this->io) && $this->io->error("No mapping found for $reference");
+            $this->logger->error("No mapping found for $reference.");
         }//end if
 
         return $mapping;
@@ -135,14 +141,14 @@ class GithubEventService
     /**
      * Check the auth of the github source.
      *
-     * @param Source $source The given source to check the api key
+     * @param Source $source The given source to check the api key.
      *
-     * @return bool|null If the api key is set or not
+     * @return bool|null If the api key is set or not.
      */
     public function checkGithubAuth(Source $source): ?bool
     {
-        if (!$source->getApiKey()) {
-            isset($this->io) && $this->io->error('No auth set for Source: '.$source->getName());
+        if ($source->getApiKey() === null) {
+            $this->logger->error('No auth set for Source: '.$source->getName().'.');
 
             return false;
         }//end if
@@ -153,25 +159,20 @@ class GithubEventService
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $name
-     * @param $source
+     * @param string $name The name of the repository.
+     * @param Source $source The source to sync from.
      *
-     * @return array|null The imported repository as array
+     * @return array|null The imported repository as array.
      */
-    public function getRepository(string $name, $source): ?array
+    public function getRepository(string $name, Source $source): ?array
     {
-        // Do we have the api key set of the source.
-        if (!$this->checkGithubAuth($source)) {
-            return null;
-        }//end if
-
-        isset($this->io) && $this->io->success('Getting repository '.$name);
+        $this->logger->debug('Getting repository '.$name.'.');
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName());
+            $this->logger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.');
 
             return null;
         }//end if
@@ -182,12 +183,12 @@ class GithubEventService
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param ?array $data          data set at the start of the handler
-     * @param ?array $configuration configuration of the action
+     * @param ?array $data          data set at the start of the handler.
+     * @param ?array $configuration configuration of the action.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
-     * @return array|null The data with the repository in the response array
+     * @return array|null The data with the repository in the response array.
      */
     public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
     {
@@ -203,6 +204,10 @@ class GithubEventService
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
         $source = $this->getSource('https://api.github.com');
+        // Do we have the api key set of the source.
+        if ($this->checkGithubAuth($source) === false) {
+            return null;
+        }//end if
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
         $mapping = $this->getMapping('https://api.github.com/repositories');
 
@@ -215,15 +220,17 @@ class GithubEventService
             return $this->data;
         }//end if
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
+        $repositoryArray['name'] = str_replace('-', ' ', $repositoryArray['name']);
 
-        isset($this->io) && $this->io->comment('Mapping object '.$repositoryUrl);
-        isset($this->io) && $this->io->comment('The mapping object '.$mapping);
-        isset($this->io) && $this->io->comment('Checking repository '.$repositoryUrl);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
+
+        $this->logger->debug('Mapping object '.$repositoryUrl.'.');
+        $this->logger->debug('The mapping object '.$mapping.'.');
+        $this->logger->debug('Checking repository '.$repositoryUrl.'.');
 
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->handleSync($synchronization, $repositoryArray);
-        isset($this->io) && $this->io->comment('Repository synchronization created with id: '.$synchronization->getId()->toString());
+        $synchronization = $this->syncService->handleSync($synchronization, $repositoryArray);
+        $this->logger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.');
 
         $repository = $synchronization->getObject();
 
