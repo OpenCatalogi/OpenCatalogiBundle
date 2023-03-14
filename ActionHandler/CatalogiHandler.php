@@ -13,14 +13,14 @@ class CatalogiHandler implements ActionHandlerInterface
     /**
      * @var FederalizationService
      */
-    private FederalizationService $federalizationiService;
+    private FederalizationService $service;
 
     /**
-     * @param FederalizationService $federalizationiService The federalization Service
+     * @param FederalizationService $service The federalization Service
      */
-    public function __construct(FederalizationService $federalizationiService)
+    public function __construct(FederalizationService $service)
     {
-        $this->federalizationiService = $federalizationiService;
+        $this->service = $service;
     }//end __construct()
 
     /**
@@ -88,6 +88,6 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->federalizationiService->catalogiHandler($data, $configuration);
+        return $this->service->catalogiHandler($data, $configuration);
     }//end run()
 }//end class

@@ -13,14 +13,14 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService $componentenCatalogusService;
+    private ComponentenCatalogusService $service;
 
     /**
-     * @param ComponentenCatalogusService $componentenCatalogusService The componenten Catalogus Service
+     * @param ComponentenCatalogusService $service The componenten Catalogus Service
      */
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(ComponentenCatalogusService $service)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->service = $service;
     }//end __construct()
 
     /**
@@ -50,6 +50,6 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->componentenCatalogusService->getApplications();
+        return $this->service->getApplications();
     }//end run()
 }//end class
