@@ -19,7 +19,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 /**
  *  This class handles the interaction with github.com.
@@ -76,7 +75,7 @@ class GithubPubliccodeService
         SynchronizationService $syncService,
         MappingService $mappingService,
         GithubApiService $githubApiService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
         Yaml $yaml
     ) {
         $this->entityManager = $entityManager;

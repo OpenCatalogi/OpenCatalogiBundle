@@ -18,7 +18,6 @@ use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
