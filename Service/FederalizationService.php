@@ -68,13 +68,12 @@ class FederalizationService
      */
     public function catalogiHandler(array $data = [], array $configuration = []): array
     {
-
         // Setup base data
         $this->prepareObjectEntities();
 
         // Savety cheek
         if (!$this->catalogusEntity) {
-            (isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '');
+            isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '';
 
             return $data;
         }
@@ -100,25 +99,24 @@ class FederalizationService
      */
     public function readCatalogus(ObjectEntity $catalogus): array
     {
-
         // Basis setup
         $reportOut = [];
 
         // Check if the past object is a
         if ($catalogus->getEntity()->getReference() != 'https://opencatalogi.nl/oc.catalogi.schema.json') {
-            (isset($this->io) ? $this->io->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json') : '');
+            isset($this->io) ? $this->io->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json') : '';
 
             return $reportOut;
         }
 
         // Lets get the source for the catalogus
         if (!$source = $catalogus->getValue('source')) {
-            (isset($this->io) ? $this->io->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source') : '');
+            isset($this->io) ? $this->io->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source') : '';
 
             return $reportOut;
         }
 
-        (isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')') : '');
+        isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')') : '';
         if (!$sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')])) {
             $sourceObject = new Source();
             $sourceObject->setLocation($source->getValue('location'));
@@ -132,11 +130,11 @@ class FederalizationService
             ['query'=> ['limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
 
-        (isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '');
+        isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '';
 
         $synchonizedObjects = [];
 
-        (isset($this->io) ? $this->io->progressStart(count($objects)) : '');
+        isset($this->io) ? $this->io->progressStart(count($objects)) : '';
         // Handle new objects
         $counter = 0;
         foreach ($objects as $key => $object) {
@@ -158,10 +156,10 @@ class FederalizationService
                 $this->entityManager->flush();
             }
 
-            (isset($this->io) ? $this->io->progressAdvance() : '');
+            isset($this->io) ? $this->io->progressAdvance() : '';
         }
 
-        (isset($this->io) ? $this->io->progressFinish() : '');
+        isset($this->io) ? $this->io->progressFinish() : '';
 
         $this->entityManager->flush();
 
@@ -294,19 +292,19 @@ class FederalizationService
     {
         if (!isset($this->catalogusEntity)) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.catalogi.schema.json']);
-            (!$this->catalogusEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '');
+            !$this->catalogusEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '';
         }
         if (!isset($this->componentEntity)) {
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.component.schema.json']);
-            (!$this->componentEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.component.schema.json') : '');
+            !$this->componentEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.component.schema.json') : '';
         }
         if (!isset($this->organisationEntity)) {
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.organisation.schema.json']);
-            (!$this->organisationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json') : '');
+            !$this->organisationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json') : '';
         }
         if (!isset($this->applicationEntity)) {
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
-            (!$this->applicationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json') : '');
+            !$this->applicationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json') : '';
         }
     }
 }
