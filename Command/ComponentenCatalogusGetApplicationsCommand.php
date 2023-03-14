@@ -58,10 +58,10 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         $applicationId = $input->getOption('application', false);
 
         if ($applicationId === false) {
-            if (!$this->componentenCatalogusService->getApplications()) {
+            if ($this->componentenCatalogusService->getApplications() === null) {
                 return Command::FAILURE;
             }
-        } else if (!$this->componentenCatalogusService->getApplication($applicationId)) {
+        } else if ($this->componentenCatalogusService->getApplication($applicationId)  === null) {
             return Command::FAILURE;
         }
 
