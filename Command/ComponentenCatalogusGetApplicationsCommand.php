@@ -61,7 +61,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             if (!$this->componentenCatalogusService->getApplications()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getApplication($applicationId)) {
+        } else if (!$this->componentenCatalogusService->getApplication($applicationId)) {
             return Command::FAILURE;
         }
 

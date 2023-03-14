@@ -23,14 +23,14 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService  $githubPubliccodeService;
+    private GithubPubliccodeService  $githubService;
 
     /**
-     * @param GithubPubliccodeService $githubPubliccodeService
+     * @param GithubPubliccodeService $githubService The Github Publiccode Service
      */
-    public function __construct(GithubPubliccodeService $githubPubliccodeService)
+    public function __construct(GithubPubliccodeService $githubService)
     {
-        $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->githubService = $githubService;
         parent::__construct();
     }//end __construct()
 
@@ -46,14 +46,14 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->githubPubliccodeService->setStyle($style);
+        $this->githubService->setStyle($style);
 
         $style->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
 
@@ -61,10 +61,10 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         $repositoryId = $input->getOption('repository', false);
 
         if ($repositoryId === false) {
-            if ($this->githubPubliccodeService->getRepositories() === false) {
+            if ($this->githubService->getRepositories() === false) {
                 return Command::FAILURE;
             }
-        } elseif ($this->githubPubliccodeService->getRepository($repositoryId) === null) {
+        } else if ($this->githubService->getRepository($repositoryId) === null) {
             return Command::FAILURE;
         }
 

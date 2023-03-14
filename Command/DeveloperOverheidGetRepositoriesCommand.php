@@ -62,7 +62,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
             if (!$this->developerOverheidService->getRepositories()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
+        } else if (!$this->developerOverheidService->getRepository($repositoryId)) {
             return Command::FAILURE;
         }
 

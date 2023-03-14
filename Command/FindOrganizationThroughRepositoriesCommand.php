@@ -61,7 +61,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
+        } else if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
             return Command::FAILURE;
         }
 

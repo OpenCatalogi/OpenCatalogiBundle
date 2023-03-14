@@ -26,7 +26,7 @@ class PublicCodeRatingCommand extends Command
     private RatingService  $ratingService;
 
     /**
-     * @param RatingService $ratingService
+     * @param RatingService $ratingService The rating service
      */
     public function __construct(RatingService $ratingService)
     {
@@ -46,8 +46,8 @@ class PublicCodeRatingCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      * @throws \Exception
      */
@@ -60,10 +60,10 @@ class PublicCodeRatingCommand extends Command
         $componentId = $input->getOption('component', false);
 
         if ($componentId === false) {
-            if (!$this->ratingService->enrichComponentsWithRating()) {
+            if ($this->ratingService->enrichComponentsWithRating() === false) {
                 return Command::FAILURE;
             }
-        } elseif ($this->ratingService->enrichComponentWithRating($componentId) === false) {
+        } else if ($this->ratingService->enrichComponentWithRating($componentId) === false) {
             return Command::FAILURE;
         }
 

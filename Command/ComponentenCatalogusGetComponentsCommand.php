@@ -61,7 +61,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             if (!$this->componentenCatalogusService->getComponents()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getComponent($componentId)) {
+        } else if (!$this->componentenCatalogusService->getComponent($componentId)) {
             return Command::FAILURE;
         }
 

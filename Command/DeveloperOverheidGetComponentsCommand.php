@@ -62,7 +62,7 @@ class DeveloperOverheidGetComponentsCommand extends Command
             if (!$this->developerOverheidService->getComponents()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getComponent($componentId)) {
+        } else if (!$this->developerOverheidService->getComponent($componentId)) {
             return Command::FAILURE;
         }
 
