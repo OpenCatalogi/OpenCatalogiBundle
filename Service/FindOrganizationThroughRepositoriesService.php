@@ -397,12 +397,12 @@ class FindOrganizationThroughRepositoriesService
         $url = $repository->getValue('url');
 
         if ($source == null) {
-            $domain = parse_url($url, PHP_URL_HOST);
+            $domain = \Safe\parse_url($url, PHP_URL_HOST);
             $domain == 'github.com' && $source = 'github';
             $domain == 'gitlab.com' && $source = 'gitlab';
         }//end if
 
-        $url = trim(parse_url($url, PHP_URL_PATH), '/');
+        $url = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
 
         switch ($source) {
             case 'github':

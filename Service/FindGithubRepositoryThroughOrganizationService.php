@@ -282,12 +282,12 @@ class FindGithubRepositoryThroughOrganizationService
             return null;
         }//end if
 
-        $domain = parse_url($url, PHP_URL_HOST);
+        $domain = \Safe\parse_url($url, PHP_URL_HOST);
         if (!$domain == 'github.com') {
             return null;
         }//end if
 
-        $name = trim(parse_url($url, PHP_URL_PATH), '/');
+        $name = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
 
         isset($this->io) && $this->io->info('Getting repo from organisation '.$name);
         $response = $this->callService->call($source, '/repos/'.$name);
