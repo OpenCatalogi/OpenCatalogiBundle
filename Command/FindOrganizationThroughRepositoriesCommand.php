@@ -25,7 +25,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
 
     /**
-     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService
+     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService find Organization Through Repositories Service
      */
     public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
     {
@@ -45,19 +45,19 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findOrganizationThroughRepositoriesService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findOrganizationThroughRepositoriesService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
+        if ($repositoryId === false) {
             if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
                 return Command::FAILURE;
             }

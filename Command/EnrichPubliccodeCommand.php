@@ -25,7 +25,7 @@ class EnrichPubliccodeCommand extends Command
     private EnrichPubliccodeService $enrichPubliccodeService;
 
     /**
-     * @param EnrichPubliccodeService $enrichPubliccodeService
+     * @param EnrichPubliccodeService $enrichPubliccodeService enrich Publiccode Service
      */
     public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
     {
@@ -45,19 +45,19 @@ class EnrichPubliccodeCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->enrichPubliccodeService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
+        if ($repositoryId === false) {
             $this->enrichPubliccodeService->enrichPubliccodeHandler();
         } elseif (!$this->enrichPubliccodeService->enrichPubliccodeHandler([], [], $repositoryId)) {
             return Command::FAILURE;

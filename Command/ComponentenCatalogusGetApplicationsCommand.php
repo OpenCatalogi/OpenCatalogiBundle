@@ -14,23 +14,41 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetApplicationsCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:componentencatalogus:applications';
+
+    /**
+     * @var ComponentenCatalogusService
+     */
     private ComponentenCatalogusService  $componentenCatalogusService;
 
+    /**
+     * @param ComponentenCatalogusService $componentenCatalogusService componenten Catalogus Service
+     */
     public function __construct(ComponentenCatalogusService $componentenCatalogusService)
     {
         $this->componentenCatalogusService = $componentenCatalogusService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all applications or one application from componentencatalogus.commonground.nl/api/products')
             ->addOption('application', 'a', InputOption::VALUE_OPTIONAL, 'Get a single application by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -39,7 +57,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         // Handle the command optiosn
         $applicationId = $input->getOption('application', false);
 
-        if (!$applicationId) {
+        if ($applicationId === false) {
             if (!$this->componentenCatalogusService->getApplications()) {
                 return Command::FAILURE;
             }
@@ -48,5 +66,5 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

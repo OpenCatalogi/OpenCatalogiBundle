@@ -25,6 +25,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     private FindGithubRepositoryThroughOrganizationService  $findGithubRepositoryThroughOrganizationService;
 
+    /**
+     * @param FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService find Github Repository Through Organization Service
+     */
     public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
     {
         $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
@@ -43,19 +46,19 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->findGithubRepositoryThroughOrganizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->findGithubRepositoryThroughOrganizationService->setStyle($style);
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        if (!$organisationId) {
+        if ($organisationId=== false) {
             if (!$this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler()) {
                 return Command::FAILURE;
             }

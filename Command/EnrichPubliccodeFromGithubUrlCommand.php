@@ -25,7 +25,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
     /**
-     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService
+     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService enrich Publiccode From Github Url Service
      */
     public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
     {
@@ -45,19 +45,19 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeFromGithubUrlService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->enrichPubliccodeFromGithubUrlService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
+        if ($repositoryId=== false) {
             $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler();
         } elseif (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
             return Command::FAILURE;

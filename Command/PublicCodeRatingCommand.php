@@ -53,17 +53,17 @@ class PublicCodeRatingCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->ratingService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->ratingService->setStyle($style);
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
-        if (!$componentId) {
+        if ($componentId === false) {
             if (!$this->ratingService->enrichComponentsWithRating()) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->ratingService->enrichComponentWithRating($componentId)) {
+        } elseif ($this->ratingService->enrichComponentWithRating($componentId) === false) {
             return Command::FAILURE;
         }
 

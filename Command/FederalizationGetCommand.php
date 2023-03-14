@@ -28,8 +28,8 @@ class FederalizationGetCommand extends Command
     private EntityManagerInterface $entityManager;
 
     /**
-     * @param FederalizationService $federalizationService
-     * @param EntityManagerInterface $entityManager
+     * @param FederalizationService $federalizationiService The federalization Service
+     * @param EntityManagerInterface $entityManager The entity Manager
      */
     public function __construct(FederalizationService $federalizationService, EntityManagerInterface $entityManager)
     {
@@ -50,29 +50,29 @@ class FederalizationGetCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param InputInterface $input The input
+     * @param OutputInterface $output The output
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
-        $io = new SymfonyStyle($input, $output);
-        $this->federalizationService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->federalizationService->setStyle($style);
 
         // Handle the command optiosn
         $catalogusId = $input->getOption('catalogus', false);
 
-        if (!$catalogusId) {
+        if ($catalogusId=== false) {
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if (!$catalogusObject) {
-                $io->debug('Could not find object entity by id, trying on name');
+                $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
             if (!$catalogusObject) {
-                $io->error('Could not find object entity by id or name '.$catalogusId);
+                $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return 1;
             }
