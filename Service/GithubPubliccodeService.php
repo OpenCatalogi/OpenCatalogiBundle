@@ -236,6 +236,7 @@ class GithubPubliccodeService
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
+
         $result = [];
         $queryConfig = [];
 

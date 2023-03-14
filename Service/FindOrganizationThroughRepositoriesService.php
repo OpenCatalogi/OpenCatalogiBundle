@@ -248,6 +248,7 @@ class FindOrganizationThroughRepositoriesService
 
             return null;
         }//end if
+
         $organisation = $this->importOrganisation($organisation);
         if ($organisation === null) {
             return null;
@@ -456,6 +457,7 @@ class FindOrganizationThroughRepositoriesService
                 $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('findOrganizationThroughRepositoriesHandler finished');
