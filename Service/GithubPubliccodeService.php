@@ -15,7 +15,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -61,13 +60,13 @@ class GithubPubliccodeService
     private Yaml $yaml;
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface.
-     * @param CallService            $callService            The Call Service.
-     * @param SynchronizationService $syncService The Synchronization Service.
-     * @param MappingService         $mappingService         The Mapping Service.
-     * @param GithubApiService       $githubApiService       The Github Api Service.
-     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
-     * @param Yaml $yaml The Yaml.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
+     * @param CallService            $callService      The Call Service.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param MappingService         $mappingService   The Mapping Service.
+     * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
+     * @param Yaml                   $yaml             The Yaml.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -532,9 +531,9 @@ class GithubPubliccodeService
             $contractors = [];
             foreach ($publiccode['maintenance']['contractors'] as $contractor) {
                 if (key_exists('name', $contractor) === true) {
-                    if (($contractor = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $contractorsEntity, 'name' => $contractor['name']])) === false ) {
+                    if (($contractor = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $contractorsEntity, 'name' => $contractor['name']])) === false) {
                         $contractor = new ObjectEntity($contractorsEntity);
-                        $contractor->hydrate(['name' => $contractor['name'],]);
+                        $contractor->hydrate(['name' => $contractor['name']]);
                     }//end if
                     $this->entityManager->persist($contractor);
                     $contractors[] = $contractor;
