@@ -12,10 +12,10 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 /**
  * Loops through repositories (https://opencatalogi.nl/oc.repository.schema.json) and updates it with fetched organization info.
@@ -103,13 +103,13 @@ class FindOrganizationThroughRepositoriesService
     private ?Entity $componentEntity;
 
     /**
-     * @param CallService $callService The call service
-     * @param EntityManagerInterface $entityManager The entity manager
-     * @param GithubApiService $githubApiService The github api service
+     * @param CallService             $callService             The call service
+     * @param EntityManagerInterface  $entityManager           The entity manager
+     * @param GithubApiService        $githubApiService        The github api service
      * @param GithubPubliccodeService $githubPubliccodeService The Github publicode service
-     * @param SynchronizationService $synchronizationService The synchonization service
-     * @param MappingService $mappingServiceThe mapping service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param SynchronizationService  $synchronizationService  The synchonization service
+     * @param MappingService          $mappingServiceThe       mapping service
+     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
     public function __construct(
         CallService $callService,

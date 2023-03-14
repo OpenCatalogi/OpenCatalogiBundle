@@ -13,11 +13,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Respect\Validation\Exceptions\ComponentException;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
-use Psr\Log\LoggerInterface;
 
 class GithubEventService
 {
@@ -67,7 +67,7 @@ class GithubEventService
      * @param CallService            $callService            The Call Service
      * @param CacheService           $cacheService           The Cache Service
      * @param GithubApiService       $githubApiService       The Github Api Service
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,

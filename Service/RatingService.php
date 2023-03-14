@@ -7,8 +7,8 @@ use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RatingService
 {
@@ -53,9 +53,9 @@ class RatingService
     private LoggerInterface $logger;
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager
-     * @param GithubApiService $githubApiService     The githubApiService
-     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
+     * @param EntityManagerInterface $entityManager    The Entity Manager
+     * @param GithubApiService       $githubApiService The githubApiService
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
