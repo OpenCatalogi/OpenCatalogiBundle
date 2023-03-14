@@ -62,6 +62,14 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
         return $this->service->enrichPubliccodeFromGithubUrlHandler($data, $configuration);

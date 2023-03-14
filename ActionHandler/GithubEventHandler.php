@@ -21,7 +21,7 @@ class GithubEventHandler implements ActionHandlerInterface
     public function __construct(GithubEventService $service)
     {
         $this->service = $service;
-    }
+    }//end __construct()
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
