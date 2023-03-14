@@ -14,7 +14,6 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  *  This class handles the interaction with developer.overheid.nl.
@@ -62,23 +61,23 @@ class DeveloperOverheidService
     private GatewayResourceService $resourceService;
 
     /**
-     * @param EntityManagerInterface $entityManager     The Entity Manager Interface.
-     * @param CallService            $callService       The Call Service.
-     * @param CacheService           $cacheService      The Cache Service.
-     * @param SynchronizationService $syncService       The Synchronization Service.
-     * @param MappingService         $mappingService    The Mapping Service.
-     * @param GithubApiService       $githubApiService  The Github Api Service.
-     * @param LoggerInterface        $pluginLogger      The plugin version of the loger interface.
-     * @param GatewayResourceService $resourceService   The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
+     * @param CallService            $callService      The Call Service.
+     * @param CacheService           $cacheService     The Cache Service.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param MappingService         $mappingService   The Mapping Service.
+     * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        CallService            $callService,
-        CacheService           $cacheService,
+        CallService $callService,
+        CacheService $cacheService,
         SynchronizationService $syncService,
-        MappingService         $mappingService,
-        GithubApiService       $githubApiService,
-        LoggerInterface        $pluginLogger,
+        MappingService $mappingService,
+        GithubApiService $githubApiService,
+        LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
         $this->entityManager = $entityManager;
@@ -222,7 +221,6 @@ class DeveloperOverheidService
     {
         // Do we have a source?
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-
 
         $this->pluginLogger->debug('Trying to get component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/apis/'.$id);

@@ -12,7 +12,6 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  *  This class handles the interaction with componentencatalogus.commonground.nl.
@@ -39,7 +38,6 @@ class ComponentenCatalogusService
      */
     private MappingService $mappingService;
 
-
     /**
      * @var DeveloperOverheidService
      */
@@ -65,13 +63,13 @@ class ComponentenCatalogusService
      * @param LoggerInterface          $pluginLogger    The Plugin logger
      */
     public function __construct(
-        EntityManagerInterface   $entityManager,
-        CallService              $callService,
-        SynchronizationService   $syncService,
-        MappingService           $mappingService,
+        EntityManagerInterface $entityManager,
+        CallService $callService,
+        SynchronizationService $syncService,
+        MappingService $mappingService,
         DeveloperOverheidService $donService,
-        GatewayResourceService   $resourceService,
-        LoggerInterface          $pluginLogger
+        GatewayResourceService $resourceService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
@@ -124,6 +122,7 @@ class ComponentenCatalogusService
 
         if ($application === null) {
             $this->pluginLogger->error('Could not find an application with id: '.$id.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
             return null;
         }
         $application = $this->importApplication($application);
@@ -192,7 +191,6 @@ class ComponentenCatalogusService
 
         // Do we have a source?
         $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
-
 
         $this->pluginLogger->debug('Trying to get all components from source '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
