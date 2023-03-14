@@ -20,8 +20,8 @@ class RatingHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/oc.rating.schema.json',
-            '$schema'    => 'https://json-schema.org/draft/2020-12/schema',
+            '$id'        => 'https://opencatalogi.nl/ActionHandler/RatingHandler.ActionHandler.json',
+            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'RatingHandler',
             'description'=> 'This handler sets the rating of a component',
             'required'   => ['componentEntityId', 'ratingEntityId'],

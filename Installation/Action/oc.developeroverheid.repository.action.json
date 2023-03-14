@@ -1,0 +1,15 @@
+{
+  "title": "GetDeveloperOverheidRepository",
+  "$id": "https://opencatalogi.nl/oc.developeroverheid.repository.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.1",
+  "listens": ["opencatalogi.default.listens"],
+  "throws": [],
+  "conditions": {
+    "==": [1,1]
+  },
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidRepositoryToGatewayHandler",
+  "configuration": [],
+  "isLockable": true,
+  "isEnabled": true
+}

@@ -1,0 +1,11 @@
+{
+    "title": "developerOverheid",
+    "$id": "https://opencatalogi.nl/source/oc.developerOverheid.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "developerOverheid",
+    "location": "https://developer.overheid.nl/api",
+    "headers": {
+        "accept" : "application/json"
+    }
+}

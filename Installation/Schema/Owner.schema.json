@@ -1,0 +1,18 @@
+{
+  "title": "Owner",
+  "$id": "https://opencatalogi.nl/oc.owner.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "properties": {
+    "fullName": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "pictureUrl": {
+      "type": "string"
+    }
+  }
+}
