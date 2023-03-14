@@ -15,13 +15,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class InstallationService implements InstallerInterface
 {
     private EntityManagerInterface $entityManager;
-    private ContainerInterface $container;
     private CatalogiService $catalogiService;
 
-    public function __construct(EntityManagerInterface $entityManager, ContainerInterface $container, CatalogiService $catalogiService)
+    public function __construct(EntityManagerInterface $entityManager, CatalogiService $catalogiService)
     {
         $this->entityManager = $entityManager;
-        $this->container = $container;
         $this->catalogiService = $catalogiService;
     }
 
@@ -58,69 +56,6 @@ class InstallationService implements InstallerInterface
         }
     }
 
-    public function createCronjobs()
-    {
-        (isset($this->io) ? $this->io->writeln(['', '<info>Looking for cronjobs</info>']) : '');
-        // We only need 1 cronjob so lets set that
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Open Catalogi'])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName('Open Catalogi');
-            $cronjob->setDescription('This cronjob fires all the open catalogi actions ever 5 minutes');
-            $cronjob->setThrows(['opencatalogi.default.listens']);
-            $cronjob->setIsEnabled(true);
-
-            $this->entityManager->persist($cronjob);
-
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
-        } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
-        }
-
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Bronnen trigger'])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName('Bronnen trigger');
-            $cronjob->setDescription('This cronjob fires all the open catalogi bronnen actions ever 5 minutes');
-            $cronjob->setThrows(['opencatalogi.bronnen.trigger']);
-            $cronjob->setIsEnabled(true);
-
-            $this->entityManager->persist($cronjob);
-
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
-        } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
-        }
-
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Github scrapper'])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName('Github scrapper');
-            $cronjob->setDescription('This cronjob fires all the open catalogi github actions ever 5 minutes');
-            $cronjob->setThrows(['opencatalogi.github']);
-            // What does this do
-            $cronjob->setIsEnabled(false);
-
-            $this->entityManager->persist($cronjob);
-
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
-        } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
-        }
-
-        if (!$cronjob = $this->entityManager->getRepository('App:Cronjob')->findOneBy(['name' => 'Federation'])) {
-            $cronjob = new Cronjob();
-            $cronjob->setName('Federation');
-            $cronjob->setDescription('This cronjob fires all the open catalogi federation actions ever 5 minutes');
-            $cronjob->setThrows(['opencatalogi.federation']);
-            // Doesn't work?
-            $cronjob->setIsEnabled(false);
-
-            $this->entityManager->persist($cronjob);
-
-            (isset($this->io) ? $this->io->writeln(['', 'Created a cronjob for '.$cronjob->getName()]) : '');
-        } else {
-            (isset($this->io) ? $this->io->writeln(['', 'There is alreade a cronjob for '.$cronjob->getName()]) : '');
-        }
-    }
-
     public function checkDataConsistency()
     {
         // set all entity maxDepth to 5
@@ -140,9 +75,6 @@ class InstallationService implements InstallerInterface
 //            $githubEventEndpoint->addEntity($repoSchema);
             $this->entityManager->persist($githubEventEndpoint);
         }
-
-        // create cronjobs
-        $this->createCronjobs();
 
         $this->entityManager->flush();
     }

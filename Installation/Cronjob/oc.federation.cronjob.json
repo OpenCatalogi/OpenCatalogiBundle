@@ -1,0 +1,11 @@
+{
+    "title": "Federation",
+    "$id": "https://opencatalogi.nl/cronjob/oc.federation.cronjob.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
+    "version": "0.0.1",
+    "description": "This cronjob fires all the open catalogi federation actions ever 5 minutes",
+    "crontab": "*/5 * * * *",
+    "throws": [
+        "opencatalogi.federation"
+    ]
+}
