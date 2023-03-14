@@ -22,14 +22,14 @@ class EnrichPubliccodeCommand extends Command
     /**
      * @var EnrichPubliccodeService
      */
-    private EnrichPubliccodeService $enrichPubliccodeService;
+    private EnrichPubliccodeService $enrichService;
 
     /**
-     * @param EnrichPubliccodeService $enrichPubliccodeService enrich Publiccode Service
+     * @param EnrichPubliccodeService $enrichService enrich Publiccode Service
      */
-    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
+    public function __construct(EnrichPubliccodeService $enrichService)
     {
-        $this->enrichPubliccodeService = $enrichPubliccodeService;
+        $this->enrichService = $enrichService;
         parent::__construct();
     }//end __construct()
 
@@ -53,14 +53,14 @@ class EnrichPubliccodeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeService->setStyle($style);
+        $this->enrichService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
         if ($repositoryId === false) {
-            $this->enrichPubliccodeService->enrichPubliccodeHandler();
-        } elseif (!$this->enrichPubliccodeService->enrichPubliccodeHandler([], [], $repositoryId)) {
+            $this->enrichService->enrichPubliccodeHandler();
+        } else if (empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 

@@ -22,14 +22,14 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     /**
      * @var EnrichPubliccodeFromGithubUrlService
      */
-    private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
+    private EnrichPubliccodeFromGithubUrlService $enrichGithubService;
 
     /**
-     * @param EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService enrich Publiccode From Github Url Service
+     * @param EnrichPubliccodeFromGithubUrlService $enrichGithubService enrich Publiccode From Github Url Service
      */
-    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
+    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichGithubService)
     {
-        $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
+        $this->enrichGithubService = $enrichGithubService;
         parent::__construct();
     }//end __construct()
 
@@ -53,14 +53,14 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeFromGithubUrlService->setStyle($style);
+        $this->enrichGithubService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
         if ($repositoryId === false) {
-            $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler();
-        } elseif (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
+            $this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler();
+        } else if (empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 

@@ -22,14 +22,14 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     /**
      * @var FindOrganizationThroughRepositoriesService
      */
-    private FindOrganizationThroughRepositoriesService  $findOrganizationThroughRepositoriesService;
+    private FindOrganizationThroughRepositoriesService  $findOrgRepService;
 
     /**
-     * @param FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService find Organization Through Repositories Service
+     * @param FindOrganizationThroughRepositoriesService $findOrgRepService find Organization Through Repositories Service
      */
-    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
+    public function __construct(FindOrganizationThroughRepositoriesService $findOrgRepService)
     {
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
+        $this->findOrgRepService = $findOrgRepService;
         parent::__construct();
     }//end __construct()
 
@@ -53,16 +53,16 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->findOrganizationThroughRepositoriesService->setStyle($style);
+        $this->findOrgRepService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
         if ($repositoryId === false) {
-            if (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler()) {
+            if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) {
+        } else if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 

@@ -23,14 +23,14 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService  $developerOverheidService;
+    private DeveloperOverheidService  $devOverheidService;
 
     /**
-     * @param DeveloperOverheidService $developerOverheidService developer Overheid Service
+     * @param DeveloperOverheidService $devOverheidService developer Overheid Service
      */
-    public function __construct(DeveloperOverheidService $developerOverheidService)
+    public function __construct(DeveloperOverheidService $devOverheidService)
     {
-        $this->developerOverheidService = $developerOverheidService;
+        $this->devOverheidService = $devOverheidService;
         parent::__construct();
     }//end __construct()
 
@@ -54,16 +54,16 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->developerOverheidService->setStyle($style);
+        $this->devOverheidService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
 
         if ($repositoryId === false) {
-            if (!$this->developerOverheidService->getRepositories()) {
+            if (empty($this->devOverheidService->getRepositories()) === true) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->developerOverheidService->getRepository($repositoryId)) {
+        } else if (empty($this->devOverheidService->getRepository($repositoryId)) === true) {
             return Command::FAILURE;
         }
 

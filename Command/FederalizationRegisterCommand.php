@@ -20,7 +20,7 @@ class FederalizationRegisterCommand extends Command
     /**
      * @var FederalizationService
      */
-    private FederalizationService  $federalizationiService;
+    private FederalizationService  $fedService;
 
     /**
      * @var EntityManagerInterface
@@ -31,9 +31,11 @@ class FederalizationRegisterCommand extends Command
      * @param FederalizationService  $federalizationiService The federalization Service
      * @param EntityManagerInterface $entityManager          The entity Manager
      */
-    public function __construct(FederalizationService $federalizationiService, EntityManagerInterface $entityManager)
+    public function __construct(
+        FederalizationService $fedService,
+        EntityManagerInterface $entityManager)
     {
-        $this->federalizationiService = $federalizationiService;
+        $this->fedService = $fedService;
         $this->entityManager = $entityManager;
         parent::__construct();
     }//end __construct()
@@ -68,15 +70,17 @@ class FederalizationRegisterCommand extends Command
             $this->federalizationService->catalogiHandler();
         } else {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
-            if (!$catalogusObject) {
+            if ($catalogusObject === false) {
                 $style->debug('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            if (!$catalogusObject) {
+
+            if ($catalogusObject === false) {
                 $style->error('Could not find object entity by id or name '.$catalogusId);
 
                 return Command::FAILURE;
             }
+
             $this->federalizationService->readCatalogus($catalogusObject);
         }
 

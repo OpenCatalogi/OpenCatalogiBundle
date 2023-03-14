@@ -22,14 +22,14 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService  $componentenCatalogusService;
+    private ComponentenCatalogusService  $compCatService;
 
     /**
-     * @param ComponentenCatalogusService $componentenCatalogusService componenten Catalogus Service
+     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
      */
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    public function __construct(ComponentenCatalogusService $compCatService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->compCatService = $compCatService;
         parent::__construct();
     }//end __construct()
 
@@ -52,17 +52,17 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->compCatService->setStyle($style);
 
         // Handle the command optiosn
         $applicationId = $input->getOption('application', false);
 
         if ($applicationId === false) {
-            if ($this->componentenCatalogusService->getApplications() === null) {
+            if ($this->compCatService->getApplications() === null) {
                 return Command::FAILURE;
             }
-        } elseif ($this->componentenCatalogusService->getApplication($applicationId) === null) {
+        } else if ($this->compCatService->getApplication($applicationId) === null) {
             return Command::FAILURE;
         }
 
