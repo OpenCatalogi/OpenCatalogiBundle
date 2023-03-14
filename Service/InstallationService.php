@@ -2,25 +2,16 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Cronjob;
-use App\Entity\Endpoint;
-use App\Entity\Entity;
-use App\Entity\Gateway as Source;
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InstallationService implements InstallerInterface
 {
     private EntityManagerInterface $entityManager;
-    private CatalogiService $catalogiService;
 
-    public function __construct(EntityManagerInterface $entityManager, CatalogiService $catalogiService)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->catalogiService = $catalogiService;
     }
 
     public function install()
@@ -60,21 +51,6 @@ class InstallationService implements InstallerInterface
     {
         // set all entity maxDepth to 5
         $this->setEntityMaxDepth();
-
-        if (!$githubEventEndpoint = $this->entityManager->getRepository('App:Endpoint')->findOneBy(['pathRegex' => '^(github_events)$'])) {
-            $githubEventEndpoint = new Endpoint();
-            $githubEventEndpoint->setName('Github Event');
-            $githubEventEndpoint->setDescription('Github Event Endpoint');
-            $githubEventEndpoint->setPath(['github_events']);
-            $githubEventEndpoint->setPathRegex('^(github_events)$');
-            $githubEventEndpoint->setMethod('POST');
-            $githubEventEndpoint->setMethods(['POST']);
-            $githubEventEndpoint->setThrows(['opencatalogi.githubevents.trigger']);
-            $githubEventEndpoint->setOperationType('collection');
-//            $repoSchema = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.repository.schema.json']);
-//            $githubEventEndpoint->addEntity($repoSchema);
-            $this->entityManager->persist($githubEventEndpoint);
-        }
 
         $this->entityManager->flush();
     }

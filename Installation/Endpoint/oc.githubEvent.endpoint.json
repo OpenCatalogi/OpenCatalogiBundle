@@ -1,0 +1,13 @@
+{
+    "title": "Github Event",
+    "$id": "https://opencatalogi.nl/EventEndpoint/oc.githubEvent.endpoint.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Endpoint.schema.json",
+    "version": "0.0.1",
+    "description": "Github Event Endpoint",
+    "path": ["github_events"],
+    "pathRegex": "^(github_events)$",
+    "methods": ["POST"],
+    "throws": [
+        "opencatalogi.githubevents.trigger"
+    ]
+}
