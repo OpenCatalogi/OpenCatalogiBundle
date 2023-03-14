@@ -73,8 +73,7 @@ class GithubPubliccodeService
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param MappingService         $mappingService   The Mapping Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
-     * @param Yaml                   $yaml             The Yaml.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -82,8 +81,7 @@ class GithubPubliccodeService
         SynchronizationService $syncService,
         MappingService $mappingService,
         GithubApiService $githubApiService,
-        LoggerInterface $pluginLogger,
-        Yaml $yaml
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
@@ -91,7 +89,7 @@ class GithubPubliccodeService
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
         $this->pluginLogger = $pluginLogger;
-        $this->yaml = $yaml;
+        $this->yaml = new Yaml();
     }//end __construct()
 
     /**
