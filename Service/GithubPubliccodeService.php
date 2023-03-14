@@ -20,7 +20,16 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- *  This class handles the interaction with github.com.
+ * This class handles the interaction with github.com.
+ *
+ * This service get repositories from api.github.com.
+ *
+ * @Author Sarai Misidjan <sarai@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @package open-catalogi/open-catalogi-bundle
+ * @category Service
  */
 class GithubPubliccodeService
 {
@@ -52,7 +61,7 @@ class GithubPubliccodeService
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private LoggerInterface $pluginLogger;
 
     /**
      * @var Yaml
@@ -65,7 +74,7 @@ class GithubPubliccodeService
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param MappingService         $mappingService   The Mapping Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
-     * @param LoggerInterface        $logger           The Logger Interface.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
      * @param Yaml                   $yaml             The Yaml.
      */
     public function __construct(
@@ -74,7 +83,7 @@ class GithubPubliccodeService
         SynchronizationService $syncService,
         MappingService $mappingService,
         GithubApiService $githubApiService,
-        LoggerInterface $logger,
+        LoggerInterface $pluginLogger,
         Yaml $yaml
     ) {
         $this->entityManager = $entityManager;
@@ -82,7 +91,7 @@ class GithubPubliccodeService
         $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
-        $this->logger = $logger;
+        $this->pluginLogger = $pluginLogger;
         $this->yaml = $yaml;
     }//end __construct()
 
@@ -97,7 +106,7 @@ class GithubPubliccodeService
     {
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
         if ($source === null) {
-            $this->logger->error("No source found for $location".'.');
+            $this->pluginLogger->error("No source found for $location".'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $source;
@@ -114,7 +123,7 @@ class GithubPubliccodeService
     {
         $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
         if ($entity === null) {
-            $this->logger->error("No entity found for $reference.");
+            $this->pluginLogger->error("No entity found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $entity;
@@ -131,7 +140,7 @@ class GithubPubliccodeService
     {
         $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
         if ($mapping === null) {
-            $this->logger->error("No mapping found for $reference.");
+            $this->pluginLogger->error("No mapping found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $mapping;
@@ -147,7 +156,7 @@ class GithubPubliccodeService
     public function checkGithubAuth(Source $source): ?bool
     {
         if ($source->getApiKey() === null) {
-            $this->logger->error('No auth set for Source: '.$source->getName().'.');
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
@@ -232,6 +241,7 @@ class GithubPubliccodeService
             return null;
         }//end if
         $result = [];
+        $queryConfig = [];
 
         $queryConfig['query'] = [
             'q' => 'publiccode in:path path:/ extension:yaml extension:yml',
@@ -240,7 +250,7 @@ class GithubPubliccodeService
         // Find on publiccode.yaml.
         $repositories = $this->callService->getAllResults($source, '/search/code', $queryConfig);
 
-        $this->logger->debug('Found '.count($repositories).' repositories.');
+        $this->pluginLogger->debug('Found '.count($repositories).' repositories.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -265,21 +275,21 @@ class GithubPubliccodeService
     {
         // Do we have a source?
         $source = $this->getSource('https://api.github.com');
-        if (!$this->checkGithubAuth($source)) {
+        if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
 
-        $this->logger->debug('Getting repository '.$id.'.');
+        $this->pluginLogger->debug('Getting repository '.$id.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         try {
             $response = $this->callService->call($source, '/repositories/'.$id.'.');
             $repository = json_decode($response->getBody()->getContents(), true);
         } catch (RequestException $requestException) {
-            $this->logger->error($requestException->getMessage());
+            $this->pluginLogger->error($requestException->getMessage(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
 
         if (isset($repository) === false) {
-            $this->logger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName().'.');
+            $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -291,7 +301,7 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        $this->logger->debug('Found repository with id: '.$id.'.');
+        $this->pluginLogger->debug('Found repository with id: '.$id.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $repository->toArray();
     }//end getRepository()
@@ -316,13 +326,13 @@ class GithubPubliccodeService
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
-        $this->logger->debug('Mapping object'.$repository['repository']['name'].'.');
-        $this->logger->debug('The mapping object '.$repositoriesMapping.'.');
+        $this->pluginLogger->debug('Mapping object'.$repository['repository']['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoriesMapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
-        $this->logger->debug('Checking repository '.$repository['repository']['name'].'.');
+        $this->pluginLogger->debug('Checking repository '.$repository['repository']['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
-        $this->logger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.');
+        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $repository = $synchronization->getObject();
 
@@ -352,19 +362,18 @@ class GithubPubliccodeService
         // Do we have a source
         $source = $this->getSource('https://api.github.com');
         $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
         $repositoryMapping = $this->getMapping('https://api.github.com/repositories');
 
         $repository['name'] = str_replace('-', ' ', $repository['name']);
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        $this->logger->debug('Mapping object'.$repository['name'].'.');
-        $this->logger->debug('The mapping object '.$repositoryMapping.'.');
-        $this->logger->debug('Checking repository '.$repository['name'].'.');
+        $this->pluginLogger->debug('Mapping object'.$repository['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoryMapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking repository '.$repository['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
-        $this->logger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.');
+        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $repositoryObject = $synchronization->getObject();
 
@@ -647,8 +656,8 @@ class GithubPubliccodeService
             $component = new ObjectEntity($componentEntity);
         }//end if
 
-        $this->logger->debug('Mapping object'.$repository->getValue('name'));
-        $this->logger->debug('The mapping object '.$repositoryMapping);
+        $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoryMapping, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
@@ -691,22 +700,22 @@ class GithubPubliccodeService
         $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
 
         if (is_array($publiccode) === true && key_exists('content', $publiccode) === true) {
-            $publiccode = base64_decode($publiccode['content']);
+            $publiccode = \Safe\base64_decode($publiccode['content']);
         }//end if
 
         // @TODO Use decodeResponse from the callService.
         try {
             $parsedPubliccode = $this->yaml->parse($publiccode);
         } catch (Exception $e) {
-            $this->logger->debug('Not able to parse '.$publiccode.' '.$e->getMessage().'.');
+            $this->pluginLogger->debug('Not able to parse '.$publiccode.' '.$e->getMessage().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
 
         if (isset($parsedPubliccode) === true) {
-            $this->logger->debug("Fetch and decode went succesfull for $repositoryUrl.");
+            $this->pluginLogger->debug("Fetch and decode went succesfull for $repositoryUrl.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $parsedPubliccode;
         }//end if
 
         return null;
     }//end parsePubliccode()
-}
+}//end class
