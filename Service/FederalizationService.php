@@ -160,18 +160,21 @@ class FederalizationService
 
         $this->logger->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
-        if (!$sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')])) {
+        if ($sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')]) === null) {
             $sourceObject = new Source();
             $sourceObject->setLocation($source->getValue('location'));
         }
 
         // Lets grap ALL the objects for an external source
-        $objects = json_decode($this->callService->call(
-            $sourceObject,
-            '/api/search',
-            'GET',
-            ['query'=> ['limit'=>10000]]
-        )->getBody()->getContents(), true)['results'];
+        $objects = json_decode(
+            $this->callService->call(
+                $sourceObject,
+                '/api/search',
+                'GET',
+                ['query'=> ['limit'=>10000]]
+            )->getBody()->getContents(),
+            true
+        )['results'];
 
         $this->logger->info('Found '.count($objects).' objects', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
@@ -199,7 +202,7 @@ class FederalizationService
                 $counter = 0;
                 $this->entityManager->flush();
             }
-        }//end for each
+        }//end foreach
 
         $this->entityManager->flush();
 
@@ -207,12 +210,13 @@ class FederalizationService
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
         $counter=0;
-        foreach ($synchonizations as $synchonization){
-            if(!in_array($synchonization->getSourceId(), $synchonizedObjects)){
+        foreach ($synchonizations as $synchonization) {
+            if (in_array($synchonization->getSourceId(), $synchonizedObjects) === false) {
                 $this->entityManager->remove($synchonization->getObject());
 
                 $counter++;
             }
+
         }
         $this->logger->info('Removed '.count($counter).' objects', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
@@ -249,7 +253,7 @@ class FederalizationService
     /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
-     * @param array $object  The object to handle
+     * @param array $object The object to handle
      * @param Source $source The Source
      *
      * @return void|Synchronization
@@ -286,7 +290,7 @@ class FederalizationService
         }
 
         // Lets handle whatever we found
-        if (isset($object['_self']['synchronisations']) === true and count($object['_self']['synchronisations']) != 0) {
+        if (isset($object['_self']['synchronisations']) === true and count($object['_self']['synchronisations']) !== 0) {
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
             $baseSync = $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
