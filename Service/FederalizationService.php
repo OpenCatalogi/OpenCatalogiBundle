@@ -182,13 +182,15 @@ class FederalizationService
         foreach ($objects as $key => $object) {
             $counter++;
             // Lets make sure we have a reference
-            if (!isset($object['_self']['schema']['ref'])) {
+            if (isset($object['_self']['schema']['ref']) === false) {
                 continue;
             }
+
             $synchronization = $this->handleObject($object, $sourceObject);
             if ($synchronization === null) {
                 continue;
             }
+
             $synchonizedObjects[] = $synchronization->getSourceId();
             $this->entityManager->persist($synchronization);
 
@@ -247,7 +249,8 @@ class FederalizationService
     /**
      * Handle en object found trough the search endpoint of an external catalogus.
      *
-     * @param array $object THe object to handle
+     * @param array $object  The object to handle
+     * @param Source $source The Source
      *
      * @return void|Synchronization
      */
@@ -283,13 +286,13 @@ class FederalizationService
         }
 
         // Lets handle whatever we found
-        if (isset($object['_self']['synchronisations']) and count($object['_self']['synchronisations']) != 0) {
+        if (isset($object['_self']['synchronisations']) === true and count($object['_self']['synchronisations']) != 0) {
             // We found something in a cataogi of witch that catalogus is not the source, so we need to synchorniste to that source set op that source if we dont have it yet etc etc
             $baseSync = $object['_self']['synchronisations'][0];
             $externalId = $baseSync['id'];
 
             // Check for source
-            if (!$source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$baseSync['source']['location']])) {
+            if ($source = $this->entityManager->getRepository('App:Gateway')->findBy(['location' =>$baseSync['source']['location']]) === null) {
                 $source = new Source();
                 $source->setName($baseSync['source']['name']);
                 $source->setDescription($baseSync['source']['description']);
@@ -301,14 +304,14 @@ class FederalizationService
         }
 
         // Lets se if we already have an synchronisation
-        if (!$synchronization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId])) {
+        if ($synchronization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' =>$externalId]) !== null) {
             $synchronization = new Synchronization($source, $entity);
             $synchronization->setSourceId($object['id']);
         }
 
         $this->entityManager->persist($synchronization);
 
-        if (isset($object['_self']['synchronizations'][0])) {
+        if (isset($object['_self']['synchronizations'][0]) === true) {
             $synchronization = $this->setSourcesSource($synchronization, $object['_self']['synchronizations'][0]);
         }
 
