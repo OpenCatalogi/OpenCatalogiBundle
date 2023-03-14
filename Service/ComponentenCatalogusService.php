@@ -184,6 +184,7 @@ class ComponentenCatalogusService
 
             return null;
         }
+
         $application = $this->importApplication($application);
         if ($application === null) {
             return null;

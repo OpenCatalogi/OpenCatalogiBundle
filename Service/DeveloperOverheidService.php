@@ -205,6 +205,7 @@ class DeveloperOverheidService
 
             return null;
         }
+
         $repository = $this->importRepository($repository);
         if ($repository === null) {
             return null;

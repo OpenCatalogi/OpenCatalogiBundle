@@ -10,13 +10,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesS
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
-    private FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService;
+    /**
+     * @var FindOrganizationThroughRepositoriesService
+     */
+    private FindOrganizationThroughRepositoriesService $service;
 
-    public function __construct(FindOrganizationThroughRepositoriesService $findOrganizationThroughRepositoriesService)
+    /**
+     * @param FindOrganizationThroughRepositoriesService $service The findOrganizationThroughRepositoriesService
+     */
+    public function __construct(FindOrganizationThroughRepositoriesService $service)
     {
-        $this->findOrganizationThroughRepositoriesService = $findOrganizationThroughRepositoriesService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [
@@ -44,8 +55,16 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->findOrganizationThroughRepositoriesService->findOrganizationThroughRepositoriesHandler($data, $configuration);
-    }
-}
+        return $this->service->findOrganizationThroughRepositoriesHandler($data, $configuration);
+    }//end run()
+}//end class

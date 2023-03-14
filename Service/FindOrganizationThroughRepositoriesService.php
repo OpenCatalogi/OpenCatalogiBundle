@@ -73,36 +73,6 @@ class FindOrganizationThroughRepositoriesService
     private LoggerInterface $logger;
 
     /**
-     * @var Entity
-     */
-    private Entity $organisationEntity;
-
-    /**
-     * @var Mapping
-     */
-    private Mapping $organisationMapping;
-
-    /**
-     * @var Entity
-     */
-    private Entity $repositoryEntity;
-
-    /**
-     * @var Mapping
-     */
-    private Mapping $repositoryMapping;
-
-    /**
-     * @var Source
-     */
-    private Source $githubApi;
-
-    /**
-     * @var Entity|null
-     */
-    private ?Entity $componentEntity;
-
-    /**
      * @param CallService             $callService             The call service
      * @param EntityManagerInterface  $entityManager           The entity manager
      * @param GithubApiService        $githubApiService        The github api service
@@ -278,6 +248,7 @@ class FindOrganizationThroughRepositoriesService
 
             return null;
         }//end if
+
         $organisation = $this->importOrganisation($organisation);
         if ($organisation === null) {
             return null;
@@ -486,6 +457,7 @@ class FindOrganizationThroughRepositoriesService
                 $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('findOrganizationThroughRepositoriesHandler finished');

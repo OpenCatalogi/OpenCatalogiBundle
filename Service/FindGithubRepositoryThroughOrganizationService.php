@@ -299,6 +299,7 @@ class FindGithubRepositoryThroughOrganizationService
 
             return null;
         }//end if
+
         $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
@@ -335,6 +336,7 @@ class FindGithubRepositoryThroughOrganizationService
                     // Get organisation repos and set the property.
                     $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
                 }
+
                 $organization->setValue('uses', $uses);
 
                 $supports = [];

@@ -14,39 +14,58 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetApplicationsCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:componentencatalogus:applications';
-    private ComponentenCatalogusService  $componentenCatalogusService;
 
-    public function __construct(ComponentenCatalogusService $componentenCatalogusService)
+    /**
+     * @var ComponentenCatalogusService
+     */
+    private ComponentenCatalogusService  $compCatService;
+
+    /**
+     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
+     */
+    public function __construct(ComponentenCatalogusService $compCatService)
     {
-        $this->componentenCatalogusService = $componentenCatalogusService;
+        $this->compCatService = $compCatService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all applications or one application from componentencatalogus.commonground.nl/api/products')
             ->addOption('application', 'a', InputOption::VALUE_OPTIONAL, 'Get a single application by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->componentenCatalogusService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->compCatService->setStyle($style);
 
         // Handle the command optiosn
         $applicationId = $input->getOption('application', false);
 
-        if (!$applicationId) {
-            if (!$this->componentenCatalogusService->getApplications()) {
+        if ($applicationId === false) {
+            if ($this->compCatService->getApplications() === null) {
                 return Command::FAILURE;
             }
-        } elseif (!$this->componentenCatalogusService->getApplication($applicationId)) {
+        } else if ($this->compCatService->getApplication($applicationId) === null) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

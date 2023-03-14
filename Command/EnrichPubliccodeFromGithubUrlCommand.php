@@ -14,37 +14,56 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class EnrichPubliccodeFromGithubUrlCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:enrichPubliccodeFromGithubUrl:execute';
-    private EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService;
 
-    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichPubliccodeFromGithubUrlService)
+    /**
+     * @var EnrichPubliccodeFromGithubUrlService
+     */
+    private EnrichPubliccodeFromGithubUrlService $enrichGithubService;
+
+    /**
+     * @param EnrichPubliccodeFromGithubUrlService $enrichGithubService enrich Publiccode From Github Url Service
+     */
+    public function __construct(EnrichPubliccodeFromGithubUrlService $enrichGithubService)
     {
-        $this->enrichPubliccodeFromGithubUrlService = $enrichPubliccodeFromGithubUrlService;
+        $this->enrichGithubService = $enrichGithubService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeFromGithubUrlService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->enrichGithubService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
-            $this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler();
-        } elseif (!$this->enrichPubliccodeFromGithubUrlService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) {
+        if ($repositoryId === false) {
+            $this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler();
+        } else if (empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

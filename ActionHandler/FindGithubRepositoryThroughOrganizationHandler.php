@@ -11,13 +11,24 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizat
  */
 class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
-    private FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService;
+    /**
+     * @var FindGithubRepositoryThroughOrganizationService
+     */
+    private FindGithubRepositoryThroughOrganizationService $service;
 
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGithubRepositoryThroughOrganizationService)
+    /**
+     * @param FindGithubRepositoryThroughOrganizationService $service The findGithubRepositoryThroughOrganizationService
+     */
+    public function __construct(FindGithubRepositoryThroughOrganizationService $service)
     {
-        $this->findGithubRepositoryThroughOrganizationService = $findGithubRepositoryThroughOrganizationService;
-    }
+        $this->service = $service;
+    }//end __construct()
 
+    /**
+     *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
+     *
+     * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
+     */
     public function getConfiguration()
     {
         return [
@@ -45,8 +56,16 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
         ];
     }
 
+    /**
+     * This function runs the application to gateway service plugin.
+     *
+     * @param array $data          The data from the call
+     * @param array $configuration The configuration of the action
+     *
+     * @return array
+     */
     public function run(array $data, array $configuration): array
     {
-        return $this->findGithubRepositoryThroughOrganizationService->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
-    }
-}
+        return $this->service->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
+    }//end run()
+}//end class

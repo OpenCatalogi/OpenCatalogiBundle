@@ -14,37 +14,56 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class EnrichPubliccodeCommand extends Command
 {
+    /**
+     * @var string
+     */
     protected static $defaultName = 'opencatalogi:enrichPubliccode:execute';
-    private EnrichPubliccodeService $enrichPubliccodeService;
 
-    public function __construct(EnrichPubliccodeService $enrichPubliccodeService)
+    /**
+     * @var EnrichPubliccodeService
+     */
+    private EnrichPubliccodeService $enrichService;
+
+    /**
+     * @param EnrichPubliccodeService $enrichService enrich Publiccode Service
+     */
+    public function __construct(EnrichPubliccodeService $enrichService)
     {
-        $this->enrichPubliccodeService = $enrichPubliccodeService;
+        $this->enrichService = $enrichService;
         parent::__construct();
-    }
+    }//end __construct()
 
+    /**
+     * @return void
+     */
     protected function configure(): void
     {
         $this
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
-    }
+    }//end configure()
 
+    /**
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output The output
+     *
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output);
-        $this->enrichPubliccodeService->setStyle($io);
+        $style = new SymfonyStyle($input, $output);
+        $this->enrichService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if (!$repositoryId) {
-            $this->enrichPubliccodeService->enrichPubliccodeHandler();
-        } elseif (!$this->enrichPubliccodeService->enrichPubliccodeHandler([], [], $repositoryId)) {
+        if ($repositoryId === false) {
+            $this->enrichService->enrichPubliccodeHandler();
+        } else if (empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
-    }
-}
+    }//end execute()
+}//end class

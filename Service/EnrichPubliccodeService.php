@@ -220,6 +220,7 @@ class EnrichPubliccodeService
                 }
             }
         }
+
         $this->entityManager->flush();
 
         isset($this->io) && $this->io->success('enrichPubliccodeHandler finished');
