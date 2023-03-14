@@ -212,9 +212,9 @@ class RatingService
     }//end ratingHandler()
 
     /**
-     * Rate a component
+     * Rate a component.
      *
-     * @param ObjectEntity $component The component to rate
+     * @param ObjectEntity $component    The component to rate
      * @param Entity       $ratingEntity The rating entity
      *
      * @throws Exception
