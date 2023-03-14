@@ -28,7 +28,6 @@ use Twig\Error\SyntaxError;
  *
  * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
  *
- * @package open-catalogi/open-catalogi-bundle
  * @category Service
  */
 class GithubPubliccodeService

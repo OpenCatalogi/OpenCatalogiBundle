@@ -4,7 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use CommonGateway\CoreBundle\Installer\InstallerInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
