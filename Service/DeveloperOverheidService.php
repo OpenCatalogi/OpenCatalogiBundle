@@ -27,11 +27,6 @@ class DeveloperOverheidService
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var SymfonyStyle
-     */
-    private SymfonyStyle $io;
-
-    /**
      * @var CallService
      */
     private CallService $callService;
@@ -44,7 +39,7 @@ class DeveloperOverheidService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -64,36 +59,36 @@ class DeveloperOverheidService
     /**
      * @var GatewayResourceService
      */
-    private GatewayResourceService $gatewayResourceService;
+    private GatewayResourceService $resourceService;
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface.
-     * @param CallService            $callService            The Call Service.
-     * @param CacheService           $cacheService           The Cache Service.
-     * @param SynchronizationService $synchronizationService The Synchronization Service.
-     * @param MappingService         $mappingService         The Mapping Service.
-     * @param GithubApiService       $githubApiService       The Github Api Service.
-     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface.
-     * @param GatewayResourceService $gatewayResourceService The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager     The Entity Manager Interface.
+     * @param CallService            $callService       The Call Service.
+     * @param CacheService           $cacheService      The Cache Service.
+     * @param SynchronizationService $syncService       The Synchronization Service.
+     * @param MappingService         $mappingService    The Mapping Service.
+     * @param GithubApiService       $githubApiService  The Github Api Service.
+     * @param LoggerInterface        $pluginLogger      The plugin version of the loger interface.
+     * @param GatewayResourceService $resourceService   The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        CallService $callService,
-        CacheService $cacheService,
-        SynchronizationService $synchronizationService,
-        MappingService $mappingService,
-        GithubApiService $githubApiService,
-        LoggerInterface $pluginLogger,
-        GatewayResourceService $gatewayResourceService
+        CallService            $callService,
+        CacheService           $cacheService,
+        SynchronizationService $syncService,
+        MappingService         $mappingService,
+        GithubApiService       $githubApiService,
+        LoggerInterface        $pluginLogger,
+        GatewayResourceService $resourceService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
         $this->logger = $pluginLogger;
-        $this->gatewayResourceService = $gatewayResourceService;
+        $this->resourceService = $resourceService;
     }
 
     /**
@@ -107,7 +102,7 @@ class DeveloperOverheidService
     {
         $result = [];
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
 
         $repositories = $this->callService->getAllResults($source, '/repositories');
 
@@ -133,14 +128,14 @@ class DeveloperOverheidService
     public function getRepository(string $id): ?array
     {
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->debug('Getting repository '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/repositories/'.$id);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repository) {
+        if ($repository === null) {
             $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
@@ -167,12 +162,12 @@ class DeveloperOverheidService
     public function importRepository($repository): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-        $repositoryEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
 
@@ -198,7 +193,7 @@ class DeveloperOverheidService
         $result = [];
 
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->debug('Trying to get all components from source '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
@@ -219,14 +214,14 @@ class DeveloperOverheidService
      *
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @param string $id
+     * @param string $id The id of the component to find.
      *
      * @return array|null
      */
     public function getComponent(string $id): ?array
     {
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
 
 
         $this->pluginLogger->debug('Trying to get component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -234,7 +229,7 @@ class DeveloperOverheidService
 
         $component = json_decode($response->getBody()->getContents(), true);
 
-        if (!$component) {
+        if ($component === null) {
             $this->pluginLogger->error('Could not find a component with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
@@ -247,7 +242,7 @@ class DeveloperOverheidService
 
         $this->entityManager->flush();
 
-        $this->pluginLogger('Found component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->info('Found component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         return $component->toArray();
     }//end getComponent()
@@ -255,54 +250,58 @@ class DeveloperOverheidService
     /**
      * Turn a repo array into an object we can handle.
      *
-     * @param array $repository
+     * @param array $repository The repository to synchronise.
      *
      * @return ?ObjectEntity
      */
     public function handleRepositoryArray(array $repository): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
 
-        $repositoryEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // Handle sync.
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $repositoryEntity, $repository['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
         $this->pluginLogger->debug('Checking component '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $repository);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         return $synchronization->getObject();
     }//end handleRepositoryArray()
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
+     * @param array        $componentArray  The component array to import.
+     * @param ObjectEntity $componentObject The resulting component object.
      *
      * @return ObjectEntity|null
      */
     public function importLegalRepoOwnerThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
     {
-        $organisationEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $legalEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $legalEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
-        if (key_exists('legal', $componentArray) &&
-            key_exists('repoOwner', $componentArray['legal']) &&
-            key_exists('name', $componentArray['legal']['repoOwner'])) {
-            if (!($organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]))) {
+        if (key_exists('legal', $componentArray) === true
+            && key_exists('repoOwner', $componentArray['legal']) === true
+            && key_exists('name', $componentArray['legal']['repoOwner']) === true) {
+            $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]);
+            if ($organisation !== null) {
                 $organisation = new ObjectEntity($organisationEntity);
-                $organisation->hydrate([
-                    'name'     => $componentArray['legal']['repoOwner']['name'],
-                    'email'    => key_exists('email', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['email'] : null,
-                    'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['phone'] : null,
-                    'website'  => key_exists('website', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['website'] : null,
-                    'type'     => key_exists('type', $componentArray['legal']['repoOwner']) ? $componentArray['legal']['repoOwner']['type'] : null,
-                ]);
-            }
+                $organisation->hydrate(
+                    [
+                        'name'     => $componentArray['legal']['repoOwner']['name'],
+                        'email'    => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
+                        'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
+                        'website'  => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
+                        'type'     => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
+                    ]
+                );
+            }//end if
+
             $this->entityManager->persist($organisation);
 
             if ($legal = $componentObject->getValue('legal')) {
-                if ($repoOwner = $legal->getValue('repoOwner')) {
+                if ($legal->getValue('repoOwner') !== false) {
                     // If the component is already set to a repoOwner return the component object.
                     return $componentObject;
                 }
@@ -315,12 +314,14 @@ class DeveloperOverheidService
                 $this->entityManager->flush();
 
                 return $componentObject;
-            }
+            }//end if
 
             $legal = new ObjectEntity($legalEntity);
-            $legal->hydrate([
-                'repoOwner' => $organisation,
-            ]);
+            $legal->hydrate(
+                [
+                    'repoOwner' => $organisation,
+                ]
+            );
             $this->entityManager->persist($legal);
             $componentObject->setValue('legal', $legal);
             $this->entityManager->persist($componentObject);
@@ -333,18 +334,18 @@ class DeveloperOverheidService
     /**
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @param $component
+     * @param array $component The component to import.
      *
      * @return ObjectEntity|null
      */
-    public function importComponent($component): ?ObjectEntity
+    public function importComponent(array $component): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-        $componentEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->gatewayResourceService->getMapping('https://developer.overheid.nl/api/components', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
+        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping('https://developer.overheid.nl/api/components', 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
 
         $this->pluginLogger->debug('Mapping object'.$component['service_name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -354,16 +355,16 @@ class DeveloperOverheidService
         // Do the mapping of the component set two variables.
         $componentMapping = $componentArray = $this->mappingService->mapping($mapping, $component);
         // Unset component legal before creating object, we don't want duplicate organisations.
-        if (key_exists('legal', $componentMapping) && key_exists('repoOwner', $componentMapping['legal'])) {
+        if (key_exists('legal', $componentMapping) === true && key_exists('repoOwner', $componentMapping['legal']) === true) {
             unset($componentMapping['legal']['repoOwner']);
         }
 
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $componentMapping);
+        $synchronization = $this->syncService->synchronize($synchronization, $componentMapping);
         $componentObject = $synchronization->getObject();
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
-        if ($component['related_repositories']) {
+        if ($component['related_repositories'] !== []) {
             $repository = $component['related_repositories'][0];
             $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);

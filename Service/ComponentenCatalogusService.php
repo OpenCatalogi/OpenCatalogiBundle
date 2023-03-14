@@ -32,7 +32,7 @@ class ComponentenCatalogusService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -43,7 +43,7 @@ class ComponentenCatalogusService
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService $developerOverheidService;
+    private DeveloperOverheidService $donService;
 
     /**
      * @var GatewayResourceService
@@ -56,29 +56,31 @@ class ComponentenCatalogusService
     private LoggerInterface $pluginLogger;
 
     /**
-     * @param EntityManagerInterface   $entityManager            The Entity Manager Interface
-     * @param CallService              $callService              The Call Service
-     * @param SynchronizationService   $synchronizationService   The Synchronization Service
-     * @param MappingService           $mappingService           The Mapping Service
-     * @param DeveloperOverheidService $developerOverheidService The Developer Overheid Service
+     * @param EntityManagerInterface   $entityManager   The Entity Manager Interface
+     * @param CallService              $callService     The Call Service
+     * @param SynchronizationService   $syncService     The Synchronization Service
+     * @param MappingService           $mappingService  The Mapping Service
+     * @param DeveloperOverheidService $donService      The Developer Overheid Service
+     * @param GatewayResourceService   $resourceService The Gateway Resource Service
+     * @param LoggerInterface          $pluginLogger    The Plugin logger
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
-        CallService $callService,
-        SynchronizationService $synchronizationService,
-        MappingService $mappingService,
-        DeveloperOverheidService $developerOverheidService,
-        GatewayResourceService $gatewayResourceService,
-        LoggerInterface $pluginLogger
+        EntityManagerInterface   $entityManager,
+        CallService              $callService,
+        SynchronizationService   $syncService,
+        MappingService           $mappingService,
+        DeveloperOverheidService $donService,
+        GatewayResourceService   $resourceService,
+        LoggerInterface          $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
-        $this->developerOverheidService = $developerOverheidService;
+        $this->donService = $donService;
         $this->pluginLogger = $pluginLogger;
-        $this->gatewayResourceService = $gatewayResourceService;
-    }
+        $this->gatewayResourceService = $resourceService;
+    }//end __construct()
 
     /**
      * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
@@ -106,7 +108,7 @@ class ComponentenCatalogusService
     /**
      * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}.
      *
-     * @param string $id
+     * @param string $id The id of the application to look for.
      *
      * @return array|null
      */
@@ -120,7 +122,7 @@ class ComponentenCatalogusService
 
         $application = json_decode($response->getBody()->getContents(), true);
 
-        if (!$application) {
+        if ($application === null) {
             $this->pluginLogger->error('Could not find an application with id: '.$id.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
             return null;
         }
@@ -137,27 +139,27 @@ class ComponentenCatalogusService
     }//end getApplication()
 
     /**
-     * @todo
+     * Import the application into the data layer.
      *
-     * @param $application
+     * @param array $application The application to import.
      *
      * @return ObjectEntity|null
      */
-    public function importApplication($application): ?ObjectEntity
+    public function importApplication(array $application): ?ObjectEntity
     {
         // Do we have a source
         $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
         $applicationEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
         $mapping = $this->gatewayResourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $applicationEntity, $application['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $applicationEntity, $application['id']);
 
         $this->pluginLogger->debug('Mapping object'.$application['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         $this->pluginLogger->info('Checking application '.$application['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($mapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $application);
+        $synchronization = $this->syncService->synchronize($synchronization, $application);
 
         $applicationObject = $synchronization->getObject();
 
@@ -167,6 +169,7 @@ class ComponentenCatalogusService
                 $componentObject = $this->importComponent($component);
                 $components[] = $componentObject;
             }
+
             $applicationObject->setValue('components', $components);
         }
 
@@ -224,7 +227,7 @@ class ComponentenCatalogusService
 
         $component = json_decode($response->getBody()->getContents(), true);
 
-        if (!$component) {
+        if ($component === null) {
             $this->pluginLogger->error('Could not find a component with id: '.$id.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
@@ -242,8 +245,10 @@ class ComponentenCatalogusService
     }//end getComponent()
 
     /**
-     * @param array        $componentArray
-     * @param ObjectEntity $componentObject
+     * Imports a repository through a component.
+     *
+     * @param array        $componentArray  The array to translate.
+     * @param ObjectEntity $componentObject The resulting component object.
      *
      * @return ObjectEntity|null
      */
@@ -251,10 +256,11 @@ class ComponentenCatalogusService
     {
         $repositoryEntity = $this->gatewayResourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         // If the component isn't already set to a repository create or get the repo and set it to the component url.
-        if (key_exists('url', $componentArray) &&
-            key_exists('url', $componentArray['url']) &&
-            key_exists('name', $componentArray['url'])) {
-            if (!($repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]))) {
+        if (key_exists('url', $componentArray) === true
+            && key_exists('url', $componentArray['url']) === true
+            && key_exists('name', $componentArray['url']) === true) {
+            $repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]);
+            if (isset($repository) === true) {
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
@@ -262,7 +268,7 @@ class ComponentenCatalogusService
                 ]);
             }//end if
             $this->entityManager->persist($repository);
-            if ($componentObject->getValue('url')) {
+            if ($componentObject->getValue('url') !== false) {
                 // If the component is already set to a repository return the component object.
                 return $componentObject;
             }//end if
@@ -275,11 +281,11 @@ class ComponentenCatalogusService
     /**
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @param $component
+     * @param array $component The component to import
      *
      * @return ObjectEntity|null
      */
-    public function importComponent($component): ?ObjectEntity
+    public function importComponent(array $component): ?ObjectEntity
     {
         // Do we have a source?
         $source = $this->gatewayResourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle', 'open-catalogi/open-catalogi-bundle');
@@ -287,7 +293,7 @@ class ComponentenCatalogusService
         $mapping = $this->gatewayResourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Handle sync.
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
 
         $this->pluginLogger->debug('Mapping object'.$component['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping, ['package' => 'open-catalogi/open-catalogi-bundle']);
@@ -302,11 +308,11 @@ class ComponentenCatalogusService
             unset($component['legal']['repoOwner']);
         }
 
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $component);
+        $synchronization = $this->syncService->synchronize($synchronization, $component);
         $componentObject = $synchronization->getObject();
 
         $this->importRepositoryThroughComponent($componentArray, $componentObject);
-        $this->developerOverheidService->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
+        $this->donService->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
         $this->entityManager->persist($componentObject);
         $this->entityManager->flush();
