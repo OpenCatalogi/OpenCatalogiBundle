@@ -7,5 +7,6 @@
     "crontab": "*/5 * * * *",
     "throws": [
         "opencatalogi.federation"
-    ]
+    ],
+    "isEnabled": false
 }
