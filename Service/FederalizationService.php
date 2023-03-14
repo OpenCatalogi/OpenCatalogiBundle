@@ -10,9 +10,21 @@ use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use Conduction\CommonGroundBundle\Service\CommonGroundService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Psr\Log\LoggerInterface;
 
+/**
+ * Service to call synchronyse catalogi.
+ *
+ * This service provides way for catalogi to use each others indexes.
+ *
+ * @Author Robert Zondervan <robert@conduction.nl>, Ruben van der Linde <ruben@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @package open-catalogi/open-catalogi-bundle
+ * @category Service
+ */
 class FederalizationService
 {
     /**
@@ -38,7 +50,7 @@ class FederalizationService
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var array
@@ -51,9 +63,9 @@ class FederalizationService
     private array $configuration;
 
     /**
-     * @var SymfonyStyle
+     * @var LoggerInterface
      */
-    private SymfonyStyle $io;
+    private LoggerInterface $logger;
 
     // Lets prevent unnesecery database calls
     /**
@@ -82,34 +94,23 @@ class FederalizationService
      * @param CommonGroundService $commonGroundService The commonground service
      * @param CallService $callService The Call Service
      * @param SynchronizationService $synchronizationService The synchronization service
+     * @param LoggerInterface $pluginLogger The plugin version of the loger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         SessionInterface $session,
         CommonGroundService $commonGroundService,
         CallService $callService,
-        SynchronizationService $synchronizationService
+        SynchronizationService $syncService,
+        LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
         $this->session = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService = $callService;
-        $this->synchronizationService = $synchronizationService;
+        $this->syncService = $syncService;
+        $this->logger = $pluginLogger;
     }//end __construct()
-
-    /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->io = $io;
-
-        return $this;
-    }//end setStyle()
 
     /**
      * Handles the sync all catalogi action from the catalogi handler.
@@ -126,7 +127,7 @@ class FederalizationService
 
         // Savety cheek
         if (!$this->catalogusEntity) {
-            isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '';
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $data;
         }
@@ -156,19 +157,20 @@ class FederalizationService
 
         // Check if the past object is a
         if ($catalogus->getEntity()->getReference() != 'https://opencatalogi.nl/oc.catalogi.schema.json') {
-            isset($this->io) ? $this->io->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json') : '';
+            $this->logger->error('The suplied Object is not of the type https://opencatalogi.nl/catalogi.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $reportOut;
         }
 
         // Lets get the source for the catalogus
         if (!$source = $catalogus->getValue('source')) {
-            isset($this->io) ? $this->io->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source') : '';
+            $this->logger->error('The catalogi '.$catalogus->getName.' doesn\'t have an valid source',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $reportOut;
         }
 
-        isset($this->io) ? $this->io->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')') : '';
+        $this->logger->info('Looking at '.$source->getName().'(@:'.$source->getValue('location').')',['plugin'=>'open-catalogi/open-catalogi-bundle']);
+
         if (!$sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')])) {
             $sourceObject = new Source();
             $sourceObject->setLocation($source->getValue('location'));
@@ -182,11 +184,10 @@ class FederalizationService
             ['query'=> ['limit'=>10000]]
         )->getBody()->getContents(), true)['results'];
 
-        isset($this->io) ? $this->io->writeln(['Found '.count($objects).' objects']) : '';
+        $this->logger->info('Found '.count($objects).' objects',['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $synchonizedObjects = [];
 
-        isset($this->io) ? $this->io->progressStart(count($objects)) : '';
         // Handle new objects
         $counter = 0;
         foreach ($objects as $key => $object) {
@@ -208,29 +209,23 @@ class FederalizationService
                 $this->entityManager->flush();
             }
 
-            isset($this->io) ? $this->io->progressAdvance() : '';
         }
 
-        isset($this->io) ? $this->io->progressFinish() : '';
 
         $this->entityManager->flush();
 
         /* Don't do this for now
-        (isset($this->io)?$this->io->writeln(['','Looking for objects to remove']):'');
         // Now we can check if any objects where removed
         $synchonizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' =>$source]);
 
-        (isset($this->io)?$this->io->writeln(['Currently '.count($synchonizations).' object attached to this source']):'');
         $counter=0;
         foreach ($synchonizations as $synchonization){
             if(!in_array($synchonization->getSourceId(), $synchonizedObjects)){
                 $this->entityManager->remove($synchonization->getObject());
 
-                (isset($this->io)?$this->io->writeln(['Removed '.$synchonization->getSourceId()]):'');
                 $counter++;
             }
         }
-        (isset($this->io)?$this->io->writeln(['Removed '.$counter.' object attached to this source']):'');
 
 
         $this->entityManager->flush();
@@ -332,7 +327,7 @@ class FederalizationService
         }
 
         // Lets sync
-        return $this->synchronizationService->synchronize($synchronization, $object);
+        return $this->syncService->synchronize($synchronization, $object);
     }//end handleObject()
 
     /**
@@ -342,21 +337,24 @@ class FederalizationService
      */
     public function prepareObjectEntities(): void
     {
-        if (!isset($this->catalogusEntity)) {
-            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.catalogi.schema.json']);
-            !$this->catalogusEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json') : '';
+        if (isset($this->catalogusEntity) === false) {
+            $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json']);
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
-        if (!isset($this->componentEntity)) {
+
+        if (isset($this->componentEntity) === false) {
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.component.schema.json']);
-            !$this->componentEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.component.schema.json') : '';
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.component.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
-        if (!isset($this->organisationEntity)) {
+
+        if (isset($this->organisationEntity) === false) {
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.organisation.schema.json']);
-            !$this->organisationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json') : '';
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
-        if (!isset($this->applicationEntity)) {
+
+        if (isset($this->applicationEntity) === false) {
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' =>'https://opencatalogi.nl/oc.application.schema.json']);
-            !$this->applicationEntity && isset($this->io) ? $this->io->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json') : '';
+            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json',['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
     }//end prepareObjectEntities()
 }//end class
