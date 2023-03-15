@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -47,11 +46,10 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input): int
     {
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
@@ -61,8 +59,8 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
                 return Command::FAILURE;
             }
         }
-        
-        if ($repositoryId !== null 
+
+        if ($repositoryId !== null
             && empty($this->devOverheidService->getRepository($repositoryId)) === true
         ) {
             return Command::FAILURE;

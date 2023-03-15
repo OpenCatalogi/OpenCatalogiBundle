@@ -47,11 +47,10 @@ class DeveloperOverheidGetComponentsCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input): int
     {
         // Handle the command options
         $componentId = $input->getOption('component', false);
@@ -61,9 +60,9 @@ class DeveloperOverheidGetComponentsCommand extends Command
                 return Command::FAILURE;
             }
         }
-        
-        if ($componentId !== null 
-        && empty($this->devOverheidService->getComponent($componentId)) === true
+
+        if ($componentId !== null
+            && empty($this->devOverheidService->getComponent($componentId)) === true
         ) {
             return Command::FAILURE;
         }

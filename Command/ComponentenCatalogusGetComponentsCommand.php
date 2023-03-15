@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
@@ -46,11 +45,10 @@ class ComponentenCatalogusGetComponentsCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input): int
     {
         // Handle the command options.
         $componentId = $input->getOption('component', false);
@@ -61,8 +59,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             }
         } 
         
-        if ($componentId !== null
-        && empty($this->compCatService->getComponent($componentId)) === true
+        if ($componentId !== null 
+            && empty($this->compCatService->getComponent($componentId)) === true
         ) {
             return Command::FAILURE;
         }
