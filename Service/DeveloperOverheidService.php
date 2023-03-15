@@ -86,7 +86,7 @@ class DeveloperOverheidService
         $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->githubApiService = $githubApiService;
-        $this->logger = $pluginLogger;
+        $this->pluginLogger = $pluginLogger;
         $this->resourceService = $resourceService;
     }
 
@@ -139,7 +139,7 @@ class DeveloperOverheidService
 
             return null;
         }//end if
-        
+
         $repository = $this->importRepository($repository);
         if ($repository === null) {
             return null;
@@ -354,7 +354,7 @@ class DeveloperOverheidService
         // Do we have a source?
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
         $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping('https://developer.overheid.nl/api/components', 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping('https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
 
@@ -375,7 +375,9 @@ class DeveloperOverheidService
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
+
         if ($component['related_repositories'] !== []) {
+
             $repository = $component['related_repositories'][0];
             $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);

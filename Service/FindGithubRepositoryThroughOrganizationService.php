@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
@@ -26,11 +27,6 @@ class FindGithubRepositoryThroughOrganizationService
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
-
-    /**
-     * @var SymfonyStyle
-     */
-    private SymfonyStyle $io;
 
     /**
      * @var CallService
@@ -55,91 +51,48 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private LoggerInterface $pluginLogger;
+
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
 
     /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
      * @param CallService             $callService             The Call Service
      * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         GithubPubliccodeService $githubPubliccodeService,
         CallService $callService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
+        GatewayResourceService $resourceService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->logger = $pluginLogger;
+        $this->pluginLogger = $pluginLogger;
+        $this->resourceService = $resourceService;
 
         $this->configuration = [];
         $this->data = [];
     }//end __construct()
 
     /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->io = $io;
-        $this->githubPubliccodeService->setStyle($io);
-
-        return $this;
-    }//end setStyle()
-
-    /**
-     * Get a source by reference.
-     *
-     * @param string $location The location to look for
-     *
-     * @return Source|null
-     */
-    public function getSource(string $location): ?Source
-    {
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
-        if ($source === null) {
-//            $this->logger->error("No source found for $location");
-            isset($this->io) && $this->io->error("No source found for $location");
-        }//end if
-
-        return $source;
-    }//end getSource()
-
-    /**
-     * Get an entity by reference.
-     *
-     * @param string $reference The reference to look for
-     *
-     * @return Entity|null
-     */
-    public function getEntity(string $reference): ?Entity
-    {
-        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
-        if ($entity === null) {
-//            $this->logger->error("No entity found for $reference");
-            isset($this->io) && $this->io->error("No entity found for $reference");
-        }//end if
-
-        return $entity;
-    }//end getEntity()
-
-    /**
      * Check the auth of the github source.
      *
-     * @param Source $source The given source to check the api key
+     * @param Source $source The given source to check the api key.
      *
-     * @return bool|null If the api key is set or not
+     * @return bool|null If the api key is set or not.
      */
     public function checkGithubAuth(Source $source): ?bool
     {
-        if (!$source->getApiKey()) {
-            isset($this->io) && $this->io->error('No auth set for Source: '.$source->getName());
+        if ($source->getApiKey() === null) {
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
@@ -157,42 +110,42 @@ class FindGithubRepositoryThroughOrganizationService
     private function getOpenCatalogiFromGithubRepo(string $organizationName): ?array
     {
         // make sync object
-        $source = $this->getSource('https://raw.githubusercontent.com');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, '/'.$organizationName.'/.github/main/openCatalogi.yaml');
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yaml: '.$e->getMessage());
+            $this->pluginLogger->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yaml: '.$e->getMessage());
         }
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/main/openCatalogi.yml');
             } catch (Exception $e) {
-                isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yml: '.$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch /'.$organizationName.'/github/main/openCatalogi.yml: '.$e->getMessage());
             }
         }//end if
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/master/openCatalogi.yaml');
             } catch (Exception $e) {
-                isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName.'/github/master/openCatalogi.yaml: '.$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch /'.$organizationName.'/github/master/openCatalogi.yaml: '.$e->getMessage());
             }
         }//end if
 
-        if (!isset($response)) {
+        if (isset($response) === false) {
             try {
                 $response = $this->callService->call($source, '/'.$organizationName.'/.github/master/openCatalogi.yml');
             } catch (Exception $e) {
-                isset($this->io) && $this->io->error('Error found trying to fetch /'.$organizationName.'/github/master/openCatalogi.yml: '.$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch /'.$organizationName.'/github/master/openCatalogi.yml: '.$e->getMessage());
             }
         }//end if
 
-        if (isset($response)) {
+        if (isset($response) === true) {
             // @TODO use decodeResponse from the callService
             $openCatalogi = Yaml::parse($response->getBody()->getContents());
-            isset($this->io) && $this->io->success("Fetch and decode went succesfull '/'.$organizationName.'/.github/master/openCatalogi.yml', '/'.$organizationName.'/.github/master/openCatalogi.yaml'");
+            $this->pluginLogger->debug("Fetch and decode went succesfull '/'.$organizationName.'/.github/master/openCatalogi.yml', '/'.$organizationName.'/.github/master/openCatalogi.yaml'");
 
             return $openCatalogi;
         }//end if
@@ -211,17 +164,17 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private function getGithubRepoFromOrganization(string $organizationName): ?array
     {
-        $source = $this->getSource('https://api.github.com');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, '/repos/'.$organizationName.'/.github');
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Error found trying to fetch /repos/'.$organizationName.'/.github: '.$e->getMessage());
+            $this->pluginLogger->error('Error found trying to fetch /repos/'.$organizationName.'/.github: '.$e->getMessage());
         }
 
-        if (isset($response)) {
+        if (isset($response) === true) {
             $githubRepo = $this->callService->decodeResponse($source, $response, 'application/json');
-            isset($this->io) && $this->io->success('Fetch and decode went succesfull for /repos/'.$organizationName.'/.github');
+            $this->pluginLogger->debug('Fetch and decode went succesfull for /repos/'.$organizationName.'/.github');
 
             return $githubRepo;
         }//end if
@@ -242,7 +195,7 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function setRepositoryComponent(ObjectEntity $repositoryObject, ObjectEntity $organization, string $type): ?ObjectEntity
     {
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $component = $repositoryObject->getValue('component');
         if ($component === false) {
@@ -277,25 +230,25 @@ class FindGithubRepositoryThroughOrganizationService
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->getSource('https://api.github.com');
-        if (!$this->checkGithubAuth($source)) {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
 
         $domain = \Safe\parse_url($url, PHP_URL_HOST);
-        if (!$domain == 'github.com') {
+        if ($domain !== 'github.com') {
             return null;
         }//end if
 
         $name = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
 
-        isset($this->io) && $this->io->info('Getting repo from organisation '.$name);
+        $this->pluginLogger->debug('Getting repo from organisation '.$name);
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repository) {
-            isset($this->io) && $this->io->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }//end if
@@ -303,7 +256,7 @@ class FindGithubRepositoryThroughOrganizationService
         $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
-        isset($this->io) && $this->io->success('Found repo from organisation with name: '.$name);
+        $this->pluginLogger->debug('Found repo from organisation with name: '.$name);
 
         return $this->setRepositoryComponent($repositoryObject, $organization, $type);
     }//end getOrganisationRepo()
@@ -319,14 +272,15 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private function getOrganizationCatalogi(ObjectEntity $organization): void
     {
-        if ($githubRepo = $this->getGithubRepoFromOrganization($organization->getValue('name'))) {
-            isset($this->io) && $this->io->success('Github repo found and fetched for '.$organization->getName());
-            if ($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) {
-                isset($this->io) && $this->io->success('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
+        if (($this->getGithubRepoFromOrganization($organization->getValue('name'))) !== null) {
+            $this->pluginLogger->debug('Github repo found and fetched for '.$organization->getName());
+            if (($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) !== null) {
+                $this->pluginLogger->debug('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
-                if (!$openCatalogi) {
+                if ($openCatalogi === null) {
                     return;
                 }//end if
+
                 // We don't want to set the name, this has to be the login property from the github api.
                 $allowedKeys = ['description', 'type', 'telephone', 'email', 'website', 'logo', 'catalogusAPI'];
                 $organization->hydrate(array_intersect_key($openCatalogi, array_flip($allowedKeys)));
@@ -344,12 +298,13 @@ class FindGithubRepositoryThroughOrganizationService
                     // Get organisation component and set the property.
                     $supports[] = $this->getOrganisationRepo($supports, $organization, 'supports');
                 }
+
                 $organization->setValue('supports', $supports);
 
                 $this->entityManager->persist($organization);
                 $this->entityManager->flush();
 
-                isset($this->io) && $this->io->success($organization->getName().' succesfully updated with fetched openCatalogi info');
+                $this->pluginLogger->debug($organization->getName().' succesfully updated with fetched openCatalogi info');
             }//end if
         }//end if
     }//end getOrganizationCatalogi()
@@ -369,30 +324,36 @@ class FindGithubRepositoryThroughOrganizationService
         $this->configuration = $configuration;
         $this->data = $data;
 
-        if ($organisationId) {
+        if ($organisationId !== null) {
             // If we are testing for one repository.
             $organisation = $this->entityManager->find('App:ObjectEntity', $organisationId);
-            if ($organisation && $organisation->getValue('name') && $organisation->getValue('github')) {
+            if ($organisation !== null
+                && $organisation->getValue('name') !== null
+                && $organisation->getValue('github') !== null
+            ) {
                 $this->getOrganizationCatalogi($organisation);
             } else {
-                isset($this->io) && $this->io->error('Could not find given organisation');
+                $this->pluginLogger->error('Could not find given organisation');
 
                 return null;
             }
+
         } else {
-            $organisationEntity = $this->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
+            $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             // If we want to do it for al repositories.
-            isset($this->io) && $this->io->info('Looping through organisations');
+            $this->pluginLogger->info('Looping through organisations');
             foreach ($organisationEntity->getObjectEntities() as $organisation) {
-                if ($organisation->getValue('name') && $organisation->getValue('github')) {
+                if ($organisation->getValue('name') !== null
+                    && $organisation->getValue('github') !== null
+                ) {
                     $this->getOrganizationCatalogi($organisation);
                 }
             }
         }
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('findRepositoriesThroughOrganisationHandler finished');
+        $this->pluginLogger->debug('findRepositoriesThroughOrganisationHandler finished');
 
         return $this->data;
     }//end findGithubRepositoryThroughOrganizationHandler()
