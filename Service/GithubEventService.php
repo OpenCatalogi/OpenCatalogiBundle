@@ -9,6 +9,7 @@ use App\Exception\GatewayException;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Cache\CacheException;
@@ -58,6 +59,12 @@ class GithubEventService
     private GithubApiService $githubApiService;
 
     /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -78,6 +85,7 @@ class GithubEventService
      * @param CallService            $callService      The Call Service.
      * @param CacheService           $cacheService     The Cache Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param GatewayResourceService $resourceService The Gateway Resource Service.
      * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
      */
     public function __construct(
@@ -86,6 +94,7 @@ class GithubEventService
         CallService $callService,
         CacheService $cacheService,
         GithubApiService $githubApiService,
+        GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
         $this->entityManager = $entityManager;
@@ -93,61 +102,11 @@ class GithubEventService
         $this->callService = $callService;
         $this->cacheService = $cacheService;
         $this->githubApiService = $githubApiService;
+        $this->resourceService = $resourceService;
         $this->pluginLogger = $pluginLogger;
         $this->configuration = [];
         $this->data = [];
     }//end __construct()
-
-    /**
-     * Get a source by reference.
-     *
-     * @param string $location The location to look for.
-     *
-     * @return Source|null
-     */
-    public function getSource(string $location): ?Source
-    {
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
-        if ($source === null) {
-            $this->pluginLogger->error("No source found for $location.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $source;
-    }//end getSource()
-
-    /**
-     * Get an entity by reference.
-     *
-     * @param string $reference The reference to look for.
-     *
-     * @return Entity|null
-     */
-    public function getEntity(string $reference): ?Entity
-    {
-        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
-        if ($entity === null) {
-            $this->pluginLogger->error("No entity found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $entity;
-    }//end getEntity()
-
-    /**
-     * Get a mapping by reference.
-     *
-     * @param string $reference The reference to look for.
-     *
-     * @return Mapping|null
-     */
-    public function getMapping(string $reference): ?Mapping
-    {
-        $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
-        if ($mapping === null) {
-            $this->pluginLogger->error("No mapping found for $reference.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $mapping;
-    }//end getMapping()
 
     /**
      * Check the auth of the github source.
@@ -204,14 +163,14 @@ class GithubEventService
     {
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
-        $source = $this->getSource('https://api.github.com');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
         // Do we have the api key set of the source.
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
 
-        $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        $mapping = $this->getMapping('https://api.github.com/repositories');
+        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
+        $mapping = $this->resourceService->getMapping('https://api.github.com/repositories');
 
         // Get repository from github.
         $repositoryArray = $this->getRepository($githubEvent['repository']['full_name'], $source);
