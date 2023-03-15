@@ -85,7 +85,7 @@ class GithubEventService
      * @param CallService            $callService      The Call Service.
      * @param CacheService           $cacheService     The Cache Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface
      */
     public function __construct(
