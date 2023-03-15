@@ -283,17 +283,16 @@ class DeveloperOverheidService
         if (key_exists('legal', $componentArray) === true
             && key_exists('repoOwner', $componentArray['legal']) === true
             && key_exists('name', $componentArray['legal']['repoOwner']) === true) {
-
             $organisations = $this->cacheService->searchObjects(null, ['name' => $componentArray['legal']['repoOwner']['name']], [$organisationEntity->getId()->toString()])['results'];
             if ($organisations === []) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(
                     [
-                        'name' => $componentArray['legal']['repoOwner']['name'],
-                        'email' => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
-                        'phone' => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
+                        'name'    => $componentArray['legal']['repoOwner']['name'],
+                        'email'   => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
+                        'phone'   => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
                         'website' => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
-                        'type' => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
+                        'type'    => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
                     ]
                 );
             }//end if
@@ -302,7 +301,6 @@ class DeveloperOverheidService
                 $organisation = $this->entityManager->find('App:ObjectEntity', $organisations[0]['_self']['id']);
             }//end if
 
-
             if ($organisation === null) {
                 return $componentObject;
             }//end if
@@ -310,7 +308,7 @@ class DeveloperOverheidService
             $this->entityManager->persist($organisation);
 
             if (($legal = $componentObject->getValue('legal')) !== false) {
-                if (($legal->getValue('repoOwner')) !== false) {
+                if ($legal->getValue('repoOwner') !== false) {
                     // If the component is already set to a repoOwner return the component object.
                     return $componentObject;
                 }//end if
@@ -375,9 +373,7 @@ class DeveloperOverheidService
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
-
         if ($component['related_repositories'] !== []) {
-
             $repository = $component['related_repositories'][0];
             $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);

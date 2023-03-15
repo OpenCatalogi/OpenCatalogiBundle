@@ -8,12 +8,12 @@ use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -80,7 +80,7 @@ class FindOrganizationThroughRepositoriesService
      * @param SynchronizationService  $syncService       The synchonization service
      * @param MappingService          $mappingServiceThe mapping service
      * @param LoggerInterface         $pluginLogger      The plugin version of the loger interface
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param GatewayResourceService  $resourceService   The Gateway Resource Service.
      */
     public function __construct(
         CallService $callService,
@@ -236,7 +236,7 @@ class FindOrganizationThroughRepositoriesService
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
-        
+
         $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
@@ -386,7 +386,6 @@ class FindOrganizationThroughRepositoriesService
             if ($repository === null) {
                 $this->pluginLogger->error('Could not find given repository', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
             }
-
         } else {
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 

@@ -134,7 +134,7 @@ class ComponentenCatalogusService
 
             return null;
         }
-        
+
         $application = $this->importApplication($application);
         if ($application === null) {
             return null;
@@ -269,7 +269,6 @@ class ComponentenCatalogusService
             && key_exists('url', $componentArray['url']) === true
             && key_exists('name', $componentArray['url']) === true
         ) {
-
             $repositories = $this->cacheService->searchObjects(null, ['url' => $componentArray['url']['url']], [$repositoryEntity->getId()->toString()])['results'];
             if ($repositories === []) {
                 $repository = new ObjectEntity($repositoryEntity);
@@ -335,7 +334,7 @@ class ComponentenCatalogusService
 
         $this->entityManager->persist($componentObject);
         $this->entityManager->flush();
-        
+
         return $componentObject;
     }//end importComponent()
 }

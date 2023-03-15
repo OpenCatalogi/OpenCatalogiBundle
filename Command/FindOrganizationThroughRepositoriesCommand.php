@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesS
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the FindOrganizationThroughRepositoriesService.
@@ -44,7 +43,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      *
      * @return int
      */
@@ -57,9 +56,9 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler()) === true) {
                 return Command::FAILURE;
             }
-        } 
-        
-        if ($repositoryId !== null 
+        }
+
+        if ($repositoryId !== null
             && empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;
