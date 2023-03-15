@@ -108,7 +108,7 @@ class DeveloperOverheidService
         $this->pluginLogger->info('Found '.count($repositories).' repositories', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         foreach ($repositories as $repository) {
             $result[] = $this->importRepository($repository);
-        }
+        }//end foreach
 
         $this->entityManager->flush();
 
@@ -138,11 +138,12 @@ class DeveloperOverheidService
             $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
-        }
+        }//end if
+        
         $repository = $this->importRepository($repository);
         if ($repository === null) {
             return null;
-        }
+        }//end if
 
         $this->entityManager->flush();
 
@@ -201,7 +202,7 @@ class DeveloperOverheidService
         $this->pluginLogger->info('Found '.count($components).' components', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         foreach ($components as $component) {
             $result[] = $this->importComponent($component);
-        }
+        }//end foreach
 
         $this->entityManager->flush();
 
@@ -231,12 +232,12 @@ class DeveloperOverheidService
             $this->pluginLogger->error('Could not find a component with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
-        }
+        }//end if
 
         $component = $this->importComponent($component);
         if ($component === null) {
             return null;
-        }
+        }//end if
 
         $this->entityManager->flush();
 
@@ -282,27 +283,37 @@ class DeveloperOverheidService
         if (key_exists('legal', $componentArray) === true
             && key_exists('repoOwner', $componentArray['legal']) === true
             && key_exists('name', $componentArray['legal']['repoOwner']) === true) {
-            $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $componentArray['legal']['repoOwner']['name']]);
-            if ($organisation !== null) {
+
+            $organisations = $this->cacheService->searchObjects(null, ['name' => $componentArray['legal']['repoOwner']['name']], [$organisationEntity->getId()->toString()])['results'];
+            if ($organisations === []) {
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(
                     [
-                        'name'     => $componentArray['legal']['repoOwner']['name'],
-                        'email'    => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
-                        'phone'    => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
-                        'website'  => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
-                        'type'     => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
+                        'name' => $componentArray['legal']['repoOwner']['name'],
+                        'email' => key_exists('email', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['email'] : null,
+                        'phone' => key_exists('phone', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['phone'] : null,
+                        'website' => key_exists('website', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['website'] : null,
+                        'type' => key_exists('type', $componentArray['legal']['repoOwner']) === true ? $componentArray['legal']['repoOwner']['type'] : null,
                     ]
                 );
             }//end if
 
+            if (count($organisations) === 1) {
+                $organisation = $this->entityManager->find('App:ObjectEntity', $organisations[0]['_self']['id']);
+            }//end if
+
+
+            if ($organisation === null) {
+                return $componentObject;
+            }//end if
+
             $this->entityManager->persist($organisation);
 
-            if ($legal = $componentObject->getValue('legal')) {
-                if ($legal->getValue('repoOwner') !== false) {
+            if (($legal = $componentObject->getValue('legal')) !== false) {
+                if (($legal->getValue('repoOwner')) !== false) {
                     // If the component is already set to a repoOwner return the component object.
                     return $componentObject;
-                }
+                }//end if
 
                 $legal->setValue('repoOwner', $organisation);
                 $this->entityManager->persist($legal);
@@ -324,7 +335,9 @@ class DeveloperOverheidService
             $componentObject->setValue('legal', $legal);
             $this->entityManager->persist($componentObject);
             $this->entityManager->flush();
-        }
+
+            return $componentObject;
+        }//end if
 
         return null;
     }//end importLegalRepoOwnerThroughComponent()
@@ -355,7 +368,7 @@ class DeveloperOverheidService
         // Unset component legal before creating object, we don't want duplicate organisations.
         if (key_exists('legal', $componentMapping) === true && key_exists('repoOwner', $componentMapping['legal']) === true) {
             unset($componentMapping['legal']['repoOwner']);
-        }
+        }//end if
 
         $synchronization = $this->syncService->synchronize($synchronization, $componentMapping);
         $componentObject = $synchronization->getObject();
@@ -367,7 +380,7 @@ class DeveloperOverheidService
             $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);
             $componentObject->setValue('url', $repositoryObject);
-        }
+        }//end if
 
         $this->entityManager->persist($componentObject);
 

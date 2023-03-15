@@ -7,6 +7,7 @@ use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
+use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
@@ -27,6 +28,11 @@ class ComponentenCatalogusService
      * @var CallService
      */
     private CallService $callService;
+
+    /**
+     * @var CacheService
+     */
+    private CacheService $cacheService;
 
     /**
      * @var SynchronizationService
@@ -54,17 +60,19 @@ class ComponentenCatalogusService
     private LoggerInterface $pluginLogger;
 
     /**
-     * @param EntityManagerInterface   $entityManager   The Entity Manager Interface
-     * @param CallService              $callService     The Call Service
-     * @param SynchronizationService   $syncService     The Synchronization Service
-     * @param MappingService           $mappingService  The Mapping Service
-     * @param DeveloperOverheidService $donService      The Developer Overheid Service
-     * @param GatewayResourceService   $resourceService The Gateway Resource Service
-     * @param LoggerInterface          $pluginLogger    The Plugin logger
+     * @param EntityManagerInterface   $entityManager   The Entity Manager Interface.
+     * @param CallService              $callService     The Call Service.
+     * @param CacheService             $cacheService    The Cache Service.
+     * @param SynchronizationService   $syncService     The Synchronization Service.
+     * @param MappingService           $mappingService  The Mapping Service.
+     * @param DeveloperOverheidService $donService      The Developer Overheid Service.
+     * @param GatewayResourceService   $resourceService The Gateway Resource Service.
+     * @param LoggerInterface          $pluginLogger    The Plugin logger.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
+        CacheService $cacheService,
         SynchronizationService $syncService,
         MappingService $mappingService,
         DeveloperOverheidService $donService,
@@ -73,6 +81,7 @@ class ComponentenCatalogusService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
+        $this->cacheService = $cacheService;
         $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->donService = $donService;
@@ -167,10 +176,10 @@ class ComponentenCatalogusService
             foreach ($application['components'] as $component) {
                 $componentObject = $this->importComponent($component);
                 $components[] = $componentObject;
-            }
+            }//end foreach
 
             $applicationObject->setValue('components', $components);
-        }
+        }//end if
 
         $this->entityManager->persist($applicationObject);
         $this->entityManager->flush();
@@ -199,7 +208,7 @@ class ComponentenCatalogusService
         $this->pluginLogger->info('Found '.count($components).' components', ['package' => 'open-catalogi/open-catalogi-bundle']);
         foreach ($components as $component) {
             $result[] = $this->importComponent($component);
-        }
+        }//end foreach
 
         $this->entityManager->flush();
 
@@ -258,19 +267,26 @@ class ComponentenCatalogusService
         if (key_exists('url', $componentArray) === true
             && key_exists('url', $componentArray['url']) === true
             && key_exists('name', $componentArray['url']) === true) {
-            $repository = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $repositoryEntity, 'name' => $componentArray['url']['name']]);
-            if (isset($repository) === true) {
+
+            $repositories = $this->cacheService->searchObjects(null, ['url' => $componentArray['url']['url']], [$repositoryEntity->getId()->toString()])['results'];
+            if ($repositories === []) {
                 $repository = new ObjectEntity($repositoryEntity);
                 $repository->hydrate([
                     'name' => $componentArray['url']['name'],
                     'url'  => $componentArray['url']['url'],
                 ]);
             }//end if
+
+            if (count($repositories) === 1) {
+                $repository = $this->entityManager->find('App:ObjectEntity', $repositories[0]['_self']['id']);
+            }//end if
+
             $this->entityManager->persist($repository);
             if ($componentObject->getValue('url') !== false) {
                 // If the component is already set to a repository return the component object.
                 return $componentObject;
             }//end if
+
             $componentObject->setValue('url', $repository);
         }//end if
 
@@ -305,7 +321,7 @@ class ComponentenCatalogusService
         unset($component['url']);
         if (key_exists('legal', $component) && key_exists('repoOwner', $component['legal'])) {
             unset($component['legal']['repoOwner']);
-        }
+        }//end if
 
         $synchronization = $this->syncService->synchronize($synchronization, $component);
         $componentObject = $synchronization->getObject();

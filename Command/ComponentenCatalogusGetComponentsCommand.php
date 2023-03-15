@@ -52,17 +52,17 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-        $this->compCatService->setStyle($style);
-
-        // Handle the command optiosn
+        // Handle the command options.
         $componentId = $input->getOption('component', false);
 
-        if ($componentId === false) {
+        if ($componentId === null) {
             if (empty($this->compCatService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } else if (empty($this->compCatService->getComponent($componentId)) === true) {
+        } 
+        
+        if ($componentId !== null
+        && empty($this->compCatService->getComponent($componentId)) === true) {
             return Command::FAILURE;
         }
 
