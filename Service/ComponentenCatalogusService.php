@@ -134,6 +134,7 @@ class ComponentenCatalogusService
 
             return null;
         }
+        
         $application = $this->importApplication($application);
         if ($application === null) {
             return null;
@@ -171,7 +172,7 @@ class ComponentenCatalogusService
 
         $applicationObject = $synchronization->getObject();
 
-        if ($application['components']) {
+        if ($application['components'] !== null) {
             $components = [];
             foreach ($application['components'] as $component) {
                 $componentObject = $this->importComponent($component);
@@ -266,7 +267,8 @@ class ComponentenCatalogusService
         // If the component isn't already set to a repository create or get the repo and set it to the component url.
         if (key_exists('url', $componentArray) === true
             && key_exists('url', $componentArray['url']) === true
-            && key_exists('name', $componentArray['url']) === true) {
+            && key_exists('name', $componentArray['url']) === true
+        ) {
 
             $repositories = $this->cacheService->searchObjects(null, ['url' => $componentArray['url']['url']], [$repositoryEntity->getId()->toString()])['results'];
             if ($repositories === []) {
@@ -319,7 +321,9 @@ class ComponentenCatalogusService
         $component = $componentArray = $this->mappingService->mapping($mapping, $component);
         // Unset component url before creating object, we don't want duplicate repositories.
         unset($component['url']);
-        if (key_exists('legal', $component) && key_exists('repoOwner', $component['legal'])) {
+        if (key_exists('legal', $component) === true
+            && key_exists('repoOwner', $component['legal']) === true
+        ) {
             unset($component['legal']['repoOwner']);
         }//end if
 
@@ -331,7 +335,7 @@ class ComponentenCatalogusService
 
         $this->entityManager->persist($componentObject);
         $this->entityManager->flush();
-
+        
         return $componentObject;
     }//end importComponent()
 }
