@@ -62,7 +62,7 @@ class RatingListService
         $this->configuration = [];
         $this->data = [];
     }//end __construct()
-    
+
     /**
      * Rates the name of the component.
      *
@@ -561,16 +561,16 @@ class RatingListService
     }//end rateCopyOwner()
 
     /**
-     * Rates the copy right owner.
+     * Rates the repo owner.
      *
-     * @param ObjectEntity $mainCopyrightOwnerObject The main copyright owner to rate.
+     * @param ObjectEntity $repoOwnerObject The repo owner to rate.
      * @param array $ratingArray The rating array.
      *
      * @throws Exception|GuzzleException
      *
      * @return ObjectEntity|null Dataset at the end of the handler.
      */
-    public function rateRepoOwner(ObjectEntity $mainCopyrightOwnerObject, array $ratingArray): array
+    public function rateRepoOwner(ObjectEntity $repoOwnerObject, array $ratingArray): array
     {
         if ($repoOwnerObject->getValue('repoOwner') !== null) {
             $ratingArray['results'][] = 'The repoOwner is rated';
@@ -675,5 +675,5 @@ class RatingListService
 
         return $ratingArray;
     }//end rateContacts()
-    
+
 }//end class
