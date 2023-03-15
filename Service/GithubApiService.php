@@ -13,7 +13,6 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GithubApiService
 {
@@ -21,11 +20,6 @@ class GithubApiService
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
-
-    /**
-     * @var SymfonyStyle
-     */
-    private SymfonyStyle $io;
 
     /**
      * @var CallService
@@ -90,23 +84,6 @@ class GithubApiService
     }//end __construct()
 
     /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->io = $io;
-        $this->synchronizationService->setStyle($io);
-        $this->mappingService->setStyle($io);
-        $this->githubPubliccodeService->setStyle($io);
-
-        return $this;
-    }//end setStyle()
-
-    /**
      * Get a source by reference.
      *
      * @param string $location The location to look for
@@ -117,8 +94,7 @@ class GithubApiService
     {
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
         if ($source === null) {
-//            $this->logger->error("No source found for $location");
-            isset($this->io) && $this->io->error("No source found for $location");
+            $this->logger->error("No source found for $location", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $source;
@@ -135,8 +111,7 @@ class GithubApiService
     {
         $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
         if ($entity === null) {
-//            $this->logger->error("No entity found for $reference");
-            isset($this->io) && $this->io->error("No entity found for $reference");
+            $this->logger->error("No entity found for $reference", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $entity;
@@ -153,8 +128,7 @@ class GithubApiService
     {
         $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
         if ($mapping === null) {
-//            $this->logger->error("No mapping found for $reference");
-            isset($this->io) && $this->io->error("No mapping found for $reference");
+            $this->logger->error("No mapping found for $reference", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }//end if
 
         return $mapping;
