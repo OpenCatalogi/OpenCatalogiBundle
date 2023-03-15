@@ -98,7 +98,7 @@ class RatingListService
      */
     public function rateUrl(ObjectEntity $component, array $ratingArray): array
     {
-        if ($repository = $component->getValue('url') !== null) {
+        if (($repository = $component->getValue('url')) !== false) {
             $url = $repository->getValue('url');
             if (empty($url) === false) {
                 $ratingArray['results'][] = 'The url: '.$url.' rated';
@@ -531,7 +531,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the license because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -555,7 +555,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the mainCopyrightOwner because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -579,7 +579,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the repoOwner because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -603,7 +603,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the authorsFile because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -627,7 +627,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the type because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -651,7 +651,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the contractors because it is not set';
         }
-        
+
         $ratingArray['maxRating']++;
 
         return $ratingArray;

@@ -81,17 +81,17 @@ class RatingService
     {
         $result = [];
 
-        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $componentEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-        $this->pluginLogger->debug('Trying to create ratings for all component ObjectEntities.');
+        $this->pluginLogger->info('Trying to create ratings for all component ObjectEntities.');
 
         if (is_countable($componentEntity->getObjectEntities()) === true) {
-            $this->pluginLogger->debug('Found '.count($componentEntity->getObjectEntities()).' components.');
+            $this->pluginLogger->info('Found '.count($componentEntity->getObjectEntities()).' components.');
         }//end if
 
         if (is_countable($componentEntity->getObjectEntities()) === false) {
-            $this->pluginLogger->debug('Found 0 components.');
+            $this->pluginLogger->info('Found 0 components.');
         }//end if
 
         foreach ($componentEntity->getObjectEntities() as $component) {
@@ -114,10 +114,10 @@ class RatingService
      */
     public function enrichComponentWithRating(string $componentId): ?array
     {
-        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->debug('Trying to get component ObjectEntity with id: '.$componentId.'.');
-        $component = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$componentId]);
+        $component = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['id'=>$componentId]);
         if ($component instanceof ObjectEntity === false) {
             $this->pluginLogger->error('No component ObjectEntity found with id: '.$componentId.'.');
 
@@ -174,7 +174,7 @@ class RatingService
 
         $rating = $component->getValue('rating');
 
-        if ($rating === false) {
+        if ($rating === null) {
             $rating = new ObjectEntity();
             $rating->setEntity($ratingEntity);
         }//end if
@@ -186,6 +186,7 @@ class RatingService
 
         $component->setValue('rating', $rating);
         $this->entityManager->persist($component);
+        $this->entityManager->flush();
 
         $this->pluginLogger->debug("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
