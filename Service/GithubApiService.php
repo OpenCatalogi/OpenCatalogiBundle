@@ -13,6 +13,7 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 
 class GithubApiService
 {
@@ -54,7 +55,12 @@ class GithubApiService
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private LoggerInterface $pluginLogger;
+
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
 
     /**
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
@@ -63,6 +69,7 @@ class GithubApiService
      * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -70,69 +77,20 @@ class GithubApiService
         CacheService $cacheService,
         SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
+        GatewayResourceService $resourceService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
         $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
-        $this->logger = $pluginLogger;
+        $this->pluginLogger = $pluginLogger;
+        $this->resourceService = $resourceService;
 
         $this->configuration = [];
         $this->data = [];
     }//end __construct()
-
-    /**
-     * Get a source by reference.
-     *
-     * @param string $location The location to look for
-     *
-     * @return Source|null
-     */
-    public function getSource(string $location): ?Source
-    {
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
-        if ($source === null) {
-            $this->logger->error("No source found for $location", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $source;
-    }//end getSource()
-
-    /**
-     * Get an entity by reference.
-     *
-     * @param string $reference The reference to look for
-     *
-     * @return Entity|null
-     */
-    public function getEntity(string $reference): ?Entity
-    {
-        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
-        if ($entity === null) {
-            $this->logger->error("No entity found for $reference", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $entity;
-    }//end getEntity()
-
-    /**
-     * Get a mapping by reference.
-     *
-     * @param string $reference The reference to look for
-     *
-     * @return Mapping|null
-     */
-    public function getMapping(string $reference): ?Mapping
-    {
-        $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
-        if ($mapping === null) {
-            $this->logger->error("No mapping found for $reference", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        }//end if
-
-        return $mapping;
-    }//end getMapping()
 
     /**
      * This function create or get the component of the repository.
@@ -145,7 +103,7 @@ class GithubApiService
      */
     public function connectComponent(ObjectEntity $repository): ?ObjectEntity
     {
-        $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
         $components = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
 
         if ($components === []) {
@@ -167,4 +125,32 @@ class GithubApiService
 
         return null;
     }//end connectComponent()
+
+    /**
+     * This function checks if a github repository is public.
+     *
+     * @param string $slug The slug of the repository
+     *
+     * @return bool Boolean for if the repository is public.
+     */
+    public function checkPublicRepository(string $slug): bool
+    {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+
+
+        $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
+        $slug = rtrim($slug, '/');
+
+        try {
+            $response = $this->callService->call($source, '/repos/'.$slug);
+            $repository = $this->callService->decodeResponse($source, $response);
+        } catch (Exception $exception) {
+            // @TODO Monolog ?
+            $this->pluginLogger->error("Exception while checking if public repository: {$exception->getMessage()}");
+
+            return false;
+        }
+
+        return $repository['private'] === false;
+    }//end checkPublicRepository()
 }//end class
