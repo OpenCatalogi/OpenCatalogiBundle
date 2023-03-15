@@ -35,25 +35,10 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'FindOrganizationThroughRepositoriesHandler',
             'description'=> 'This handler finds organizations through repositories',
-            'required'   => ['repositoryEntityId', 'organisationEntityId'],
-            'properties' => [
-                'repositoryEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the repository entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
-                ],
-                'organisationEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the organisation entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                ],
-            ],
+            'required'   => [],
+            'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.

@@ -35,16 +35,8 @@ class GithubEventHandler implements ActionHandlerInterface
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'GithubEventHandler',
             'description'=> 'This handler gets the github event and creates or updates the repository',
-            'required'   => ['repositoryEntityId'],
-            'properties' => [
-                'repositoryEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the repository entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
-                ],
-            ],
+            'required'   => [],
+            'properties' => [],
         ];
     }//end getConfiguration()
 

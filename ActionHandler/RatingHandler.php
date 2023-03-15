@@ -35,23 +35,8 @@ class RatingHandler implements ActionHandlerInterface
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'RatingHandler',
             'description'=> 'This handler sets the rating of a component',
-            'required'   => ['componentEntityId', 'ratingEntityId'],
-            'properties' => [
-                'componentEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the component entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.component.schema.json',
-                ],
-                'ratingEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the rating entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.rating.schema.json',
-                ],
-            ],
+            'required'   => [],
+            'properties' => [],
         ];
     }//end getConfiguration()
 
