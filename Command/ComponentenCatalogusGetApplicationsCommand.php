@@ -62,7 +62,8 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         }
 
         if ($applicationId !== null
-        && $this->compCatService->getApplication($applicationId) === null) {
+        && $this->compCatService->getApplication($applicationId) === null
+        ) {
             return Command::FAILURE;
         }
 

@@ -53,17 +53,18 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-        $this->findGitService->setStyle($style);
-
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        if ($organisationId === false) {
+        if ($organisationId === null) {
             if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
                 return Command::FAILURE;
             }
-        } else if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true) {
+        } 
+        
+        if ($organisationId !== null 
+            && empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true
+        ) {
             return Command::FAILURE;
         }
 

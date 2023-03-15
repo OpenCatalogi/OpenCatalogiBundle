@@ -62,7 +62,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         } 
         
         if ($componentId !== null
-        && empty($this->compCatService->getComponent($componentId)) === true) {
+        && empty($this->compCatService->getComponent($componentId)) === true
+        ) {
             return Command::FAILURE;
         }
 

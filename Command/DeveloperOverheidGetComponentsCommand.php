@@ -53,17 +53,18 @@ class DeveloperOverheidGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-        $this->devOverheidService->setStyle($style);
-
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
-        if ($componentId === false) {
+        if ($componentId === null) {
             if (empty($this->devOverheidService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } else if (empty($this->devOverheidService->getComponent($componentId)) === true) {
+        }
+        
+        if ($componentId !== null 
+        && empty($this->devOverheidService->getComponent($componentId)) === true
+        ) {
             return Command::FAILURE;
         }
 

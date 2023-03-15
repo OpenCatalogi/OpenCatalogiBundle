@@ -52,15 +52,16 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-        $this->enrichGithubService->setStyle($style);
-
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if ($repositoryId === false) {
+        if ($repositoryId === null) {
             $this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler();
-        } else if (empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true) {
+        }
+        
+        if ($repositoryId !== null 
+            && empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true
+        ) {
             return Command::FAILURE;
         }
 

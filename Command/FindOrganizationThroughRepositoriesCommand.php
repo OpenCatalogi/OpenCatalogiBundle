@@ -52,17 +52,18 @@ class FindOrganizationThroughRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-        $this->findOrgRepService->setStyle($style);
-
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if ($repositoryId === false) {
+        if ($repositoryId === null) {
             if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler()) === true) {
                 return Command::FAILURE;
             }
-        } else if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true) {
+        } 
+        
+        if ($repositoryId !== null 
+            && empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true
+        ) {
             return Command::FAILURE;
         }
 

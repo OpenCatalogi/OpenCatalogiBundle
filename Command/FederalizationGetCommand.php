@@ -59,16 +59,14 @@ class FederalizationGetCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //$this->cacheService->setStyle(new SymfonyStyle($input, $output));
-        $style = new SymfonyStyle($input, $output);
-        $this->fedService->setStyle($style);
-
-        // Handle the command optiosn
+        // Handle the command options
         $catalogusId = $input->getOption('catalogus', false);
 
-        if ($catalogusId === false) {
+        if ($catalogusId === null) {
             $this->fedService->catalogiHandler();
-        } else if ($catalogusId !== false) {
+        } 
+        
+        if ($catalogusId !== null) {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if ($catalogusObject === null) {
                 $style->debug('Could not find object entity by id, trying on name');
