@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -68,13 +67,13 @@ class FindOrganizationThroughRepositoriesService
     private LoggerInterface $logger;
 
     /**
-     * @param CallService             $callService             The call service
-     * @param EntityManagerInterface  $entityManager           The entity manager
-     * @param GithubApiService        $githubApiService        The github api service
-     * @param GithubPubliccodeService $gitService The Github publicode service
-     * @param SynchronizationService  $syncService  The synchonization service
-     * @param MappingService          $mappingServiceThe       mapping service
-     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
+     * @param CallService             $callService       The call service
+     * @param EntityManagerInterface  $entityManager     The entity manager
+     * @param GithubApiService        $githubApiService  The github api service
+     * @param GithubPubliccodeService $gitService        The Github publicode service
+     * @param SynchronizationService  $syncService       The synchonization service
+     * @param MappingService          $mappingServiceThe mapping service
+     * @param LoggerInterface         $pluginLogger      The plugin version of the loger interface
      */
     public function __construct(
         CallService $callService,

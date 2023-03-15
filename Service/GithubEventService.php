@@ -4,7 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
-use App\Entity\Mapping;
 use App\Exception\GatewayException;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -62,7 +61,6 @@ class GithubEventService
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
-
 
     /**
      * @var LoggerInterface

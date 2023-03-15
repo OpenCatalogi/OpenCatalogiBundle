@@ -4,12 +4,11 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\ObjectEntity;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
 
 class RatingService
 {
@@ -49,11 +48,11 @@ class RatingService
     private array $data;
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager.
-     * @param GithubApiService       $githubApiService The github Api Service.
-     * @param RatingListService $ratingListService The Rating List Service.
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
+     * @param EntityManagerInterface $entityManager     The Entity Manager.
+     * @param GithubApiService       $githubApiService  The github Api Service.
+     * @param RatingListService      $ratingListService The Rating List Service.
+     * @param GatewayResourceService $resourceService   The Gateway Resource Service.
+     * @param LoggerInterface        $pluginLogger      The plugin version of the loger interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
