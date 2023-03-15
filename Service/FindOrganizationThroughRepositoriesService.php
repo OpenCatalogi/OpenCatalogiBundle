@@ -50,12 +50,12 @@ class FindOrganizationThroughRepositoriesService
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $gitService;
 
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -71,8 +71,8 @@ class FindOrganizationThroughRepositoriesService
      * @param CallService             $callService             The call service
      * @param EntityManagerInterface  $entityManager           The entity manager
      * @param GithubApiService        $githubApiService        The github api service
-     * @param GithubPubliccodeService $githubPubliccodeService The Github publicode service
-     * @param SynchronizationService  $synchronizationService  The synchonization service
+     * @param GithubPubliccodeService $gitService The Github publicode service
+     * @param SynchronizationService  $syncService  The synchonization service
      * @param MappingService          $mappingServiceThe       mapping service
      * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      */
@@ -80,16 +80,16 @@ class FindOrganizationThroughRepositoriesService
         CallService $callService,
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
-        GithubPubliccodeService $githubPubliccodeService,
-        SynchronizationService $synchronizationService,
+        GithubPubliccodeService $gitService,
+        SynchronizationService $syncService,
         MappingService $mappingService,
         LoggerInterface $pluginLogger
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubApiService = $githubApiService;
-        $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->gitService = $gitService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
         $this->logger = $pluginLogger;
 
@@ -250,14 +250,14 @@ class FindOrganizationThroughRepositoriesService
         $organisationEntity = $this->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
         $organisationMapping = $this->getMapping('https://api.github.com/organisation');
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $organisationEntity, $organisation['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $organisationEntity, $organisation['id']);
 
         $this->logger->comment('Mapping object'.$organisation['login'], ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $this->logger->comment('The mapping object '.$organisationMapping, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         $this->logger->comment('Checking organisation '.$organisation['login'], ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
+        $synchronization = $this->syncService->synchronize($synchronization, $organisation);
         $this->logger->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $synchronization->getObject();
@@ -295,7 +295,7 @@ class FindOrganizationThroughRepositoriesService
 
         $owns = [];
         foreach ($repositories as $repository) {
-            $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
+            $repositoryObject = $this->gitService->importRepository($repository);
             $this->entityManager->persist($repositoryObject);
             $this->entityManager->flush();
 
@@ -366,7 +366,7 @@ class FindOrganizationThroughRepositoriesService
                     return null;
                 }//end if
 
-                $repository = $this->githubPubliccodeService->importRepository($github);
+                $repository = $this->gitService->importRepository($github);
 
                 if ($github['owner']['type'] === 'Organization') {
                     // get organisation from github and set the property
