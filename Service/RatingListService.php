@@ -98,16 +98,16 @@ class RatingListService
      */
     public function rateUrl(ObjectEntity $component, array $ratingArray): array
     {
-        if ($repository = $component->getValue('url')) {
+        if ($repository = $component->getValue('url') !== null) {
             $url = $repository->getValue('url');
-            if (!empty($url)) {
+            if (empty($url) === false) {
                 $ratingArray['results'][] = 'The url: '.$url.' rated';
                 $ratingArray['rating']++;
 
                 $domain = \Safe\parse_url($url, PHP_URL_HOST);
                 if ($domain !== 'github.com') {
                     $ratingArray['results'][] = 'Cannot rate the repository because it is not a valid github repository';
-                } elseif ($this->githubApiService->checkPublicRepository($url)) {
+                } else if ($this->githubApiService->checkPublicRepository($url) !== null) {
                     $ratingArray['results'][] = 'Rated the repository because it is public';
                     $ratingArray['rating']++;
                 } else {
@@ -115,7 +115,7 @@ class RatingListService
                 }
 
                 $ratingArray['maxRating']++;
-            } elseif ($url === null) {
+            } else if ($url === null) {
                 $ratingArray['results'][] = 'Cannot rate the url because it is not set';
             } else {
                 $ratingArray['results'][] = 'Cannot rate the repository because url is empty';
@@ -531,6 +531,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the license because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -546,14 +547,15 @@ class RatingListService
      *
      * @return ObjectEntity|null Dataset at the end of the handler.
      */
-    public function rateCopyOwner(ObjectEntity $mainCopyrightOwnerObject, array $ratingArray): array
+    public function rateCopyOwner(ObjectEntity $mainOwnerObject, array $ratingArray): array
     {
-        if ($mainCopyrightOwnerObject->getValue('mainCopyrightOwner') !== null) {
-            $ratingArray['results'][] = 'The mainCopyrightOwner: '.$mainCopyrightOwnerObject->getValue('name').' rated';
+        if ($mainOwnerObject->getValue('mainCopyrightOwner') !== null) {
+            $ratingArray['results'][] = 'The mainCopyrightOwner: '.$mainOwnerObject->getValue('name').' rated';
             $ratingArray['rating']++;
         } else {
             $ratingArray['results'][] = 'Cannot rate the mainCopyrightOwner because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -577,6 +579,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the repoOwner because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -600,6 +603,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the authorsFile because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -623,6 +627,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the type because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;
@@ -646,6 +651,7 @@ class RatingListService
         } else {
             $ratingArray['results'][] = 'Cannot rate the contractors because it is not set';
         }
+        
         $ratingArray['maxRating']++;
 
         return $ratingArray;

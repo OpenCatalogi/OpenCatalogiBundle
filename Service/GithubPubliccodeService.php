@@ -130,7 +130,7 @@ class GithubPubliccodeService
     public function callSource(): ?array
     {
         // Do we have a source?
-        $source = $this->callService->getSource('https://api.github.com');
+        $source = $this->callService->getSource('https://api.github.com', 'open-catalogi/open-catalogi-bundle');
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
@@ -188,7 +188,7 @@ class GithubPubliccodeService
     public function getRepositories(): ?array
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
@@ -227,7 +227,7 @@ class GithubPubliccodeService
     public function getRepository(string $id): ?array
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
@@ -271,9 +271,9 @@ class GithubPubliccodeService
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
-        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        $repositoriesMapping = $this->resourceService->getMapping('https://api.github.com/search/code');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoriesMapping = $this->resourceService->getMapping('https://api.github.com/search/code', 'open-catalogi/open-catalogi-bundle');
 
         $repository['repository']['name'] = str_replace('-', ' ', $repository['repository']['name']);
 
@@ -313,9 +313,9 @@ class GithubPubliccodeService
     public function importRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
-        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-        $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/repositories');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/repositories', 'open-catalogi/open-catalogi-bundle');
 
         $repository['name'] = str_replace('-', ' ', $repository['name']);
 
@@ -350,7 +350,7 @@ class GithubPubliccodeService
      */
     public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
     {
-        $applicationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.application.schema.json');
+        $applicationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('applicationSuite', $publiccode) === true) {
             if ($application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']]) === false) {
@@ -378,8 +378,8 @@ class GithubPubliccodeService
      */
     public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        $organisationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
-        $legalEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.legal.schema.json');
+        $organisationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $legalEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) === true
@@ -431,8 +431,8 @@ class GithubPubliccodeService
      */
     public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        $organisationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
-        $legalEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.legal.schema.json');
+        $organisationEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $legalEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) === true
@@ -484,8 +484,8 @@ class GithubPubliccodeService
      */
     public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        $maintenanceEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.maintenance.schema.json');
-        $contractorsEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.contractor.schema.json');
+        $maintenanceEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.maintenance.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $contractorsEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.contractor.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('maintenance', $publiccode) === true
             && key_exists('contractors', $publiccode['maintenance']) === true
@@ -541,8 +541,8 @@ class GithubPubliccodeService
      */
     public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
-        $maintenanceEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.maintenance.schema.json');
-        $contactEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.contact.schema.json');
+        $maintenanceEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.maintenance.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $contactEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('maintenance', $publiccode) === true
             && key_exists('contacts', $publiccode['maintenance']) === true
@@ -602,8 +602,8 @@ class GithubPubliccodeService
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode): ?ObjectEntity
     {
-        $componentEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.component.schema.json');
-        $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/publiccode/component');
+        $componentEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/publiccode/component', 'open-catalogi/open-catalogi-bundle');
 
         if (($component = $repository->getValue('component')) === false) {
             $component = new ObjectEntity($componentEntity);
@@ -649,7 +649,7 @@ class GithubPubliccodeService
      */
     public function parsePubliccode(string $repositoryUrl, $response): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
 
         if (is_array($publiccode) === true && key_exists('content', $publiccode) === true) {

@@ -81,8 +81,8 @@ class RatingService
     {
         $result = [];
 
-        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json');
-        $componentEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->debug('Trying to create ratings for all component ObjectEntities.');
 
@@ -112,14 +112,14 @@ class RatingService
      *
      * @return array|null dataset at the end of the handler
      */
-    public function enrichComponentWithRating(string $id): ?array
+    public function enrichComponentWithRating(string $componentId): ?array
     {
-        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json');
+        $ratingEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-        $this->pluginLogger->debug('Trying to get component ObjectEntity with id: '.$id.'.');
-        $component = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$id]);
+        $this->pluginLogger->debug('Trying to get component ObjectEntity with id: '.$componentId.'.');
+        $component = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$componentId]);
         if ($component instanceof ObjectEntity === false) {
-            $this->pluginLogger->error('No component ObjectEntity found with id: '.$id.'.');
+            $this->pluginLogger->error('No component ObjectEntity found with id: '.$componentId.'.');
 
             return null;
         }//end if
@@ -149,10 +149,10 @@ class RatingService
         $this->data = $data;
         $this->configuration = $configuration;
 
-        if (array_key_exists('id', $this->data['response'])) {
-            $id = $this->data['response']['id'];
+        if (array_key_exists('id', $this->data['response']) === true) {
+            $componentId = $this->data['response']['id'];
 
-            $this->enrichComponentWithRating($id);
+            $this->enrichComponentWithRating($componentId);
         }//end if
 
         return $this->data;
@@ -217,7 +217,7 @@ class RatingService
         $ratingArray = $this->ratingListService->ratePlatforms($component, $ratingArray);
         $ratingArray = $this->ratingListService->rateCategories($component, $ratingArray);
 
-        if ($descriptionObject = $component->getValue('description')) {
+        if ($descriptionObject = $component->getValue('description') === null) {
             $ratingArray = $this->ratingListService->rateLocalisedName($descriptionObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateShortDescription($descriptionObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateLongDescription($descriptionObject, $ratingArray);
@@ -230,14 +230,14 @@ class RatingService
             $ratingArray['maxRating'] = $ratingArray['maxRating'] + 7;
         }
 
-        if ($legalObject = $component->getValue('legal')) {
+        if ($legalObject = $component->getValue('legal') === null) {
             $ratingArray = $this->ratingListService->rateLicense($legalObject, $ratingArray);
 
-            if ($mainCopyrightOwnerObject = $legalObject->getValue('mainCopyrightOwner')) {
-                $ratingArray = $this->ratingListService->rateCopyOwner($mainCopyrightOwnerObject, $ratingArray);
+            if ($mainOwnerObject = $legalObject->getValue('mainCopyrightOwner') === null) {
+                $ratingArray = $this->ratingListService->rateCopyOwner($mainOwnerObject, $ratingArray);
             }//end if
 
-            if ($repoOwnerObject = $legalObject->getValue('repoOwner')) {
+            if ($repoOwnerObject = $legalObject->getValue('repoOwner') === null) {
                 $ratingArray = $this->ratingListService->rateRepoOwner($repoOwnerObject, $ratingArray);
             }//end if
 
@@ -247,7 +247,7 @@ class RatingService
             $ratingArray['maxRating'] = $ratingArray['maxRating'] + 2;
         }
 
-        if ($maintenanceObject = $component->getValue('maintenance')) {
+        if ($maintenanceObject = $component->getValue('maintenance') === null) {
             $ratingArray = $this->ratingListService->rateType($maintenanceObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateContractors($maintenanceObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateContacts($maintenanceObject, $ratingArray);
