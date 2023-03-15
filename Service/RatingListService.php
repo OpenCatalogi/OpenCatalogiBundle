@@ -540,8 +540,8 @@ class RatingListService
     /**
      * Rates the copy right owner.
      *
-     * @param ObjectEntity $mainCopyrightOwnerObject The main copyright owner to rate.
-     * @param array        $ratingArray              The rating array.
+     * @param ObjectEntity $mainOwnerObject The main copyright owner to rate.
+     * @param array        $ratingArray     The rating array.
      *
      * @throws Exception|GuzzleException
      *

@@ -33,11 +33,6 @@ class GithubApiService
     private CacheService $cacheService;
 
     /**
-     * @var SynchronizationService
-     */
-    private SynchronizationService $synchronizationService;
-
-    /**
      * @var MappingService
      */
     private MappingService $mappingService;
@@ -66,7 +61,6 @@ class GithubApiService
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param CallService            $callService            The Call Service
      * @param CacheService           $cacheService           The Cache Service
-     * @param SynchronizationService $synchronizationService The Synchronization Service
      * @param MappingService         $mappingService         The Mapping Service
      * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
@@ -75,7 +69,6 @@ class GithubApiService
         EntityManagerInterface $entityManager,
         CallService $callService,
         CacheService $cacheService,
-        SynchronizationService $synchronizationService,
         MappingService $mappingService,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
@@ -83,7 +76,6 @@ class GithubApiService
         $this->entityManager = $entityManager;
         $this->callService = $callService;
         $this->cacheService = $cacheService;
-        $this->synchronizationService = $synchronizationService;
         $this->mappingService = $mappingService;
         $this->pluginLogger = $pluginLogger;
         $this->resourceService = $resourceService;
@@ -95,7 +87,7 @@ class GithubApiService
     /**
      * This function create or get the component of the repository.
      *
-     * @param ObjectEntity $repository
+     * @param ObjectEntity $repository The repository object.
      *
      * @throws Exception
      *

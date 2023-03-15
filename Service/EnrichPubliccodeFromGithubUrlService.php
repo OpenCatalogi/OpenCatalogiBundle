@@ -30,11 +30,6 @@ class EnrichPubliccodeFromGithubUrlService
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
-     */
-    private SynchronizationService $synchronizationService;
-
-    /**
      * @var MappingService
      */
     private MappingService $mappingService;
@@ -42,7 +37,7 @@ class EnrichPubliccodeFromGithubUrlService
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $githubService;
 
     /**
      * @var LoggerInterface
@@ -67,25 +62,22 @@ class EnrichPubliccodeFromGithubUrlService
     /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param CallService             $callService             The Call Service
-     * @param SynchronizationService  $synchronizationService  The Synchronization Service
      * @param MappingService          $mappingService          The Mapping Service
-     * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param GithubPubliccodeService $githubService The Github Publiccode Service
      * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService,
+        GithubPubliccodeService $githubService,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->githubService = $githubService;
         $this->mappingService = $mappingService;
         $this->pluginLogger = $pluginLogger;
         $this->resourceService = $resourceService;
@@ -121,7 +113,7 @@ class EnrichPubliccodeFromGithubUrlService
         }
 
         if (isset($response) === true) {
-            return $this->githubPubliccodeService->parsePubliccode($repositoryUrl, $response);
+            return $this->githubService->parsePubliccode($repositoryUrl, $response);
         }
 
         return null;
@@ -137,7 +129,7 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
         if (($publiccode = $this->getPubliccodeFromUrl($url)) !== null) {
-            $this->githubPubliccodeService->mapPubliccode($repository, $publiccode);
+            $this->githubService->mapPubliccode($repository, $publiccode);
         }
 
         return $repository;

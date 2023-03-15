@@ -36,7 +36,7 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $githubService;
 
     /**
      * @var array
@@ -59,24 +59,30 @@ class FindGithubRepositoryThroughOrganizationService
     private GatewayResourceService $resourceService;
 
     /**
+     * @var Yaml
+     */
+    private Yaml $yaml;
+
+    /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
-     * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param GithubPubliccodeService $githubService The Github Publiccode Service
      * @param CallService             $callService             The Call Service
      * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
-        GithubPubliccodeService $githubPubliccodeService,
+        GithubPubliccodeService $githubService,
         CallService $callService,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
-        $this->githubPubliccodeService = $githubPubliccodeService;
+        $this->githubService = $githubService;
         $this->pluginLogger = $pluginLogger;
         $this->resourceService = $resourceService;
+        $this->yaml = new Yaml();
 
         $this->configuration = [];
         $this->data = [];
@@ -144,7 +150,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         if (isset($response) === true) {
             // @TODO use decodeResponse from the callService
-            $openCatalogi = Yaml::parse($response->getBody()->getContents());
+            $openCatalogi = $this->yaml->parse($response->getBody()->getContents());
             $this->pluginLogger->debug("Fetch and decode went succesfull '/'.$organizationName.'/.github/master/openCatalogi.yml', '/'.$organizationName.'/.github/master/openCatalogi.yaml'");
 
             return $openCatalogi;
@@ -185,9 +191,9 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get or create a component for the given repository.
      *
-     * @param ObjectEntity $repositoryObject
-     * @param ObjectEntity $organization
-     * @param string       $type
+     * @param ObjectEntity $repositoryObject The repoitory object.
+     * @param ObjectEntity $organization The organisation object.
+     * @param string       $type The type of the organisation.
      *
      * @throws Exception
      *
@@ -219,9 +225,9 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
-     * @param string       $url
-     * @param ObjectEntity $organization
-     * @param string       $type
+     * @param string       $url The url of the repository.
+     * @param ObjectEntity $organization The organisation object.
+     * @param string       $type The type of the organisation.
      *
      * @throws GuzzleException|LoaderError|SyntaxError
      *
@@ -253,7 +259,7 @@ class FindGithubRepositoryThroughOrganizationService
             return null;
         }//end if
 
-        $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
+        $repositoryObject = $this->githubService->importRepository($repository);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
         $this->pluginLogger->debug('Found repo from organisation with name: '.$name);

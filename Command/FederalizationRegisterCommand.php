@@ -7,6 +7,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FederalizationRegisterCommand extends Command
@@ -55,8 +56,10 @@ class FederalizationRegisterCommand extends Command
      *
      * @return int
      */
-    protected function execute(InputInterface $input): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
+        
         // Handle the command options
         $catalogusId = $input->getOption('catalogus', false);
 

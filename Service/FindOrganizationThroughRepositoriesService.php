@@ -236,9 +236,7 @@ class FindOrganizationThroughRepositoriesService
         if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
-
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-
+        
         $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
@@ -356,8 +354,8 @@ class FindOrganizationThroughRepositoriesService
                 break;
         }
 
-        if (isset($repositoryObject) === true) {
-            $this->entityManager->persist($repositoryObject);
+        if (isset($repository) === true) {
+            $this->entityManager->persist($repository);
         }
 
         return null;
@@ -384,11 +382,11 @@ class FindOrganizationThroughRepositoriesService
             if (($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) !== null) {
                 $this->enrichRepositoryWithOrganisation($repository);
             }
-            
+
             if ($repository === null) {
                 $this->pluginLogger->error('Could not find given repository', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
             }
-            
+
         } else {
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 

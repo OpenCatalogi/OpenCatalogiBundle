@@ -30,11 +30,6 @@ class EnrichPubliccodeService
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
-     */
-    private SynchronizationService $synchronizationService;
-
-    /**
      * @var MappingService
      */
     private MappingService $mappingService;
@@ -42,7 +37,7 @@ class EnrichPubliccodeService
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $githubService;
 
     /**
      * @var array
@@ -67,25 +62,22 @@ class EnrichPubliccodeService
     /**
      * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
      * @param CallService             $callService             The Call Service
-     * @param SynchronizationService  $synchronizationService  The Synchronization Service
      * @param MappingService          $mappingService          The Mapping Service
-     * @param GithubPubliccodeService $githubPubliccodeService The Github Publiccode Service
+     * @param GithubPubliccodeService $githubService The Github Publiccode Service
      * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        SynchronizationService $synchronizationService,
         MappingService $mappingService,
-        GithubPubliccodeService $githubPubliccodeService,
+        GithubPubliccodeService $githubService,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
         $this->entityManager = $entityManager;
         $this->callService = $callService;
-        $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->githubService = $githubService;
         $this->mappingService = $mappingService;
         $this->pluginLogger = $pluginLogger;
         $this->resourceService = $resourceService;
@@ -114,15 +106,15 @@ class EnrichPubliccodeService
         }
 
         if (isset($response) === true) {
-            return $this->githubPubliccodeService->parsePubliccode($publiccodeUrl, $response);
+            return $this->githubService->parsePubliccode($publiccodeUrl, $response);
         }
 
         return null;
     }//end getPubliccodeFromUrl()
 
     /**
-     * @param ObjectEntity $repository
-     * @param string       $publiccodeUrl
+     * @param ObjectEntity $repository The repository object.
+     * @param string       $publiccodeUrl The publiccode url.
      *
      * @throws GuzzleException
      *
@@ -132,16 +124,16 @@ class EnrichPubliccodeService
     {
         $url = trim(\Safe\parse_url($publiccodeUrl, PHP_URL_PATH), '/');
         if (($publiccode = $this->getPubliccodeFromUrl($url)) !== null) {
-            $this->githubPubliccodeService->mapPubliccode($repository, $publiccode);
+            $this->githubService->mapPubliccode($repository, $publiccode);
         }
 
         return $repository;
     }//end enrichRepositoryWithPubliccode()
 
     /**
-     * @param array|null  $data          data set at the start of the handler
-     * @param array|null  $configuration configuration of the action
-     * @param string|null $repositoryId
+     * @param array|null  $data          Data set at the start of the handler.
+     * @param array|null  $configuration Configuration of the action.
+     * @param string|null $repositoryId  The repositoory id.
      *
      * @return array dataset at the end of the handler
      */

@@ -115,22 +115,22 @@ class ComponentenCatalogusService
     /**
      * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}.
      *
-     * @param string $id The id of the application to look for.
+     * @param string $applicationId The id of the application to look for.
      *
      * @return array|null
      */
-    public function getApplication(string $id): ?array
+    public function getApplication(string $applicationId): ?array
     {
         // Do we have a source?
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
 
-        $this->pluginLogger->info('Getting application '.$id);
-        $response = $this->callService->call($source, '/products/'.$id);
+        $this->pluginLogger->info('Getting application '.$applicationId);
+        $response = $this->callService->call($source, '/products/'.$applicationId);
 
         $application = json_decode($response->getBody()->getContents(), true);
 
         if ($application === null) {
-            $this->pluginLogger->error('Could not find an application with id: '.$id.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('Could not find an application with id: '.$applicationId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }
@@ -142,7 +142,7 @@ class ComponentenCatalogusService
 
         $this->entityManager->flush();
 
-        $this->pluginLogger->info('Found application with id: '.$id, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->info('Found application with id: '.$applicationId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $application->toArray();
     }//end getApplication()
@@ -221,22 +221,22 @@ class ComponentenCatalogusService
      *
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @param string $id
+     * @param string $componentId
      *
      * @return array|null
      */
-    public function getComponent(string $id): ?array
+    public function getComponent(string $componentId): ?array
     {
         // Do we have a source
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
 
-        $this->pluginLogger->debug('Trying to get component with id: '.$id, ['package' => 'open-catalogi/open-catalogi-bundle']);
-        $response = $this->callService->call($source, '/components/'.$id);
+        $this->pluginLogger->debug('Trying to get component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $response = $this->callService->call($source, '/components/'.$componentId);
 
         $component = json_decode($response->getBody()->getContents(), true);
 
         if ($component === null) {
-            $this->pluginLogger->error('Could not find a component with id: '.$id.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('Could not find a component with id: '.$componentId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -248,7 +248,7 @@ class ComponentenCatalogusService
 
         $this->entityManager->flush();
 
-        $this->pluginLogger->info('Found component with id: '.$id, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $component->toArray();
     }//end getComponent()

@@ -106,7 +106,7 @@ class RatingService
     /**
      * Create Rating for a single component.
      *
-     * @param string $id The id of the component to enrich
+     * @param string $componentId The id of the component to enrich
      *
      * @throws Exception
      *
