@@ -3,17 +3,15 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
-use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
-use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
 
 class GithubApiService
 {
@@ -58,12 +56,12 @@ class GithubApiService
     private GatewayResourceService $resourceService;
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
-     * @param CallService            $callService            The Call Service
-     * @param CacheService           $cacheService           The Cache Service
-     * @param MappingService         $mappingService         The Mapping Service
-     * @param LoggerInterface        $pluginLogger           The plugin version of the loger interface
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager   The Entity Manager Interface
+     * @param CallService            $callService     The Call Service
+     * @param CacheService           $cacheService    The Cache Service
+     * @param MappingService         $mappingService  The Mapping Service
+     * @param LoggerInterface        $pluginLogger    The plugin version of the loger interface
+     * @param GatewayResourceService $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -128,7 +126,6 @@ class GithubApiService
     public function checkPublicRepository(string $slug): bool
     {
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-
 
         $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
         $slug = rtrim($slug, '/');

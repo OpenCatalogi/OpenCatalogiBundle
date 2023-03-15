@@ -3,19 +3,16 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
-use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
-use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\HttpFoundation\Response;
 use Psr\Log\LoggerInterface;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
+use Symfony\Component\HttpFoundation\Response;
 
 class EnrichPubliccodeFromGithubUrlService
 {
@@ -23,7 +20,7 @@ class EnrichPubliccodeFromGithubUrlService
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
-    
+
     /**
      * @var CallService
      */
@@ -60,12 +57,12 @@ class EnrichPubliccodeFromGithubUrlService
     private array $data;
 
     /**
-     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
-     * @param CallService             $callService             The Call Service
-     * @param MappingService          $mappingService          The Mapping Service
-     * @param GithubPubliccodeService $githubService The Github Publiccode Service
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
+     * @param CallService             $callService     The Call Service
+     * @param MappingService          $mappingService  The Mapping Service
+     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface.
+     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -153,11 +150,9 @@ class EnrichPubliccodeFromGithubUrlService
                 if ($repository->getValue('publiccode_url') !== null) {
                     $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
                 }
-                
             } else {
                 $this->pluginLogger->error('Could not find given repository');
             }
-            
         } else {
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 

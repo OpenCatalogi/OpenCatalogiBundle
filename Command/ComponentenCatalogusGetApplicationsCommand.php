@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the FindGithubRepositoryThroughOrganizationService.
@@ -44,7 +43,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      *
      * @return int
      */
@@ -59,7 +58,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             }
         }
 
-        if ($applicationId !== null 
+        if ($applicationId !== null
             && $this->compCatService->getApplication($applicationId) === null
         ) {
             return Command::FAILURE;

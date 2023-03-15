@@ -35,8 +35,8 @@ class CatalogiHandler implements ActionHandlerInterface
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'CatalogiHandler',
             'description' => 'Syncs  all the know catalogi',
-            'required'   => [],
-            'properties' => [],
+            'required'    => [],
+            'properties'  => [],
         ];
     }//end getConfiguration()
 

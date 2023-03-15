@@ -6,12 +6,11 @@ use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
@@ -64,11 +63,11 @@ class FindGithubRepositoryThroughOrganizationService
     private Yaml $yaml;
 
     /**
-     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
-     * @param GithubPubliccodeService $githubService The Github Publiccode Service
-     * @param CallService             $callService             The Call Service
-     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
+     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
+     * @param CallService             $callService     The Call Service
+     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface
+     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -192,8 +191,8 @@ class FindGithubRepositoryThroughOrganizationService
      * Get or create a component for the given repository.
      *
      * @param ObjectEntity $repositoryObject The repoitory object.
-     * @param ObjectEntity $organization The organisation object.
-     * @param string       $type The type of the organisation.
+     * @param ObjectEntity $organization     The organisation object.
+     * @param string       $type             The type of the organisation.
      *
      * @throws Exception
      *
@@ -225,9 +224,9 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
-     * @param string       $url The url of the repository.
+     * @param string       $url          The url of the repository.
      * @param ObjectEntity $organization The organisation object.
-     * @param string       $type The type of the organisation.
+     * @param string       $type         The type of the organisation.
      *
      * @throws GuzzleException|LoaderError|SyntaxError
      *
@@ -278,7 +277,7 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private function getOrganizationCatalogi(ObjectEntity $organization): void
     {
-        if (($this->getGithubRepoFromOrganization($organization->getValue('name'))) !== null) {
+        if ($this->getGithubRepoFromOrganization($organization->getValue('name')) !== null) {
             $this->pluginLogger->debug('Github repo found and fetched for '.$organization->getName());
             if (($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'))) !== null) {
                 $this->pluginLogger->debug('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
@@ -343,7 +342,6 @@ class FindGithubRepositoryThroughOrganizationService
 
                 return null;
             }
-
         } else {
             $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 

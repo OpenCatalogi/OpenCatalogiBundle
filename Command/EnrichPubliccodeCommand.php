@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the EnrichPubliccodeCommand.
@@ -44,7 +43,7 @@ class EnrichPubliccodeCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      *
      * @return int
      */
@@ -55,9 +54,9 @@ class EnrichPubliccodeCommand extends Command
 
         if ($repositoryId === null) {
             $this->enrichService->enrichPubliccodeHandler();
-        } 
-        
-        if ($repositoryId !== null 
+        }
+
+        if ($repositoryId !== null
             && empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;

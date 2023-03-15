@@ -6,7 +6,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the GithubService.
@@ -45,7 +44,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      *
      * @return int
      */
@@ -59,8 +58,8 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
                 return Command::FAILURE;
             }
         }
-        
-        if ($repositoryId !== null 
+
+        if ($repositoryId !== null
             && $this->githubService->getRepository($repositoryId) === null) {
             return Command::FAILURE;
         }

@@ -3,19 +3,16 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
-use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
-use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Response;
-use CommonGateway\CoreBundle\Service\GatewayResourceService;
 
 class EnrichPubliccodeService
 {
@@ -60,12 +57,12 @@ class EnrichPubliccodeService
     private GatewayResourceService $resourceService;
 
     /**
-     * @param EntityManagerInterface  $entityManager           The Entity Manager Interface
-     * @param CallService             $callService             The Call Service
-     * @param MappingService          $mappingService          The Mapping Service
-     * @param GithubPubliccodeService $githubService The Github Publiccode Service
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
+     * @param CallService             $callService     The Call Service
+     * @param MappingService          $mappingService  The Mapping Service
+     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface.
+     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -113,7 +110,7 @@ class EnrichPubliccodeService
     }//end getPubliccodeFromUrl()
 
     /**
-     * @param ObjectEntity $repository The repository object.
+     * @param ObjectEntity $repository    The repository object.
      * @param string       $publiccodeUrl The publiccode url.
      *
      * @throws GuzzleException
@@ -151,7 +148,6 @@ class EnrichPubliccodeService
             } else {
                 $this->pluginLogger->error('Could not find given repository');
             }
-            
         } else {
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
