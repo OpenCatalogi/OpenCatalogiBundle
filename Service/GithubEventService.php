@@ -167,8 +167,8 @@ class GithubEventService
             return null;
         }//end if
 
-        $repositoryEntity = $this->resourceService->getEntity('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping('https://api.github.com/repositories', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
         $repositoryArray = $this->getRepository($githubEvent['repository']['full_name'], $source);
