@@ -6,6 +6,8 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the DeveloperOverheidService.
@@ -44,14 +46,19 @@ class DeveloperOverheidGetComponentsCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output  The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
+
         // Handle the command options
         $componentId = $input->getOption('component', false);
+
+        $style->info('Execute getComponents');
 
         if ($componentId === null) {
             if (empty($this->devOverheidService->getComponents()) === true) {

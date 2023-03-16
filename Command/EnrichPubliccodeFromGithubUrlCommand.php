@@ -6,6 +6,8 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the EnrichPubliccodeFromGithubUrlCommand.
@@ -43,20 +45,24 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output  The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
+
+        $style->info('Execute enrichPubliccodeFromGithubUrlHandler');
 
         if ($repositoryId === null) {
             $this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler();
         }
-
-        if ($repositoryId !== null
+        
+        if ($repositoryId !== null 
             && empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;

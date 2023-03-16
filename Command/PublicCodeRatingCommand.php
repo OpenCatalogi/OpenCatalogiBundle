@@ -6,6 +6,8 @@ use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the RatingService.
@@ -44,24 +46,29 @@ class PublicCodeRatingCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output  The output
      *
      * @throws \Exception
      *
      * @return int
      */
-    protected function execute(InputInterface $input): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
+
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
+        $style->info('Execute enrichComponentsWithRating');
+        
         if ($componentId === null) {
             if ($this->ratingService->enrichComponentsWithRating() === null) {
                 return Command::FAILURE;
             }
-        }
-
-        if ($componentId !== null
+        } 
+        
+        if ($componentId !== null 
             && $this->ratingService->enrichComponentWithRating($componentId) === null
         ) {
             return Command::FAILURE;

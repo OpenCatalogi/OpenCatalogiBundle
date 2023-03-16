@@ -6,6 +6,8 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizat
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Command to execute the FindGithubRepositoryThroughOrganizationService.
@@ -44,22 +46,27 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output  The output
      *
      * @return int
      */
-    protected function execute(InputInterface $input): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $style = new SymfonyStyle($input, $output);
+
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
+
+        $style->info('Execute findGithubRepositoryThroughOrganizationHandler');
 
         if ($organisationId === null) {
             if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
                 return Command::FAILURE;
             }
-        }
-
-        if ($organisationId !== null
+        } 
+        
+        if ($organisationId !== null 
             && empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true
         ) {
             return Command::FAILURE;

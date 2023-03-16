@@ -52,25 +52,26 @@ class FederalizationRegisterCommand extends Command
     }//end configure()
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
+     * @param OutputInterface $output  The output
      *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-
+        
         // Handle the command options
         $catalogusId = $input->getOption('catalogus', false);
 
         if ($catalogusId === null) {
             $this->federalizationService->catalogiHandler();
-        }
-
+        } 
+        
         if ($catalogusId !== null) {
             $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
             if ($catalogusObject === []) {
-                $style->debug('Could not find object entity by id, trying on name');
+                $style->error('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
 
