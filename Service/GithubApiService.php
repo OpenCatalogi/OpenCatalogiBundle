@@ -60,7 +60,7 @@ class GithubApiService
      * @param CallService            $callService     The Call Service
      * @param CacheService           $cacheService    The Cache Service
      * @param MappingService         $mappingService  The Mapping Service
-     * @param LoggerInterface        $pluginLogger    The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface
      * @param GatewayResourceService $resourceService The Gateway Resource Service.
      */
     public function __construct(

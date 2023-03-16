@@ -66,7 +66,7 @@ class FindGithubRepositoryThroughOrganizationService
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
      * @param CallService             $callService     The Call Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface
+     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface
      * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(
@@ -190,7 +190,7 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * Get or create a component for the given repository.
      *
-     * @param ObjectEntity $repositoryObject The repoitory object.
+     * @param ObjectEntity $repositoryObject The repository object.
      * @param ObjectEntity $organization     The organisation object.
      * @param string       $type             The type of the organisation.
      *

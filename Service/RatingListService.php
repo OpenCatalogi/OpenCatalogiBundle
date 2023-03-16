@@ -46,7 +46,7 @@ class RatingListService
      * @param EntityManagerInterface $entityManager    The Entity Manager.
      * @param GithubApiService       $githubApiService The github Api Service.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,

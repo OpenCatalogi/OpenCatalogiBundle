@@ -76,10 +76,10 @@ class FindOrganizationThroughRepositoriesService
      * @param CallService             $callService       The call service
      * @param EntityManagerInterface  $entityManager     The entity manager
      * @param GithubApiService        $githubApiService  The github api service
-     * @param GithubPubliccodeService $gitService        The Github publicode service
+     * @param GithubPubliccodeService $gitService        The Github publiccode service
      * @param SynchronizationService  $syncService       The synchonization service
-     * @param MappingService          $mappingServiceThe mapping service
-     * @param LoggerInterface         $pluginLogger      The plugin version of the loger interface
+     * @param MappingService          $mappingServiceThe The mapping service
+     * @param LoggerInterface         $pluginLogger      The plugin version of the logger interface
      * @param GatewayResourceService  $resourceService   The Gateway Resource Service.
      */
     public function __construct(

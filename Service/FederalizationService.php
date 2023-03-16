@@ -83,7 +83,7 @@ class FederalizationService
      * @param CommonGroundService    $commonGroundService The commonground service
      * @param CallService            $callService         The Call Service
      * @param SynchronizationService $syncService         The synchronization service
-     * @param LoggerInterface        $pluginLogger        The plugin version of the loger interface
+     * @param LoggerInterface        $pluginLogger        The plugin version of the logger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,

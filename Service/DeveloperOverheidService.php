@@ -67,7 +67,7 @@ class DeveloperOverheidService
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param MappingService         $mappingService   The Mapping Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the loger interface.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      */
     public function __construct(
@@ -233,6 +233,7 @@ class DeveloperOverheidService
 
             return null;
         }//end if
+
 
         $component = $this->importComponent($component);
         if ($component === null) {

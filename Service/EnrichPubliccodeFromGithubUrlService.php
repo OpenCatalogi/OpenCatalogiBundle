@@ -61,7 +61,7 @@ class EnrichPubliccodeFromGithubUrlService
      * @param CallService             $callService     The Call Service
      * @param MappingService          $mappingService  The Mapping Service
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface.
+     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
      * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(

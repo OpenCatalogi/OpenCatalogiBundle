@@ -61,7 +61,7 @@ class EnrichPubliccodeService
      * @param CallService             $callService     The Call Service
      * @param MappingService          $mappingService  The Mapping Service
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the loger interface.
+     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
      * @param GatewayResourceService  $resourceService The Gateway Resource Service.
      */
     public function __construct(
@@ -130,7 +130,7 @@ class EnrichPubliccodeService
     /**
      * @param array|null  $data          Data set at the start of the handler.
      * @param array|null  $configuration Configuration of the action.
-     * @param string|null $repositoryId  The repositoory id.
+     * @param string|null $repositoryId  The repository id.
      *
      * @return array dataset at the end of the handler
      */
