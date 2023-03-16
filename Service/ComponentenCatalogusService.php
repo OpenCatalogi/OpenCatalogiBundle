@@ -221,7 +221,7 @@ class ComponentenCatalogusService
      *
      * @todo duplicate with DeveloperOverheidService ?
      *
-     * @param string $componentId
+     * @param string $componentId The component id.
      *
      * @return array|null
      */
