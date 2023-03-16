@@ -53,7 +53,7 @@ class FederalizationGetCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -73,7 +73,6 @@ class FederalizationGetCommand extends Command
                 $style->error('Could not find object entity by id, trying on name');
                 $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
             }
-            
 
             if ($catalogusObject === null) {
                 $style->error('Could not find object entity by id or name '.$catalogusId);

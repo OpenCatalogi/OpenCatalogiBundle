@@ -46,7 +46,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -63,9 +63,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             if (empty($this->compCatService->getComponents()) === true) {
                 return Command::FAILURE;
             }
-        } 
-        
-        if ($componentId !== null 
+        }
+
+        if ($componentId !== null
             && empty($this->compCatService->getComponent($componentId)) === true
         ) {
             return Command::FAILURE;

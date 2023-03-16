@@ -46,7 +46,7 @@ class FindOrganizationThroughRepositoriesCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -63,9 +63,9 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             if (empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler()) === true) {
                 return Command::FAILURE;
             }
-        } 
-        
-        if ($repositoryId !== null 
+        }
+
+        if ($repositoryId !== null
             && empty($this->findOrgRepService->findOrganizationThroughRepositoriesHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;

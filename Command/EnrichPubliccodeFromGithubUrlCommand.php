@@ -46,7 +46,7 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -61,8 +61,8 @@ class EnrichPubliccodeFromGithubUrlCommand extends Command
         if ($repositoryId === null) {
             $this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler();
         }
-        
-        if ($repositoryId !== null 
+
+        if ($repositoryId !== null
             && empty($this->enrichGithubService->enrichPubliccodeFromGithubUrlHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;

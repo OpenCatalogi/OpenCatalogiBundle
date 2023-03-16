@@ -301,14 +301,13 @@ class DeveloperOverheidService
             $this->entityManager->persist($organisation);
 
             if (($legal = $componentObject->getValue('legal')) !== null) {
-
                 $legal->setValue('repoOwner', $organisation);
                 $this->entityManager->persist($legal);
 
                 $componentObject->setValue('legal', $legal);
                 $this->entityManager->persist($componentObject);
                 $this->entityManager->flush();
-                
+
                 return $componentObject;
             }//end if
 
