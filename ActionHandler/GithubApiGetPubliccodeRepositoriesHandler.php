@@ -16,7 +16,7 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     private GithubPubliccodeService $service;
 
     /**
-     * @param GithubPubliccodeService $service The  gitService
+     * @param GithubPubliccodeService $service The  githubPubliccodeService
      */
     public function __construct(GithubPubliccodeService $service)
     {
