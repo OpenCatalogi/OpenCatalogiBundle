@@ -234,7 +234,6 @@ class DeveloperOverheidService
             return null;
         }//end if
 
-
         $component = $this->importComponent($component);
         if ($component === null) {
             return null;
