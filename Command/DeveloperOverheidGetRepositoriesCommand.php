@@ -54,16 +54,21 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->devOverheidService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
 
-        if ($repositoryId === false) {
+        $style->info('Execute getRepositories');
+
+        if ($repositoryId === null) {
             if (empty($this->devOverheidService->getRepositories()) === true) {
                 return Command::FAILURE;
             }
-        } else if (empty($this->devOverheidService->getRepository($repositoryId)) === true) {
+        }
+
+        if ($repositoryId !== null
+            && empty($this->devOverheidService->getRepository($repositoryId)) === true
+        ) {
             return Command::FAILURE;
         }
 

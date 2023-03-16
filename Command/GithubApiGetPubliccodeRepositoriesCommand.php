@@ -54,18 +54,20 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->githubService->setStyle($style);
-
-        $style->comment('GithubApiGetPubliccodeRepositoriesCommand triggered');
 
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);
 
-        if ($repositoryId === false) {
+        $style->info('Execute getRepositories');
+
+        if ($repositoryId === null) {
             if ($this->githubService->getRepositories() === false) {
                 return Command::FAILURE;
             }
-        } else if ($this->githubService->getRepository($repositoryId) === null) {
+        }
+
+        if ($repositoryId !== null
+            && $this->githubService->getRepository($repositoryId) === null) {
             return Command::FAILURE;
         }
 

@@ -38,7 +38,7 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
             'required'   => [],
             'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.

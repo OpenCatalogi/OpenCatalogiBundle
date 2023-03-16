@@ -8,12 +8,12 @@ use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -38,11 +38,6 @@ class FindOrganizationThroughRepositoriesService
     private array $data;
 
     /**
-     * @var SymfonyStyle
-     */
-    private SymfonyStyle $io;
-
-    /**
      * @var CallService
      */
     private CallService $callService;
@@ -55,12 +50,12 @@ class FindOrganizationThroughRepositoriesService
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService $githubPubliccodeService;
+    private GithubPubliccodeService $gitService;
 
     /**
      * @var SynchronizationService
      */
-    private SynchronizationService $synchronizationService;
+    private SynchronizationService $syncService;
 
     /**
      * @var MappingService
@@ -70,120 +65,57 @@ class FindOrganizationThroughRepositoriesService
     /**
      * @var LoggerInterface
      */
-    private LoggerInterface $logger;
+    private LoggerInterface $pluginLogger;
 
     /**
-     * @param CallService             $callService             The call service
-     * @param EntityManagerInterface  $entityManager           The entity manager
-     * @param GithubApiService        $githubApiService        The github api service
-     * @param GithubPubliccodeService $githubPubliccodeService The Github publicode service
-     * @param SynchronizationService  $synchronizationService  The synchonization service
-     * @param MappingService          $mappingServiceThe       mapping service
-     * @param LoggerInterface         $pluginLogger            The plugin version of the loger interface
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+
+    /**
+     * @param CallService             $callService       The call service
+     * @param EntityManagerInterface  $entityManager     The entity manager
+     * @param GithubApiService        $githubApiService  The github api service
+     * @param GithubPubliccodeService $gitService        The Github publiccode service
+     * @param SynchronizationService  $syncService       The synchonization service
+     * @param MappingService          $mappingServiceThe The mapping service
+     * @param LoggerInterface         $pluginLogger      The plugin version of the logger interface
+     * @param GatewayResourceService  $resourceService   The Gateway Resource Service.
      */
     public function __construct(
         CallService $callService,
         EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
-        GithubPubliccodeService $githubPubliccodeService,
-        SynchronizationService $synchronizationService,
+        GithubPubliccodeService $gitService,
+        SynchronizationService $syncService,
         MappingService $mappingService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
+        GatewayResourceService $resourceService
     ) {
         $this->callService = $callService;
         $this->entityManager = $entityManager;
         $this->githubApiService = $githubApiService;
-        $this->githubPubliccodeService = $githubPubliccodeService;
-        $this->synchronizationService = $synchronizationService;
+        $this->gitService = $gitService;
+        $this->syncService = $syncService;
         $this->mappingService = $mappingService;
-        $this->logger = $pluginLogger;
+        $this->pluginLogger = $pluginLogger;
+        $this->resourceService = $resourceService;
 
         $this->configuration = [];
         $this->data = [];
     }//end __construct)()
 
     /**
-     * Set symfony style in order to output to the console.
-     *
-     * @param SymfonyStyle $io
-     *
-     * @return self
-     */
-    public function setStyle(SymfonyStyle $io): self
-    {
-        $this->io = $io;
-        $this->githubPubliccodeService->setStyle($io);
-        $this->synchronizationService->setStyle($io);
-        $this->mappingService->setStyle($io);
-
-        return $this;
-    }//end setStyle()
-
-    /**
-     * Get a source by reference.
-     *
-     * @param string $location The location to look for
-     *
-     * @return Source|null
-     */
-    public function getSource(string $location): ?Source
-    {
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $location]);
-        if ($source === null) {
-//            $this->logger->error("No source found for $location");
-            isset($this->io) && $this->io->error("No source found for $location");
-        }//end if
-
-        return $source;
-    }//end getSource()
-
-    /**
-     * Get an entity by reference.
-     *
-     * @param string $reference The reference to look for
-     *
-     * @return Entity|null
-     */
-    public function getEntity(string $reference): ?Entity
-    {
-        $entity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => $reference]);
-        if ($entity === null) {
-//            $this->logger->error("No entity found for $reference");
-            isset($this->io) && $this->io->error("No entity found for $reference");
-        }//end if
-
-        return $entity;
-    }//end getEntity()
-
-    /**
-     * Get a mapping by reference.
-     *
-     * @param string $reference The reference to look for
-     *
-     * @return Mapping|null
-     */
-    public function getMapping(string $reference): ?Mapping
-    {
-        $mapping = $this->entityManager->getRepository('App:Mapping')->findOneBy(['reference' => $reference]);
-        if ($mapping === null) {
-//            $this->logger->error("No mapping found for $reference");
-            isset($this->io) && $this->io->error("No mapping found for $reference");
-        }//end if
-
-        return $mapping;
-    }//end getMapping()
-
-    /**
      * Check the auth of the github source.
      *
-     * @param Source $source The given source to check the api key
+     * @param Source $source The given source to check the api key.
      *
-     * @return bool|null If the api key is set or not
+     * @return bool|null If the api key is set or not.
      */
     public function checkGithubAuth(Source $source): ?bool
     {
-        if (!$source->getApiKey()) {
-            isset($this->io) && $this->io->error('No auth set for Source: '.$source->getName());
+        if ($source->getApiKey() === null) {
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
@@ -203,17 +135,17 @@ class FindOrganizationThroughRepositoriesService
     public function getRepositoryFromUrl(string $slug)
     {
         // Make sync object.
-        $source = $this->getSource('https://api.github.com');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, '/repos/'.$slug);
         } catch (Exception $e) {
-            isset($this->io) && $this->io->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage());
+            $this->pluginLogger->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         }
 
-        if (isset($response)) {
+        if (isset($response) === true) {
             $repository = $this->callService->decodeResponse($source, $response, 'application/json');
-            isset($this->io) && $this->io->info("Fetch and decode went succesfull for /repos/$slug");
+            $this->pluginLogger->info("Fetch and decode went succesfull for /repos/$slug", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return $repository;
         }//end if
@@ -233,18 +165,18 @@ class FindOrganizationThroughRepositoriesService
     public function getOrganisation(string $name): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->getSource('https://api.github.com');
-        if (!$this->checkGithubAuth($source)) {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        if ($this->checkGithubAuth($source) === false) {
             return null;
-        }
+        }//end if
 
-        isset($this->io) && $this->io->info('Getting organisation '.$name);
+        $this->pluginLogger->info('Getting organisation '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/orgs/'.$name);
 
         $organisation = json_decode($response->getBody()->getContents(), true);
 
-        if (!$organisation) {
-            isset($this->io) && $this->io->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName());
+        if ($organisation === null) {
+            $this->pluginLogger->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -256,7 +188,7 @@ class FindOrganizationThroughRepositoriesService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('Found organisation with name: '.$name);
+        $this->pluginLogger->debug('Found organisation with name: '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $organisation;
     }//end getOrganisation()
@@ -271,19 +203,19 @@ class FindOrganizationThroughRepositoriesService
     public function importOrganisation($organisation): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->getSource('https://api.github.com');
-        $organisationEntity = $this->getEntity('https://opencatalogi.nl/oc.organisation.schema.json');
-        $organisationMapping = $this->getMapping('https://api.github.com/organisation');
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $organisationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->synchronizationService->findSyncBySource($source, $organisationEntity, $organisation['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $organisationEntity, $organisation['id']);
 
-        isset($this->io) && $this->io->comment('Mapping object'.$organisation['login']);
-        isset($this->io) && $this->io->comment('The mapping object '.$organisationMapping);
+        $this->pluginLogger->debug('Mapping object'.$organisation['login'], ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$organisationMapping, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
-        isset($this->io) && $this->io->comment('Checking organisation '.$organisation['login']);
+        $this->pluginLogger->debug('Checking organisation '.$organisation['login'], ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($organisationMapping);
-        $synchronization = $this->synchronizationService->synchronize($synchronization, $organisation);
-        isset($this->io) && $this->io->comment('Organisation synchronization created with id: '.$synchronization->getId()->toString());
+        $synchronization = $this->syncService->synchronize($synchronization, $organisation);
+        $this->pluginLogger->debug('Organisation synchronization created with id: '.$synchronization->getId()->toString(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $synchronization->getObject();
     }//end importOrganisation()
@@ -299,28 +231,25 @@ class FindOrganizationThroughRepositoriesService
      */
     public function getOrganisationRepos(string $name): ?array
     {
-        // Do we have a source?
-        $source = $this->getSource('https://api.github.com');
-        if (!$this->checkGithubAuth($source)) {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        if ($this->checkGithubAuth($source) === false) {
             return null;
         }//end if
 
-        $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
-
-        isset($this->io) && $this->io->info('Getting repos from organisation '.$name);
+        $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
         $repositories = json_decode($response->getBody()->getContents(), true);
 
-        if (!$repositories) {
-            isset($this->io) && $this->io->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
+        if ($repositories === null) {
+            $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }//end if
 
         $owns = [];
         foreach ($repositories as $repository) {
-            $repositoryObject = $this->githubPubliccodeService->importRepository($repository);
+            $repositoryObject = $this->gitService->importRepository($repository);
             $this->entityManager->persist($repositoryObject);
             $this->entityManager->flush();
 
@@ -329,7 +258,7 @@ class FindOrganizationThroughRepositoriesService
                 continue;
             }//end if
 
-            $componentEntity = $this->getEntity('https://opencatalogi.nl/oc.component.schema.json');
+            $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             $component = new ObjectEntity($componentEntity);
             $component->hydrate([
@@ -344,7 +273,7 @@ class FindOrganizationThroughRepositoriesService
             $owns[] = $component;
         }
 
-        isset($this->io) && $this->io->success('Found '.count($owns).' repos from organisation with name: '.$name);
+        $this->pluginLogger->debug('Found '.count($owns).' repos from organisation with name: '.$name, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $owns;
     }//end getOrganisationRepos()
@@ -359,8 +288,8 @@ class FindOrganizationThroughRepositoriesService
      */
     public function enrichRepositoryWithOrganisation(ObjectEntity $repository, array &$createdOrganizations = []): ?ObjectEntity
     {
-        if (!$repository->getValue('url')) {
-            isset($this->io) && $this->io->error('Repository url not set');
+        if ($repository->getValue('url') === null) {
+            $this->pluginLogger->error('Repository url not set', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -378,20 +307,22 @@ class FindOrganizationThroughRepositoriesService
         switch ($source) {
             case 'github':
                 // let's get the repository datar
-                isset($this->io) && $this->io->info("Trying to fetch repository from: $url");
+                $this->pluginLogger->info("Trying to fetch repository from: $url", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
-                if (!$github = $this->getRepositoryFromUrl($url)) {
+                if (($github = $this->getRepositoryFromUrl($url)) === null) {
                     return null;
                 }//end if
 
                 // Check if we didnt already loop through this organization during this loop
-                if (isset($github['owner']['login']) && in_array($github['owner']['login'], $createdOrganizations)) {
-                    isset($this->io) && $this->io->info('Organization already created/updated during this loop, continuing.');
+                if (isset($github['owner']['login']) === true
+                    && in_array($github['owner']['login'], $createdOrganizations) === true
+                ) {
+                    $this->pluginLogger->info('Organization already created/updated during this loop, continuing.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
                     return null;
                 }//end if
 
-                $repository = $this->githubPubliccodeService->importRepository($github);
+                $repository = $this->gitService->importRepository($github);
 
                 if ($github['owner']['type'] === 'Organization') {
                     // get organisation from github and set the property
@@ -401,28 +332,31 @@ class FindOrganizationThroughRepositoriesService
                     $this->entityManager->persist($repository);
 
                     // get organisation component and set the property
-                    $owns = $this->getOrganisationRepos($github['owner']['login']);
-                    $organisation->setValue('owns', $owns);
+                    if (($owns = $this->getOrganisationRepos($github['owner']['login'])) !== null) {
+                        $organisation->setValue('owns', $owns);
+                    }
 
                     $this->entityManager->persist($organisation);
                     $this->entityManager->flush();
 
                     $createdOrganizations[] = $github['owner']['login'];
                 } else {
-                    isset($this->io) && $this->io->error('No organisation found for fetched repository');
+                    $this->pluginLogger->error('No organisation found for fetched repository', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
                 }
                 break;
             case 'gitlab':
                 // hetzelfde maar dan voor gitlab
                 // @TODO code for gitlab as we do for github repositories
-                isset($this->io) && $this->io->error("We dont do gitlab yet ($url)");
+                $this->pluginLogger->error("We dont do gitlab yet ($url)", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
                 break;
             default:
-                isset($this->io) && $this->io->error("We dont know this type source yet ($source)");
+                $this->pluginLogger->error("We dont know this type source yet ($source)", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
                 break;
         }
 
-        isset($repositoryObject) && $this->entityManager->persist($repositoryObject);
+        if (isset($repository) === true) {
+            $this->entityManager->persist($repository);
+        }
 
         return null;
     }//end enrichRepositoryWithOrganisation()
@@ -443,15 +377,20 @@ class FindOrganizationThroughRepositoriesService
         $this->configuration = $configuration;
         $this->data = $data;
 
-        if ($repositoryId) {
+        if ($repositoryId !== null) {
             // If we are testing for one repository
-            ($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) && $this->enrichRepositoryWithOrganisation($repository);
-            !$repository && $this->io->error('Could not find given repository');
+            if (($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) !== null) {
+                $this->enrichRepositoryWithOrganisation($repository);
+            }
+
+            if ($repository === null) {
+                $this->pluginLogger->error('Could not find given repository', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            }
         } else {
-            $repositoryEntity = $this->getEntity('https://opencatalogi.nl/oc.repository.schema.json');
+            $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             // If we want to do it for al repositories
-            isset($this->io) && $this->io->info('Looping through repositories');
+            $this->pluginLogger->info('Looping through repositories', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
             $createdOrganizations = [];
             foreach ($repositoryEntity->getObjectEntities() as $repository) {
                 $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
@@ -460,7 +399,7 @@ class FindOrganizationThroughRepositoriesService
 
         $this->entityManager->flush();
 
-        isset($this->io) && $this->io->success('findOrganizationThroughRepositoriesHandler finished');
+        $this->pluginLogger->debug('findOrganizationThroughRepositoriesHandler finished', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
 
         return $this->data;
     }//end findOrganizationThroughRepositoriesHandler()

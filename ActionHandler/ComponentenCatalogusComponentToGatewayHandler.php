@@ -38,7 +38,7 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
             'required'   => [],
             'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.

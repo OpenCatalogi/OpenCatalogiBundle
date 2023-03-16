@@ -36,25 +36,10 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'FindGithubRepositoryThroughOrganizationHandler',
             'description'=> 'This handler finds the .github repository through organizations',
-            'required'   => ['source', 'organisationEntityId'],
-            'properties' => [
-                'source' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the Github API source',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    'name'        => 'GitHub API',
-                ],
-                'organisationEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the organisation entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                ],
-            ],
+            'required'   => [],
+            'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.

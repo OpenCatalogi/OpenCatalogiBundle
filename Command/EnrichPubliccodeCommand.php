@@ -53,14 +53,19 @@ class EnrichPubliccodeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->enrichService->setStyle($style);
 
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 
-        if ($repositoryId === false) {
+        $style->info('Execute enrichPubliccodeHandler');
+
+        if ($repositoryId === null) {
             $this->enrichService->enrichPubliccodeHandler();
-        } else if (empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true) {
+        }
+
+        if ($repositoryId !== null
+            && empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true
+        ) {
             return Command::FAILURE;
         }
 

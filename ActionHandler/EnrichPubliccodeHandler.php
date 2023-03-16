@@ -35,32 +35,10 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
             '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'      => 'EnrichPubliccodeHandler',
             'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
-            'required'   => ['repositoryEntityId', 'componentEntityId', 'descriptionEntityId'],
-            'properties' => [
-                'repositoryEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the repository entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.repository.schema.json',
-                ],
-                'componentEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the component entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.catalogi.schema.json',
-                ],
-                'descriptionEntityId' => [
-                    'type'        => 'uuid',
-                    'description' => 'The uuid of the description entity',
-                    'example'     => 'b484ba0b-0fb7-4007-a303-1ead3ab48846',
-                    'required'    => true,
-                    '$ref'        => 'https://opencatalogi.nl/oc.description.schema.json',
-                ],
-            ],
+            'required'   => [],
+            'properties' => [],
         ];
-    }
+    }//end getConfiguration()
 
     /**
      * This function runs the application to gateway service plugin.

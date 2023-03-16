@@ -53,16 +53,20 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
-        $this->compCatService->setStyle($style);
 
-        // Handle the command optiosn
+        // Handle the command options.
         $applicationId = $input->getOption('application', false);
+        $style->info('Execute getApplications');
 
-        if ($applicationId === false) {
+        if ($applicationId === null) {
             if ($this->compCatService->getApplications() === null) {
                 return Command::FAILURE;
             }
-        } else if ($this->compCatService->getApplication($applicationId) === null) {
+        }
+
+        if ($applicationId !== null
+            && $this->compCatService->getApplication($applicationId) === null
+        ) {
             return Command::FAILURE;
         }
 
