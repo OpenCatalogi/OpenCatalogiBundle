@@ -47,7 +47,7 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -65,8 +65,8 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
                 return Command::FAILURE;
             }
         }
-        
-        if ($repositoryId !== null 
+
+        if ($repositoryId !== null
             && $this->githubService->getRepository($repositoryId) === null) {
             return Command::FAILURE;
         }

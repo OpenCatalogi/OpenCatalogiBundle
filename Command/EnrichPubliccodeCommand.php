@@ -46,7 +46,7 @@ class EnrichPubliccodeCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -58,12 +58,12 @@ class EnrichPubliccodeCommand extends Command
         $repositoryId = $input->getOption('repositoryId', false);
 
         $style->info('Execute enrichPubliccodeHandler');
-        
+
         if ($repositoryId === null) {
             $this->enrichService->enrichPubliccodeHandler();
-        } 
-        
-        if ($repositoryId !== null 
+        }
+
+        if ($repositoryId !== null
             && empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true
         ) {
             return Command::FAILURE;

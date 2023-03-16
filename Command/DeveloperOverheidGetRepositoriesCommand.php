@@ -47,7 +47,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */

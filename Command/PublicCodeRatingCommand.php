@@ -47,7 +47,7 @@ class PublicCodeRatingCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @throws \Exception
      *
@@ -61,14 +61,14 @@ class PublicCodeRatingCommand extends Command
         $componentId = $input->getOption('component', false);
 
         $style->info('Execute enrichComponentsWithRating');
-        
+
         if ($componentId === null) {
             if ($this->ratingService->enrichComponentsWithRating() === null) {
                 return Command::FAILURE;
             }
-        } 
-        
-        if ($componentId !== null 
+        }
+
+        if ($componentId !== null
             && $this->ratingService->enrichComponentWithRating($componentId) === null
         ) {
             return Command::FAILURE;

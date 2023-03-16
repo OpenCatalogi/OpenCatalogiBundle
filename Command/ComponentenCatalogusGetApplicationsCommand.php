@@ -46,8 +46,8 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
-     * 
+     * @param OutputInterface $output The output
+     *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,7 +64,7 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             }
         }
 
-        if ($applicationId !== null 
+        if ($applicationId !== null
             && $this->compCatService->getApplication($applicationId) === null
         ) {
             return Command::FAILURE;

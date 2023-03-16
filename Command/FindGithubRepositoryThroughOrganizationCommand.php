@@ -47,7 +47,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
 
     /**
      * @param InputInterface  $input  The input
-     * @param OutputInterface $output  The output
+     * @param OutputInterface $output The output
      *
      * @return int
      */
@@ -64,9 +64,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
             if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
                 return Command::FAILURE;
             }
-        } 
-        
-        if ($organisationId !== null 
+        }
+
+        if ($organisationId !== null
             && empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true
         ) {
             return Command::FAILURE;
