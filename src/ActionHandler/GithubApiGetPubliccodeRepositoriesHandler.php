@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
  */
 class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterface
 {
+
     /**
      * @var GithubPubliccodeService
      */
     private GithubPubliccodeService $service;
+
 
     /**
      * @param GithubPubliccodeService $service The  githubPubliccodeService
@@ -21,7 +23,9 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     public function __construct(GithubPubliccodeService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/GithubApiGetPubliccodeRepositoriesHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'GithubApiGetPubliccodeRepositoriesHandler',
-            'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubApiGetPubliccodeRepositoriesHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'GithubApiGetPubliccodeRepositoriesHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
     public function run(array $data, array $configuration): array
     {
         return $this->service->getRepositories();
+
     }//end run()
+
+
 }//end class

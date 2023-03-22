@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 
 class GithubApiService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -55,6 +56,7 @@ class GithubApiService
      */
     private GatewayResourceService $resourceService;
 
+
     /**
      * @param EntityManagerInterface $entityManager   The Entity Manager Interface
      * @param CallService            $callService     The Call Service
@@ -71,16 +73,18 @@ class GithubApiService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
-        $this->entityManager = $entityManager;
-        $this->callService = $callService;
-        $this->cacheService = $cacheService;
-        $this->mappingService = $mappingService;
-        $this->pluginLogger = $pluginLogger;
+        $this->entityManager   = $entityManager;
+        $this->callService     = $callService;
+        $this->cacheService    = $cacheService;
+        $this->mappingService  = $mappingService;
+        $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
 
         $this->configuration = [];
-        $this->data = [];
+        $this->data          = [];
+
     }//end __construct()
+
 
     /**
      * This function create or get the component of the repository.
@@ -94,14 +98,16 @@ class GithubApiService
     public function connectComponent(ObjectEntity $repository): ?ObjectEntity
     {
         $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $components = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
+        $components      = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
 
         if ($components === []) {
             $component = new ObjectEntity($componentEntity);
-            $component->hydrate([
-                'name' => $repository->getValue('name'),
-                'url'  => $repository,
-            ]);
+            $component->hydrate(
+                [
+                    'name' => $repository->getValue('name'),
+                    'url'  => $repository,
+                ]
+            );
             $this->entityManager->persist($component);
         }//end if
 
@@ -114,7 +120,9 @@ class GithubApiService
         }//end if
 
         return null;
+
     }//end connectComponent()
+
 
     /**
      * This function checks if a github repository is public.
@@ -131,7 +139,7 @@ class GithubApiService
         $slug = rtrim($slug, '/');
 
         try {
-            $response = $this->callService->call($source, '/repos/'.$slug);
+            $response   = $this->callService->call($source, '/repos/'.$slug);
             $repository = $this->callService->decodeResponse($source, $response);
         } catch (Exception $exception) {
             // @TODO Monolog ?
@@ -141,5 +149,8 @@ class GithubApiService
         }
 
         return $repository['private'] === false;
+
     }//end checkPublicRepository()
+
+
 }//end class

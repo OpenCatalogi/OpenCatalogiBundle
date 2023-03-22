@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesS
  */
 class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterface
 {
+
     /**
      * @var FindOrganizationThroughRepositoriesService
      */
     private FindOrganizationThroughRepositoriesService $service;
+
 
     /**
      * @param FindOrganizationThroughRepositoriesService $service The findOrganizationThroughRepositoriesService
@@ -21,7 +23,9 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function __construct(FindOrganizationThroughRepositoriesService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/FindOrganizationThroughRepositoriesHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'FindOrganizationThroughRepositoriesHandler',
-            'description'=> 'This handler finds organizations through repositories',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/FindOrganizationThroughRepositoriesHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'FindOrganizationThroughRepositoriesHandler',
+            'description' => 'This handler finds organizations through repositories',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
     public function run(array $data, array $configuration): array
     {
         return $this->service->findOrganizationThroughRepositoriesHandler($data, $configuration);
+
     }//end run()
+
+
 }//end class

@@ -22,6 +22,7 @@ use Twig\Error\SyntaxError;
  */
 class FindGithubRepositoryThroughOrganizationService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -62,6 +63,7 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private Yaml $yaml;
 
+
     /**
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
@@ -76,16 +78,18 @@ class FindGithubRepositoryThroughOrganizationService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
-        $this->callService = $callService;
-        $this->entityManager = $entityManager;
-        $this->githubService = $githubService;
-        $this->pluginLogger = $pluginLogger;
+        $this->callService     = $callService;
+        $this->entityManager   = $entityManager;
+        $this->githubService   = $githubService;
+        $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
-        $this->yaml = new Yaml();
+        $this->yaml            = new Yaml();
 
         $this->configuration = [];
-        $this->data = [];
+        $this->data          = [];
+
     }//end __construct()
+
 
     /**
      * Check the auth of the github source.
@@ -97,13 +101,15 @@ class FindGithubRepositoryThroughOrganizationService
     public function checkGithubAuth(Source $source): ?bool
     {
         if ($source->getApiKey() === null) {
-            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
 
         return true;
+
     }//end checkGithubAuth()
+
 
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
@@ -156,7 +162,9 @@ class FindGithubRepositoryThroughOrganizationService
         }//end if
 
         return null;
+
     }//end getOpenCatalogiFromGithubRepo()
+
 
     /**
      * This function is searching for repositories containing a publiccode.yaml file.
@@ -185,7 +193,9 @@ class FindGithubRepositoryThroughOrganizationService
         }//end if
 
         return null;
+
     }//end getGithubRepoFromOrganization()
+
 
     /**
      * Get or create a component for the given repository.
@@ -207,19 +217,23 @@ class FindGithubRepositoryThroughOrganizationService
             $component = new ObjectEntity($componentEntity);
         }//end if
 
-        $component->hydrate([
-            'name' => $repositoryObject->getValue('name'),
-            'url'  => $repositoryObject,
+        $component->hydrate(
+            [
+                'name'   => $repositoryObject->getValue('name'),
+                'url'    => $repositoryObject,
             // set the organisation to usedBy if type is uses
-            'usedBy' => $type == 'use' ? [$organization] : [],
-        ]);
+                'usedBy' => $type == 'use' ? [$organization] : [],
+            ]
+        );
         $repositoryObject->setValue('component', $component);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->persist($component);
         $this->entityManager->flush();
 
         return $component;
+
     }//end setRepositoryComponent()
+
 
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
@@ -264,7 +278,9 @@ class FindGithubRepositoryThroughOrganizationService
         $this->pluginLogger->debug('Found repo from organisation with name: '.$name);
 
         return $this->setRepositoryComponent($repositoryObject, $organization, $type);
+
     }//end getOrganisationRepo()
+
 
     /**
      * Fetches opencatalogi.yaml info with function getOpenCatalogiFromGithubRepo for an organization and updates the given organization.
@@ -287,7 +303,15 @@ class FindGithubRepositoryThroughOrganizationService
                 }//end if
 
                 // We don't want to set the name, this has to be the login property from the github api.
-                $allowedKeys = ['description', 'type', 'telephone', 'email', 'website', 'logo', 'catalogusAPI'];
+                $allowedKeys = [
+                    'description',
+                    'type',
+                    'telephone',
+                    'email',
+                    'website',
+                    'logo',
+                    'catalogusAPI',
+                ];
                 $organization->hydrate(array_intersect_key($openCatalogi, array_flip($allowedKeys)));
 
                 $uses = [];
@@ -312,7 +336,9 @@ class FindGithubRepositoryThroughOrganizationService
                 $this->pluginLogger->debug($organization->getName().' succesfully updated with fetched openCatalogi info');
             }//end if
         }//end if
+
     }//end getOrganizationCatalogi()
+
 
     /**
      * Makes sure the action the action can actually runs and then executes functions to update an organization with fetched opencatalogi.yaml info.
@@ -324,10 +350,10 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return array|null dataset at the end of the handler              (not needed here)
      */
-    public function findGithubRepositoryThroughOrganizationHandler(?array $data = [], ?array $configuration = [], ?string $organisationId = null): ?array
+    public function findGithubRepositoryThroughOrganizationHandler(?array $data=[], ?array $configuration=[], ?string $organisationId=null): ?array
     {
         $this->configuration = $configuration;
-        $this->data = $data;
+        $this->data          = $data;
 
         if ($organisationId !== null) {
             // If we are testing for one repository.
@@ -354,11 +380,15 @@ class FindGithubRepositoryThroughOrganizationService
                     $this->getOrganizationCatalogi($organisation);
                 }
             }
-        }
+        }//end if
+
         $this->entityManager->flush();
 
         $this->pluginLogger->debug('findRepositoriesThroughOrganisationHandler finished');
 
         return $this->data;
+
     }//end findGithubRepositoryThroughOrganizationHandler()
+
+
 }//end class

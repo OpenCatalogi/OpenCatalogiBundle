@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
  */
 class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
 {
+
     /**
      * @var DeveloperOverheidService
      */
     private DeveloperOverheidService $service;
+
 
     /**
      * @param DeveloperOverheidService $service The developer Overheid Service
@@ -21,7 +23,9 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
     public function __construct(DeveloperOverheidService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/DeveloperOverheidApiToGatewayHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'DeveloperOverheidApiToGatewayHandler',
-            'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/DeveloperOverheidApiToGatewayHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'DeveloperOverheidApiToGatewayHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->service->getComponents();
+
     }//end run()
+
+
 }//end class

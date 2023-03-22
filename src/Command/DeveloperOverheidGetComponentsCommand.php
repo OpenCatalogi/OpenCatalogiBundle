@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class DeveloperOverheidGetComponentsCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+
     /**
      * @var string
      */
@@ -23,7 +24,8 @@ class DeveloperOverheidGetComponentsCommand extends Command
     /**
      * @var DeveloperOverheidService
      */
-    private DeveloperOverheidService  $devOverheidService;
+    private DeveloperOverheidService $devOverheidService;
+
 
     /**
      * @param DeveloperOverheidService $devOverheidService developer Overheid Service
@@ -32,7 +34,9 @@ class DeveloperOverheidGetComponentsCommand extends Command
     {
         $this->devOverheidService = $devOverheidService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -43,7 +47,9 @@ class DeveloperOverheidGetComponentsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi DeveloperOverheidService')
             ->setHelp('This command allows you to get all components or one component from developer.overheid.nl/apis')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -73,5 +79,8 @@ class DeveloperOverheidGetComponentsCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

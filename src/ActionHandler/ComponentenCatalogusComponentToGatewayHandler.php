@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
  */
 class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInterface
 {
+
     /**
      * @var ComponentenCatalogusService
      */
     private ComponentenCatalogusService $service;
+
 
     /**
      * @param ComponentenCatalogusService $service The componenten Catalogus Service
@@ -21,7 +23,9 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
     public function __construct(ComponentenCatalogusService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/ComponentenCatalogusComponentToGatewayHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'ComponentenCatalogusComponentToGatewayHandler',
-            'description'=> 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/ComponentenCatalogusComponentToGatewayHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'ComponentenCatalogusComponentToGatewayHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
     public function run(array $data, array $configuration): array
     {
         return $this->service->getComponents();
+
     }//end run()
+
+
 }//end class

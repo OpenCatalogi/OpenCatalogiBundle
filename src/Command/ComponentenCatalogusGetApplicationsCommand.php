@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetApplicationsCommand extends Command
 {
+
     /**
      * @var string
      */
@@ -22,7 +23,8 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService  $compCatService;
+    private ComponentenCatalogusService $compCatService;
+
 
     /**
      * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
@@ -31,7 +33,9 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     {
         $this->compCatService = $compCatService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -42,7 +46,9 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all applications or one application from componentencatalogus.commonground.nl/api/products')
             ->addOption('application', 'a', InputOption::VALUE_OPTIONAL, 'Get a single application by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -71,5 +77,8 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

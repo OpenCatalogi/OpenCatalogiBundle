@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FindGithubRepositoryThroughOrganizationCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+
     /**
      * @var string
      */
@@ -23,7 +24,8 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     /**
      * @var FindGithubRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService  $findGitService;
+    private FindGithubRepositoryThroughOrganizationService $findGitService;
+
 
     /**
      * @param FindGithubRepositoryThroughOrganizationService $findGitService find Github Repository Through Organization Service
@@ -32,7 +34,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     {
         $this->findGitService = $findGitService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -43,7 +47,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update create owned repositories from organisation')
             ->addOption('organisationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -73,5 +79,8 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

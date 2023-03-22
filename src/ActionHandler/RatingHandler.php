@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
  */
 class RatingHandler implements ActionHandlerInterface
 {
+
     /**
      * @var RatingService
      */
     private RatingService $service;
+
 
     /**
      * @param RatingService $service The RatingService
@@ -21,7 +23,9 @@ class RatingHandler implements ActionHandlerInterface
     public function __construct(RatingService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class RatingHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/RatingHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'RatingHandler',
-            'description'=> 'This handler sets the rating of a component',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/RatingHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'RatingHandler',
+            'description' => 'This handler sets the rating of a component',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the email service plugin.
@@ -51,5 +57,8 @@ class RatingHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->service->ratingHandler($data, $configuration);
+
     }//end run()
+
+
 }//end class

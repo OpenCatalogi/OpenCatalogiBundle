@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnrichPubliccodeFromGithubUrlService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -56,6 +57,7 @@ class EnrichPubliccodeFromGithubUrlService
      */
     private array $data;
 
+
     /**
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param CallService             $callService     The Call Service
@@ -72,15 +74,17 @@ class EnrichPubliccodeFromGithubUrlService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
-        $this->entityManager = $entityManager;
-        $this->callService = $callService;
-        $this->githubService = $githubService;
-        $this->mappingService = $mappingService;
-        $this->pluginLogger = $pluginLogger;
+        $this->entityManager   = $entityManager;
+        $this->callService     = $callService;
+        $this->githubService   = $githubService;
+        $this->mappingService  = $mappingService;
+        $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
-        $this->configuration = [];
-        $this->data = [];
-    }
+        $this->configuration   = [];
+        $this->data            = [];
+
+    }//end __construct()
+
 
     /**
      * This function fetches repository data.
@@ -114,7 +118,9 @@ class EnrichPubliccodeFromGithubUrlService
         }
 
         return null;
+
     }//end getPubliccodeFromUrl()
+
 
     /**
      * @param ObjectEntity $repository
@@ -130,7 +136,9 @@ class EnrichPubliccodeFromGithubUrlService
         }
 
         return $repository;
+
     }//end enrichRepositoryWithPubliccode()
+
 
     /**
      * @param array|null  $data          data set at the start of the handler
@@ -139,10 +147,10 @@ class EnrichPubliccodeFromGithubUrlService
      *
      * @return array dataset at the end of the handler
      */
-    public function enrichPubliccodeFromGithubUrlHandler(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): array
+    public function enrichPubliccodeFromGithubUrlHandler(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): array
     {
         $this->configuration = $configuration;
-        $this->data = $data;
+        $this->data          = $data;
 
         if ($repositoryId !== null) {
             // If we are testing for one repository.
@@ -170,5 +178,8 @@ class EnrichPubliccodeFromGithubUrlService
         $this->pluginLogger->debug('enrichPubliccodeFromGithubUrlHandler finished');
 
         return $this->data;
+
     }//end enrichPubliccodeFromGithubUrlHandler()
-}
+
+
+}//end class

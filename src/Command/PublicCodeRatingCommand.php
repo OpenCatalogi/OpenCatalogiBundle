@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class PublicCodeRatingCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+
     /**
      * @var string
      */
@@ -23,7 +24,8 @@ class PublicCodeRatingCommand extends Command
     /**
      * @var RatingService
      */
-    private RatingService  $ratingService;
+    private RatingService $ratingService;
+
 
     /**
      * @param RatingService $ratingService The rating service
@@ -32,7 +34,9 @@ class PublicCodeRatingCommand extends Command
     {
         $this->ratingService = $ratingService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -43,7 +47,9 @@ class PublicCodeRatingCommand extends Command
             ->setDescription('This command triggers OpenCatalogi RatingService')
             ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Rate a single component by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -75,5 +81,8 @@ class PublicCodeRatingCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

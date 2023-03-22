@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
  */
 class ComponentenCatalogusService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -59,6 +60,7 @@ class ComponentenCatalogusService
      */
     private LoggerInterface $pluginLogger;
 
+
     /**
      * @param EntityManagerInterface   $entityManager   The Entity Manager Interface.
      * @param CallService              $callService     The Call Service.
@@ -79,15 +81,17 @@ class ComponentenCatalogusService
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager = $entityManager;
-        $this->callService = $callService;
-        $this->cacheService = $cacheService;
-        $this->syncService = $syncService;
-        $this->mappingService = $mappingService;
-        $this->donService = $donService;
-        $this->pluginLogger = $pluginLogger;
+        $this->entityManager   = $entityManager;
+        $this->callService     = $callService;
+        $this->cacheService    = $cacheService;
+        $this->syncService     = $syncService;
+        $this->mappingService  = $mappingService;
+        $this->donService      = $donService;
+        $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
+
     }//end __construct()
+
 
     /**
      * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
@@ -110,7 +114,9 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $result;
+
     }//end getApplications()
+
 
     /**
      * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}.
@@ -145,7 +151,9 @@ class ComponentenCatalogusService
         $this->pluginLogger->info('Found application with id: '.$applicationId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $application->toArray();
+
     }//end getApplication()
+
 
     /**
      * Import the application into the data layer.
@@ -157,9 +165,9 @@ class ComponentenCatalogusService
     public function importApplication(array $application): ?ObjectEntity
     {
         // Do we have a source
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source            = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
         $applicationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping           = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $applicationEntity, $application['id']);
 
@@ -176,7 +184,7 @@ class ComponentenCatalogusService
             $components = [];
             foreach ($application['components'] as $component) {
                 $componentObject = $this->importComponent($component);
-                $components[] = $componentObject;
+                $components[]    = $componentObject;
             }//end foreach
 
             $applicationObject->setValue('components', $components);
@@ -186,7 +194,9 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $applicationObject;
+
     }//end importApplication()
+
 
     /**
      * Get components through the components of https://componentencatalogus.commonground.nl/api/components.
@@ -214,7 +224,9 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $result;
+
     }//end getComponents()
+
 
     /**
      * Get a component trough the components of https://componentencatalogus.commonground.nl/api/components/{id}.
@@ -251,7 +263,9 @@ class ComponentenCatalogusService
         $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $component->toArray();
+
     }//end getComponent()
+
 
     /**
      * Imports a repository through a component.
@@ -272,10 +286,12 @@ class ComponentenCatalogusService
             $repositories = $this->cacheService->searchObjects(null, ['url' => $componentArray['url']['url']], [$repositoryEntity->getId()->toString()])['results'];
             if ($repositories === []) {
                 $repository = new ObjectEntity($repositoryEntity);
-                $repository->hydrate([
-                    'name' => $componentArray['url']['name'],
-                    'url'  => $componentArray['url']['url'],
-                ]);
+                $repository->hydrate(
+                    [
+                        'name' => $componentArray['url']['name'],
+                        'url'  => $componentArray['url']['url'],
+                    ]
+                );
             }//end if
 
             if (count($repositories) === 1) {
@@ -292,7 +308,9 @@ class ComponentenCatalogusService
         }//end if
 
         return null;
+
     }//end importRepositoryThroughComponent()
+
 
     /**
      * @todo duplicate with DeveloperOverheidService ?
@@ -304,9 +322,9 @@ class ComponentenCatalogusService
     public function importComponent(array $component): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle', 'open-catalogi/open-catalogi-bundle');
+        $source          = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle', 'open-catalogi/open-catalogi-bundle');
         $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping         = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Handle sync.
         $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
@@ -336,5 +354,8 @@ class ComponentenCatalogusService
         $this->entityManager->flush();
 
         return $componentObject;
+
     }//end importComponent()
-}
+
+
+}//end class

@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class EnrichPubliccodeCommand extends Command
 {
+
     /**
      * @var string
      */
@@ -24,6 +25,7 @@ class EnrichPubliccodeCommand extends Command
      */
     private EnrichPubliccodeService $enrichService;
 
+
     /**
      * @param EnrichPubliccodeService $enrichService enrich Publiccode Service
      */
@@ -31,7 +33,9 @@ class EnrichPubliccodeCommand extends Command
     {
         $this->enrichService = $enrichService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -42,7 +46,9 @@ class EnrichPubliccodeCommand extends Command
             ->setDescription('Find repositories containing publiccode')
             ->setHelp('This command finds repositories on github that contain an publiccode file')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find a organization for a specific repository by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -70,5 +76,8 @@ class EnrichPubliccodeCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

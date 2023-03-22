@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class RatingListService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -42,6 +43,7 @@ class RatingListService
      */
     private array $data;
 
+
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager.
      * @param GithubApiService       $githubApiService The github Api Service.
@@ -54,13 +56,15 @@ class RatingListService
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager    = $entityManager;
         $this->githubApiService = $githubApiService;
-        $this->resourceService = $resourceService;
-        $this->pluginLogger = $pluginLogger;
-        $this->configuration = [];
+        $this->resourceService  = $resourceService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->configuration    = [];
         $this->data = [];
+
     }//end __construct()
+
 
     /**
      * Rates the name of the component.
@@ -84,7 +88,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateName()
+
 
     /**
      * Rates the url of the component.
@@ -124,10 +130,12 @@ class RatingListService
             $ratingArray['maxRating']++;
         }//end if
 
-        $ratingArray['maxRating'] = $ratingArray['maxRating'] + 2;
+        $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 2);
 
         return $ratingArray;
+
     }//end rateUrl()
+
 
     /**
      * Rates the landing url of the component.
@@ -151,7 +159,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateLandingUrl()
+
 
     /**
      * Rates the software version of the component.
@@ -175,7 +185,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateSoftwareVersion()
+
 
     /**
      * Rates the release date of the component.
@@ -199,7 +211,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateReleaseDate()
+
 
     /**
      * Rates the logo of the component.
@@ -223,7 +237,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateLogo()
+
 
     /**
      * Rates the roadmap of the component.
@@ -247,7 +263,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateRoadmap()
+
 
     /**
      * Rates the development status of the component.
@@ -271,7 +289,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateDevelopmentStatus()
+
 
     /**
      * Rates the software type of the component.
@@ -295,7 +315,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateSoftwareType()
+
 
     /**
      * Rates the platforms of the component.
@@ -319,7 +341,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end ratePlatforms()
+
 
     /**
      * Rates the categories of the component.
@@ -343,7 +367,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateCategories()
+
 
     /**
      * Rates the localised name of the description.
@@ -367,7 +393,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateLocalisedName()
+
 
     /**
      * Rates the short description of the description.
@@ -391,7 +419,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateShortDescription()
+
 
     /**
      * Rates the long description of the description.
@@ -415,7 +445,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateLongDescription()
+
 
     /**
      * Rates the api documentation of the description.
@@ -439,7 +471,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateApiDocumentation()
+
 
     /**
      * Rates the features of the description.
@@ -463,7 +497,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateFeatures()
+
 
     /**
      * Rates the screenshots of the description.
@@ -487,7 +523,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateScreenshots()
+
 
     /**
      * Rates the screenshots of the description.
@@ -511,7 +549,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateVideos()
+
 
     /**
      * Rates the license of the legal object.
@@ -535,7 +575,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateLicense()
+
 
     /**
      * Rates the copy right owner.
@@ -559,7 +601,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateCopyOwner()
+
 
     /**
      * Rates the repo owner.
@@ -583,7 +627,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateRepoOwner()
+
 
     /**
      * Rates the authors file of the legal object.
@@ -607,7 +653,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateAuthorsFile()
+
 
     /**
      * Rates the type of the maintenace object.
@@ -631,7 +679,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateType()
+
 
     /**
      * Rates the type of the maintenace object.
@@ -655,7 +705,9 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateContractors()
+
 
     /**
      * Rates the type of the maintenace object.
@@ -679,5 +731,8 @@ class RatingListService
         $ratingArray['maxRating']++;
 
         return $ratingArray;
+
     }//end rateContacts()
+
+
 }//end class

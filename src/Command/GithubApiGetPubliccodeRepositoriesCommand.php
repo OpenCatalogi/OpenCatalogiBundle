@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GithubApiGetPubliccodeRepositoriesCommand extends Command
 {
     // the name of the command (the part after "bin/console")
+
     /**
      * @var string
      */
@@ -23,7 +24,8 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     /**
      * @var GithubPubliccodeService
      */
-    private GithubPubliccodeService  $githubService;
+    private GithubPubliccodeService $githubService;
+
 
     /**
      * @param GithubPubliccodeService $githubService The Github Publiccode Service
@@ -32,7 +34,9 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     {
         $this->githubService = $githubService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -43,7 +47,9 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
             ->setDescription('This command triggers OpenCatalogi GithubPubliccodeService')
             ->setHelp('This command allows you to get all repositories or one repository from https://api.github.com/search/code')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -67,10 +73,14 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
         }
 
         if ($repositoryId !== null
-            && $this->githubService->getRepository($repositoryId) === null) {
+            && $this->githubService->getRepository($repositoryId) === null
+        ) {
             return Command::FAILURE;
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class
