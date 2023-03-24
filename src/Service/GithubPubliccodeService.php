@@ -100,7 +100,7 @@ class GithubPubliccodeService
         $this->githubApiService = $githubApiService;
         $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
-        $this->yaml = new Yaml();
+        $this->yaml             = new Yaml();
 
     }//end __construct()
 
@@ -287,8 +287,8 @@ class GithubPubliccodeService
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source?
-        $source           = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $source              = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity    = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         $repositoriesMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $repository['repository']['name'] = str_replace('-', ' ', $repository['repository']['name']);

@@ -213,7 +213,7 @@ class FindOrganizationThroughRepositoriesService
     public function importOrganisation($organisation): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source              = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         $organisationEntity  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
         $organisationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
@@ -314,7 +314,7 @@ class FindOrganizationThroughRepositoriesService
         $url    = $repository->getValue('url');
 
         if ($source == null) {
-            $domain = \Safe\parse_url($url, PHP_URL_HOST);
+            $domain                            = \Safe\parse_url($url, PHP_URL_HOST);
             $domain == 'github.com' && $source = 'github';
             $domain == 'gitlab.com' && $source = 'gitlab';
         }//end if

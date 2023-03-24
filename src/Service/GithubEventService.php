@@ -105,7 +105,7 @@ class GithubEventService
         $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
         $this->configuration    = [];
-        $this->data = [];
+        $this->data             = [];
 
     }//end __construct()
 

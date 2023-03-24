@@ -96,12 +96,12 @@ class FederalizationService
         SynchronizationService $syncService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager = $entityManager;
-        $this->session       = $session;
+        $this->entityManager       = $entityManager;
+        $this->session             = $session;
         $this->commonGroundService = $commonGroundService;
         $this->callService         = $callService;
         $this->syncService         = $syncService;
-        $this->logger = $pluginLogger;
+        $this->logger              = $pluginLogger;
 
     }//end __construct()
 
