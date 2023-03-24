@@ -33,6 +33,7 @@ use Twig\Error\SyntaxError;
  */
 class GithubPubliccodeService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -73,6 +74,7 @@ class GithubPubliccodeService
      */
     private Yaml $yaml;
 
+
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
      * @param CallService            $callService      The Call Service.
@@ -91,15 +93,17 @@ class GithubPubliccodeService
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager = $entityManager;
-        $this->callService = $callService;
-        $this->syncService = $syncService;
-        $this->mappingService = $mappingService;
+        $this->entityManager    = $entityManager;
+        $this->callService      = $callService;
+        $this->syncService      = $syncService;
+        $this->mappingService   = $mappingService;
         $this->githubApiService = $githubApiService;
-        $this->resourceService = $resourceService;
-        $this->pluginLogger = $pluginLogger;
+        $this->resourceService  = $resourceService;
+        $this->pluginLogger     = $pluginLogger;
         $this->yaml = new Yaml();
+
     }//end __construct()
+
 
     /**
      * Check the auth of the github source.
@@ -111,13 +115,15 @@ class GithubPubliccodeService
     public function checkGithubAuth(Source $source): ?bool
     {
         if ($source->getApiKey() === null) {
-            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
 
         return true;
+
     }//end checkGithubAuth()
+
 
     /**
      * @TODO Loop through all the pages of the github api.
@@ -136,8 +142,8 @@ class GithubPubliccodeService
         }//end if
 
         $errorCount = 0;
-        $pageCount = 1;
-        $results = [];
+        $pageCount  = 1;
+        $results    = [];
         while ($errorCount < 5) {
             try {
                 $url = 'https://api.github.com/search/code?q=publiccode+in:path+path:/+extension:yaml+extension:yml&page='.$pageCount;
@@ -150,11 +156,16 @@ class GithubPubliccodeService
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
                 // Set your auth headers.
-                curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                    'Content-Type: application/json',
-                    'Authorization: '.$source->getApiKey(),
-                    'User-Agent: smisidjan', // @TODO This is for everyone different set this to the github api sourc?
-                ]);
+                curl_setopt(
+                    $ch,
+                    CURLOPT_HTTPHEADER,
+                    [
+                        'Content-Type: application/json',
+                        'Authorization: '.$source->getApiKey(),
+                        'User-Agent: smisidjan',
+                    // @TODO This is for everyone different set this to the github api sourc?
+                    ]
+                );
 
                 // Get stringified data/output. See CURLOPT_RETURNTRANSFER.
                 $data = curl_exec($ch);
@@ -163,19 +174,22 @@ class GithubPubliccodeService
 
                 $decodedResult = json_decode($data, true);
 
-                if ($decodedResult === [] || !isset($decodedResult['results']) ||
-                    $decodedResult['results'] === []) {
+                if ($decodedResult === [] || !isset($decodedResult['results'])
+                    || $decodedResult['results'] === []
+                ) {
                     continue;
                 }//end if
 
                 $results[] = $decodedResult;
             } catch (\Exception $exception) {
                 $errorCount++;
-            }
-        }
+            }//end try
+        }//end while
 
         return $results;
+
     }//end callSource()
+
 
     /**
      * Get repositories through the repositories of https://api.github.com/search/code
@@ -193,17 +207,15 @@ class GithubPubliccodeService
             return null;
         }//end if
 
-        $result = [];
+        $result      = [];
         $queryConfig = [];
 
-        $queryConfig['query'] = [
-            'q' => 'publiccode in:path path:/ extension:yaml extension:yml',
-        ];
+        $queryConfig['query'] = ['q' => 'publiccode in:path path:/ extension:yaml extension:yml'];
 
         // Find on publiccode.yaml.
         $repositories = $this->callService->getAllResults($source, '/search/code', $queryConfig);
 
-        $this->pluginLogger->debug('Found '.count($repositories).' repositories.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Found '.count($repositories).' repositories.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         foreach ($repositories as $repository) {
             $result[] = $this->importPubliccodeRepository($repository);
         }
@@ -211,7 +223,9 @@ class GithubPubliccodeService
         $this->entityManager->flush();
 
         return $result;
+
     }//end getRepositories()
+
 
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
@@ -232,17 +246,17 @@ class GithubPubliccodeService
             return null;
         }//end if
 
-        $this->pluginLogger->debug('Getting repository '.$id.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Getting repository '.$id.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         try {
-            $response = $this->callService->call($source, '/repositories/'.$id.'.');
+            $response   = $this->callService->call($source, '/repositories/'.$id.'.');
             $repository = json_decode($response->getBody()->getContents(), true);
         } catch (RequestException $requestException) {
-            $this->pluginLogger->error($requestException->getMessage(), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error($requestException->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
         if (isset($repository) === false) {
-            $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
@@ -254,10 +268,12 @@ class GithubPubliccodeService
 
         $this->entityManager->flush();
 
-        $this->pluginLogger->debug('Found repository with id: '.$id.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Found repository with id: '.$id.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         return $repository->toArray();
+
     }//end getRepository()
+
 
     /**
      * Maps a repository object and creates/updates a Synchronization.
@@ -271,7 +287,7 @@ class GithubPubliccodeService
     public function importPubliccodeRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source           = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         $repositoriesMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
@@ -279,13 +295,13 @@ class GithubPubliccodeService
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['repository']['id']);
 
-        $this->pluginLogger->debug('Mapping object'.$repository['repository']['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$repositoriesMapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object'.$repository['repository']['name'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoriesMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
-        $this->pluginLogger->debug('Checking repository '.$repository['repository']['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking repository '.$repository['repository']['name'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($repositoriesMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
-        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $repository = $synchronization->getObject();
 
@@ -297,7 +313,9 @@ class GithubPubliccodeService
         }//end if
 
         return $repository;
+
     }//end importPubliccodeRepository()
+
 
     /**
      * Maps a repository object and creates/updates a Synchronization.
@@ -313,20 +331,20 @@ class GithubPubliccodeService
     public function importRepository(array $repository): ?ObjectEntity
     {
         // Do we have a source
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $source            = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $repositoryEntity  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $repository['name'] = str_replace('-', ' ', $repository['name']);
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
 
-        $this->pluginLogger->debug('Mapping object'.$repository['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$repositoryMapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('Checking repository '.$repository['name'].'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object'.$repository['name'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoryMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking repository '.$repository['name'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($repositoryMapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
-        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $repositoryObject = $synchronization->getObject();
 
@@ -338,7 +356,9 @@ class GithubPubliccodeService
         }//end if
 
         return $repositoryObject;
+
     }//end importRepository()
+
 
     /**
      * @param array        $publiccode The publiccode array for updating the component object.
@@ -358,6 +378,7 @@ class GithubPubliccodeService
                 $application = new ObjectEntity($applicationEntity);
                 $application->hydrate(['name' => $publiccode['applicationSuite'], 'components' => [$component]]);
             }//end if
+
             $this->entityManager->persist($application);
             $component->setValue('applicationSuite', $application);
             $this->entityManager->persist($application);
@@ -367,7 +388,9 @@ class GithubPubliccodeService
         }//end if
 
         return null;
+
     }//end createApplicationSuite()
+
 
     /**
      * @param array        $publiccode      The publiccode array for updating the component object.
@@ -380,7 +403,7 @@ class GithubPubliccodeService
     public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
         $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $legalEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) === true
@@ -392,6 +415,7 @@ class GithubPubliccodeService
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(['name' => $publiccode['legal']['mainCopyrightOwner']]);
             }//end if
+
             $this->entityManager->persist($organisation);
 
             if (($legal = $componentObject->getValue('legal')) !== null) {
@@ -421,7 +445,9 @@ class GithubPubliccodeService
         }//end if
 
         return null;
+
     }//end createMainCopyrightOwner()
+
 
     /**
      * @param array        $publiccode      The publiccode array for updating the component object.
@@ -434,7 +460,7 @@ class GithubPubliccodeService
     public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
         $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $legalEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $publiccode) === true
@@ -446,6 +472,7 @@ class GithubPubliccodeService
                 $organisation = new ObjectEntity($organisationEntity);
                 $organisation->hydrate(['name' => $publiccode['legal']['repoOwner']]);
             }//end if
+
             $this->entityManager->persist($organisation);
 
             if (($legal = $componentObject->getValue('legal')) !== null) {
@@ -475,7 +502,9 @@ class GithubPubliccodeService
         }//end if
 
         return null;
+
     }//end createRepoOwner()
+
 
     /**
      * @param array        $publiccode      The publiccode array for updating the component object.
@@ -500,6 +529,7 @@ class GithubPubliccodeService
                         $contractor = new ObjectEntity($contractorsEntity);
                         $contractor->hydrate(['name' => $contractor['name']]);
                     }//end if
+
                     $this->entityManager->persist($contractor);
                     $contractors[] = $contractor;
                 }//end if
@@ -532,7 +562,9 @@ class GithubPubliccodeService
         }//end if
 
         return null;
+
     }//end createContractors()
+
 
     /**
      * @param array        $publiccode      The publiccode array for updating the component object.
@@ -545,7 +577,7 @@ class GithubPubliccodeService
     public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
     {
         $maintenanceEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.maintenance.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $contactEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $contactEntity     = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('maintenance', $publiccode) === true
             && key_exists('contacts', $publiccode['maintenance']) === true
@@ -557,6 +589,7 @@ class GithubPubliccodeService
                         $contact = new ObjectEntity($contactEntity);
                         $contact->hydrate(['name' => $contact['name']]);
                     }//end if
+
                     $this->entityManager->persist($contact);
                     $contacts[] = $contact;
                 }//end if
@@ -586,10 +619,12 @@ class GithubPubliccodeService
             $this->entityManager->flush();
 
             return $componentObject;
-        }
+        }//end if
 
         return null;
+
     }//end createContacts()
+
 
     /**
      * This function maps the publiccode to a component.
@@ -605,15 +640,15 @@ class GithubPubliccodeService
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode): ?ObjectEntity
     {
-        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentEntity   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
         $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         if (($component = $repository->getValue('component')) === false) {
             $component = new ObjectEntity($componentEntity);
         }//end if
 
-        $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$repositoryMapping, ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$repositoryMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $componentArray = $this->mappingService->mapping($repositoryMapping, $publiccode);
         $component->hydrate($componentArray);
@@ -626,9 +661,8 @@ class GithubPubliccodeService
 
         // @TODO These to functions aren't working.
         // contracts and contacts are not set to the component
-//        $component = $this->createContractors($publiccode, $component);
-//        $component = $this->createContacts($publiccode, $component);
-
+        // $component = $this->createContractors($publiccode, $component);
+        // $component = $this->createContacts($publiccode, $component);
         $this->entityManager->flush();
         $this->entityManager->persist($component);
         $repository->setValue('component', $component);
@@ -636,13 +670,15 @@ class GithubPubliccodeService
         $this->entityManager->flush();
 
         return $repository;
+
     }//end mapPubliccode()
+
 
     /**
      * This function parses the publiccode.
      *
      * @param string $repositoryUrl The repository url.
-     * @param $response The response of the get publiccode call.
+     * @param $response      The response of the get publiccode call.
      *
      * @throws Exception
      *
@@ -652,7 +688,7 @@ class GithubPubliccodeService
      */
     public function parsePubliccode(string $repositoryUrl, $response): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source     = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
 
         if (is_array($publiccode) === true && key_exists('content', $publiccode) === true) {
@@ -663,15 +699,18 @@ class GithubPubliccodeService
         try {
             $parsedPubliccode = $this->yaml->parse($publiccode);
         } catch (Exception $e) {
-            $this->pluginLogger->debug('Not able to parse '.$publiccode.' '.$e->getMessage().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->debug('Not able to parse '.$publiccode.' '.$e->getMessage().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
         if (isset($parsedPubliccode) === true) {
-            $this->pluginLogger->debug("Fetch and decode went succesfull for $repositoryUrl.", ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->debug("Fetch and decode went succesfull for $repositoryUrl.", ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return $parsedPubliccode;
         }//end if
 
         return null;
+
     }//end parsePubliccode()
+
+
 }//end class

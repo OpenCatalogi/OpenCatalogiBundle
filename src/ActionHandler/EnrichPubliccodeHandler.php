@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService;
  */
 class EnrichPubliccodeHandler implements ActionHandlerInterface
 {
+
     /**
      * @var EnrichPubliccodeService
      */
     private EnrichPubliccodeService $service;
+
 
     /**
      * @param EnrichPubliccodeService $service Thew enrichPubliccodeService
@@ -21,7 +23,9 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function __construct(EnrichPubliccodeService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'EnrichPubliccodeHandler',
-            'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'EnrichPubliccodeHandler',
+            'description' => 'This handler checks repositories for publuccode.yaml or publiccode.yml',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->service->enrichPubliccodeHandler($data, $configuration);
+
     }//end run()
+
+
 }//end class

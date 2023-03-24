@@ -32,6 +32,7 @@ use Twig\Error\SyntaxError;
  */
 class GithubEventService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -77,6 +78,7 @@ class GithubEventService
      */
     private array $data;
 
+
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
      * @param SynchronizationService $syncService      The Synchronization Service.
@@ -95,16 +97,18 @@ class GithubEventService
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager = $entityManager;
-        $this->syncService = $syncService;
-        $this->callService = $callService;
-        $this->cacheService = $cacheService;
+        $this->entityManager    = $entityManager;
+        $this->syncService      = $syncService;
+        $this->callService      = $callService;
+        $this->cacheService     = $cacheService;
         $this->githubApiService = $githubApiService;
-        $this->resourceService = $resourceService;
-        $this->pluginLogger = $pluginLogger;
-        $this->configuration = [];
+        $this->resourceService  = $resourceService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->configuration    = [];
         $this->data = [];
+
     }//end __construct()
+
 
     /**
      * Check the auth of the github source.
@@ -116,13 +120,15 @@ class GithubEventService
     public function checkGithubAuth(Source $source): ?bool
     {
         if ($source->getApiKey() === null) {
-            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return false;
         }//end if
 
         return true;
+
     }//end checkGithubAuth()
+
 
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
@@ -134,19 +140,21 @@ class GithubEventService
      */
     public function getRepository(string $name, Source $source): ?array
     {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
 
         return $repository;
+
     }//end getRepository()
+
 
     /**
      * This function creates/updates the repository with the github event response.
@@ -168,7 +176,7 @@ class GithubEventService
         }//end if
 
         $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
         $repositoryArray = $this->getRepository($githubEvent['repository']['full_name'], $source);
@@ -183,13 +191,13 @@ class GithubEventService
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
 
-        $this->pluginLogger->debug('Mapping object '.$repositoryUrl.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$mapping.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('Checking repository '.$repositoryUrl.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$mapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking repository '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->handleSync($synchronization, $repositoryArray);
-        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $repository = $synchronization->getObject();
 
@@ -203,7 +211,9 @@ class GithubEventService
         $this->data['response'] = new Response(json_encode($repository->toArray()), 200);
 
         return $this->data;
+
     }//end createRepository()
+
 
     /**
      * This function creates/updates the repository with the github event response.
@@ -215,10 +225,10 @@ class GithubEventService
      *
      * @return array|null The data with the repository in the response array.
      */
-    public function updateRepositoryWithEventResponse(?array $data = [], ?array $configuration = []): ?array
+    public function updateRepositoryWithEventResponse(?array $data=[], ?array $configuration=[]): ?array
     {
         $this->configuration = $configuration;
-        $this->data = $data;
+        $this->data          = $data;
 
         if (key_exists('payload', $this->data) === true) {
             $githubEvent = $this->data['payload'];
@@ -231,5 +241,8 @@ class GithubEventService
 
         // Create repository with the body of the request.
         return $this->createRepository($githubEvent);
+
     }//end updateRepositoryWithEventResponse()
+
+
 }//end class

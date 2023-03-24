@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class FindOrganizationThroughRepositoriesCommand extends Command
 {
+
     /**
      * @var string
      */
@@ -22,7 +23,8 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     /**
      * @var FindOrganizationThroughRepositoriesService
      */
-    private FindOrganizationThroughRepositoriesService  $findOrgRepService;
+    private FindOrganizationThroughRepositoriesService $findOrgRepService;
+
 
     /**
      * @param FindOrganizationThroughRepositoriesService $findOrgRepService find Organization Through Repositories Service
@@ -31,7 +33,9 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     {
         $this->findOrgRepService = $findOrgRepService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -42,7 +46,9 @@ class FindOrganizationThroughRepositoriesCommand extends Command
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update an organizations with found opencatalogi.yml info')
             ->addOption('repositoryId', 'r', InputOption::VALUE_OPTIONAL, 'Find an organization for a specific repository by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -72,5 +78,8 @@ class FindOrganizationThroughRepositoriesCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

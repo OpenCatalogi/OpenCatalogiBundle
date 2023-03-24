@@ -12,6 +12,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class FederalizationGetCommand extends Command
 {
+
     /**
      * @var string
      */
@@ -20,12 +21,13 @@ class FederalizationGetCommand extends Command
     /**
      * @var FederalizationService
      */
-    private FederalizationService  $fedService;
+    private FederalizationService $fedService;
 
     /**
      * @var EntityManagerInterface
      */
     private EntityManagerInterface $entityManager;
+
 
     /**
      * @param FederalizationService  $fedService    The federalization Service
@@ -35,10 +37,12 @@ class FederalizationGetCommand extends Command
         FederalizationService $fedService,
         EntityManagerInterface $entityManager
     ) {
-        $this->fedService = $fedService;
+        $this->fedService    = $fedService;
         $this->entityManager = $entityManager;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -49,7 +53,9 @@ class FederalizationGetCommand extends Command
             ->setDescription('This command gets al or a single catalogi from the federalized network')
             ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -68,10 +74,10 @@ class FederalizationGetCommand extends Command
         }
 
         if ($catalogusId !== null) {
-            $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id'=>$catalogusId]);
+            $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['id' => $catalogusId]);
             if ($catalogusObject === null) {
                 $style->error('Could not find object entity by id, trying on name');
-                $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name'=>$catalogusId]);
+                $catalogusObject = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['name' => $catalogusId]);
             }
 
             if ($catalogusObject === null) {
@@ -84,5 +90,8 @@ class FederalizationGetCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
  */
 class CatalogiHandler implements ActionHandlerInterface
 {
+
     /**
      * @var FederalizationService
      */
     private FederalizationService $service;
+
 
     /**
      * @param FederalizationService $service The federalization Service
@@ -21,7 +23,9 @@ class CatalogiHandler implements ActionHandlerInterface
     public function __construct(FederalizationService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -38,7 +42,9 @@ class CatalogiHandler implements ActionHandlerInterface
             'required'    => [],
             'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the email service plugin.
@@ -51,5 +57,8 @@ class CatalogiHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->service->catalogiHandler($data, $configuration);
+
     }//end run()
+
+
 }//end class

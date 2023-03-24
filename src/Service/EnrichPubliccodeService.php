@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnrichPubliccodeService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -56,6 +57,7 @@ class EnrichPubliccodeService
      */
     private GatewayResourceService $resourceService;
 
+
     /**
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param CallService             $callService     The Call Service
@@ -72,16 +74,18 @@ class EnrichPubliccodeService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
-        $this->entityManager = $entityManager;
-        $this->callService = $callService;
-        $this->githubService = $githubService;
-        $this->mappingService = $mappingService;
-        $this->pluginLogger = $pluginLogger;
+        $this->entityManager   = $entityManager;
+        $this->callService     = $callService;
+        $this->githubService   = $githubService;
+        $this->mappingService  = $mappingService;
+        $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
 
         $this->configuration = [];
-        $this->data = [];
+        $this->data          = [];
+
     }//end __construct()
+
 
     /**
      * This function fetches repository data.
@@ -107,7 +111,9 @@ class EnrichPubliccodeService
         }
 
         return null;
+
     }//end getPubliccodeFromUrl()
+
 
     /**
      * @param ObjectEntity $repository    The repository object.
@@ -125,7 +131,9 @@ class EnrichPubliccodeService
         }
 
         return $repository;
+
     }//end enrichRepositoryWithPubliccode()
+
 
     /**
      * @param array|null  $data          Data set at the start of the handler.
@@ -134,10 +142,10 @@ class EnrichPubliccodeService
      *
      * @return array dataset at the end of the handler
      */
-    public function enrichPubliccodeHandler(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): array
+    public function enrichPubliccodeHandler(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): array
     {
         $this->configuration = $configuration;
-        $this->data = $data;
+        $this->data          = $data;
 
         if ($repositoryId !== null) {
             // If we are testing for one repository.
@@ -165,5 +173,8 @@ class EnrichPubliccodeService
         $this->pluginLogger->debug('enrichPubliccodeHandler finished');
 
         return $this->data;
+
     }//end enrichPubliccodeHandler()
+
+
 }//end class

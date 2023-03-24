@@ -14,6 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class ComponentenCatalogusGetComponentsCommand extends Command
 {
+
     /**
      * @var string
      */
@@ -22,7 +23,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     /**
      * @var ComponentenCatalogusService
      */
-    private ComponentenCatalogusService  $compCatService;
+    private ComponentenCatalogusService $compCatService;
+
 
     /**
      * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
@@ -31,7 +33,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     {
         $this->compCatService = $compCatService;
         parent::__construct();
+
     }//end __construct()
+
 
     /**
      * @return void
@@ -42,7 +46,9 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             ->setDescription('This command triggers OpenCatalogi ComponentenCatalogusService')
             ->setHelp('This command allows you to get all components or one component from componentencatalogus.commonground.nl/api/components')
             ->addOption('component', 'c', InputOption::VALUE_OPTIONAL, 'Get a single component by id');
+
     }//end configure()
+
 
     /**
      * @param InputInterface  $input  The input
@@ -72,5 +78,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
         }
 
         return Command::SUCCESS;
+
     }//end execute()
+
+
 }//end class

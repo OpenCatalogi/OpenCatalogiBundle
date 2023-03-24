@@ -10,10 +10,12 @@ use OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService
  */
 class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
 {
+
     /**
      * @var EnrichPubliccodeFromGithubUrlService
      */
     private EnrichPubliccodeFromGithubUrlService $service;
+
 
     /**
      * @param EnrichPubliccodeFromGithubUrlService $service The enrich Publiccode From Github Ur Service
@@ -21,7 +23,9 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function __construct(EnrichPubliccodeFromGithubUrlService $service)
     {
         $this->service = $service;
+
     }//end __construct()
+
 
     /**
      *  This function returns the required configuration as a [json-schema](https://json-schema.org/) array.
@@ -31,14 +35,16 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function getConfiguration()
     {
         return [
-            '$id'        => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeFromGithubUrlHandler.ActionHandler.json',
-            '$schema'    => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'      => 'EnrichPubliccodeFromGithubUrlHandler',
-            'description'=> 'This handler checks repositories for publuccode.yaml or publiccode.yml',
-            'required'   => [],
-            'properties' => [],
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/EnrichPubliccodeFromGithubUrlHandler.ActionHandler.json',
+            '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
+            'title'       => 'EnrichPubliccodeFromGithubUrlHandler',
+            'description' => 'This handler checks repositories for publuccode.yaml or publiccode.yml',
+            'required'    => [],
+            'properties'  => [],
         ];
+
     }//end getConfiguration()
+
 
     /**
      * This function runs the application to gateway service plugin.
@@ -51,5 +57,8 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         return $this->service->enrichPubliccodeFromGithubUrlHandler($data, $configuration);
+
     }//end run()
+
+
 }//end class
