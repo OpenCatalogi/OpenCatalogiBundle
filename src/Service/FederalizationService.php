@@ -119,14 +119,14 @@ class FederalizationService
         // Setup base data
         $this->prepareObjectEntities();
 
-        // Savety cheek
+        // Safety check
         if ($this->catalogusEntity === null) {
             $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return $data;
         }
 
-        // Get al the catalogi
+        // Get all the catalogi
         $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $this->catalogusEntity]);
 
         // Sync them
