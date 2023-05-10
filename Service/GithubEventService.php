@@ -127,7 +127,7 @@ class GithubEventService
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $url   The url of the repository.
+     * @param string $url    The url of the repository.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported repository as array.
