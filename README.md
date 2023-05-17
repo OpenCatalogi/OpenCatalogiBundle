@@ -78,23 +78,22 @@ Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een op
 
 ## Zijn er uitbreidingen op de publiccode standaard?
 
-Bij het veld softwareType ondersteunen we extra mogenlijkheden 
+Bij het veld softwareType ondersteunen we extra mogenlijkheden
 
-- standalone/mobile - The software is a standalone, self-contained The software is a native mobile app.
-- standalone/iot - The software is suitable for an IoT context.
-- standalone/desktop - The software is typically installed and run in a a desktop operating system environment.
-- standalone/web - The software represents a web application usable by means of a browser.
-- standalone/backend - The software is a backend application.
-- standalone/other - The software has a different nature from the once listed above.
-- softwareAddon - The software is an addon, such as a plugin or a theme, for a more complex software (e.g. a CMS or an office suite).
-- library - The software contains a library or an SDK to make it easier to third party developers to create new products.
-- configurationFiles - The software does not contain executable script but a set of configuration files. They may document how to obtain a certain deployment. They could be in the form of plain configuration files, bash scripts, ansible playbooks, Dockerfiles, or other instruction sets.
-- api - The repository/folder doesn't contain software but an OAS api description
-- schema - The repository/folder doesn't contain software but an schema.json object description
-- data -  The repository/folder doesn't contain software but an public data file (e.g. csv, xml etc)
-- procces - The repository/folder doesn't contain software but an executable proces (e.g. bpmn2, camunda)
-- model The repository/folder doesn't contain software but an model (e.g. uml)
-
+*   standalone/mobile - The software is a standalone, self-contained The software is a native mobile app.
+*   standalone/iot - The software is suitable for an IoT context.
+*   standalone/desktop - The software is typically installed and run in a a desktop operating system environment.
+*   standalone/web - The software represents a web application usable by means of a browser.
+*   standalone/backend - The software is a backend application.
+*   standalone/other - The software has a different nature from the once listed above.
+*   softwareAddon - The software is an addon, such as a plugin or a theme, for a more complex software (e.g. a CMS or an office suite).
+*   library - The software contains a library or an SDK to make it easier to third party developers to create new products.
+*   configurationFiles - The software does not contain executable script but a set of configuration files. They may document how to obtain a certain deployment. They could be in the form of plain configuration files, bash scripts, ansible playbooks, Dockerfiles, or other instruction sets.
+*   api - The repository/folder doesn't contain software but an OAS api description
+*   schema - The repository/folder doesn't contain software but an schema.json object description
+*   data -  The repository/folder doesn't contain software but an public data file (e.g. csv, xml etc)
+*   procces - The repository/folder doesn't contain software but an executable proces (e.g. bpmn2, camunda)
+*   model The repository/folder doesn't contain software but an model (e.g. uml)
 
 ## Welke bronnen indexeerd open catalogi naast Github?
 
