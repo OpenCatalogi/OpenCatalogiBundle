@@ -1,84 +1,102 @@
 # OpenCatalogiBundle
-An example repository for creating php symfony flex bundles
 
+## Hoe werkt Open Catalogi
 
-### Using this bundle
+Open catalogi vormt een index over meerdere bronnen, en maakt informatie hieruit inzichtenlijk en doorzoekbaar voor gebruikers. Het focused hierbij in eerste instantie op software componenten aan de hand van repositories maar kan ook API's, datasets of proccesen indexeren.
 
+## Waar leeft metadata?
 
-To execute the following command you will need [Composer](https://getcomposer.org/download/).
+Open catalogi indexeerd meta data uitverschillende bronnen maar vanuit een data bij de bron princiepe prevereren we het als een (open)source codebade zichzelf beschrijft.
 
-U can install this plugin by installing with command:
-`composer require common-gateway/pet-store-plugin:dev-main`
-in the directory where your composer.json lives.
+## Compont Publiceren
 
-### Creating your own bundle
+Het publiceren van een component op opencatalogi.nl gaat met behulp van een publiccode.yaml bestand in de root van je repository. Om je component te publiceren, dien je een publiccode.yaml bestand te maken dat metadata en informatie over je component bevat. Dit bestand helpt het platform om je component te indexeren en gemakkelijk te vinden voor andere gebruikers.
 
-##### Requirements
-- [GitHub](https://github.com/login) account or organization
-- [Packagist](https://packagist.org/login/) account
-- [Composer](https://getcomposer.org/download/) or if your project is dockerized, [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+1.  Maak een `publiccode.yaml` bestand in de root van je repository met een teksteditor of een geïntegreerde ontwikkelomgeving (IDE).
 
-#### Using this template
+2.  Voeg de vereiste metadata toe aan het `publiccode.yaml` bestand. Een voorbeeld van een basisstructuur:
 
-To create your own symfony bundle. You can copy this repository for a fast start.
+```yaml
+publiccodeYmlVersion: "0.2"
+ 
+name: Medusa
+url: "https://example.com/italia/medusa.git"
+softwareVersion: "dev"    # Optional
+releaseDate: "2017-04-15"
+platforms:
+  - web
 
-1. Login on [GitHub](https://github.com)
-2. Use [this template](https://github.com/OpenCatalogi/OpenCatalogiBundle/generate)
-3. Name your bundle (CamelCase)
-4. Press the green button `Create repository from template`
-5. Update file names and namespace to your fitting 
-   - Open composer.json, and change the name to your fitting. The first word should be the namespace and the second the name of your bundle. Check the autoload field to be set accordingly. Note: this is kebab-case. Also read: [naming your package](https://packagist.org/about#naming-your-package)
-   - Open OpenCatalogiBundle.php and change the Bundle name and namespace. The namespace should be the same as your package name in composer.json but in CamelCase. So common-gateway/pet-store-bundle becomes OpenCatalogi/OpenCatalogiBundle
-   - Rename the /Service and /ActionHandler accordingly (or delete if not used).
-   - Rename the /DependencyInjection/OpenCatalogiExtension.php to your BundleNameExtension.php
-   - Rename the /Resources/config/services.yaml namespaces  
+categories:
+  - financial-reporting
 
-##### Adding schemas
-If you use your bundel with the common-gateway, you can add your own schemas that will be loaded as Entities. 
-These Entities will be loaded into the database so you can work with your own objects/data.
+developmentStatus: development
 
-These schemas are [json schema's](https://json-schema.org/learn/getting-started-step-by-step.html#starting-the-schema).
+softwareType: "standalone/desktop"
 
-You can add existing schemas or create your own and add them in /Schema. There is also an example as /Schema/example.json.
+description:
+  en:
+    localisedName: medusa   # Optional
+    shortDescription: >
+          A rather short description which
+          is probably useless
 
-Make sure your schema's have a `version` property so you can update your schema's!
+    longDescription: >
+          Very long description of this software, also split
+          on multiple rows. You should note what the software
+          is and why one should need it. We can potentially
+          have many pages of text here.
 
-Also make sure they have a unique `$id` so that they can be related to other schema's.
+    features:
+       - Just one feature
 
-If you have added schema's you can also add objects/data for them, in /Data is an example you can use.
+legal:
+  license: AGPL-3.0-or-later
 
-#### Upload to packagist
+maintenance:
+  type: "community"
 
-Before we can use our bundle and code, we must have it online on packagist so we can install with composer.
+  contacts:
+    - name: Francesco Rossi
 
-1. Upload to packagist  
-   - Go to [Packagist](https://packagist.org)
-   - Press `submit` in the top menu bar and paste your bundle's github repository link, the name from you composer.json will be used as package name.
-   - If valid press `Submit`
-2. Auto-update package
-   - Go to your [packagist profile](https://packagist.org/profile/).
-   - Press `Show API Token` and copy
-   - Go to your new bundle's github repository
-   - Go to your repository settings
-   - Go to webhooks, and press `Add webhook`
-   - As Payload URL, set https://packagist.org/api/github?username=yourPackagistUsername  
-   - Keep SSL verification enabled
-   - As secret, paste the copied API token from packagist
-   - Set event on `Just push the event`
-   - Press `Add webhook`
-   - If you push new code it will now push to packagis. On packagist you should not see the auto-update warning anymore. If its still there check if your username and secret are set properly on the github webhook.
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+```
 
-#### Using your code
+Pas dit voorbeeld aan op basis van de specificaties van jouw component. Een volledige beschrijving van de publiccode standaard vind je op [yml.publiccode.tools](https://yml.publiccode.tools/schema.core.html#top-level-keys-and-sections)
 
-To use the code in your library we first have to install it with composer.
+3.  Voeg eventuele aanvullende metadata toe die relevant kan zijn voor jouw component, zoals documentatie, afhankelijkheden, contactinformatie of onderhoudsinformatie.
 
-Note: for docker add `docker-compose exec php` before all commands
+4.  Commit en push het `publiccode.yaml` bestand naar je repository. Hou er rekening mee dat het de eerste keer tot 24 uur kan duren voordat OpenCatalogi je component indexeerd
 
-1. Navigate with a command line to where your composer.json lives in the project you want to use this bundle.
-   - Execute `composer require {full package name}:dev-main`
-   - Docker users: restart your containers so symfony can recognize the new Bundle's namespace
-2. Open a php file where you want to use a class.
-   - Add the correct use statement (example `use CommonGateway\OpenCatalogiBundle\Service\OpenCatalogiService;`)
-   - U can now use your class!
+> :note: Open Catalogi scant github elke nacht, als je een component sneller wilt aanmelden of bijwerken kan dat via (opencatalogi.nl)\[https://opencatalogi.nl/documentation/about] gaan en onder "documentatie->over" (hoofd menu)
 
-In the common gateway, if you want to use your code when triggered by an event with a action, make sure the class of the action object is set as the handler name including the namespace. For example if I want to use the OpenCatalogiService I can set the OpenCatalogiHandler as `CommonGateway\OpenCatalogiBundle\ActionHandler\OpenCatalogiHandler`.
+## Zijn er mininmum eisen aan een publiccode?
+
+Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een open toegankenlijke repository spreekt de intentie uit om een open source oplossing aan te bieden en is voldoende omt e worden mee genomen in de indexatie. In het geval bepaalde gegevens missen worden deze aangevuld vanuit de repository (naam, beschrijving, organisatie, url, licentie).
+
+## Welke bronnen indexeerd open catalogi naast Github?
+
+Open Catalogi kijkt mee op:
+
+*   https://developer.overheid.nl
+*   https://data.overheid.nl
+*   https://componentencatalogus.commonground.nl
+
+## Hoe werkt federalisatie?
+
+Iedere installatie (Catalogus) van Open Catalogi heeft een directory waarin alle installaties van Open Catalogi zijn opgenomen. Bij het opkomen van een nieuwe catalogus moet deze connectie maken met ten minimale één bestaande catalogus (bij default is dat opencatalogi.nl) voor het ophalen van de directory.
+
+Vervolgens meld de catalogus zich bij de overige catalogusen aan als nieuwe mogenlijke bron. De catalogusen hanteren onderling zowel periodieke pull requests op hun directories als cloudevent gebaseerd berichten verkeer om elkar op de hoogte te houden van nieuwe catalogi en eventueele endpoints binnen die catalogi.
+
+De bestaande catalogi hebben vervolgens de mogenlijkheid om de niewe catlogus mee te nemen in hun zoekopdrachten.
+
+> :note:
+>
+> *   Bronnen worden pas gebruikt door een catalogus als de beheerder hiervoor akkoord heeft gegeven
+> *   Bronnen kunnen zelf voorwaarde stellen aan het gebruikt (bijvoorbeeld alleen met PKI certificaat, of aan de hand van API sleutel)
+
+## Licentie
+
+Deze bundle is beschickbaar onder [EUPL](https://eupl.eu/1.2/nl/) licentie.
