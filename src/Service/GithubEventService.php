@@ -140,13 +140,10 @@ class GithubEventService
      */
     public function getRepository(string $url, Source $source): ?array
     {
-<<<<<<< HEAD:src/Service/GithubEventService.php
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-=======
-        $this->pluginLogger->debug('Getting repository '.$url.'.', ['plugin'=>'open-catalogi/open-catalogi-bundle']);
-        $name = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
->>>>>>> main:Service/GithubEventService.php
-        $response = $this->callService->call($source, '/repos/'.$name);
+        ( << << << ) < HEAD:(src / Service / GithubEventService).php
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']); === === = $this->pluginLogger->debug('Getting repository '.$url.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $name                                                                                                                    = trim(\Safe\parse_url($url, PHP_URL_PATH), '/'); ( >> >> >> ) > main:(Service / GithubEventService).php
+        $response                                                                                                                = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
