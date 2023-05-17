@@ -1,0 +1,25 @@
+<?php
+return (object)[
+    'rootNamespace' => 'OpenCatalogi\OpenCatalogiBundle',
+    'destDirectory' => 'docs/classes',
+    'format' => 'github',
+    'classes' => [
+        '\OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\InstallationService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\RatingListService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\RatingService',
+        '\OpenCatalogi\OpenCatalogiBundle\Command\ComponentenCatalogusGetApplicationsCommand',
+        '\OpenCatalogi\OpenCatalogiBundle\Command\ComponentenCatalogusGetComponentsCommand',
+        '\OpenCatalogi\OpenCatalogiBundle\Command\DeveloperOverheidGetComponentsCommand',
+        '\OpenCatalogi\OpenCatalogiBundle\Command\DeveloperOverheidGetRepositoriesCommand'
+    ],
+];
