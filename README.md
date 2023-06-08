@@ -77,6 +77,7 @@ Pas dit voorbeeld aan op basis van de specificaties van jouw component. Een voll
 Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een open toegankenlijke repository spreekt de intentie uit om een open source oplossing aan te bieden en is voldoende omt e worden mee genomen in de indexatie. In het geval bepaalde gegevens missen worden deze aangevuld vanuit de repository (naam, beschrijving, organisatie, url, licentie).
 
 ## Welke velden kan ik verwachten in een publiccode?
+
 In een publiccode.yaml bestand zijn er verschillende properties die gedefinieerd kunnen worden om verschillende aspecten van de software of het project te beschrijven. Deze properties variëren van het geven van basisinformatie zoals de naam van de software, tot meer specifieke informatie zoals de gebruikte licentie of de ontwikkelstatus van de software. De volgende tabel geeft een overzicht van de mogelijke properties, of ze verplicht zijn of niet, wat het verwachte type input is en een korte beschrijving van elk.
 
 Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard die wordt beschreven op yml.publiccode.tools:
@@ -102,7 +103,6 @@ Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard
 | roadmap              | Nee       | String<URL>        | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
 | inputTypes           | Nee       | array<String>      | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
 | outputTypes          | Nee       | array<String>         | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
-
 
 ## Zijn er uitbreidingen op de publiccode standaard?
 
@@ -138,18 +138,15 @@ Open Catalogi kijkt mee op:
 *   https://componentencatalogus.commonground.nl
 
 ## Hoe kan ik specifieke nderlandse verwijzingen opnemen naar bijvoorbeeld de GEMMA software catalogus?
+
 OpenCatalogi maakt hiervoor gebruik van de mogenlijkheid om landsspecifieke uitbreidingen op de publiccode standaard toe te voegen (link hier). Je kan deze terugvinden in het voorbeeld bestand onder nl.
 
 De op dit moment door open catalogie ondersteunde landsspecifieke standaarden zijn:
 
 nl.gamma
-nl.commonground.layer 
+nl.commonground.layer
 nl.upl
 nl.
-
-
-
-
 
 ## Hoe werkt federalisatie?
 
