@@ -1,4 +1,4 @@
-# OpenCatalogiBundle [![Codacy Badge](https://app.codacy.com/project/badge/Grade/62464eebd6984848ba8642c3e0eaa809)](https://app.codacy.com/gh/OpenCatalogi/OpenCatalogiBundle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+# OpenCatalogiBundle [![Codacy Badge](https://app.codacy.com/project/badge/Grade/62464eebd6984848ba8642c3e0eaa809)](https://app.codacy.com/gh/OpenCatalogi/OpenCatalogiBundle/dashboard?utm_source=gh\&utm_medium=referral\&utm_content=\&utm_campaign=Badge_grade)
 
 ## Concept
 
@@ -18,16 +18,15 @@ Open Catalogi kijkt standaard mee op:
 *   https://data.overheid.nl
 *   https://componentencatalogus.commonground.nl
 
-
 ## Overige documenten
 
 *   [Publiccode](docs/Publiccode.md), bevat meer text en uitleg over het schrijven en toevoegen van publiccode bestanden
 *   [Publiorganisation](docs/Publicorganisation.md), bevat meer text en uitleg over het schrijven en toevoegen van publicorganisation bestanden
 *   [Installatie](docs/Installatie.md), hoe installeer je Open Catalogi
-*   [API specificatie](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/OpenCatalogi/OpenCatalogiBundle/main/docs/oas.yaml&nocors), voor het headless implementeren van open catalogi.
+*   [API specificatie](https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/OpenCatalogi/OpenCatalogiBundle/main/docs/oas.yaml\&nocors), voor het headless implementeren van open catalogi.
 *   [Security](docs/Security.md), voor onze veiligheids maatregelen
 *   [Architectuur](docs/Architectuur.md), de architectuur achter open catalogi
-*   [Codacy](https://app.codacy.com/gh/OpenCatalogi/OpenCatalogiBundle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade), en onafhankenlijke controlle op de kwaliteit van de code
+*   [Codacy](https://app.codacy.com/gh/OpenCatalogi/OpenCatalogiBundle/dashboard?utm_source=gh\&utm_medium=referral\&utm_content=\&utm_campaign=Badge_grade), en onafhankenlijke controlle op de kwaliteit van de code
 
 ## Licentie
 
