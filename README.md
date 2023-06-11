@@ -8,7 +8,10 @@ Open catalogi vormt een index over meerdere bronnen, en maakt informatie hieruit
 
 Open catalogi indexeerd meta data uitverschillende bronnen maar vanuit een data bij de bron princiepe prevereren we het als een (open)source codebade zichzelf beschrijft.
 
-## Compont Publiceren
+zie ook: https://archive.fosdem.org/2022/schedule/event/publiccodeyml/
+
+
+## Component (software) Publiceren
 
 Het publiceren van een component op opencatalogi.nl gaat met behulp van een publiccode.yaml bestand in de root van je repository. Om je component te publiceren, dien je een publiccode.yaml bestand te maken dat metadata en informatie over je component bevat. Dit bestand helpt het platform om je component te indexeren en gemakkelijk te vinden voor andere gebruikers.
 
@@ -62,6 +65,21 @@ localisation:
   localisationReady: true
   availableLanguages:
     - en
+# De Nederlandse uitbreiding op de commonground standaard
+nl:
+  countryExtensionVersion: "1.0"
+  commonground:
+  - layerType: "interface"
+  - installationType: "helm"
+  - intendedOrganisations: "https://github.com/Rotterdam"
+  gemma:
+    bedrijfsfuncties:
+      - "sadsad"
+      - "sadsad"
+    bedrijfsservices:
+      - "sadsad"
+      - "sadsad"
+    applicatiefunctie: "referentie component"
 ```
 
 Pas dit voorbeeld aan op basis van de specificaties van jouw component. Een volledige beschrijving van de publiccode standaard vind je op [yml.publiccode.tools](https://yml.publiccode.tools/schema.core.html#top-level-keys-and-sections)
@@ -74,37 +92,79 @@ Pas dit voorbeeld aan op basis van de specificaties van jouw component. Een voll
 
 ## Zijn er mininmum eisen aan een publiccode?
 
-Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een open toegankenlijke repository spreekt de intentie uit om een open source oplossing aan te bieden en is voldoende omt e worden mee genomen in de indexatie. In het geval bepaalde gegevens missen worden deze aangevuld vanuit de repository (naam, beschrijving, organisatie, url, licentie).
+Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een open toegankenlijke repository spreekt de intentie uit om een open source oplossing aan te bieden en is voldoende om te worden mee genomen in de indexatie. In het geval bepaalde gegevens missen worden deze aangevuld vanuit de repository (naam, beschrijving, organisatie, url, licentie).
 
 ## Welke velden kan ik verwachten in een publiccode?
 
 In een publiccode.yaml bestand zijn er verschillende properties die gedefinieerd kunnen worden om verschillende aspecten van de software of het project te beschrijven. Deze properties variëren van het geven van basisinformatie zoals de naam van de software, tot meer specifieke informatie zoals de gebruikte licentie of de ontwikkelstatus van de software. De volgende tabel geeft een overzicht van de mogelijke properties, of ze verplicht zijn of niet, wat het verwachte type input is en een korte beschrijving van elk.
 
-Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard die wordt beschreven op yml.publiccode.tools:
+Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard die wordt beschreven op [yml.publiccode.tools]() en uitgewerkt onder [top level formats](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#top-level-keys-and-sections) op docs.italia.it.:
 
-| Property             | Verplicht | Verwachte Input    | Default                                                            | Enum | Beschrijving                                                 |
-|----------------------|-----------|--------------------|--------------------------------------------------------------------|------|--------------------------------------------------------------|
-| publiccodeYmlVersion | Nee       | String<SEMVER>     | 0.2                                                                | Nee  | De versie van de publiccode.yml standaard.                   |
-| name                 | Nee       | String             | De naam ven de repository waarin de public code is gevonden        | Nee  | De naam van de software.                                     |
-| url                  | Nee       | String<URL>        | De url van de repository waarin de public code is gevonden         | Nee  | De URL naar de repository van de software.                   |
-| landingURL           | Nee       | String<URL>        | De url onder repository settings (indien opgegeven)                | Nee  | URL naar een landingspagina voor de software.                |
-| isBasedOn            | Nee       | String<URL>        | N.v.t.                                                             | Nee  | URL van het originele project, als de software een variant of fork is. |
-| softwareVersion      | Nee       | String<SEMVER>     | N.v.t.                                                             | Nee  | De huidige stabiele versie van de software.                  |
-| logo                 | Nee       | URL / Pad          | De afbeedling van de repository (indien opgegeven)                 | Nee  | Pad of URL naar het logo van de software.                    |
-| platforms            | Nee       | Lijst              | N.v.t.                                                             | Ja   | De platformen waarop de software kan draaien.                |
-| releaseDate          | Nee       | Datum (YYYY-MM-DD) | De creatie datum van de repository (indien opgegeven)              | Nee  | De release datum van de huidige softwareversie.              |
-| categories           | Nee       | Lijst              | N.v.t.                                                             | Nee  | De categorieën waartoe de software behoort.                  |
-| developmentStatus    | Nee       | String             | N.v.t.                                                             | Ja   | De huidige ontwikkelstatus van de software.                  |
-| softwareType         | Nee       | String             | N.v.t.                                                             | Ja   | Het type software (e.g., standalone, library, etc.).         |
-| description          | Nee       | Object             | De beschrijving van de repository waarind e publiccode is gevonden | Nee  | Bevat gelokaliseerde namen en beschrijvingen van de software.|
-| legal                | Nee       | Object             | De licentie van de repository (indien opgegeven)                   | Nee  | Bevat de licentie onder welke de software is vrijgegeven.    |
-| maintenance          | Nee       | Object             | N.v.t.                                                             | Nee  | Bevat onderhoudsinformatie voor de software.                 |
-| localisation         | Nee       | Object             | N.v.t.                                                             | Nee  | Bevat informatie over de beschikbare talen van de software.  |
-| roadmap              | Nee       | String<URL>        | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
-| inputTypes           | Nee       | array<String>      | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
-| outputTypes          | Nee       | array<String>         | N.v.t.                                                             | Nee  | A link to a public roadmap of the software.  |
+| Property             | Verplicht | Verwachte Input | Default                                                            | Enum                                                                                                                                           | Voorbeeld                                 | Beschrijving                                                 |
+|----------------------|-----------|-----------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|--------------------------------------------------------------|
+| publiccodeYmlVersion | Nee       | String<SEMVER>  | 0.2                                                                | Nee                                                                                                                                            | 0.2                                       |This key specifies the version to which the current publiccode.yml adheres to, for forward compatibility.                  |
+| name                 | Nee       | String          | De naam ven de repository waarin de public code is gevonden        | Nee                                                                                                                                            | Medusa                                    | This key contains the name of the software. It contains the (short) public name of the product, which can be localised in the specific localisation section. It should be the name most people usually refer to the software. In case the software has both an internal “code” name and a commercial name, use the commercial name.                                  |
+| applicationSuite     | Nee       | String     | n.v.t                                                              | Nee                                                                                                                                            | MegaProductivitySuite                     | This key contains the name of the “suite” to which the software belongs.|
+| url                  | Nee       | String<URL>     | De url van de repository waarin de public code is gevonden         | Nee                                                                                                                                            | https://example.com/italia/medusa.git     | A unique identifier for this software. This string must be a URL to the source code repository (git, svn, …) in which the software is published. If the repository is available under multiple protocols, prefer HTTP/HTTPS URLs which don’t require user authentication.Forks created for the purpose of contributing upstream should not modify this file; this helps software parsing publiccode.yml to immediately skip technical forks. On the contrary, a complete fork that is meant to be maintained separately from the original software should modify this line, to give themselves the status of a different project.                |
+| landingURL           | Nee       | String<URL>     | De url onder repository settings (indien opgegeven)                | Nee                                                                                                                                            | https://example.com/italia/medusa         | If the url parameter does not serve a human readable or browsable page, but only serves source code to a source control client, with this key you have an option to specify a landing page. This page, ideally, is where your users will land when they will click a button labeled something like “Go to the application source code”. In case the product provides an automated graphical installer, this URL can point to a page which contains a reference to the source code but also offers the download of such an installer.|
+| isBasedOn            | Nee       | String<URL>     | N.v.t.                                                             | Nee                                                                                                                                            | https://example.com/italia/medusa.gi      | In case this software is a variant or a fork of another software, which might or might not contain a publiccode.yml file, this key will contain the url of the original project(s).The existence of this key identifies the fork as a software variant, descending from the specified repositories.. |
+| softwareVersion      | Nee       | String<SEMVER>  | N.v.t.                                                             | Nee                                                                                                                                            | 1.0                                       | This key contains the latest stable version number of the software. The version number is a string that is not meant to be interpreted and parsed but just displayed; parsers should not assume semantic versioning or any other specific version format.The key can be omitted if the software is currently in initial development and has never been released yet.              |
+| logo                 | Nee       | String          | De afbeedling van de repository (indien opgegeven)                 | Nee                                                                                                                                            | img/logo.svg                              | This key contains the path to the logo of the software. Logos should be in vector format; raster formats are only allowed as a fallback. In this case, they should be transparent PNGs, minimum 1000px of width. The key value can be the relative path to the file starting from the root of the repository, or it can be an absolute URL pointing to the logo in raw version. In both cases, the file must reside inside the same repository where the publiccode.yml file is stored.                 |
+| monochromeLogo       | Nee       | String          | N.v.t.                  | Nee                                                                                                                                            | img/logo-mono.svg                         | A monochromatic (black) logo. The logo should be in vector format; raster formats are only allowed as a fallback. In this case, they should be transparent PNGs, minimum 1000px of width. The key value can be the relative path to the file starting from the root of the repository, or it can be an absolute URL pointing to the logo in raw version. In both cases, the file must reside inside the same repository where the publiccode.yml file is stored.           |
+| platforms            | Nee       | Lijst           | N.v.t.                                                             | web, windows, mac, linux, ios, android, haven,kubernetes,azure,aws                                                                             | 0.2                                       | This key specifies which platform the software runs on. It is meant to describe the platforms that users will use to access and operate the software, rather than the platform the software itself runs on.Use the predefined values if possible. If the software runs on a platform for which a predefined value is not available, a different value can be used.             |
+| releaseDate          | Nee       | String<DATE>    | De creatie datum van de repository (indien opgegeven)              | Nee                                                                                                                                            | 2023-01-01                                | This key contains the date at which the latest version was released. This date is mandatory if the software has been released at least once and thus the version number is present.           |
+| categories           | Nee       | Lijst           | N.v.t.                                                             | Any of [the catagories list](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/categories-list.html#categories-list). | 0.2                                       | A list of words that can be used to describe the software and can help building catalogs of open software.              |
+| developmentStatus    | Nee       | String          | N.v.t.                                                             | concept, development, beta, stable, obsolete                                                                                                                                             | stable                                       | De huidige ontwikkelstatus van de software.               |
+| softwareType         | Nee       | String          | N.v.t.                                                             | "standalone/mobile", "standalone/iot", "standalone/desktop", "standalone/web", "standalone/backend", "standalone/other", "addon", "library", "configurationFiles"                                                                                                                                             | 0.2                                       | Het type software (e.g., standalone, library, etc.).      |
+| description          | Nee       | Object          | De beschrijving van de repository waarind e publiccode is gevonden | Nee                                                                                                                                            | 0.2                                       | Bevat gelokaliseerde namen en beschrijvingen van de software.|
+| legal                | Nee       | Object          | De licentie van de repository (indien opgegeven)                   | Nee                                                                                                                                            | 0.2                                       | Bevat de licentie onder welke de software is vrijgegeven. |
+| maintenance          | Nee       | Object          | N.v.t.                                                             | Nee                                                                                                                                            | 0.2                                       | Bevat onderhoudsinformatie voor de software.              |
+| localisation         | Nee       | Object          | N.v.t.                                                             | Nee                                                                                                                                            | 0.2                                       |Bevat informatie over de beschikbare talen van de software. |
+| roadmap              | Nee       | String<URL>     | N.v.t.                                                             | Nee                                                                                                                                            | https://example.com/italia/medusa/roadmap | A link to a public roadmap of the software. |
+| inputTypes           | Nee       | array<String>   | N.v.t.                                                             | as per RFC 6838                                                                                                                                | text/plain                                |A list of Media Types (MIME Types) as mandated in RFC 6838 which the application can handle as input.In case the software does not support any input, you can skip this field or use application/x.empty. |
+| outputTypes          | Nee       | array<String>   | N.v.t.                                                             | as per RFC 6838                                                                                                                                | text/plain                                |A list of Media Types (MIME Types) as mandated in RFC 6838 which the application can handle as output.In case the software does not support any output, you can skip this field or use application/x.empty. |
+| nl                   | Nee       | object          | N.v.t.                                                             | Nee                                                                                                                                            | n.v.t.                                    | A link to a public roadmap of the software. |
 
-## Zijn er uitbreidingen op de publiccode standaard?
+Dat laats dus een aantal mogenlijke subobjecten
+
+### description
+
+### legal
+
+### maintenance
+
+### localisation
+
+### nl
+Een (concept) Nederlande uitbreiding op de publiccode standaard in lijn met de [mogenlijkheid tot regionale uitbreidingen](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/country.html#italy).
+
+| Property                | Verplicht | Verwachte Input | Default  | Enum | Beschrijving                                                                                                                                                                                                                                                                                                                                                                |
+|-------------------------|-----------|-----------------|----------|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| countryExtensionVersion | Ja        | String<SEMVER>  | N.v.t.   | N.v.t.  | This key specifies the version to which the current extension schema adheres to, for forward compatibility.Please note how the value of this key is independent from the top-level publiccodeYmlVersion one (see The Standard (core)). In such a way, the extensions schema versioning is independent both from the core version of the schema and from every other Country. |
+| commonground            | Nee       | String          | N.v.t.   |N.v.t.| An object describing the commonground attributes of this software, look bellow for the object definitions.                                                                                                                                                                                                                                                                  |
+| gemma                   | Nee       | String<URL>     | N.v.t.   | N.v.t.  | An object describing the GEMMA attributes of this software, look bellow for the object definitions.                                                                                                                                                                                                                                                                                                                  |
+| upl                     | Nee       | array<String>   | N.v.t.   | N.v.t.  | One or more from the [UPL list](https://standaarden.overheid.nl/upl), defines products provided by this sotware                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                                                                                                    |
+
+Dit leid tot de volgende subobjecten
+#### Commonground
+| Property             | Verplicht | Verwachte Input | Default | Enum                                           | Beschrijving                                                                                                                                                                                                                                                                                                                                                                 |
+|----------------------|-----------|----------------|---------|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| intendedOrganisations | Nee       | Array          | n.v.t   | n.v.t.                                         | This key specifies the version to which the current extension schema adheres to, for forward compatibility.Please note how the value of this key is independent from the top-level publiccodeYmlVersion one (see The Standard (core)). In such a way, the extensions schema versioning is independent both from the core version of the schema and from every other Country. |
+| installationType                 | Nee       | String         | n.v.t.  | self, helm, provision                          | Defines how the software should be installed                                                                                                                                                                                                                                                                                                                                 |
+| layerType                  | Nee       | String     | n.v.t   | interface, integration, data, service, process | An extension to public code based on the componentencatalogus. Refers to the layer on wich the component oprates.                                                                                                                                                                                                                                                            |
+
+#### Gemma
+| Property             | Verplicht | Verwachte Input | Default | Enum                                   | Beschrijving                                                                                                                                   |
+|----------------------|-----------|-----------------|---------|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| bedrijfsfuncties | Nee       | Array<STRING>   | n.v.t   | n.v.t                                  | Een of meerdere [bedrijfsfuncties](https://www.gemmaonline.nl/index.php/GEMMA_Bedrijfsfuncties)                                                |
+| bedrijfsservices                 | Nee       | Array<STRING>            | n.v.t.  | n.v.t                                  | Een of meerdere [bedrijfsservices]                                                                                                             |
+| applicatiefunctie                  | Nee       | String          | n.v.t   | n.v.t                                  | Een van [de mogenlijke applicatie functies](https://www.gemmaonline.nl/index.php/GEMMAkennismodel/1.0/id-35825388-05d9-45aa-98f4-86dfb82337f5) |
+| model                  | Nee       | String          | n.v.t   | semantic, conceptual,logical, physical | Het soort model (mag alleen worden gebruikt als het type schema is).                                                                           |
+
+In theorie zijn er meer mogenlijke nederlandse utibreidingen te bedenken maar voor fase 1 hebben we ons bewust tot bovenstaande beperkt.
+
+## Zijn er uitbreidingen op en afwijkingen van de publiccode standaard?
+We hebben op verschillende pleken afgeweken en uitgebreid op de publiccode standaard, met namen omdat deze te beperkend bleek. We hebben er overal voor gekozen om aan te vullen of eisen te verlagen. Dat betekend dat een (volgens de standaard) geldige publiccode.yaml ook voor OC werkt maar dat je aanvullende informatie zou kunnen opnemen. 
 
 Bij het veld softwareType ondersteunen we extra mogenlijkheden
 
@@ -125,28 +185,23 @@ Bij het veld softwareType ondersteunen we extra mogenlijkheden
 | process               | The repository/folder doesn't contain software but an executable process (e.g. bpmn2, camunda).   |
 | model                 | The repository/folder doesn't contain software but a model (e.g. uml).                            |
 
-Bij het veld platforms ondersteunen we extra mogenlijkheden "haven","kubernetes","azure","aws"
+Bij het veld platforms ondersteunen we extra opties "haven","kubernetes","azure","aws"
 
 Daarnaast zijn in de normale versie van de standaard de velden "publiccodeYmlVersion","name","url" verplicht en kent public code vanuit de standaard geen default values (die wij ontrekken aan de repository)
 
+Bij logo laten we naast een realtief pad ook een absolute url naar het logo toe.
+
+## API
+
+
 ## Welke bronnen indexeerd open catalogi naast Github?
 
-Open Catalogi kijkt mee op:
+Open Catalogi kijkt standaard mee op:
 
 *   https://developer.overheid.nl
 *   https://data.overheid.nl
 *   https://componentencatalogus.commonground.nl
 
-## Hoe kan ik specifieke nderlandse verwijzingen opnemen naar bijvoorbeeld de GEMMA software catalogus?
-
-OpenCatalogi maakt hiervoor gebruik van de mogenlijkheid om landsspecifieke uitbreidingen op de publiccode standaard toe te voegen (link hier). Je kan deze terugvinden in het voorbeeld bestand onder nl.
-
-De op dit moment door open catalogie ondersteunde landsspecifieke standaarden zijn:
-
-nl.gamma
-nl.commonground.layer
-nl.upl
-nl.
 
 ## Hoe werkt federalisatie?
 
