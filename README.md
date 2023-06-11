@@ -10,7 +10,6 @@ Open catalogi indexeerd meta data uitverschillende bronnen maar vanuit een data 
 
 zie ook: https://archive.fosdem.org/2022/schedule/event/publiccodeyml/
 
-
 ## Component (software) Publiceren
 
 Het publiceren van een component op opencatalogi.nl gaat met behulp van een publiccode.yaml bestand in de root van je repository. Om je component te publiceren, dien je een publiccode.yaml bestand te maken dat metadata en informatie over je component bevat. Dit bestand helpt het platform om je component te indexeren en gemakkelijk te vinden voor andere gebruikers.
@@ -136,6 +135,7 @@ Dat laats dus een aantal mogenlijke subobjecten
 ### localisation
 
 ### nl
+
 Een (concept) Nederlande uitbreiding op de publiccode standaard in lijn met de [mogenlijkheid tot regionale uitbreidingen](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/country.html#italy).
 
 | Property                | Verplicht | Verwachte Input | Default  | Enum | Beschrijving                                                                                                                                                                                                                                                                                                                                                                |
@@ -146,7 +146,9 @@ Een (concept) Nederlande uitbreiding op de publiccode standaard in lijn met de [
 | upl                     | Nee       | array<String>   | N.v.t.   | N.v.t.  | One or more from the [UPL list](https://standaarden.overheid.nl/upl), defines products provided by this sotware                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                             |                                                                                                                                                                                                                                                                                                                                                    |
 
 Dit leid tot de volgende subobjecten
+
 #### Commonground
+
 | Property             | Verplicht | Verwachte Input | Default | Enum                                           | Beschrijving                                                                                                                                                                                                                                                                                                                                                                 |
 |----------------------|-----------|----------------|---------|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | intendedOrganisations | Nee       | Array          | n.v.t   | n.v.t.                                         | This key specifies the version to which the current extension schema adheres to, for forward compatibility.Please note how the value of this key is independent from the top-level publiccodeYmlVersion one (see The Standard (core)). In such a way, the extensions schema versioning is independent both from the core version of the schema and from every other Country. |
@@ -154,17 +156,19 @@ Dit leid tot de volgende subobjecten
 | layerType                  | Nee       | String     | n.v.t   | interface, integration, data, service, process | An extension to public code based on the componentencatalogus. Refers to the layer on wich the component oprates.                                                                                                                                                                                                                                                            |
 
 #### Gemma
+
 | Property             | Verplicht | Verwachte Input | Default | Enum                                   | Beschrijving                                                                                                                                   |
 |----------------------|-----------|-----------------|---------|----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
 | bedrijfsfuncties | Nee       | Array<STRING>   | n.v.t   | n.v.t                                  | Een of meerdere [bedrijfsfuncties](https://www.gemmaonline.nl/index.php/GEMMA_Bedrijfsfuncties)                                                |
-| bedrijfsservices                 | Nee       | Array<STRING>            | n.v.t.  | n.v.t                                  | Een of meerdere [bedrijfsservices]                                                                                                             |
+| bedrijfsservices                 | Nee       | Array<STRING>            | n.v.t.  | n.v.t                                  | Een of meerdere \[bedrijfsservices]                                                                                                             |
 | applicatiefunctie                  | Nee       | String          | n.v.t   | n.v.t                                  | Een van [de mogenlijke applicatie functies](https://www.gemmaonline.nl/index.php/GEMMAkennismodel/1.0/id-35825388-05d9-45aa-98f4-86dfb82337f5) |
 | model                  | Nee       | String          | n.v.t   | semantic, conceptual,logical, physical | Het soort model (mag alleen worden gebruikt als het type schema is).                                                                           |
 
 In theorie zijn er meer mogenlijke nederlandse utibreidingen te bedenken maar voor fase 1 hebben we ons bewust tot bovenstaande beperkt.
 
 ## Zijn er uitbreidingen op en afwijkingen van de publiccode standaard?
-We hebben op verschillende pleken afgeweken en uitgebreid op de publiccode standaard, met namen omdat deze te beperkend bleek. We hebben er overal voor gekozen om aan te vullen of eisen te verlagen. Dat betekend dat een (volgens de standaard) geldige publiccode.yaml ook voor OC werkt maar dat je aanvullende informatie zou kunnen opnemen. 
+
+We hebben op verschillende pleken afgeweken en uitgebreid op de publiccode standaard, met namen omdat deze te beperkend bleek. We hebben er overal voor gekozen om aan te vullen of eisen te verlagen. Dat betekend dat een (volgens de standaard) geldige publiccode.yaml ook voor OC werkt maar dat je aanvullende informatie zou kunnen opnemen.
 
 Bij het veld softwareType ondersteunen we extra mogenlijkheden
 
@@ -193,7 +197,6 @@ Bij logo laten we naast een realtief pad ook een absolute url naar het logo toe.
 
 ## API
 
-
 ## Welke bronnen indexeerd open catalogi naast Github?
 
 Open Catalogi kijkt standaard mee op:
@@ -201,7 +204,6 @@ Open Catalogi kijkt standaard mee op:
 *   https://developer.overheid.nl
 *   https://data.overheid.nl
 *   https://componentencatalogus.commonground.nl
-
 
 ## Hoe werkt federalisatie?
 
