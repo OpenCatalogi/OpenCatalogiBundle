@@ -1,4 +1,5 @@
 # Public Organisation YAML Specification
+
 The publicorganisation.yaml file is a proposed standard for identifying and providing information about public organisations on GitHub. This file should be placed in the .github directory of a GitHub organisation's repository. It serves as a declaration of the organisation's identity, including its name, website, contact details, and the software it uses and supports.
 
 By implementing this file, public organisations can more effectively communicate their software portfolio and contribute to a more transparent, open-source ecosystem. Each organisation's publicorganisation.yaml file provides crucial information that can be used by developers, citizens, and other stakeholders to understand the organisation's activities and commitments in the open-source domain.
@@ -61,8 +62,8 @@ Here is a table presenting all the properties in the publicorganisation.yaml fil
 |contact.phone| 	String                  | 	The public contact phone number of the public organisation                                              |
 |softwareUsed| 	Array of Strings (URLs) | 	List of software the public organisation uses, represented by their repository URLs                     |
 |softwareSupported|	Array of Objects (maintenance)|	List of software the public organisation supports, represented by their maintenance objects
-|softwareSupported[].software|	String|	The software that the organisation supports
-|softwareSupported[].type|	String|	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"
-|softwareSupported[].contact|	Object|	The contact details of the support |
-|softwareSupported[].contact.email| 	String                  | 	The public contact email of the public organisation                                                     |
-|softwareSupported[].contact.phone| 	String                  | 	The public contact phone number of the public organisation                                              |
+|softwareSupported\[].software|	String|	The software that the organisation supports
+|softwareSupported\[].type|	String|	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"
+|softwareSupported\[].contact|	Object|	The contact details of the support |
+|softwareSupported\[].contact.email| 	String                  | 	The public contact email of the public organisation                                                     |
+|softwareSupported\[].contact.phone| 	String                  | 	The public contact phone number of the public organisation                                              |

@@ -12,4 +12,3 @@ De bestaande catalogi hebben vervolgens de mogenlijkheid om de niewe catlogus me
 >
 > *   Bronnen worden pas gebruikt door een catalogus als de beheerder hiervoor akkoord heeft gegeven
 > *   Bronnen kunnen zelf voorwaarde stellen aan het gebruikt (bijvoorbeeld alleen met PKI certificaat, of aan de hand van API sleutel)
-

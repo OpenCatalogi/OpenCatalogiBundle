@@ -23,9 +23,11 @@ Meer installatie over installeren via helm kan worden gevonden op de  [helm](htt
 > Bij helm ligt de moeilijkheid vaak in het vinden van alle mogelijke configuratie opties. Om dit te vergemakkelijken hebben we alle opties opgenomen in een zogenoemd values bestand, deze kan je [hier](https://artifacthub.io/packages/helm/opencatalogi/opencatalogi?modal=values) vinden.
 
 ## Alternatieve installatie route
+
 In sommige gevallen is er meer behoefte aan controle over de installatie (bijvoorbeeld omdat er geen kubernetes omgeving beschikbaar is) in dat geval kan gebruik worden gemaakt van een ‘kale’ common gateway instalatie, zie voor meer informatie over het installeren van de Common Gateway de [Common Gateway installatie handleiding](https://github.com/ConductionNL/commonground-gateway).
 
 Omdat Open Catalogi een Common Gateway plugin is kan je vervolgens simpelweg in de common gateway naar plugins navigeren zoeken naar Open Catalogi en op installeren klikken.
 
 ## Bijwerken naar nieuwere versies
+
 Er worden regelmatig nieuwe updates van Open Catalogi gepubliceerd, deze kunnen via de Common Gateway Admin ui worden geïnstalleerd door  naar plugins te navigeren, Open Catalogi te selecteren en op Update te drukken.

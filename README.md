@@ -10,14 +10,14 @@ Open catalogi indexeerd meta data uitverschillende bronnen maar vanuit een data 
 
 zie ook: https://archive.fosdem.org/2022/schedule/event/publiccodeyml/
 
-
 ## Overige documenten
-- [Publicode](docs/Publicode.md), bevat meer text en uitleg over het schrijven en toevoegen van publiccode bestanden
-- [Publiorganisation](docs/Publicorganisation.md), bevat meer text en uitleg over het schrijven en toevoegen van publicorganisation bestanden
-- [Installatie](docs/Installatie.md), hoe installeer je Open Catalogi
-- [API specificatie](https://redocly.github.io/redoc/?url=https://api.apis.guru/v2/specs/slack.com/1.7.0/openapi.yaml&nocors), voor het headless implementeren van open catalogi.
-- [Security]()
-- [Architectuur](docs/Architectuur.md), de architectuur achter open catalogi
+
+*   [Publicode](docs/Publicode.md), bevat meer text en uitleg over het schrijven en toevoegen van publiccode bestanden
+*   [Publiorganisation](docs/Publicorganisation.md), bevat meer text en uitleg over het schrijven en toevoegen van publicorganisation bestanden
+*   [Installatie](docs/Installatie.md), hoe installeer je Open Catalogi
+*   [API specificatie](https://redocly.github.io/redoc/?url=https://api.apis.guru/v2/specs/slack.com/1.7.0/openapi.yaml\&nocors), voor het headless implementeren van open catalogi.
+*   [Security]()
+*   [Architectuur](docs/Architectuur.md), de architectuur achter open catalogi
 
 ## API
 
@@ -28,7 +28,6 @@ Open Catalogi kijkt standaard mee op:
 *   https://developer.overheid.nl
 *   https://data.overheid.nl
 *   https://componentencatalogus.commonground.nl
-
 
 ## Licentie
 
