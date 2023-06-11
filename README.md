@@ -21,7 +21,6 @@ zie ook: https://archive.fosdem.org/2022/schedule/event/publiccodeyml/
 
 ## API
 
-
 ## Welke bronnen indexeerd open catalogi naast Github?
 
 Open Catalogi kijkt standaard mee op:
