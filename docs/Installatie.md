@@ -16,7 +16,7 @@ En vervolgens geïnstalleerd via
 $ helm install [my-opencatalogi] open-catalogi/opencatalogi 
 ```
 
-Meer installatie over installeren via helm kan worden gevonden op de  [helm](https://helm.sh/), meer informatie over installatie opties kan worden gevonden op [artifact hub](https://artifacthub.io/packages/helm/opencatalogi/commonground-gateway?modal=values).
+Meer installatie over installeren via helm kan worden gevonden op de  [helm](https://helm.sh/), meer informatie over installatie opties kan worden gevonden op [artifact hub](https://artifacthub.io/packages/helm/opencatalogi/opencatalogi?modal=values).
 
 > :note:
 >
