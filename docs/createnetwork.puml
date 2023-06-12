@@ -14,7 +14,7 @@ note over A, B: New installation is added to existing installation's directory
 A -> C: Announce itself and request other unknown installations
 note over A, C: New installation communicates with all other installations in its directory
 C --> A: Provide other unknown installations
-note over C: Other installations provide their unknown installations to the new one
+note over C: Other installations provide their known installations to the new one
 
 note over A: Repeat the process at regular intervals
 @enduml

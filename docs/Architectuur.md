@@ -37,7 +37,6 @@ Every time a query is made to the '/search' endpoint of an Open Catalogi install
 Indexed Data:
 Open Catalogi prefers to index data when the source allows it. During each network synchronization run (as explained in 'Setting Up a Network'), any data that can be indexed is indexed if the source is set to indexing. It's important to note that when an object is shared from another catalog, a cloud event subscription is established. This means that when the object is updated in that catalog, the changes are also updated almost instantly in the local installation.
 
-![](index.svg "Sequence Diagram network creation")
 > :note:
 >
 > *   Bronnen worden pas gebruikt door een catalogus als de beheerder hiervoor akkoord heeft gegeven
