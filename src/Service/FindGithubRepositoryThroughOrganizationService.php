@@ -323,9 +323,9 @@ class FindGithubRepositoryThroughOrganizationService
                 $organization->setValue('uses', $uses);
 
                 $supports = [];
-                foreach ($openCatalogi['supports'] as $supports) {
+                foreach ($openCatalogi['supports'] as $support) {
                     // Get organisation component and set the property.
-                    $supports[] = $this->getOrganisationRepo($supports, $organization, 'supports');
+                    $supports[] = $this->getOrganisationRepo($support, $organization, 'supports');
                 }
 
                 $organization->setValue('supports', $supports);
