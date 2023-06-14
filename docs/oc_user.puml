@@ -6,9 +6,6 @@ header: Components
 actor "User" as user
 interface "F5 extern (port 443)" as f5extern
 
-actor "Externe Catalogus" as externalCatalouge
-interface "Hipp (outd of scope)" as hipp
-
 cloud "Azure"{
  [ADFS]  as identity
 }

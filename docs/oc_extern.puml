@@ -1,18 +1,12 @@
 @startuml
-title: Open Catalogi | Extern
+title: Open Catalogi | Externe Catalogus
 footer: Common Gateway | Components
 header: Components
 
 actor "Externe Catalogus" as externalCatalouge
 interface "Mtls (PKIo)" as hipp
 
-cloud "Azure"{
- [ADFS]  as identity
-}
 
-cloud "Internet"{
-interface "External Catalog" as externalCatalog
-}
 
 
 cloud "Kubernetes"{
@@ -52,18 +46,12 @@ cloud "Database Service"{
 }
 }
 
-externalCatalouge <..> Mtls: PKIO
 hipp <..> ingress: Catalogus uitwisselingen
-
-ingress <..> ui: Exposes
-ingress <..> admin: Exposes
 ingress <..> Nginx: Exposes
 Nginx  <..> Gateway: Runs
 Gateway <..> Plugins: Implements
-Gateway <..> identity: Implements
 Gateway ..> loki: Logs to
 Gateway ..> prometheus: Reports to
-Plugins <..> externalCatalog: exchanges based on pki
 Gateway ..> MognoDB: Index
 Gateway ..> Redis: Cache
 Gateway ..> ORM: Store
