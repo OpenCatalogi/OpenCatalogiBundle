@@ -112,21 +112,27 @@ Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard
 Dat laats dus een aantal mogenlijke subobjecten
 
 ### intendedaudience
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-intendedaudience).
 
 ### description
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-description).
 
 ### legal
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-legal).
 
 ### maintenance
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-maintenance).
 
 ### localisation
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-localisation).
 
 ### dependsOn
+
 Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-dependson).
 
 ### nl

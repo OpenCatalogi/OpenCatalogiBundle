@@ -23,6 +23,7 @@ Ten slotte omvat het systeem een externe catalogusacteur die communiceert met he
 ![](oc_extern.svg "UML Diagram of Open Catalogi")
 
 ## Hoe vormt Open Catalogi een gefedereerd netwerk?
+
 Elke Open Catalogi-installatie (aangeduid als een Catalogus) onderhoudt een directorylijst van andere bekende installaties (of catalogi). Wanneer een nieuwe installatie aan het netwerk wordt toegevoegd, moet deze op de hoogte zijn van, of ten minste één bestaande installatie vinden. Deze bestaande installatie verstrekt zijn directory aan de nieuwe installatie, waardoor deze op de hoogte wordt gebracht van alle andere bekende installaties. Tijdens dit proces wordt de nieuwe installatie ook toegevoegd aan de directory van de bestaande installatie, die als referentie wordt gebruikt.
 
 Vervolgens communiceert de nieuwe installatie met alle andere installaties die vermeld staan in zijn directory. Het doel van deze communicatie is tweeledig: het aankondigen van zijn toevoeging aan het netwerk en informeren of ze op de hoogte zijn van andere installaties die nog niet zijn opgenomen in de directory van de nieuwe installatie.
@@ -32,6 +33,7 @@ Dit onderzoekproces wordt regelmatig herhaald. Omdat elke installatie zijn eigen
 ![](createnetwork.svg "Sequence Diagram network creation")
 
 ## Hoe maakt Open Catalogi gebruik van een gefedereerd netwerk?
+
 **Live gegevens**:
 Telkens wanneer een query wordt uitgevoerd naar het '/search' eindpunt van een Open Catalogi-installatie, zoekt het antwoorden in zijn eigen MongoDB-index op basis van bepaalde filters. Tegelijkertijd controleert het ook zijn directory van bekende catalogi om andere catalogi te vinden die mogelijk de gevraagde gegevens bevatten en waar de oorspronkelijke catalogus toegang toe heeft. De query wordt ook asynchroon naar deze catalogi verzonden, en de reacties worden gecombineerd, tenzij een vooraf gedefinieerde time-outdrempel wordt bereikt.
 
