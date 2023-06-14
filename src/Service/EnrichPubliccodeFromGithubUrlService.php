@@ -102,15 +102,14 @@ class EnrichPubliccodeFromGithubUrlService
 
         $possibleEndpoints = [
             '/repos/'.$repositoryUrl.'/contents/publiccode.yaml',
-            '/repos/'.$repositoryUrl.'/contents/publiccode.yml'
+            '/repos/'.$repositoryUrl.'/contents/publiccode.yml',
         ];
 
         foreach ($possibleEndpoints as $endpoint) {
-
             try {
                 $response = $this->callService->call($source, $endpoint);
             } catch (Exception $e) {
-                $this->pluginLogger->error('Error found trying to fetch ' . $endpoint . ' ' .$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch '.$endpoint.' '.$e->getMessage());
             }
 
             if (isset($response) === true) {
@@ -121,6 +120,7 @@ class EnrichPubliccodeFromGithubUrlService
         return null;
 
     }//end getPubliccodeFromUrl()
+
 
     /**
      * This function fetches repository data.
@@ -139,15 +139,14 @@ class EnrichPubliccodeFromGithubUrlService
             '/'.$repositoryUrl.'/main/publiccode.yaml',
             '/'.$repositoryUrl.'/main/publiccode.yml',
             '/'.$repositoryUrl.'/master/publiccode.yaml',
-            '/'.$repositoryUrl.'/master/publiccode.yml'
+            '/'.$repositoryUrl.'/master/publiccode.yml',
         ];
 
         foreach ($possibleEndpoints as $endpoint) {
-
             try {
                 $response = $this->callService->call($source, $endpoint);
             } catch (Exception $e) {
-                $this->pluginLogger->error('Error found trying to fetch ' . $endpoint . ' ' .$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch '.$endpoint.' '.$e->getMessage());
             }
 
             if (isset($response) === true) {
@@ -160,7 +159,7 @@ class EnrichPubliccodeFromGithubUrlService
 
         return null;
 
-    }//end getPubliccodeFromUrl()
+    }//end getPubliccodeFromRawUserContent()
 
 
     /**
@@ -216,7 +215,7 @@ class EnrichPubliccodeFromGithubUrlService
             }
         }
 
-        if ($repositoryId === null){
+        if ($repositoryId === null) {
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             // If we want to do it for al repositories.
