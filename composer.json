@@ -2,20 +2,20 @@
     "name": "open-catalogi/open-catalogi-bundle",
     "description": "An example package for creating symfony flex bundles as plugins",
     "type" : "symfony-bundle",
-"keywords" : [
-	"commongateway",
-	"common",
-	"gateway",
-	"conduction",
-	"symfony",
-	"common-gateway-plugin",
-	"open catalogi"
-],
-"homepage" : "https://commongatway.nl",
-    "license": "EUPL-1.2",
-    "minimum-stability" : "dev",
-    "require": {
-        "php": ">=7.4",
+	"keywords" : [
+		"commongateway",
+		"common",
+		"gateway",
+		"conduction",
+		"symfony",
+		"common-gateway-plugin",
+		"open catalogi"
+	],
+	"homepage" : "https://commongatway.nl",
+	"license": "EUPL-1.2",
+	"minimum-stability" : "dev",
+	"require": {
+		"php": ">=7.4",
 		"commongateway/corebundle": ">=1.0.82"
 	},
 	"require-dev" : {
@@ -23,12 +23,12 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"OpenCatalogi\\OpenCatalogiBundle\\" : ""
+			"OpenCatalogi\\OpenCatalogiBundle\\" : "src/"
 		}
 	},
 	"scripts": {
-		"post-package-install-cmd": "bin/console open-catalogi/open-catalogi-bundle",
-		"post-package-update-cmd": "bin/console open-catalogi/open-catalogi-bundle",
-		"post-package-uninstall-cmd": "bin/console open-catalogi/open-catalogi-bundle"
+		"post-package-install-cmd": "bin/console commongateway:install open-catalogi/open-catalogi-bundle",
+		"post-package-update-cmd": "bin/console  commongateway:update open-catalogi/open-catalogi-bundle",
+		"post-package-uninstall-cmd": "bin/console commongateway:uninstall open-catalogi/open-catalogi-bundle"
 	}
 }
