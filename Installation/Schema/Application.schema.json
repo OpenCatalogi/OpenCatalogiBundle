@@ -2,7 +2,7 @@
   "title": "Application",
   "$id": "https://opencatalogi.nl/oc.application.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "object",
   "description": "",
   "properties": {
@@ -38,7 +38,8 @@
       "type": "array",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
-      }
+      },
+      "inversedBy": "applicationSuite"
     }
   },
   "required": [

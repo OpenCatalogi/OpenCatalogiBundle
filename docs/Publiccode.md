@@ -70,7 +70,7 @@ nl:
     applicatiefunctie: "referentie component"
 ```
 
-> :note: Open Catalogi scant github elke nacht, als je een component sneller wilt aanmelden of bijwerken kan dat via (opencatalogi.nl)\[https://opencatalogi.nl/documentation/about] gaan en onder "documentatie->over" (hoofd menu)
+> :note: Open Catalogi scant github elke nacht, als je een component sneller wilt aanmelden of bijwerken kan dat via [opencatalogi.nl](https://opencatalogi.nl/documentation/about) gaan en onder "documentatie->over" (hoofd menu)
 
 ## Zijn er mininmum eisen aan een publiccode?
 
@@ -80,7 +80,7 @@ Nee, de publiccode.yaml mag zelfs leeg zijn. Puur het plaatsen daarvan in een op
 
 In een publiccode.yaml bestand zijn er verschillende properties die gedefinieerd kunnen worden om verschillende aspecten van de software of het project te beschrijven. Deze properties variëren van het geven van basisinformatie zoals de naam van de software, tot meer specifieke informatie zoals de gebruikte licentie of de ontwikkelstatus van de software. De volgende tabel geeft een overzicht van de mogelijke properties, of ze verplicht zijn of niet, wat het verwachte type input is en een korte beschrijving van elk.
 
-Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard die wordt beschreven op [yml.publiccode.tools]() en uitgewerkt onder [top level formats](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#top-level-keys-and-sections) op docs.italia.it.:
+Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard die wordt beschreven op [yml.publiccode.tools](https://yml.publiccode.tools) en uitgewerkt onder [top level formats](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#top-level-keys-and-sections) op docs.italia.it.:
 
 | Property             | Verplicht | Verwachte Input | Default                                                            | Enum                                                                                                                                           | Voorbeeld                                 | Beschrijving                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 |----------------------|-----------|-----------------|--------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -112,22 +112,28 @@ Hier is een voorbeeld van hoe de tabel eruit kan zien, gebaseerd op de standaard
 Dat laats dus een aantal mogenlijke subobjecten
 
 ### intendedaudience
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-intendedaudience).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-intendedaudience).
 
 ### description
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-description).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-description).
 
 ### legal
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-legal).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-legal).
 
 ### maintenance
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-maintenance).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-maintenance).
 
 ### localisation
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-localisation).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-localisation).
 
 ### dependsOn
-Conform specs[description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-dependson).
+
+Conform specs [description](https://docs.italia.it/italia/developers-italia/publiccodeyml-en/en/master/schema.core.html#section-dependson).
 
 ### nl
 
@@ -159,11 +165,11 @@ Dit leid tot de volgende subobjecten
 | applicatiefunctie                  | Nee       | String          | n.v.t   | n.v.t                                  | Een van [de mogenlijke applicatie functies](https://www.gemmaonline.nl/index.php/GEMMAkennismodel/1.0/id-35825388-05d9-45aa-98f4-86dfb82337f5) |
 | model                  | Nee       | String          | n.v.t   | semantic, conceptual,logical, physical | Het soort model (mag alleen worden gebruikt als het type schema is).                                                                           |
 
-In theorie zijn er meer mogenlijke nederlandse utibreidingen te bedenken maar voor fase 1 hebben we ons bewust tot bovenstaande beperkt.
+In theorie zijn er meer mogelijke nederlandse utibreidingen te bedenken maar voor fase 1 hebben we ons bewust tot bovenstaande beperkt.
 
 ## Zijn er uitbreidingen op en afwijkingen van de publiccode standaard?
 
-We hebben op verschillende pleken afgeweken en uitgebreid op de publiccode standaard, met namen omdat deze te beperkend bleek. We hebben er overal voor gekozen om aan te vullen of eisen te verlagen. Dat betekend dat een (volgens de standaard) geldige publiccode.yaml ook voor OC werkt maar dat je aanvullende informatie zou kunnen opnemen.
+We hebben op verschillende plekken afgeweken en uitgebreid op de publiccode standaard, met namen omdat deze te beperkend bleek. We hebben er overal voor gekozen om aan te vullen of eisen te verlagen. Dat betekend dat een (volgens de standaard) geldige publiccode.yaml ook voor OC werkt maar dat je aanvullende informatie zou kunnen opnemen.
 
 Bij het veld softwareType ondersteunen we extra mogenlijkheden
 
@@ -184,8 +190,8 @@ Bij het veld softwareType ondersteunen we extra mogenlijkheden
 | process               | The repository/folder doesn't contain software but an executable process (e.g. bpmn2, camunda).   |
 | model                 | The repository/folder doesn't contain software but a model (e.g. uml).                            |
 
-Bij het veld platforms ondersteunen we extra opties "haven","kubernetes","azure","aws"
+Bij het veld platforms ondersteunen we extra opties "haven", "kubernetes", "azure", "aws"
 
-Daarnaast zijn in de normale versie van de standaard de velden "publiccodeYmlVersion","name","url" verplicht en kent public code vanuit de standaard geen default values (die wij ontrekken aan de repository)
+Daarnaast zijn in de normale versie van de standaard de velden "publiccodeYmlVersion", "name", "url" verplicht en kent public code vanuit de standaard geen default values (die wij ontrekken aan de repository)
 
-Bij logo laten we naast een realtief pad ook een absolute url naar het logo toe.
+Bij logo laten we naast een relatief pad ook een absolute url naar het logo toe.
