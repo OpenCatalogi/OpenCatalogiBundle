@@ -9,6 +9,8 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OpenCatalogiExtension extends Extension
 {
+
+
     /**
      * @param array            $configs   The config
      * @param ContainerBuilder $container The container builder
@@ -19,6 +21,7 @@ class OpenCatalogiExtension extends Extension
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../../Resources/config'));
         $loader->load('services.yaml');
+
     }//end load()
 
 
