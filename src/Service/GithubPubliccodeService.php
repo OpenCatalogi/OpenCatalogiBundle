@@ -376,12 +376,12 @@ class GithubPubliccodeService
             $application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']]);
             if ($application === null) {
                 $application = new ObjectEntity($applicationEntity);
-                $application->hydrate(['name' => $publiccode['applicationSuite'], 'components' => [$component]]);
+                $application->hydrate(['name' => $publiccode['applicationSuite']]);
             }//end if
 
             $this->entityManager->persist($application);
             $component->setValue('applicationSuite', $application);
-            $this->entityManager->persist($application);
+            $this->entityManager->persist($component);
             $this->entityManager->flush();
 
             return $component;
