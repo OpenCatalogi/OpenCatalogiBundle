@@ -1,73 +1,64 @@
-# Security
+# Beveiliging
+Wij geloven in het integreren van beveiliging in de kern van ons ontwikkelingsproces. We maken gebruik van geautomatiseerde penetratietesten en scanning als onderdeel van onze Continuous Integration en Continuous Deployment (CI/CD) pipeline. Deze aanpak stelt ons in staat om mogelijke beveiligingskwetsbaarheden vroegtijdig te identificeren en aan te pakken, tijdens de ontwikkelingsfase in plaats van later in de productiefase.
 
-We believe in integrating security into the core of our development process. We employ automated penetration testing and scanning as part of our Continuous Integration and Continuous Deployment (CI/CD) pipeline. This approach allows us to identify and address potential security vulnerabilities early, during the development phase, rather than later in the production phase.
+## Geautomatiseerde Penetratietesten
+Geautomatiseerde penetratietesttools zijn geïntegreerd in onze CI/CD-pipeline om aanvallen op onze systemen te simuleren en beveiligingszwaktes te identificeren. Deze tools voeren een reeks tests uit om te controleren op veelvoorkomende kwetsbaarheden, waaronder die vermeld staan in de OWASP Top 10.
 
-## Automated Penetration Testing
+De resultaten van deze tests worden vervolgens gebruikt om onze ontwikkelings- en beveiligingsteams te informeren over mogelijke kwetsbaarheden. Dit proces stelt ons in staat om deze kwetsbaarheden aan te pakken voordat de software wordt ingezet naar productie.
 
-Automated penetration testing tools are integrated into our CI/CD pipeline to simulate attacks on our systems and identify security weaknesses. These tools conduct a series of tests to check for common vulnerabilities, including those listed in the OWASP Top 10.
+## Scannen
+Onze CI/CD-pipeline bevat ook geautomatiseerde scannertools die onze broncode, containers en cloud-infrastructuur controleren op beveiligingsproblemen.
 
-The results from these tests are then used to inform our development and security teams about potential vulnerabilities. This process enables us to address these vulnerabilities before the software is deployed to production.
+Broncodescanners analyseren onze code om beveiligingszwaktes te vinden, zoals die vermeld staan in de OWASP Top 10-lijst van veelvoorkomende beveiligingsrisico's.
+Containerscanners inspecteren onze Docker- en andere containerimages op kwetsbaarheden, verkeerde configuraties en naleving van best practices. Dit sluit aan bij onze inzet om te voldoen aan de top tien tips voor containerbeveiliging.
+Cloudbeveiligingsscanners zorgen ervoor dat onze cloud-infrastructuur veilig is geconfigureerd, in overeenstemming met het principe van minimale rechten en andere best practices voor cloudbeveiliging.
 
-## Scanning
+## Naleving van de Top Tien Tips voor Containerbeveiliging
+Om een robuuste beveiliging te waarborgen, houden we ons aan de top tien tips voor containerbeveiliging. Hier zijn enkele van de praktijken die we volgen:
 
-Our CI/CD pipeline also includes automated scanning tools that check our source code, containers, and cloud infrastructure for security issues.
+- **Gebruik minimale basisimages:** We nemen alleen de noodzakelijke services en componenten op in onze containerimages om het aanvalsoppervlak te verminderen.
+- **Beheer geheimen veilig:** We slaan geen gevoelige informatie zoals wachtwoorden, API-sleutels of geheime tokens op in onze containerimages. In plaats daarvan maken we gebruik van veilige tools voor geheimenbeheer.
+- **Gebruik containers met niet-rootrechten:** We laten onze containers draaien als niet-rootgebruikers, waar mogelijk, om de potentiële schade te beperken als een container gecompromitteerd raakt.
+- **Regelmatig bijwerken en patchen van containers:** We houden onze containers up-to-date met de nieuwste beveiligingspatches.
+- **Scannen van images op kwetsbaarheden:** Zoals hierboven vermeld, maken we gebruik van geautomatiseerde tools om onze containerimages te scannen op bekende kwetsbaarheden.
+- **Beperken van het gebruik van systeembronnen:** We maken gebruik van beveiligingsfuncties van container-runtime om de hoeveelheid systeembronnen die een container kan gebruiken, te beperken.
+- **Gebruik van netwerksegmentatie:** We isoleren onze containers in afzonderlijke netwerksegmenten om laterale beweging te beperken in geval van een inbreuk.
+- **Implementeren van sterke authenticatie- en autorisatiecontroles:** We zorgen ervoor dat alleen geautoriseerde personen toegang hebben tot onze containers en de gegevens daarin.
+- **Monitoren en loggen van containeractiviteit:** We verzamelen en analyseren logs van onze containers om verdachte activiteiten te detecteren.
+- **Zorgen voor onveranderlijkheid en het onderhouden van een effectieve CI/CD-pipeline:** Onze containers zijn ontworpen om onveranderlijk te zijn, wat betekent dat ze niet worden bijgewerkt of gepatcht zodra ze zijn ingezet. In plaats daarvan worden wijzigingen aangebracht in het containerimage en wordt een nieuwe versie van de container ingezet via onze CI/CD-pipeline.
 
-Source code scanners analyze our code to find security weaknesses such as those in the OWASP Top 10 list of common security risks.
-Container scanners inspect our Docker and other container images for vulnerabilities, misconfigurations, and compliance with best practices. This is in line with our commitment to adhere to the top ten containerization security tips.
-Cloud security scanners ensure that our cloud infrastructure is configured securely, following the principle of least privilege and other cloud security best practices.
-Adhering to the Top Ten Containerization Security Tips
-In our commitment to maintain robust security, we adhere to the top ten containerization security tips. Here are some of the practices we follow:
+Door beveiliging te integreren in ons ontwikkelingsproces streven we ernaar een veilige, betrouwbare omgeving te creëren voor onze software en diensten.
 
-*   **Use minimal base images:** We only include the necessary services and components in our container images to reduce the attack surface.
-*   **Manage secrets securely:** We don't store sensitive information like passwords, API keys, or secret tokens in our container images. Instead, we use secure secrets management tools.
-*   **Use containers with non-root privileges:** We run our containers as non-root users whenever possible to limit the potential damage if a container is compromised.
-*   **Regularly update and patch containers:** We keep our containers up to date with the latest security patches.
-*   **Scan images for vulnerabilities:** As mentioned above, we use automated tools to scan our container images for known vulnerabilities.
-*   **Limit resource usage:** We use container runtime security features to limit the amount of system resources a container can use.
-*   **Use network segmentation:** We isolate our containers in separate network segments to limit lateral movement in case of a breach.
-*   **Implement strong authentication and authorization controls:** We ensure that only authorized individuals can access our containers and the data within them.
-*   **Monitor and log container activity:** We collect and analyze logs from our containers to detect any suspicious activity.
-*   **Ensure immutability and maintain an effective CI/CD pipeline:** Our containers are designed to be immutable, meaning they are not updated or patched once they are deployed. Instead, changes are made to the container image and a new version of the container is deployed through our CI/CD pipeline.
+## Gebruikersauthenticatie
+We implementeren gebruikersauthenticatie via oAuth of Active Directory Federation Services (ADFS). ADFS is een softwarecomponent ontwikkeld door Microsoft die gebruikers voorziet van single sign-on toegang tot systemen en applicaties die zich bevinden over organisatorische grenzen heen.
 
-By integrating security into our development process, we aim to create a secure, reliable environment for our software and services.
+Gebruikers authenticeren zich eerst via oAuth/ADFS, die vervolgens een reeks claims produceert die de gebruiker identificeren. Deze claims worden vervolgens gebruikt door de Open Catalogi-applicatie, die ze gebruikt om te beslissen of de gebruiker toegang en rollen krijgt (zie RBAC). Dit systeem vereenvoudigt het aanmeldingsproces voor gebruikers en maakt veilige authenticatie mogelijk over verschillende systemen en applicaties.
 
-## User Authentication
+## Identificatie op basis van Two-Way SSL
+De identificatie van andere catalogi in ons gefedereerde netwerk is gebaseerd op Two-Way SSL (Secure Sockets Layer) certificaten, in overeenstemming met het Nederlandse PKI (Public Key Infrastructure) systeem. Deze aanpak zorgt voor een beveiligd en vertrouwd communicatiekanaal tussen de software en de catalogus.
 
-We implement user authentication through oAuth or Active Directory Federation Services (ADFS). ADFS is a software component developed by Microsoft that provides users with single-sign-on access to systems and applications located across organizational boundaries.
+Het two-way SSL authenticatiemechanisme vereist dat zowel de client als de server elkaars openbare certificaten presenteren en accepteren voordat er communicatie kan plaatsvinden. Dit proces garandeert de identiteit van zowel de client als de server, en zorgt voor een hoog niveau van beveiliging en vertrouwen in de communicatie.
 
-Users first authenticate through oAuth/ADFS, which then produces a series of claims identifying the user. These claims are then used by the Open Catalogi application, which uses them to decide whether to grant the user access and roles (See RBAC). This system simplifies the login process for users and allows for secure authentication across different systems and applications.
+## Rolgebaseerde toegangscontrole (RBAC)
+Ons systeem implementeert rolgebaseerde toegangscontrole (RBAC) om zowel gebruikers- als applicatierechten te beheren. RBAC is een methode om de toegang tot computer- of netwerkbronnen te reguleren op basis van de rollen van individuele gebruikers binnen de organisatie.
 
-## Identification Based on Two-Way SSL
+Bij RBAC worden machtigingen geassocieerd met rollen (en geconfigureerd in onze software) en worden gebruikers en andere applicaties toegewezen aan passende rollen. Deze opzet vereenvoudigt het beheer van gebruikersprivileges en zorgt ervoor dat alleen geautoriseerde gebruikers en applicaties toegang hebben tot bepaalde bronnen of bepaalde handelingen kunnen uitvoeren.
 
-Identification of other catalogs in our federative network is based on two-way SSL (Secure Sockets Layer) certificates, specifically adhering to the Dutch PKI (Public Key Infrastructure) system. This approach ensures a secure and trusted communication channel between the software and the catalog.
+## Gegevensbeveiligingsniveaus
+Ons systeem behandelt verschillende soorten gegevens, elk met verschillende beveiligingsniveaus:
 
-The two-way SSL authentication mechanism requires both the client and the server to present and accept each other's public certificates before any communication can take place. This process guarantees the identity of both the client and server, ensuring a high level of security and trust in the communication.
+- **Openbare gegevens:** Deze gegevens zijn beschikbaar voor alle gebruikers en bevatten geen gevoelige informatie. Hoewel ze openbaar zijn, nemen we nog steeds maatregelen om de integriteit en beschikbaarheid ervan te waarborgen.
+- **Gegevens beschikbaar voor gespecificeerde organisaties:** Sommige gegevens zijn alleen toegankelijk voor bepaalde organisaties. We implementeren strikte toegangscontroles en authenticatiemethoden om ervoor te zorgen dat alleen geautoriseerde organisaties toegang hebben tot deze gegevens.
+- **Gegevens alleen beschikbaar voor de eigen organisatie:** Bepaalde gegevens zijn strikt intern en alleen toegankelijk voor onze organisatie. Deze gegevens zijn beschermd door meerdere beveiligingslagen en kunnen alleen worden geopend door geauthenticeerd en geautoriseerd personeel binnen onze organisatie.
+- **Gebruikersspecifieke gegevens:** Sommige gegevens zijn gepersonaliseerd en alleen beschikbaar voor specifieke gebruikers. Deze gegevens worden beschermd door strikte toegangscontroles en versleuteling. Alleen de specifieke gebruiker en geautoriseerd personeel binnen onze organisatie kunnen toegang krijgen tot deze gegevens.
 
-## Role-Based Access Control (RBAC)
+- We nemen gegevensbeveiliging zeer serieus en hebben robuuste maatregelen geïmplementeerd om de veiligheid, vertrouwelijkheid, integriteit en beschikbaarheid van alle gegevens in ons systeem te waarborgen.
 
-Our system implements Role-Based Access Control (RBAC) to manage both user and application rights. RBAC is a method of regulating access to computer or network resources based on the roles of individual users within the organization.
+## Scheiding van Landingzone, Executionzone en Data
+In onze opstelling maken we gebruik van NGINX- en PHP-containers om een ​​duidelijke scheiding van verantwoordelijkheden te waarborgen tussen internet/netwerktoegang, code-uitvoering en gegevensopslag. Deze ontwerpbenadering bevordert een robuuste beveiliging en verbeterde beheerbaarheid van onze applicaties en diensten.
 
-In RBAC, permissions are associated with roles (and configured in our software), and users and other appliations are assigned appropriate roles. This setup simplifies managing user privileges and helps to ensure that only authorized users and applications can access certain resources or perform certain operations.
+- **NGINX-containers als Landing Zone:** De eerste laag van onze architectuur bestaat uit NGINX-containers die dienen als een landing zone. NGINX is populaire open-source software die wordt gebruikt voor webserver, omgekeerde proxy, caching, load balancing en mediaservering, onder andere. In onze context gebruiken we het voornamelijk als een omgekeerde proxy en load balancer. Wanneer een verzoek binnenkomt vanaf het internet, komt het eerst bij de NGINX-container terecht. De rol van deze container is het verwerken van netwerkverkeer vanaf het internet, het uitvoeren van de nodige load balancing en het veilig doorsturen van verzoeken naar de juiste toepassingscontainers. Deze opstelling beschermt onze toepassingscontainers tegen directe blootstelling aan het internet en verbetert onze beveiligingspositie.
+- **PHP-containers als Execution Zone:** Nadat een verzoek is doorgestuurd door de NGINX-container, komt het terecht in de juiste PHP-container voor verwerking. Deze containers dienen als onze uitvoeringszone, waar toepassingslogica wordt uitgevoerd. Elke PHP-container draait een exemplaar van onze toepassing. Door de uitvoeringsomgeving op deze manier te isoleren, kunnen we ervoor zorgen dat problemen of kwetsbaarheden binnen één container geen invloed hebben op andere. Deze encapsulatie biedt een aanzienlijk beveiligingsvoordeel en maakt het gemakkelijker om individuele componenten van onze toepassing te beheren en schalen.
+- **Gegevensopslag buiten de cluster:** Voor gegevensopslag hanteren we de strategie om gegevens buiten de cluster te bewaren. Deze aanpak scheidt gegevens van de uitvoeringsomgeving en de netwerktoegangslaag, en biedt een extra beveiligingslaag. Gegevens die buiten de cluster zijn opgeslagen, kunnen grondig worden beschermd met specifieke beveiligingscontroles, versleuteling en back-upprocedures, onafhankelijk van de toepassing en netwerklagen.
 
-## Data Security Levels
-
-Our system handles various types of data, each requiring different levels of security:
-
-*   **Public Data:** This data is available to all users and doesn't contain any sensitive information. Even though it's public, we still take measures to ensure its integrity and availability.
-*   **Data Available to Specified Organizations:** Some data is only accessible to certain organizations. We implement strict access controls and authentication methods to ensure that only authorized organizations can access this data.
-*   **Data Available Only to the Own Organization:** Certain data is strictly internal and only accessible by our organization. This data is protected by multiple layers of security and can only be accessed by authenticated and authorized personnel within our organization.
-*   **User-Specific Data:** Some data is personalized and only available to specific users. This data is protected by strong access controls and encryption. Only the specific user and authorized personnel within our organization can access this data.
-
-We take data security very seriously and have implemented robust measures to ensure the safety, confidentiality, integrity, and availability of all data in our system.
-
-## Seperating Landingzone, Executionzone and Data
-
-In our setup, we utilize NGINX and PHP containers to ensure a clean separation of concerns between internet/network access, code execution, and data storage. This design facilitates robust security and improved manageability of our applications and services.
-
-*   **NGINX Containers as Landing Zone:** The first layer of our architecture involves NGINX containers serving as a landing zone. NGINX is a popular open-source software used for web serving, reverse proxying, caching, load balancing, and media streaming, among other things. In our context, we use it primarily as a reverse proxy and load balancer.  When a request arrives from the internet, it first hits the NGINX container. The role of this container is to handle network traffic from the internet, perform necessary load balancing, and forward requests to appropriate application containers in a secure manner. This arrangement shields our application containers from direct exposure to the internet, enhancing our security posture.
-
-*   **PHP Containers as Execution Zone:** Once a request has been forwarded by the NGINX container, it lands in the appropriate PHP container for processing. These containers serve as our execution zone, where application logic is executed.  Each PHP container runs an instance of our application. By isolating the execution environment in this way, we can ensure that any issues or vulnerabilities within one container don't affect others. This encapsulation provides a significant security advantage and makes it easier to manage and scale individual components of our application.
-
-*   **Data Storage Outside of the Cluster:** For data storage, we follow a strategy of keeping data outside the cluster. This approach separates data from the execution environment and the network access layer, providing an additional layer of security. Data stored outside the cluster can be thoroughly protected with specific security controls, encryption, and backup procedures, independent of the application and network layers.
-
-This three-tiered approach – NGINX containers for network access, PHP containers for code execution, and external storage for data – provides us with a secure, scalable, and resilient architecture. It allows us to isolate potential issues and manage each layer independently, thereby enhancing our ability to maintain and secure our services.
+Deze driedelige benadering - NGINX-containers voor netwerktoegang, PHP-containers voor code-uitvoering en externe opslag voor gegevens - biedt ons een beveiligde, schaalbare en veerkrachtige architectuur. Het stelt ons in staat potentiële problemen te isoleren en elke laag onafhankelijk te beheren, waardoor onze mogelijkheid om onze diensten te onderhouden en te beveiligen wordt verbeterd.

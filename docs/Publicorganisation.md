@@ -1,14 +1,13 @@
-# Public Organisation YAML Specification
+# Specificatie YAML voor Openbare Organisaties
+Het bestand publicorganisation.yaml is een voorgestande standaard voor het identificeren en verstrekken van informatie over openbare organisaties op GitHub. Dit bestand moet worden geplaatst in de .github-map van het repository van een GitHub-organisatie. Het dient als een verklaring van de identiteit van de organisatie, inclusief de naam, website, contactgegevens en de software die het gebruikt en ondersteunt.
 
-The publicorganisation.yaml file is a proposed standard for identifying and providing information about public organisations on GitHub. This file should be placed in the .github directory of a GitHub organisation's repository. It serves as a declaration of the organisation's identity, including its name, website, contact details, and the software it uses and supports.
+Door dit bestand te implementeren, kunnen openbare organisaties effectiever communiceren over hun softwareportfolio en bijdragen aan een transparant ecosysteem voor open-source. Het publicorganisation.yaml-bestand van elke organisatie biedt essentiële informatie die kan worden gebruikt door ontwikkelaars, burgers en andere belanghebbenden om de activiteiten en toewijding van de organisatie in het open-source domein te begrijpen.
 
-By implementing this file, public organisations can more effectively communicate their software portfolio and contribute to a more transparent, open-source ecosystem. Each organisation's publicorganisation.yaml file provides crucial information that can be used by developers, citizens, and other stakeholders to understand the organisation's activities and commitments in the open-source domain.
+Een belangrijk aspect van deze toewijding aan open-source is de ondersteuning die een organisatie biedt voor bepaalde software. Dit omvat zowel software die eigendom is van de organisatie zelf als software die eigendom is van andere organisaties. De geboden ondersteuning kan verschillende vormen aannemen, zoals onderhoud, hosting, software als een dienst (SaaS) of andere services. Deze details worden vastgelegd in een onderhoudsobject onder het veld softwareSupported.
 
-One key aspect of this open-source commitment is the support an organisation provides for certain software. This includes both software that the organisation owns and software owned by other organisations. The support provided can take various forms, such as maintenance, hosting, software as a service (SaaS), or other services. These details are encapsulated in a maintenance object under the softwareSupported field.
+Het onderhoudsobject vertegenwoordigt het type en niveau van ondersteuning dat de organisatie biedt voor een bepaalde software. Het bevat details zoals het type onderhoud en contactgegevens voor onderhoudsvragen.
 
-The maintenance object represents the type and level of support the organisation provides for a given software. It includes details like the type of maintenance and contact information for maintenance enquiries.
-
-Here's an example publicorganisation.yaml file:
+Hier is een voorbeeld van een publicorganisation.yaml-bestand:
 
 ```yaml
 publicorganisationYmlVersion: "0.2"

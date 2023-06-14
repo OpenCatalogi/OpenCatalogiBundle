@@ -1,41 +1,44 @@
-# Architecture
+# Architectuur
 
-The system is divided into different layers. Layer 5 is the interaction layer, Layer 4 is the logic layer, and Layer 1 is the data layer.
+Het systeem is verdeeld in verschillende lagen. Laag 5 is de interactielaag, Laag 4 is de logische laag en Laag 1 is de datalaag.
 
-Layer 5 (Interaction) contains the user interface and the admin interface. These interfaces are housed within React Container 1 and React Container 2 respectively. The user and admin interact with these interfaces via browsers. The user's browser interaction is anonymous while the admin's browser interaction includes JWT claims.
+Laag 5 (Interactie) bevat de gebruikersinterface en de beheerdersinterface. Deze interfaces zijn respectievelijk ondergebracht in React Container 1 en React Container 2. De gebruiker en beheerder communiceren met deze interfaces via webbrowsers. De interactie van de gebruiker via de browser is anoniem, terwijl de interactie van de beheerder JWT-claims bevat.
 
-Layer 4 (Logic) is the core of the system and consists of multiple components. The NGINX container holds the Nginx boundary which runs the Web Gateway housed in the Gateway Container. The Gateway Container also contains the Open Catalogi plugin and the ORM (Object-Relational Mapping). The Gateway implements these plugins and interacts with the identity component in the Azure cloud. The Gateway also indexes to MongoDB, caches to Redis, and stores data to the ORM.
+Laag 4 (Logica) is de kern van het systeem en bestaat uit meerdere componenten. De NGINX-container bevat de Nginx-grens die de Web Gateway uitvoert, die is ondergebracht in de Gateway Container. De Gateway Container bevat ook de Open Catalogi-plugin en de ORM (Object-Relationele Mapping). De Gateway implementeert deze plugins en communiceert met het identiteitscomponent in de Azure-cloud. De Gateway maakt ook indexen naar MongoDB, caches naar Redis en slaat gegevens op in de ORM.
 
-The Redis Container houses the Redis component, and the MongoDB Container houses the MongoDB database. The Gateway logs to Loki and reports to Prometheus. The Open Catalogi plugin exchanges information with the external catalog based on PKI (Public Key Infrastructure).
+De Redis Container bevat het Redis-component en de MongoDB Container bevat de MongoDB-database. De Gateway logt naar Loki en rapporteert aan Prometheus. De Open Catalogi-plugin wisselt informatie uit met de externe catalogus op basis van PKI (Public Key Infrastructure).
 
-Layer 1 (Data) contains a Database Service which includes various database systems like Postgress, MsSQL, MySql, and Oracle. The ORM persists data to these databases.
+Laag 1 (Data) bevat een Database Service die verschillende databasesystemen bevat zoals Postgres, MsSQL, MySQL en Oracle. De ORM slaat gegevens op in deze databases.
 
-The system is housed within a Kubernetes cluster. The ingress component exposes the user interface, the admin interface, and the Nginx component. The ingress interacts with the F5 extern for only public endpoints and objects and with the F5 intern for all endpoints. It also interacts with the Hipp component for catalog exchanges.
+Het systeem is ondergebracht in een Kubernetes-cluster. Het ingress-component maakt de gebruikersinterface, de beheerdersinterface en het Nginx-component beschikbaar. Het ingress-component communiceert met F5 extern alleen voor openbare eindpunten en objecten, en met F5 intern voor alle eindpunten. Het communiceert ook met het Hipp-component voor catalogusuitwisselingen.
 
-The external catalog interacts with the Hipp component using PKIO. The Hipp component is out of scope for the system.
+De externe catalogus communiceert met het Hipp-component met behulp van PKIO. Het Hipp-component valt buiten de scope van het systeem.
 
-The Azure cloud contains the ADFS component which serves as an identity provider.
+De Azure-cloud bevat het ADFS-component dat fungeert als een identiteitsprovider.
 
-Finally, the system includes an External Catalogue actor which interacts with the Hipp component, and an Admin actor who interacts with the F5 intern component via a browser with JWT claims. There is also a User actor who interacts with the F5 extern component via an anonymous browser.
+Ten slotte omvat het systeem een externe catalogusacteur die communiceert met het Hipp-component, en een beheerdersacteur die communiceert met het F5 intern-component via een browser met JWT-claims. Er is ook een gebruikersacteur die communiceert met het F5 extern-component via een anonieme browser.
 
-![](oc.svg "UML Diagram of Open Catalogi")
+![](oc_user.svg "UML Diagram of Open Catalogi")
+![](oc_admin.svg "UML Diagram of Open Catalogi")
+![](oc_extern.svg "UML Diagram of Open Catalogi")
 
-## How does open catalogi form an federated network
-Each Open Catalogi installation (referred to as a Catalog) maintains a directory listing of other known installations (or catalogs). When a new installation is added to the network, it needs to be aware of, or locate, at least one existing installation. This existing installation provides its directory to the new installation, thereby informing it about all other known installations. During this process, the new installation is also added to the existing installation's directory, which it used as a reference.
+## Hoe vormt Open Catalogi een gefedereerd netwerk?
+Elke Open Catalogi-installatie (aangeduid als een Catalogus) onderhoudt een directorylijst van andere bekende installaties (of catalogi). Wanneer een nieuwe installatie aan het netwerk wordt toegevoegd, moet deze op de hoogte zijn van, of ten minste één bestaande installatie vinden. Deze bestaande installatie verstrekt zijn directory aan de nieuwe installatie, waardoor deze op de hoogte wordt gebracht van alle andere bekende installaties. Tijdens dit proces wordt de nieuwe installatie ook toegevoegd aan de directory van de bestaande installatie, die als referentie wordt gebruikt.
 
-Next, the new installation communicates with all other installations listed in its directory. The purpose of this communication is two-fold: to announce its addition to the network, and to inquire if they are aware of other installations that are not yet included in the new installation's directory.
+Vervolgens communiceert de nieuwe installatie met alle andere installaties die vermeld staan in zijn directory. Het doel van deze communicatie is tweeledig: het aankondigen van zijn toevoeging aan het netwerk en informeren of ze op de hoogte zijn van andere installaties die nog niet zijn opgenomen in de directory van de nieuwe installatie.
 
-This inquiry process is repeated at regular intervals. Given that each installation maintains its own directory, the network remains robust and operational even if an individual installation becomes unavailable.
+Dit onderzoekproces wordt regelmatig herhaald. Omdat elke installatie zijn eigen directory bijhoudt, blijft het netwerk robuust en operationeel, zelfs als een individuele installatie niet beschikbaar is.
 
 ![](createnetwork.svg "Sequence Diagram network creation")
 
-## How does open catalogi use a federated network
-Live Data:
-Every time a query is made to the '/search' endpoint of an Open Catalogi installation, it seeks answers in its own MongoDB index based on certain filters. Simultaneously, it also checks its directory of known catalogs to find other catalogs that might contain the requested data and which the original catalog has access to. The query is also sent asynchronously to these catalogs, and the responses are combined unless a predefined timeout threshold is reached.
+## Hoe maakt Open Catalogi gebruik van een gefedereerd netwerk?
+**Live gegevens**:
+Telkens wanneer een query wordt uitgevoerd naar het '/search' eindpunt van een Open Catalogi-installatie, zoekt het antwoorden in zijn eigen MongoDB-index op basis van bepaalde filters. Tegelijkertijd controleert het ook zijn directory van bekende catalogi om andere catalogi te vinden die mogelijk de gevraagde gegevens bevatten en waar de oorspronkelijke catalogus toegang toe heeft. De query wordt ook asynchroon naar deze catalogi verzonden, en de reacties worden gecombineerd, tenzij een vooraf gedefinieerde time-outdrempel wordt bereikt.
 
 ![](live.svg "Sequence Diagram network creation")
-Indexed Data:
-Open Catalogi prefers to index data when the source allows it. During each network synchronization run (as explained in 'Setting Up a Network'), any data that can be indexed is indexed if the source is set to indexing. It's important to note that when an object is shared from another catalog, a cloud event subscription is established. This means that when the object is updated in that catalog, the changes are also updated almost instantly in the local installation.
+
+**Geïndexeerde gegevens**:
+Open Catalogi geeft de voorkeur aan het indexeren van gegevens wanneer de bron dit toestaat. Tijdens elke uitvoer van netwerksynchronisatie (zoals uitgelegd in 'Hoe vormt Open Catalogi een gefedereerd netwerk?'), worden alle gegevens die kunnen worden geïndexeerd, geïndexeerd als de bron is ingesteld op indexering. Het is belangrijk op te merken dat wanneer een object wordt gedeeld vanuit een andere catalogus, er een cloudgebeurtenisabonnement wordt gemaakt. Dit betekent dat wanneer het object wordt bijgewerkt in die catalogus, de wijzigingen ook vrijwel direct worden bijgewerkt in de lokale installatie.
 
 > :note:
 >
