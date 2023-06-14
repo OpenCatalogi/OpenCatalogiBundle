@@ -46,7 +46,8 @@ cloud "Database Service"{
 }
 }
 
-hipp <..> ingress: Catalogus uitwisselingen
+externalCatalouge <..> hipp: PKIo
+hipp <..> ingress: /api/catalogi/*
 ingress <..> Nginx: Exposes
 Nginx  <..> Gateway: Runs
 Gateway <..> Plugins: Implements

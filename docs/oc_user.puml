@@ -58,10 +58,9 @@ cloud "Database Service"{
 }
 
 user <..> f5extern: Browser ANONIEM
-f5extern <..> ingress: Alleen openbare endpoints en objecten
+f5extern <..> ingress: /api/search/* en andere
 
 ingress <..> ui: Exposes
-ingress <..> admin: Exposes
 ingress <..> Nginx: Exposes
 Nginx  <..> Gateway: Runs
 Gateway <..> Plugins: Implements

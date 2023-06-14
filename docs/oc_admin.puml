@@ -59,9 +59,8 @@ cloud "Database Service"{
 }
 
 adminUser <..> f5intern : Browser MET JWT Claim
-f5intern <..> ingress: Alle endpionts
+f5intern <..> ingress: /api/admin/*
 
-ingress <..> ui: Exposes
 ingress <..> admin: Exposes
 ingress <..> Nginx: Exposes
 Nginx  <..> Gateway: Runs
