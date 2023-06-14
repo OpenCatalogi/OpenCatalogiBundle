@@ -13,6 +13,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Encoder\YamlEncoder;
 
 class EnrichPubliccodeFromGithubUrlService
 {
@@ -99,22 +100,62 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
 
-        try {
-            $response = $this->callService->call($source, '/repos/'.$repositoryUrl.'/contents/publiccode.yaml');
-        } catch (Exception $e) {
-            $this->pluginLogger->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yaml '.$e->getMessage());
-        }
+        $possibleEndpoints = [
+            '/repos/'.$repositoryUrl.'/contents/publiccode.yaml',
+            '/repos/'.$repositoryUrl.'/contents/publiccode.yml'
+        ];
 
-        if (isset($response) === false) {
+        foreach ($possibleEndpoints as $endpoint) {
+
             try {
-                $response = $this->callService->call($source, '/repos/'.$repositoryUrl.'/contents/publiccode.yml');
+                $response = $this->callService->call($source, $endpoint);
             } catch (Exception $e) {
-                $this->pluginLogger->error('Error found trying to fetch /repos/'.$repositoryUrl.'/contents/publiccode.yml '.$e->getMessage());
+                $this->pluginLogger->error('Error found trying to fetch ' . $endpoint . ' ' .$e->getMessage());
+            }
+
+            if (isset($response) === true) {
+                return $this->githubService->parsePubliccode($repositoryUrl, $response);
             }
         }
 
-        if (isset($response) === true) {
-            return $this->githubService->parsePubliccode($repositoryUrl, $response);
+        return null;
+
+    }//end getPubliccodeFromUrl()
+
+    /**
+     * This function fetches repository data.
+     *
+     * @param string $publiccodeUrl endpoint to request
+     *
+     * @throws GuzzleException
+     *
+     * @return array|null|Response
+     */
+    public function getPubliccodeFromRawUserContent(string $repositoryUrl)
+    {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
+
+        $possibleEndpoints = [
+            '/'.$repositoryUrl.'/main/publiccode.yaml',
+            '/'.$repositoryUrl.'/main/publiccode.yml',
+            '/'.$repositoryUrl.'/master/publiccode.yaml',
+            '/'.$repositoryUrl.'/master/publiccode.yml'
+        ];
+
+        foreach ($possibleEndpoints as $endpoint) {
+
+            try {
+                $response = $this->callService->call($source, $endpoint);
+            } catch (Exception $e) {
+                $this->pluginLogger->error('Error found trying to fetch ' . $endpoint . ' ' .$e->getMessage());
+            }
+
+            if (isset($response) === true) {
+                $yamlEncoder = new YamlEncoder();
+
+                // @TODO: Use the CallService decodeBody
+                return $yamlEncoder->decode($response->getBody()->getContents(), 'yaml');
+            }
         }
 
         return null;
@@ -131,7 +172,16 @@ class EnrichPubliccodeFromGithubUrlService
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $repositoryUrl): ?ObjectEntity
     {
         $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
-        if (($publiccode = $this->getPubliccodeFromUrl($url)) !== null) {
+
+        // Get the publiccode through the raw.githubusercontent source
+        if (($publiccode = $this->getPubliccodeFromRawUserContent($url)) !== null) {
+            $this->githubService->mapPubliccode($repository, $publiccode);
+        }
+
+        // If still not found, get the publiccode through the api.github source
+        if ($publiccode === null
+            && ($publiccode = $this->getPubliccodeFromUrl($url)) !== null
+        ) {
             $this->githubService->mapPubliccode($repository, $publiccode);
         }
 
@@ -154,14 +204,19 @@ class EnrichPubliccodeFromGithubUrlService
 
         if ($repositoryId !== null) {
             // If we are testing for one repository.
-            if (($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) !== null) {
-                if ($repository->getValue('publiccode_url') === null) {
-                    $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
-                }
-            } else {
+            $repository = $this->entityManager->find('App:ObjectEntity', $repositoryId);
+            if ($repository instanceof ObjectEntity === true
+                && $repository->getValue('publiccode_url') === null
+            ) {
+                $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
+            }
+
+            if ($repository instanceof ObjectEntity === false) {
                 $this->pluginLogger->error('Could not find given repository');
             }
-        } else {
+        }
+
+        if ($repositoryId === null){
             $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             // If we want to do it for al repositories.
