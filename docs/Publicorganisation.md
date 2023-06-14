@@ -57,15 +57,15 @@ Here is a table presenting all the properties in the openCatalogi.yaml or openCa
 |---|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 |name| 	String                  | 	The official name of the public organization                                                                                       |
 |website| 	String (URL)            | 	The official website of the public organization                                                                                    |
-|logo| 	String                  | 	The image of the organization                                                                                                                                    
-|catalogusAPI| 	String                  | 	The catalogus api of the organization                                                                                                                              
+|logo| 	String                  | 	The image of the organization\
+|catalogusAPI| 	String                  | 	The catalogus api of the organization\
 |contact| 	Object                  | 	The contact details of the public organization                                                                                     |
 |contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
 |softwareUsed| 	Array of Strings (URLs) | 	List of software the public organization uses, represented by their repository URLs                                                |
-|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects                                        
-|softwareSupported\[].software|	String| 	The software that the organization supports                                                                                        
-|softwareSupported\[].type|	String| 	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase" 
+|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects\
+|softwareSupported\[].software|	String| 	The software that the organization supports\
+|softwareSupported\[].type|	String| 	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"
 |softwareSupported\[].contact|	Object| 	The contact details of the support                                                                                                 |
 |softwareSupported\[].contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |softwareSupported\[].contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
