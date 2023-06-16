@@ -1,6 +1,6 @@
 # Specificatie YAML voor Openbare Organisaties
 
-Het bestand openCatalogi.yaml is een voorgestande standaard voor het identificeren en verstrekken van informatie over openbare organisaties op GitHub. Dit bestand moet worden geplaatst in de .github-map van het repository van een GitHub-organisatie. Het dient als een verklaring van de identiteit van de organisatie, inclusief de naam, website, contactgegevens en de software die het gebruikt en ondersteunt.
+Het bestand openCatalogi.yaml is een voorgestelde standaard voor het identificeren van en verstrekken van informatie over openbare organisaties op GitHub. Dit bestand moet worden geplaatst in de .github-map van de repository van een GitHub-organisatie. Het dient als een verklaring van de identiteit van de organisatie, inclusief de naam, website, contactgegevens en de software die het gebruikt en ondersteunt.
 
 Door dit bestand te implementeren, kunnen openbare organisaties effectiever communiceren over hun softwareportfolio en bijdragen aan een transparant ecosysteem voor open-source. Het openCatalogi.yaml-bestand van elke organisatie biedt essentiële informatie die kan worden gebruikt door ontwikkelaars, burgers en andere belanghebbenden om de activiteiten en toewijding van de organisatie in het open-source domein te begrijpen.
 
@@ -14,10 +14,10 @@ Hier is een voorbeeld van een openCatalogi.yaml-bestand:
 openCatalogiYmlVersion: "0.2"
 
 # The official name of the public organization
-name: 'Public Organization Name'
+name: 'Public Organization Name'   # for example  name: 'Gemeente Rotterdam'
 
 # The official website of the public organization
-website: 'https://www.publicorganizationwebsite.com'
+website: 'https://www.publicorganizationwebsite.com'    # for example  website: 'https://www.rotterdam.nl'
 
 # The contact details of the public organization
 contact:
@@ -35,6 +35,7 @@ softwareOwned:
 softwareUsed:
   - 'https://github.com/organization/software1'
   - 'https://github.com/organization/software2'
+  - 'https://github.com/organization/software3'
 
 # List of software the public organization supports
 # Each item is a maintenance object representing the support provided for a software
@@ -44,14 +45,14 @@ softwareSupported:
     contact:
       email: 'contact@publicorganization.com' # Public contact email
       phone: '+1234567890' # Public contact phone number
-  - software: 'https://github.com/organization/software2'
+  - software: 'https://github.com/organization/software3'
     type: 'saas' # The type of support provided
     contact:
       email: 'contact@publicorganization.com' # Public contact email
       phone: '+1234567890' # Public contact phone number
 ```
 
-Here is a table presenting all the properties in the openCatalogi.yaml or openCatalogi.yml file:
+De volgende tabel geeft een overzicht van alle eigenschappen in de openCatalogi.yaml of openCatalogi.yml bestand
 
 |Key| 	Type                    | 	Description                                                                                                                        |
 |---|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
@@ -72,7 +73,7 @@ Here is a table presenting all the properties in the openCatalogi.yaml or openCa
 
 ## Jouw organisatie toevoegen aan open catalogi
 
-Om je organisatie aan te melden op Open Catalogi heb je een github organisaite en organisatie repository met een publicorganisation.yml nodig. Doorloop daarvoor de volgende stappen
+Om je organisatie aan te melden op Open Catalogi heb je een github organisatie en organisatie repository met een publicorganisation.yml nodig. Doorloop daarvoor de volgende stappen
 
 ### Stap 1: Maak een Organisatie op GitHub
 
