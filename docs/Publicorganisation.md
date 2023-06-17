@@ -135,26 +135,27 @@ Voor veel gebruikte softwarerepositories zie de onderstaande lijst
 | Open Formulieren | <https://github.com/open-formulieren/open-forms> |
 | Open Webconcept | <https://github.com/VNG-Realisatie/OpenWebConcept> |
 
-
 ### Stap 5: (optioneel) Meld je github organisatie aan voor open catalogi
+
 OpenCatalogi scant iedere dag github, maar als je wilt weten of je bestand klopt kan dat wat lang duren. Gelukkig kan je dit ook versnellen
 
-1. Ga naar opencatalogi.nl 
-2. Klik in het hoofd menu op "documentatie"" en selecteer "over"
-3. Plak in de balk "Meld uw component" je url van je .github repository e.g. "https://github.com/[organisatienaam]/github"
-4. Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina
+1.  Ga naar opencatalogi.nl
+2.  Klik in het hoofd menu op "documentatie"" en selecteer "over"
+3.  Plak in de balk "Meld uw component" je url van je .github repository e.g. "https://github.com/\[organisatienaam]/github"
+4.  Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina
 
 ### Stap 6: (optioneel) Inregelen van een webhook
+
 OpenCatalogi scant iedere dag github, dat betkend dat het lang kan duren voordat wijzigingen in je repositories of ieuwe repositories zichtbaar worden. Gelukkig is daar een oplossing voor door OpenCatalogi elke keer te notificeren als er iets is gewijzigd. Daarvoor moet er een github webhook worden ingericht.
 
-1. Log in op je GitHub-account en ga naar de hoofdpagina van je organisatie.
-2. Klik op de "Settings" tab in de rechterbovenhoek van de pagina.
-3. Klik in het linker zijmenu op "Webhooks".
-4. Klik op de "Add webhook" knop aan de rechterkant.
-5. Je wordt nu gevraagd om je GitHub-wachtwoord in te voeren om te bevestigen dat je de rechten hebt om een webhook toe te voegen.
-6. In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/githubwebhook zijn.
-7. Kies voor "Content type" de optie "application/json".
-8. In het gedeelte "Which events would you like to trigger this webhook?", selecteer je "Repositories". Dit zorgt ervoor dat de webhook wordt geactiveerd bij elke wijziging of het aanmaken van een repository.
-9. Zorg ervoor dat de "Active" checkbox is aangevinkt zodat de webhook daadwerkelijk wordt geactiveerd.
+1.  Log in op je GitHub-account en ga naar de hoofdpagina van je organisatie.
+2.  Klik op de "Settings" tab in de rechterbovenhoek van de pagina.
+3.  Klik in het linker zijmenu op "Webhooks".
+4.  Klik op de "Add webhook" knop aan de rechterkant.
+5.  Je wordt nu gevraagd om je GitHub-wachtwoord in te voeren om te bevestigen dat je de rechten hebt om een webhook toe te voegen.
+6.  In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/githubwebhook zijn.
+7.  Kies voor "Content type" de optie "application/json".
+8.  In het gedeelte "Which events would you like to trigger this webhook?", selecteer je "Repositories". Dit zorgt ervoor dat de webhook wordt geactiveerd bij elke wijziging of het aanmaken van een repository.
+9.  Zorg ervoor dat de "Active" checkbox is aangevinkt zodat de webhook daadwerkelijk wordt geactiveerd.
 10. Klik op de "Add webhook" knop om de webhook te creëren.
 11. Nu is je webhook ingesteld. Telkens wanneer er een repository wordt aangemaakt of gewijzigd in je organisatie, wordt er een bericht gestuurd naar de opgegeven URL. Let op, dit vereist beheerdersrechten voor de organisatie op GitHub. Als je deze rechten niet hebt, moet je aan de beheerder vragen om deze stappen uit te voeren.
