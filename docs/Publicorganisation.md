@@ -2,11 +2,11 @@
 
 Het bestand openCatalogi.yaml is een voorgestelde standaard voor het identificeren van en verstrekken van informatie over openbare organisaties op GitHub. Dit bestand moet worden geplaatst in de .github-map van de repository van een GitHub-organisatie. Het dient als een verklaring van de identiteit van de organisatie, inclusief de naam, website, contactgegevens en de software die het gebruikt en ondersteunt.
 
-Door dit bestand te implementeren, kunnen openbare organisaties effectiever communiceren over hun softwareportfolio en bijdragen aan een transparant ecosysteem voor open-source. Het openCatalogi.yaml-bestand van elke organisatie biedt essentiële informatie die kan worden gebruikt door ontwikkelaars, burgers en andere belanghebbenden om de activiteiten en toewijding van de organisatie in het open-source domein te begrijpen.
+Door dit bestand te implementeren, kunnen openbare organisaties effectiever communiceren over hun software portfolio en bijdragen aan een transparant ecosysteem voor open-source. Het openCatalogi.yaml bestand van elke organisatie biedt essentiële informatie die kan worden gebruikt door ontwikkelaars, burgers en andere belanghebbenden om de activiteiten en toewijding van de organisatie in het open-source domein te begrijpen.
 
-Een belangrijk aspect van deze toewijding aan open-source is de ondersteuning die een organisatie biedt voor bepaalde software. Dit omvat zowel software die eigendom is van de organisatie zelf als software die eigendom is van andere organisaties. De geboden ondersteuning kan verschillende vormen aannemen, zoals onderhoud, hosting, software als een dienst (SaaS) of andere services. Deze details worden vastgelegd in een onderhoudsobject onder het veld softwareSupported.
+Een belangrijk aspect van deze toewijding aan open-source is de ondersteuning die een organisatie biedt voor bepaalde software. Dit omvat zowel software die eigendom is van de organisatie zelf als software die eigendom is van andere organisaties. De geboden ondersteuning kan verschillende vormen aannemen, zoals onderhoud, hosting, software als een dienst (SaaS) of andere services. Deze details worden vastgelegd in een onderhouds object onder het veld softwareSupported.
 
-Het onderhoudsobject vertegenwoordigt het type en niveau van ondersteuning dat de organisatie biedt voor een bepaalde software. Het bevat details zoals het type onderhoud en contactgegevens voor onderhoudsvragen.
+Het onderhoud object vertegenwoordigt het type en niveau van ondersteuning dat de organisatie biedt voor een bepaalde software. Het bevat details zoals het type onderhoud en contactgegevens voor onderhoudsvragen.
 
 Hier is een voorbeeld van een openCatalogi.yaml bestand:
 
@@ -27,7 +27,7 @@ contact:
   email: 'contact@publicorganization.com' # Public contact email
   phone: '+1234567890' # Public contact phone number
 
-# List of software the public organization owns. keep in mind that owns dosn't automaticly means maintained
+# List of software the public organization owns. keep in mind that owns dosn't automatically means maintained
 # Each item refers to the repository URL of the software
 softwareOwned:
   - 'https://github.com/organization/software1'
@@ -36,9 +36,9 @@ softwareOwned:
 # List of software the public organization uses
 # Each item refers to the repository URL of the software
 softwareUsed:
-  - 'https://github.com/organization/software1'
-  - 'https://github.com/organization/software2'
-  - 'https://github.com/organization/software3'
+  - 'https://github.com/OpenCatalogi/OpenCatalogiBundle'
+  - 'https://github.com/open-zaak/open-zaak'
+  - 'https://github.com/VNG-Realisatie/OpenWebConcep'
 
 # List of software the public organization supports
 # Each item is a maintenance object representing the support provided for a software
@@ -61,23 +61,24 @@ De volgende tabel geeft een overzicht van alle eigenschappen in de openCatalogi.
 |---|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
 |name| 	String                  | 	The official name of the public organization                                                                                       |
 |website| 	String (URL)            | 	The official website of the public organization                                                                                    |
-|logo| 	String                  | 	The image of the organization\
-|catalogusAPI| 	String                  | 	The catalogus api of the organization\
-|contact| 	Object                  | 	The contact details of the public organization                                                                                     |
+|logo| 	String                  | 	The image of the organization|
+|catalogusAPI| 	String                  | 	The catalogus api of the organization|
+|contact| 	Object                  | 	The contact details of the public organization|                                                                                     |
 |contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
 |softwareUsed| 	Array of Strings (URLs) | 	List of software the public organization uses, represented by their repository URLs                                                |
-|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects\
-|softwareSupported\[].software|	String| 	The software that the organization supports\
-|softwareSupported\[].type|	String| 	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"
-|softwareSupported\[].contact|	Object| 	The contact details of the support                                                                                                 |
+|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects\|
+|softwareSupported\[].software|	String| 	The software that the organization supports\|
+|softwareSupported\[].type|	String| 	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"|
+|softwareSupported\[].contact|	Object| 	The contact details of the support|                                                                                                 |
 |softwareSupported\[].contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |softwareSupported\[].contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
 
-Voor veel gebruikte softwarerepositories zie de onderstaande lijst
+Voor veel gebruikte software repositories zie de onderstaande lijst
 
 |Naam|Repository URl                |
 |---|--------------------------|
+| Open Catalogi| <https://github.com/open-zaak/open-zaak>  |
 | Open Zaak | <https://github.com/open-zaak/open-zaak>  |
 | Open Formulieren | <https://github.com/open-formulieren/open-forms> |
 | Open Webconcept | <https://github.com/VNG-Realisatie/OpenWebConcept> |
@@ -98,7 +99,7 @@ Om je organisatie aan te melden op Open Catalogi heb je een github organisatie e
 6.  Je kunt nu mensen aan je organisatie toevoegen door hun GitHub-gebruikersnamen of e-mailadressen in te voeren. Je kunt deze stap ook overslaan en later mensen toevoegen.
 7.  Klik op 'Create organization'.
 
-### Stap 2: Maak een .github Repository (als je die not niet hebt)
+### Stap 2: Maak een .github Repository (als je die nog niet hebt)
 
 1.  Ga naar de pagina van je nieuwe organisatie. Dit zou iets moeten zijn als `https://github.com/[organisatienaam]`.
 2.  Klik op 'New' om een nieuwe repository te maken.
@@ -134,7 +135,7 @@ softwareUsed:
 ```
 
 5.  Vervang de bovenstaande waarden door de relevante gegevens van uw organisatie
-6.  Voeg eventueel extra gebruikte software pakketen toe (zie tabel hier boven)
+6.  Voeg eventueel extra gebruikte software pakketten toe (zie tabel hier boven)
 7.  Klik op "Commit new file" onderaan de pagina
 
 
@@ -149,7 +150,7 @@ OpenCatalogi scant iedere dag github, maar als je wilt weten of je bestand klopt
 
 ### Stap 6: (optioneel) Inregelen van een webhook
 
-OpenCatalogi scant iedere dag github, dat betkend dat het lang kan duren voordat wijzigingen in je repositories of ieuwe repositories zichtbaar worden. Gelukkig is daar een oplossing voor door OpenCatalogi elke keer te notificeren als er iets is gewijzigd. Daarvoor moet er een github webhook worden ingericht.
+OpenCatalogi scant iedere dag github, dat betekent dat het lang kan duren voordat wijzigingen in je repositories of ieuwe repositories zichtbaar worden. Gelukkig is daar een oplossing voor door OpenCatalogi elke keer te notificeren als er iets is gewijzigd. Daarvoor moet er een github webhook worden ingericht.
 
 1.  Log in op je GitHub-account en ga naar de hoofdpagina van je organisatie.
 2.  Klik op de "Settings" tab in de rechterbovenhoek van de pagina.
@@ -165,9 +166,9 @@ OpenCatalogi scant iedere dag github, dat betkend dat het lang kan duren voordat
 
 ## Jouw organisatie toevoegen aan open catalogi via gitlab (beta)
 > Note
-> Deze functionaliet bevind zich nog in de beta fase, en wordt niet ondersteund voor productie omgevingen
+> Deze functionaliteit bevindt zich nog in de beta fase, en wordt niet ondersteund voor productie omgevingen
 
-### Stap 1: Maak een Groep op GitLab (als je die not niet hebt)
+### Stap 1: Maak een Groep op GitLab (als je die nog niet hebt)
 
 1. Log in op je GitLab-account.
 2. Klik op het '+' icoon in de navigatiebalk aan de linkerzijde.
@@ -210,19 +211,19 @@ softwareUsed:
 ```
 
 5.  Vervang de bovenstaande waarden door de relevante gegevens van uw organisatie
-6. Voeg eventueel extra gebruikte software pakketten toe (zie tabel boven).
+6. Voeg eventueel extra gebruikte softwarepakketten toe (zie tabel boven).
 7. Klik op 'Commit changes'.
 
 ### Stap 4: (verplicht) Meld je GitLab groep aan voor open catalogi
 1. Ga naar opencatalogi.nl
-2. Klik in het hoofd menu op "documentatie" en selecteer "over"
+2. Klik in het hoofdmenu op "documentatie" en selecteer "over"
 3. Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/[groepsnaam]/.gitlab"
 4. Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
 
 ### Stap 5: (verplicht) Inregelen van een webhook
 
 1. Ga naar GitLab en log in met je gebruikersnaam en wachtwoord.
-2. Navigeer naar de groep waarvoor je de webhook wilt instellen. Dit kan je doen door in het linker menu op "Groepen" te klikken en dan de desbetreffende groep te selecteren.
+2. Navigeer naar de groep waarvoor je de webhook wilt instellen. Dit kan je doen door in het linkermenu op "Groepen" te klikken en dan de desbetreffende groep te selecteren.
 3. Op de groepspagina, ga naar "Instellingen" in het linkermenu en selecteer "Webhooks".
 4. Klik op "Add webhook" of "Webhook toevoegen". Hier kan je de URL opgeven waar de webhook-aanvragen naartoe gestuurd moeten worden.
 5. Vul in het veld "URL" de URL api.opencatalogi.nl/gitlabwebhook in.
