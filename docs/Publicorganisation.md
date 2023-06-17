@@ -83,8 +83,6 @@ Voor veel gebruikte software repositories zie de onderstaande lijst
 | Open Formulieren | <https://github.com/open-formulieren/open-forms> |
 | Open Webconcept | <https://github.com/VNG-Realisatie/OpenWebConcept> |
 
-
-
 ## Jouw organisatie toevoegen aan open catalogi via github
 
 Om je organisatie aan te melden op Open Catalogi heb je een github organisatie en organisatie repository met een publicorganisation.yml nodig. Doorloop daarvoor de volgende stappen
@@ -138,7 +136,6 @@ softwareUsed:
 6.  Voeg eventueel extra gebruikte software pakketten toe (zie tabel hier boven)
 7.  Klik op "Commit new file" onderaan de pagina
 
-
 ### Stap 5: (optioneel) Meld je github organisatie aan voor open catalogi
 
 OpenCatalogi scant iedere dag github, maar als je wilt weten of je bestand klopt kan dat wat lang duren. Gelukkig kan je dit ook versnellen
@@ -165,30 +162,39 @@ OpenCatalogi scant iedere dag github, dat betekent dat het lang kan duren voorda
 11. Nu is je webhook ingesteld. Telkens wanneer er een repository wordt aangemaakt of gewijzigd in je organisatie, wordt er een bericht gestuurd naar de opgegeven URL. Let op, dit vereist beheerdersrechten voor de organisatie op GitHub. Als je deze rechten niet hebt, moet je aan de beheerder vragen om deze stappen uit te voeren.
 
 ## Jouw organisatie toevoegen aan open catalogi via gitlab (beta)
+
 > Note
 > Deze functionaliteit bevindt zich nog in de beta fase, en wordt niet ondersteund voor productie omgevingen
 
 ### Stap 1: Maak een Groep op GitLab (als je die nog niet hebt)
 
-1. Log in op je GitLab-account.
-2. Klik op het '+' icoon in de navigatiebalk aan de linkerzijde.
-3. Kies 'New group' uit het dropdown menu.
-4. Vul de groepsgegevens in, zoals de groepsnaam, omschrijving, etc. Klik daarna op 'Create group'.
-5. Je kunt nu mensen aan je groep toevoegen door hun GitLab-gebruikersnamen of e-mailadressen in te voeren. Je kunt deze stap ook overslaan en later mensen toevoegen.
+1.  Log in op je GitLab-account.
+2.  Klik op het '+' icoon in de navigatiebalk aan de linkerzijde.
+3.  Kies 'New group' uit het dropdown menu.
+4.  Vul de groepsgegevens in, zoals de groepsnaam, omschrijving, etc. Klik daarna op 'Create group'.
+5.  Je kunt nu mensen aan je groep toevoegen door hun GitLab-gebruikersnamen of e-mailadressen in te voeren. Je kunt deze stap ook overslaan en later mensen toevoegen.
 
 ### Stap 2: Maak een .gitlab Repository
-1. Ga naar de pagina van je nieuwe groep. Dit zou iets moeten zijn als https://gitlab.com/[groepsnaam].
-1. Klik op 'New project' om een nieuw project te maken.
-1. Geef het project de naam '.gitlab'.
-1. Je kunt nu optioneel een beschrijving toevoegen, let er op dat je het project publiek maakt, en een README of .gitignore bestand toevoegen.
-1. Klik op 'Create project'.
 
-2. ### Stap 3: Maak een publicorganisation.yml bestand
+1.  Ga naar de pagina van je nieuwe groep. Dit zou iets moeten zijn als https://gitlab.com/\[groepsnaam].
 
-1. Navigeer naar het zojuist aangemaakte .gitlab project.
-2. Klik op 'New file'.
-3. Kies de template 'YAML' en geef het bestand de naam 'openCatalogi.yaml'.
-4. Voeg de volgende inhoud toe aan het bestand:
+2.  Klik op 'New project' om een nieuw project te maken.
+
+3.  Geef het project de naam '.gitlab'.
+
+4.  Je kunt nu optioneel een beschrijving toevoegen, let er op dat je het project publiek maakt, en een README of .gitignore bestand toevoegen.
+
+5.  Klik op 'Create project'.
+
+6.  ### Stap 3: Maak een publicorganisation.yml bestand
+
+7.  Navigeer naar het zojuist aangemaakte .gitlab project.
+
+8.  Klik op 'New file'.
+
+9.  Kies de template 'YAML' en geef het bestand de naam 'openCatalogi.yaml'.
+
+10. Voeg de volgende inhoud toe aan het bestand:
 
 ```yaml
 openCatalogiYmlVersion: "0.2"
@@ -219,6 +225,11 @@ softwareUsed:
 2. Klik in het hoofdmenu op "documentatie" en selecteer "over"
 3. Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/[groepsnaam]/.gitlab"
 4. Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
+
+1.  Ga naar opencatalogi.nl
+2.  Klik in het hoofd menu op "documentatie" en selecteer "over"
+3.  Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/\[groepsnaam]/.gitlab"
+4.  Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
 
 ### Stap 5: (verplicht) Inregelen van een webhook
 
