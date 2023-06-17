@@ -67,8 +67,8 @@ De volgende tabel geeft een overzicht van alle eigenschappen in de openCatalogi.
 |contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
 |softwareUsed| 	Array of Strings (URLs) | 	List of software the public organization uses, represented by their repository URLs                                                |
-|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects\|
-|softwareSupported\[].software|	String| 	The software that the organization supports\|
+|softwareSupported|	Array of Objects (maintenance)| 	List of software the public organization supports, represented by their maintenance objects|
+|softwareSupported\[].software|	String| 	The software that the organization supports|
 |softwareSupported\[].type|	String| 	The type of support provided for the software, one of "Hosting","SAAS","Support","Maintenance","Training","Consultancy","Purchase"|
 |softwareSupported\[].contact|	Object| 	The contact details of the support|                                                                                                 |
 |softwareSupported\[].contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
@@ -217,26 +217,33 @@ softwareUsed:
 ```
 
 5.  Vervang de bovenstaande waarden door de relevante gegevens van uw organisatie
-6. Voeg eventueel extra gebruikte softwarepakketten toe (zie tabel boven).
-7. Klik op 'Commit changes'.
+6.  Voeg eventueel extra gebruikte softwarepakketten toe (zie tabel boven).
+7.  Klik op 'Commit changes'.
 
 ### Stap 4: (verplicht) Meld je GitLab groep aan voor open catalogi
-1. Ga naar opencatalogi.nl
-2. Klik in het hoofdmenu op "documentatie" en selecteer "over"
-3. Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/[groepsnaam]/.gitlab"
-4. Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
 
 1.  Ga naar opencatalogi.nl
-2.  Klik in het hoofd menu op "documentatie" en selecteer "over"
+
+2.  Klik in het hoofdmenu op "documentatie" en selecteer "over"
+
 3.  Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/\[groepsnaam]/.gitlab"
+
 4.  Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
+
+5.  Ga naar opencatalogi.nl
+
+6.  Klik in het hoofd menu op "documentatie" en selecteer "over"
+
+7.  Plak in de balk "Meld uw component" je url van je .gitlab project e.g. "https://gitlab.com/\[groepsnaam]/.gitlab"
+
+8.  Als alles goed gaat wordt je daarna doorverwezen naar je organisatie pagina.
 
 ### Stap 5: (verplicht) Inregelen van een webhook
 
-1. Ga naar GitLab en log in met je gebruikersnaam en wachtwoord.
-2. Navigeer naar de groep waarvoor je de webhook wilt instellen. Dit kan je doen door in het linkermenu op "Groepen" te klikken en dan de desbetreffende groep te selecteren.
-3. Op de groepspagina, ga naar "Instellingen" in het linkermenu en selecteer "Webhooks".
-4. Klik op "Add webhook" of "Webhook toevoegen". Hier kan je de URL opgeven waar de webhook-aanvragen naartoe gestuurd moeten worden.
-5. Vul in het veld "URL" de URL api.opencatalogi.nl/gitlabwebhook in.
-6. Onder het kopje "Triggers", selecteer de opties die je wilt activeren voor de webhook. In dit geval wil je waarschijnlijk de "Repository" trigger selecteren, die wordt geactiveerd wanneer er nieuwe repositories worden gemaakt of bestaande repositories worden bijgewerkt.
-7. Klik op "Add webhook" of "Webhook toevoegen" om de nieuwe webhook te creëren.
+1.  Ga naar GitLab en log in met je gebruikersnaam en wachtwoord.
+2.  Navigeer naar de groep waarvoor je de webhook wilt instellen. Dit kan je doen door in het linkermenu op "Groepen" te klikken en dan de desbetreffende groep te selecteren.
+3.  Op de groepspagina, ga naar "Instellingen" in het linkermenu en selecteer "Webhooks".
+4.  Klik op "Add webhook" of "Webhook toevoegen". Hier kan je de URL opgeven waar de webhook-aanvragen naartoe gestuurd moeten worden.
+5.  Vul in het veld "URL" de URL api.opencatalogi.nl/gitlabwebhook in.
+6.  Onder het kopje "Triggers", selecteer de opties die je wilt activeren voor de webhook. In dit geval wil je waarschijnlijk de "Repository" trigger selecteren, die wordt geactiveerd wanneer er nieuwe repositories worden gemaakt of bestaande repositories worden bijgewerkt.
+7.  Klik op "Add webhook" of "Webhook toevoegen" om de nieuwe webhook te creëren.
