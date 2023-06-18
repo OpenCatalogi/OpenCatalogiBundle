@@ -154,7 +154,7 @@ OpenCatalogi scant iedere dag github, dat betekent dat het lang kan duren voorda
 3.  Klik in het linker zijmenu op "Webhooks".
 4.  Klik op de "Add webhook" knop aan de rechterkant.
 5.  Je wordt nu gevraagd om je GitHub-wachtwoord in te voeren om te bevestigen dat je de rechten hebt om een webhook toe te voegen.
-6.  In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/github_events zijn.
+6.  In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/github\_events zijn.
 7.  Kies voor "Content type" de optie "application/json".
 8.  In het gedeelte "Which events would you like to trigger this webhook?", selecteer je "Repositories". Dit zorgt ervoor dat de webhook wordt geactiveerd bij elke wijziging of het aanmaken van een repository.
 9.  Zorg ervoor dat de "Active" checkbox is aangevinkt zodat de webhook daadwerkelijk wordt geactiveerd.
