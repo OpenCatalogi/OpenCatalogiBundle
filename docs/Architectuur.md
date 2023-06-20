@@ -4,9 +4,9 @@ Het systeem is verdeeld in verschillende lagen. Laag 5 is de interactielaag, Laa
 
 Laag 5 (Interactie) bevat de gebruikersinterface en de beheerdersinterface. Deze interfaces zijn respectievelijk ondergebracht in React Container 1 en React Container 2. De gebruiker en beheerder communiceren met deze interfaces via webbrowsers. De interactie van de gebruiker via de browser is anoniem, terwijl de interactie van de beheerder JWT-claims bevat.
 
-Laag 4 (Logica) is de kern van het systeem en bestaat uit meerdere componenten. De NGINX-container bevat de Nginx-grens die de Web Gateway uitvoert, die is ondergebracht in de Gateway Container. De Gateway Container bevat ook de Open Catalogi-plugin en de ORM (Object-Relationele Mapping). De Gateway implementeert deze plug-ins en communiceert met het identiteitscomponent in de Azure-cloud. De Gateway maakt ook indexen naar MongoDB, caches naar Redis en slaat gegevens op in de ORM.
+Laag 4 (Logica) is de kern van het systeem en bestaat uit meerdere componenten. De NGINX-container bevat de Nginx-grens die de Web Gateway uitvoert, die is ondergebracht in de Gateway Container. De Gateway Container bevat ook de OpenCatalogi-plugin en de ORM (Object-Relationele Mapping). De Gateway implementeert deze plug-ins en communiceert met het identiteitscomponent in de Azure-cloud. De Gateway maakt ook indexen naar MongoDB, caches naar Redis en slaat gegevens op in de ORM.
 
-De Redis Container bevat het Redis-component en de MongoDB Container bevat de MongoDB-database. De Gateway logt naar Loki en rapporteert aan Prometheus. De Open Catalogi-plugin wisselt informatie uit met de externe catalogus op basis van PKI (Public Key Infrastructure).
+De Redis Container bevat het Redis-component en de MongoDB Container bevat de MongoDB-database. De Gateway logt naar Loki en rapporteert aan Prometheus. De OpenCatalogi-plugin wisselt informatie uit met de externe catalogus op basis van PKI (Public Key Infrastructure).
 
 Laag 1 (Data) bevat een Database Service die verschillende databasesystemen bevat zoals PostgreSQL, MsSQL, MySQL en Oracle. De ORM slaat gegevens op in deze databases.
 
@@ -18,9 +18,9 @@ De Azure-cloud bevat het ADFS-component dat fungeert als een identiteitsprovider
 
 Ten slotte omvat het systeem een externe catalogusacteur die communiceert met het Hipp-component, en een beheerdersacteur die communiceert met het F5 intern-component via een browser met JWT-claims. Er is ook een gebruikersacteur die communiceert met het F5 extern-component via een anonieme browser.
 
-![](oc_user.svg "UML Diagram of Open Catalogi")
-![](oc_admin.svg "UML Diagram of Open Catalogi")
-![](oc_extern.svg "UML Diagram of Open Catalogi")
+![](oc_user.svg "UML Diagram of OpenCatalogi")
+![](oc_admin.svg "UML Diagram of OpenCatalogi")
+![](oc_extern.svg "UML Diagram of OpenCatalogi")
 
 ## Hoe vormt OpenCatalogi een gefedereerd netwerk?
 
