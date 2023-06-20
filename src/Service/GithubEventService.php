@@ -198,7 +198,7 @@ class GithubEventService
      * This function creates/updates the organization with the github event response.
      *
      * @param string $organizationName The name of the organization
-     * @param Source $source The github api source.
+     * @param Source $source           The github api source.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
@@ -308,7 +308,6 @@ class GithubEventService
             $this->entityManager->persist($repository);
             $this->entityManager->flush();
         }//end if
-
 
         $componentResponse['component'] = $component->toArray();
 
