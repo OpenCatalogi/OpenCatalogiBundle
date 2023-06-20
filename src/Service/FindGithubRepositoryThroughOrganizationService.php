@@ -285,7 +285,7 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return void
      */
-    private function getOrganizationCatalogi(ObjectEntity $organization): void
+    public function getOrganizationCatalogi(ObjectEntity $organization): void
     {
         if ($this->getGithubRepoFromOrganization($organization->getValue('name')) === null) {
             return;
@@ -307,36 +307,39 @@ class FindGithubRepositoryThroughOrganizationService
         $this->entityManager->flush();
 
         $uses = [];
-        foreach ($openCatalogi['softwareUsed'] as $use) {
-            // Get organisation repos and set the property.
-            $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
+        if (key_exists('softwareUsed', $openCatalogi) === true){
+            foreach ($openCatalogi['softwareUsed'] as $use) {
+                // Get organisation repos and set the property.
+                $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
+            }
         }
-
         $organization->setValue('uses', $uses);
 
         $supports = [];
-        foreach ($openCatalogi['softwareSupported'] as $support) {
-            if (key_exists('software', $support) === false) {
-                continue;
-            }
+        if (key_exists('softwareSupported', $openCatalogi) === true) {
+            foreach ($openCatalogi['softwareSupported'] as $support) {
+                if (key_exists('software', $support) === false) {
+                    continue;
+                }
 
-            // Get organisation component and set the property.
-            $supports[] = $supportOrganisation = $this->getOrganisationRepo($support['software'], $organization, 'supports');
+                // Get organisation component and set the property.
+                $supports[] = $supportOrganisation = $this->getOrganisationRepo($support['software'], $organization, 'supports');
 
-            if (key_exists('contact', $support) === false) {
-                continue;
-            }
+                if (key_exists('contact', $support) === false) {
+                    continue;
+                }
 
-            if (key_exists('email', $support['contact']) === true) {
-                $supportOrganisation->setValue('email', $support['contact']['email']);
-            }
+                if (key_exists('email', $support['contact']) === true) {
+                    $supportOrganisation->setValue('email', $support['contact']['email']);
+                }
 
-            if (key_exists('phone', $support['contact']) === true) {
-                $supportOrganisation->setValue('email', $support['contact']['phone']);
-            }
+                if (key_exists('phone', $support['contact']) === true) {
+                    $supportOrganisation->setValue('email', $support['contact']['phone']);
+                }
 
-            $this->entityManager->persist($supportOrganisation);
-        }//end foreach
+                $this->entityManager->persist($supportOrganisation);
+            }//end foreach
+        }
 
         $organization->setValue('supports', $supports);
 

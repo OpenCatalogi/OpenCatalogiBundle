@@ -4,6 +4,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
+use App\Entity\ObjectEntity;
 use App\Exception\GatewayException;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -59,6 +60,11 @@ class GithubEventService
     private GithubApiService $githubApiService;
 
     /**
+     * @var FindGithubRepositoryThroughOrganizationService
+     */
+    private FindGithubRepositoryThroughOrganizationService $organizationService;
+
+    /**
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
@@ -85,6 +91,7 @@ class GithubEventService
      * @param CallService            $callService      The Call Service.
      * @param CacheService           $cacheService     The Cache Service.
      * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
      */
@@ -94,6 +101,7 @@ class GithubEventService
         CallService $callService,
         CacheService $cacheService,
         GithubApiService $githubApiService,
+        FindGithubRepositoryThroughOrganizationService $organizationService,
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
@@ -102,6 +110,7 @@ class GithubEventService
         $this->callService      = $callService;
         $this->cacheService     = $cacheService;
         $this->githubApiService = $githubApiService;
+        $this->organizationService = $organizationService;
         $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
         $this->configuration    = [];
@@ -133,15 +142,16 @@ class GithubEventService
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $url    The url of the repository.
+     * @param string $name    The name of the repository.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported repository as array.
      */
-    public function getRepository(string $url, Source $source): ?array
+    public function getRepository(string $name, Source $source): ?array
     {
-        $this->pluginLogger->debug('Getting repository '.$url.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $name     = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+//        $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
@@ -155,6 +165,67 @@ class GithubEventService
         return $repository;
 
     }//end getRepository()
+
+    /**
+     * Get a organization from the given name.
+     *
+     * @param string $name    The name of the organization.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported organization as array.
+     */
+    public function getOrganization(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting organization '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $response = $this->callService->call($source, '/orgs/'.$name);
+
+        $organization = json_decode($response->getBody()->getContents(), true);
+
+        if ($organization === null) {
+            $this->pluginLogger->error('Could not find a organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }//end if
+
+        return $organization;
+
+    }//end getRepository()
+
+    /**
+     * This function creates/updates the organization with the github event response.
+     *
+     * @param array $githubEvent The github event data from the request.
+     *
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     *
+     * @return array|null The data with the repository in the response array.
+     */
+    public function createOrganization(string $organizationName, Source $source): ?ObjectEntity
+    {
+        $organizationArray = $this->getOrganization($organizationName, $source);
+
+        // If the organization is null return this->data
+        if ($organizationArray === null) {
+            $this->data['response'] = new Response('Could not find a organization with name: '.$organizationName.' and with source: '.$source->getName().'.', 404);
+
+            return null;
+        }
+
+        $organizationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
+
+
+        $synchronization = $this->syncService->findSyncBySource($source, $organizationEntity, $organizationArray['id']);
+        $synchronization->setMapping($mapping);
+        $synchronization = $this->syncService->synchronize($synchronization, $organizationArray);
+
+        $organizationObject = $synchronization->getObject();
+
+        $this->organizationService->getOrganizationCatalogi($organizationObject);
+
+        return $organizationObject;
+    }
 
 
     /**
@@ -176,11 +247,38 @@ class GithubEventService
             return null;
         }//end if
 
+        $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
+        $explodedName = explode('/', $name);
+
+        // Check if the array has 1 item. If so this is an organisation.
+        if (count($explodedName) === 1) {
+            $organizationName = $name;
+        }
+
+        // Check if this is a .github repository
+        foreach ($explodedName as $item) {
+            if ($item === '.github') {
+                $organizationName = $explodedName[0];
+            }
+        }
+
+        // Check if the organizationName is set.
+        if (isset($organizationName) === true) {
+
+            $organizationObject = $this->createOrganization($organizationName, $source);
+
+            $response['organization'] = $organizationObject->toArray();
+
+            $this->data['response'] = new Response(json_encode($response), 200);
+
+            return $this->data;
+        }
+
         $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
-        $repositoryArray = $this->getRepository($githubEvent['repository']['html_url'], $source);
+        $repositoryArray = $this->getRepository($name, $source);
         if ($repositoryArray === null) {
             // Return error if repository is not found.
             $this->data['response'] = new Response('Cannot find repository with url: '.$repositoryUrl, 404);
@@ -197,7 +295,7 @@ class GithubEventService
         $this->pluginLogger->debug('Checking repository '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $synchronization->setMapping($mapping);
-        $synchronization = $this->syncService->handleSync($synchronization, $repositoryArray);
+        $synchronization = $this->syncService->synchronize($synchronization, $repositoryArray);
         $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $repository = $synchronization->getObject();
@@ -209,7 +307,10 @@ class GithubEventService
             $this->entityManager->flush();
         }//end if
 
-        $this->data['response'] = new Response(json_encode($repository->toArray()), 200);
+
+        $response['component'] = $component->toArray();
+
+        $this->data['response'] = new Response(json_encode($response), 200);
 
         return $this->data;
 
