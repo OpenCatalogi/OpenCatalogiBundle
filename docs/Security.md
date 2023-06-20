@@ -37,7 +37,7 @@ Door beveiliging te integreren in ons ontwikkelingsproces streven we ernaar een 
 
 We implementeren gebruikersauthenticatie via oAuth of Active Directory Federation Services (ADFS). ADFS is een softwarecomponent ontwikkeld door Microsoft die gebruikers voorziet van single sign-on toegang tot systemen en applicaties die zich bevinden over organisatorische grenzen heen.
 
-Gebruikers authenticeren zich eerst via oAuth/ADFS, die vervolgens een reeks claims produceert die de gebruiker identificeren. Deze claims worden vervolgens gebruikt door de Open Catalogi-applicatie, die ze gebruikt om te beslissen of de gebruiker toegang en rollen krijgt (zie RBAC). Dit systeem vereenvoudigt het aanmeldingsproces voor gebruikers en maakt veilige authenticatie mogelijk over verschillende systemen en applicaties.
+Gebruikers authenticeren zich eerst via oAuth/ADFS, die vervolgens een reeks claims produceert die de gebruiker identificeren. Deze claims worden vervolgens gebruikt door de OpenCatalogi-applicatie, die ze gebruikt om te beslissen of de gebruiker toegang en rollen krijgt (zie RBAC). Dit systeem vereenvoudigt het aanmeldingsproces voor gebruikers en maakt veilige authenticatie mogelijk over verschillende systemen en applicaties.
 
 ## Identificatie op basis van Two-Way SSL
 
