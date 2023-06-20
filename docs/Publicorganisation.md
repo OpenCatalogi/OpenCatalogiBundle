@@ -142,7 +142,7 @@ OpenCatalogi scant iedere dag GitHub, maar als je wilt weten of jouw bestand klo
 
 1.  Ga naar [opencatalogi.nl](opencatalogi.nl)
 2.  Klik in het hoofdmenu op "documentatie"" en selecteer "over"
-3.  Plak in de balk "Meld uw component" je URL van jouw .github repository e.g. "https://github.com/\[organisatienaam]/github"
+3.  Plak in de balk "Meld uw component" je URL van jouw .github repository e.g. "https://github.com/\[organisatienaam]/.github"
 4.  Als alles goed gaat wordt je daarna doorverwezen naar jouw organisatiepagina
 
 ### Stap 6: (optioneel) Inregelen van een webhook
@@ -154,7 +154,7 @@ OpenCatalogi scant iedere dag GitHub, dat betekent dat het lang kan duren voorda
 3.  Klik in het linker zijmenu op "Webhooks".
 4.  Klik op de "Add webhook" knop aan de rechterkant.
 5.  Je wordt nu gevraagd om jouw GitHub-wachtwoord in te voeren om te bevestigen dat je de rechten hebt om een webhook toe te voegen.
-6.  In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/githubwebhook zijn.
+6.  In het veld "Payload URL" voer je de URL in waar je de webhook-gebeurtenissen naartoe wilt sturen. In jouw geval zou dit https://api.opencatalogi.nl/github\_events zijn.
 7.  Kies voor "Content type" de optie "application/json".
 8.  In het gedeelte "Which events would you like to trigger this webhook?", selecteer je "Repositories". Dit zorgt ervoor dat de webhook wordt geactiveerd bij elke wijziging of het aanmaken van een repository.
 9.  Zorg ervoor dat de "Active" checkbox is aangevinkt zodat de webhook daadwerkelijk wordt geactiveerd.
@@ -186,7 +186,7 @@ OpenCatalogi scant iedere dag GitHub, dat betekent dat het lang kan duren voorda
 
 5.  Klik op 'Create project'.
 
-6.  ### Stap 3: Maak een publicorganisation.yml bestand
+6.  ### Stap 3: Maak een openCatalogi.yml bestand
 
 7.  Navigeer naar het zojuist aangemaakte `.gitlab` project.
 
