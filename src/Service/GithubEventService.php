@@ -197,7 +197,8 @@ class GithubEventService
     /**
      * This function creates/updates the organization with the github event response.
      *
-     * @param array $githubEvent The github event data from the request.
+     * @param string $organizationName The name of the organization
+     * @param Source $source The github api source.
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
      *
@@ -268,9 +269,9 @@ class GithubEventService
         if (isset($organizationName) === true) {
             $organizationObject = $this->createOrganization($organizationName, $source);
 
-            $response['organization'] = $organizationObject->toArray();
+            $organizatioResponse['organization'] = $organizationObject->toArray();
 
-            $this->data['response'] = new Response(json_encode($response), 200);
+            $this->data['response'] = new Response(json_encode($organizatioResponse), 200);
 
             return $this->data;
         }
@@ -308,9 +309,10 @@ class GithubEventService
             $this->entityManager->flush();
         }//end if
 
-        $response['component'] = $component->toArray();
 
-        $this->data['response'] = new Response(json_encode($response), 200);
+        $componentResponse['component'] = $component->toArray();
+
+        $this->data['response'] = new Response(json_encode($componentResponse), 200);
 
         return $this->data;
 
