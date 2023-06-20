@@ -307,12 +307,13 @@ class FindGithubRepositoryThroughOrganizationService
         $this->entityManager->flush();
 
         $uses = [];
-        if (key_exists('softwareUsed', $openCatalogi) === true){
+        if (key_exists('softwareUsed', $openCatalogi) === true) {
             foreach ($openCatalogi['softwareUsed'] as $use) {
                 // Get organisation repos and set the property.
                 $uses[] = $this->getOrganisationRepo($use, $organization, 'use');
             }
         }
+
         $organization->setValue('uses', $uses);
 
         $supports = [];
@@ -339,7 +340,7 @@ class FindGithubRepositoryThroughOrganizationService
 
                 $this->entityManager->persist($supportOrganisation);
             }//end foreach
-        }
+        }//end if
 
         $organization->setValue('supports', $supports);
 

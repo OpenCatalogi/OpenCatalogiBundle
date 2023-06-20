@@ -86,14 +86,14 @@ class GithubEventService
 
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
-     * @param SynchronizationService $syncService      The Synchronization Service.
-     * @param CallService            $callService      The Call Service.
-     * @param CacheService           $cacheService     The Cache Service.
-     * @param GithubApiService       $githubApiService The Github Api Service.
+     * @param EntityManagerInterface                         $entityManager       The Entity Manager Interface.
+     * @param SynchronizationService                         $syncService         The Synchronization Service.
+     * @param CallService                                    $callService         The Call Service.
+     * @param CacheService                                   $cacheService        The Cache Service.
+     * @param GithubApiService                               $githubApiService    The Github Api Service.
      * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
+     * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
+     * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -105,16 +105,16 @@ class GithubEventService
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager    = $entityManager;
-        $this->syncService      = $syncService;
-        $this->callService      = $callService;
-        $this->cacheService     = $cacheService;
-        $this->githubApiService = $githubApiService;
+        $this->entityManager       = $entityManager;
+        $this->syncService         = $syncService;
+        $this->callService         = $callService;
+        $this->cacheService        = $cacheService;
+        $this->githubApiService    = $githubApiService;
         $this->organizationService = $organizationService;
-        $this->resourceService  = $resourceService;
-        $this->pluginLogger     = $pluginLogger;
-        $this->configuration    = [];
-        $this->data             = [];
+        $this->resourceService     = $resourceService;
+        $this->pluginLogger        = $pluginLogger;
+        $this->configuration       = [];
+        $this->data                = [];
 
     }//end __construct()
 
@@ -142,7 +142,7 @@ class GithubEventService
     /**
      * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param string $name    The name of the repository.
+     * @param string $name   The name of the repository.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported repository as array.
@@ -151,7 +151,7 @@ class GithubEventService
     {
         $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
-//        $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
+        // $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
@@ -166,10 +166,11 @@ class GithubEventService
 
     }//end getRepository()
 
+
     /**
      * Get a organization from the given name.
      *
-     * @param string $name    The name of the organization.
+     * @param string $name   The name of the organization.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported organization as array.
@@ -190,7 +191,8 @@ class GithubEventService
 
         return $organization;
 
-    }//end getRepository()
+    }//end getOrganization()
+
 
     /**
      * This function creates/updates the organization with the github event response.
@@ -213,8 +215,7 @@ class GithubEventService
         }
 
         $organizationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
-
+        $mapping            = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $organizationEntity, $organizationArray['id']);
         $synchronization->setMapping($mapping);
@@ -225,7 +226,8 @@ class GithubEventService
         $this->organizationService->getOrganizationCatalogi($organizationObject);
 
         return $organizationObject;
-    }
+
+    }//end createOrganization()
 
 
     /**
@@ -247,7 +249,7 @@ class GithubEventService
             return null;
         }//end if
 
-        $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
+        $name         = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
         $explodedName = explode('/', $name);
 
         // Check if the array has 1 item. If so this is an organisation.
@@ -264,7 +266,6 @@ class GithubEventService
 
         // Check if the organizationName is set.
         if (isset($organizationName) === true) {
-
             $organizationObject = $this->createOrganization($organizationName, $source);
 
             $response['organization'] = $organizationObject->toArray();
@@ -306,7 +307,6 @@ class GithubEventService
             $this->entityManager->persist($repository);
             $this->entityManager->flush();
         }//end if
-
 
         $response['component'] = $component->toArray();
 
