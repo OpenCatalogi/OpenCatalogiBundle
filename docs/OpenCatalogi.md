@@ -85,7 +85,7 @@ Voor veel gebruikte software repositories zie de onderstaande lijst
 
 ## Jouw organisatie toevoegen aan OpenCatalogi via GitHub
 
-Om je organisatie aan te melden op OpenCatalogi heb je een GitHub-organisatie en een organisatie-repository met een `publicorganisation.yml` nodig. Doorloop daarvoor de volgende stappen:
+Om je organisatie aan te melden op OpenCatalogi heb je een GitHub-organisatie en een organisatie-repository met een `openCatalogi.yaml` nodig. Doorloop daarvoor de volgende stappen:
 
 ### Stap 1: Maak een Organisatie op GitHub (als je die nog niet hebt)
 
