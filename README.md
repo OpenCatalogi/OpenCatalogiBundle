@@ -2,7 +2,7 @@
 
 ## Concept
 
-OpenCatalogi vormt een index over meerdere bronnen, en maakt informatie hieruit inzichtenlijk en doorzoekbaar voor gebruikers. Het focust hierbij in eerste instantie op software componenten aan de hand van repositories, maar kan ook API's, datasets of processen indexeren.
+OpenCatalogi vormt een index over meerdere bronnen, en maakt informatie hieruit inzichtelijk en doorzoekbaar voor gebruikers. Het focust hierbij in eerste instantie op software componenten aan de hand van repositories, maar kan ook APIs, datasets of processen indexeren.
 
 ## Waar leeft metadata?
 
@@ -30,4 +30,4 @@ OpenCatalogi kijkt standaard mee op:
 
 ## Licentie
 
-Deze bundle is beschickbaar onder [EUPL](https://eupl.eu/1.2/nl/) licentie.
+Deze bundle is beschikbaar onder [EUPL](https://eupl.eu/1.2/nl/) licentie.
