@@ -160,13 +160,13 @@ class EnrichPubliccodeFromGithubUrlService
         return null;
 
     }//end getPubliccodeFromRawUserContent()
-    
-    
+
+
     /**
      * @TODO
      *
      * @param ObjectEntity $repository
-     * @param string $repositoryUrl
+     * @param string       $repositoryUrl
      *
      * @throws Exception
      *
