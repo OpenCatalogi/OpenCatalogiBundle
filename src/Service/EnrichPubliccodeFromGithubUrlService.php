@@ -160,11 +160,15 @@ class EnrichPubliccodeFromGithubUrlService
         return null;
 
     }//end getPubliccodeFromRawUserContent()
-
-
+    
+    
     /**
+     * @TODO
+     *
      * @param ObjectEntity $repository
-     * @param array        $publiccode
+     * @param string $repositoryUrl
+     *
+     * @throws Exception
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
@@ -173,15 +177,17 @@ class EnrichPubliccodeFromGithubUrlService
         $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
 
         // Get the publiccode through the raw.githubusercontent source
-        if (($publiccode = $this->getPubliccodeFromRawUserContent($url)) !== null) {
+        $publiccode = $this->getPubliccodeFromRawUserContent($url);
+        if (is_array($publiccode) === true) {
             $this->githubService->mapPubliccode($repository, $publiccode);
         }
 
         // If still not found, get the publiccode through the api.github source
-        if ($publiccode === null
-            && ($publiccode = $this->getPubliccodeFromUrl($url)) !== null
-        ) {
-            $this->githubService->mapPubliccode($repository, $publiccode);
+        if ($publiccode === null) {
+            $publiccode = $this->getPubliccodeFromUrl($url);
+            if (is_array($publiccode) === true) {
+                $this->githubService->mapPubliccode($repository, $publiccode);
+            }
         }
 
         return $repository;
