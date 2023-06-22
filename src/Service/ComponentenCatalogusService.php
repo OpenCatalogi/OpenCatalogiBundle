@@ -298,7 +298,7 @@ class ComponentenCatalogusService
                 $repository = $this->entityManager->find('App:ObjectEntity', $repositories[0]['_self']['id']);
                 $this->entityManager->persist($repository);
             }//end if
-            
+
             if ($componentObject->getValue('url') !== false) {
                 // If the component is already set to a repository return the component object.
                 return $componentObject;
