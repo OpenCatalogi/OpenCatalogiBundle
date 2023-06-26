@@ -3,6 +3,13 @@ name: "OpenCatalogiBundle"
 url: "https://github.com/OpenCatalogi/OpenCatalogiBundle"
 releaseDate: "2022-10-01"
 softwareType: addon
+applicationSuite: "OpenCatalogi Applicatie"
+
+isBasedOn: "https://github.com/CommonGateway/PetstoreBundle"
+dependsOn:
+  open:
+    - "https://github.com/CommonGateway/CoreBundle"
+    - "https://github.com/ConductionNL/commonground-gateway"
 
 platforms:
   - web
