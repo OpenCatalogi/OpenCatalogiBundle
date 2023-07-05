@@ -60,6 +60,11 @@ class GithubEventService
     private GithubApiService $githubApiService;
 
     /**
+     * @var EnrichPubliccodeFromGithubUrlService
+     */
+    private EnrichPubliccodeFromGithubUrlService $enrichPubliccode;
+
+    /**
      * @var FindGithubRepositoryThroughOrganizationService
      */
     private FindGithubRepositoryThroughOrganizationService $organizationService;
@@ -91,6 +96,7 @@ class GithubEventService
      * @param CallService                                    $callService         The Call Service.
      * @param CacheService                                   $cacheService        The Cache Service.
      * @param GithubApiService                               $githubApiService    The Github Api Service.
+     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode    The Enrich Publiccode From Github Url Service.
      * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
      * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
      * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
@@ -101,6 +107,7 @@ class GithubEventService
         CallService $callService,
         CacheService $cacheService,
         GithubApiService $githubApiService,
+        EnrichPubliccodeFromGithubUrlService $enrichPubliccode,
         FindGithubRepositoryThroughOrganizationService $organizationService,
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
@@ -110,6 +117,7 @@ class GithubEventService
         $this->callService         = $callService;
         $this->cacheService        = $cacheService;
         $this->githubApiService    = $githubApiService;
+        $this->enrichPubliccode    = $enrichPubliccode;
         $this->organizationService = $organizationService;
         $this->resourceService     = $resourceService;
         $this->pluginLogger        = $pluginLogger;
@@ -302,14 +310,9 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
-        $component = $this->githubApiService->connectComponent($repository);
-        if ($component !== null) {
-            $repository->setValue('component', $component);
-            $this->entityManager->persist($repository);
-            $this->entityManager->flush();
-        }//end if
+        $repository = $this->enrichPubliccode->enrichRepositoryWithPubliccode($repository, $repositoryUrl);
 
-        $componentResponse['component'] = $component->toArray();
+        $componentResponse['component'] = $repository->getValue('component')->toArray();
 
         $this->data['response'] = new Response(json_encode($componentResponse), 200);
 
