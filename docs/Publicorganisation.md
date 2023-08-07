@@ -140,7 +140,7 @@ softwareUsed:
 
 OpenCatalogi scant iedere dag GitHub, maar als je wilt weten of jouw bestand klopt kan dat wat lang duren. Gelukkig kan je dit ook versnellen
 
-1.  Ga naar [opencatalogi.nl](opencatalogi.nl)
+1.  Ga naar [opencatalogi.nl](https://opencatalogi.nl/)
 2.  Klik in het hoofdmenu op "documentatie"" en selecteer "over"
 3.  Plak in de balk "Meld uw component" je URL van jouw .github repository e.g. "https://github.com/\[organisatienaam]/.github"
 4.  Als alles goed gaat wordt je daarna doorverwezen naar jouw organisatiepagina
