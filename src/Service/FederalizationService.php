@@ -308,7 +308,7 @@ class FederalizationService
                 $this->entityManager->flush();
 
                 if (isset($this->style) === true) {
-                    $this->style->info('Flushed 100 objects...');
+                    $this->style->writeln('Flushed 100 objects...');
                 }
             }
         }//end foreach
