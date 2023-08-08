@@ -66,6 +66,8 @@ class FederalizationGetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
+        $this->fedService->setStyle($style);
+        
         // Handle the command options
         $catalogusId = $input->getOption('catalogus', false);
 
@@ -85,7 +87,7 @@ class FederalizationGetCommand extends Command
 
                 return Command::FAILURE;
             }
-
+            
             $this->fedService->readCatalogus($catalogusObject);
         }
 

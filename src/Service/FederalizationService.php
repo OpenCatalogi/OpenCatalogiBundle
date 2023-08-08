@@ -8,8 +8,10 @@ use App\Entity\ObjectEntity;
 use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
+use CommonGateway\CoreBundle\Service\InstallationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
@@ -25,7 +27,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class FederalizationService
 {
-
+    
+    /**
+     * @var SymfonyStyle
+     */
+    private SymfonyStyle $style;
+    
     /**
      * @var EntityManagerInterface
      */
@@ -77,6 +84,13 @@ class FederalizationService
      * @var boolean
      */
     private bool $weAreKnown;
+    
+    /**
+     * The domain of this Catalogi installation, set through the getAppDomain() function.
+     *
+     * @var string
+     */
+    private string $currentDomain;
 
 
     /**
@@ -100,6 +114,22 @@ class FederalizationService
         $this->logger        = $pluginLogger;
 
     }//end __construct()
+    
+    
+    /**
+     * Set symfony style in order to output to the console.
+     *
+     * @param SymfonyStyle $style The SymfonyStyle.
+     *
+     * @return self
+     */
+    public function setStyle(SymfonyStyle $style): self
+    {
+        $this->style = $style;
+        
+        return $this;
+        
+    }//end setStyle()
 
 
     /**
@@ -114,6 +144,9 @@ class FederalizationService
     {
         // Setup base data
         $this->prepareObjectEntities();
+
+        // Get the application domain we use the register this Catalogi to other Catalogi installations.
+        $this->getAppDomain();
 
         // Safety check
         if ($this->catalogusEntity === null) {
@@ -151,7 +184,7 @@ class FederalizationService
     private function makeOurselvesKnown(ObjectEntity $catalogus)
     {
         // Make sure we never add localhost as catalogi to another catalogi.
-        if ('myDomain' === 'localhost') {
+        if ($this->currentDomain === 'localhost') {
             return;
         }
 
@@ -172,9 +205,9 @@ class FederalizationService
 
         $newCatalogi = [
             "source" => [
-                "name"        => "myName",
-                "description" => "myDescription",
-                "location"    => "myDomain",
+                "name"        => preg_replace('/^api\./', '', $this->currentDomain).' Source',
+                "description" => 'Source for: '.preg_replace('/^api\./', '', $this->currentDomain),
+                "location"    => "https://$this->currentDomain",
             ],
         ];
 
@@ -320,14 +353,14 @@ class FederalizationService
 
 
     /**
-     * Handle en object found trough the search endpoint of an external catalogus.
+     * Handle en object found through the search endpoint of an external catalogus.
      *
      * @param array  $object The object to handle
      * @param Source $source The Source
      *
      * @return void|Synchronization
      */
-    public function handleObject(array $object, Source $source): ?Synchronization
+    private function handleObject(array $object, Source $source): ?Synchronization
     {
         // Let's make sure we have a reference, just in case this function gets used separately
         if (isset($object['_self']['schema']['ref']) === false) {
@@ -344,7 +377,7 @@ class FederalizationService
         case 'https://opencatalogi.nl/oc.catalogi.schema.json':
             // Let's not add ourselves as catalogi.
             if (isset($object['embedded']['source']['location']) === true
-                && $object['embedded']['source']['location'] === 'myDomain'
+                && $object['embedded']['source']['location'] === $this->currentDomain
             ) {
                 // We need to keep track of this, so we don't add ourselves to the $source Catalogi later.
                 $this->weAreKnown = true;
@@ -378,7 +411,7 @@ class FederalizationService
             $externalId = $baseSync['sourceId'];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
-            if ($baseSync['location'] === 'myDomain') {
+            if ($baseSync['location'] === $this->currentDomain) {
                 return null;
             }
         } else {
@@ -413,7 +446,7 @@ class FederalizationService
      *
      * @return void
      */
-    public function prepareObjectEntities(): void
+    private function prepareObjectEntities(): void
     {
         if (isset($this->catalogusEntity) === false) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json']);
@@ -436,6 +469,51 @@ class FederalizationService
         }
 
     }//end prepareObjectEntities()
+    
+    
+    /**
+     * Gets de default application, else the first other application. And gets the first domain from it that isn't localhost.
+     * This currentDomain is also use to prevent 'federalization sync loops', where we would try to synchronize objects from other Catalogi that actually originated in this/the current Opencatalogi.
+     *
+     * @param int $key A key used to find a random application, if necessary.
+     *
+     * @return void
+     */
+    private function getAppDomain(int $key = 0): void
+    {
+        $this->currentDomain = 'localhost';
+    
+        // First try and find the default application.
+        $application = $this->entityManager->getRepository('App:Application')->findOneBy(['reference' => 'https://docs.commongateway.nl/application/default.application.json']);
+        if ($application === null) {
+            $applications = $this->entityManager->getRepository('App:Application')->findAll();
+            if (count($applications) === $key) {
+                $this->logger->error('Could not find an Application for federalization', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                
+                return;
+            }
+            
+            // If we couldn't find the default application, take the first other application we can find.
+            $application = $applications[$key];
+        }
+        
+        // If this application has no domains or only the domain localhost, try looking for another application.
+        if (empty($application->getDomains())
+            || (count($application->getDomains()) === 1 && $application->getDomains()[0] === 'localhost')
+        ) {
+            $this->getAppDomain($key + 1);
+            
+            return;
+        }
+        
+        // Find the first domain that isn't localhost.
+        foreach ($application->getDomains() as $domain) {
+            if ($domain !== 'localhost') {
+                $this->currentDomain = $domain;
+                return;
+            }
+        }
+    }
 
 
 }//end class
