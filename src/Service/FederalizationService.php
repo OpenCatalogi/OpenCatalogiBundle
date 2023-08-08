@@ -306,6 +306,10 @@ class FederalizationService
             if ($counter >= 100) {
                 $counter = 0;
                 $this->entityManager->flush();
+    
+                if (isset($this->style) === true) {
+                    $this->style->info('Flushed 100 objects...');
+                }
             }
         }//end foreach
 
