@@ -16,7 +16,7 @@ class FederalizationGetCommand extends Command
     /**
      * @var string
      */
-    protected static $defaultName = 'opencatalogi:fedaralization:get';
+    protected static $defaultName = 'opencatalogi:federalization:get';
 
     /**
      * @var FederalizationService

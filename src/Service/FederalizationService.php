@@ -150,13 +150,17 @@ class FederalizationService
 
         // Safety check
         if ($this->catalogusEntity === null) {
-            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return $data;
         }
 
         // Get all the catalogi
         $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $this->catalogusEntity]);
+        
+        if (isset($this->style) === true) {
+            $this->style->info('Found '.count($catalogi).' Catalogi');
+        }
 
         // Sync them
         foreach ($catalogi as $catalogus) {
@@ -201,7 +205,7 @@ class FederalizationService
             return;
         }
 
-        $sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')]);
+        $sourceObject = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $source->getValue('location')]);
 
         $newCatalogi = [
             "source" => [
@@ -248,9 +252,12 @@ class FederalizationService
             return $reportOut;
         }
 
-        $this->logger->info('Looking at '.$source->getValue('name').'(@:'.$source->getValue('location').')', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->logger->info('Looking at '.$source->getValue('name').' (@:'.$source->getValue('location').')', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (isset($this->style) === true) {
+            $this->style->section('Looking at '.$source->getValue('name').' (@:'.$source->getValue('location').')');
+        }
 
-        $sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')]);
+        $sourceObject = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $source->getValue('location')]);
         if ($sourceObject === null) {
             $sourceObject = new Source();
             $sourceObject->setName($source->getValue('name'));
@@ -272,6 +279,9 @@ class FederalizationService
         )['results'];
 
         $this->logger->info('Found '.count($objects).' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (isset($this->style) === true) {
+            $this->style->info('Found '.count($objects).' objects');
+        }
 
         $synchonizedObjects = [];
 
@@ -300,6 +310,11 @@ class FederalizationService
         }//end foreach
 
         $this->entityManager->flush();
+    
+        $this->logger->info('Synchronized '.count($synchonizedObjects).' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (isset($this->style) === true) {
+            $this->style->info('Synchronized '.count($synchonizedObjects).' objects');
+        }
 
         // Now we can check if any objects where removed ->  Don't do this for now
         $synchronizations = $this->entityManager->getRepository('App:Synchronization')->findBy(['gateway' => $source]);
@@ -314,6 +329,9 @@ class FederalizationService
         }
 
         $this->logger->info('Removed '.$counter.' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (isset($this->style) === true) {
+            $this->style->info('Removed '.$counter.' objects');
+        }
 
         $this->entityManager->flush();
 
@@ -450,22 +468,30 @@ class FederalizationService
     {
         if (isset($this->catalogusEntity) === false) {
             $this->catalogusEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.catalogi.schema.json']);
-            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            if ($this->catalogusEntity === null) {
+                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.catalogi.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            }
         }
 
         if (isset($this->componentEntity) === false) {
             $this->componentEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.component.schema.json']);
-            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.component.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            if ($this->componentEntity === null) {
+                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.component.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            }
         }
 
         if (isset($this->organisationEntity) === false) {
             $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
-            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.organisation.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            if ($this->organisationEntity === null) {
+                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.organisation.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            }
         }
 
         if (isset($this->applicationEntity) === false) {
             $this->applicationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.application.schema.json']);
-            $this->logger->error('Could not find a entity for https://opencatalogi.nl/oc.application.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            if ($this->applicationEntity === null) {
+                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.application.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            }
         }
 
     }//end prepareObjectEntities()
@@ -484,8 +510,8 @@ class FederalizationService
         $this->currentDomain = 'localhost';
 
         // First try and find the default application.
-        $application = $this->entityManager->getRepository('App:Application')->findOneBy(['reference' => 'https://docs.commongateway.nl/application/default.application.json']);
-        if ($application === null) {
+        $defaultApplication = $application = $this->entityManager->getRepository('App:Application')->findOneBy(['reference' => 'https://docs.commongateway.nl/application/default.application.json']);
+        if ($defaultApplication === null) {
             $applications = $this->entityManager->getRepository('App:Application')->findAll();
             if (count($applications) === $key) {
                 $this->logger->error('Could not find an Application for federalization', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -501,6 +527,11 @@ class FederalizationService
         if (empty($application->getDomains())
             || (count($application->getDomains()) === 1 && $application->getDomains()[0] === 'localhost')
         ) {
+            if ($defaultApplication !== null) {
+                $this->logger->error('The Default Application does not have a domain (or only the domain localhost)', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                
+                return;
+            }
             $this->getAppDomain($key + 1);
 
             return;
