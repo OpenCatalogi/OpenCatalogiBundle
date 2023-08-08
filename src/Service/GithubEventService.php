@@ -148,34 +148,6 @@ class GithubEventService
 
 
     /**
-     * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
-     *
-     * @param string $name   The name of the repository.
-     * @param Source $source The source to sync from.
-     *
-     * @return array|null The imported repository as array.
-     */
-    public function getRepository(string $name, Source $source): ?array
-    {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        // $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
-        $response = $this->callService->call($source, '/repos/'.$name);
-
-        $repository = json_decode($response->getBody()->getContents(), true);
-
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        return $repository;
-
-    }//end getRepository()
-
-
-    /**
      * Get a organization from the given name.
      *
      * @param string $name   The name of the organization.
@@ -288,7 +260,7 @@ class GithubEventService
         $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
-        $repositoryArray = $this->getRepository($name, $source);
+        $repositoryArray = $this->githubApiService->getRepository($name, $source);
         if ($repositoryArray === null) {
             // Return error if repository is not found.
             $this->data['response'] = new Response('Cannot find repository with url: '.$repositoryUrl, 404);

@@ -38,9 +38,30 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
             '$id'         => 'https://opencatalogi.nl/ActionHandler/DeveloperOverheidRepositoryToGatewayHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'DeveloperOverheidRepositoryToGatewayHandler',
-            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'    => [],
-            'properties'  => [],
+            'description' => 'This is a action to create objects from the fetched repositories from the developer overheid source.',
+            'required'    => ['source', 'schema', 'endpoint'],
+            'properties'  => [
+                'source' => [
+                    'type'        => 'string',
+                    'description' => 'The source of the developer overheid.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+                    'required'    => true
+                ],
+                'schema' => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'required'    => true
+                ],
+                'endpoint' => [
+                    'type'        => 'string',
+                    'description' => 'The endpoint of the source.',
+                    'example'     => '/repositories',
+                    'required'    => true
+                ]
+            ],
         ];
 
     }//end getConfiguration()
@@ -56,7 +77,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getRepositories();
+        return $this->service->getDeveloperOverheidRepositories($data, $configuration);
 
     }//end run()
 

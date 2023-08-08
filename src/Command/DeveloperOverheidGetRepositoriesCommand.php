@@ -59,21 +59,22 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-
+        $configuration = [
+            'source' => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+            'schema' => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'endpoint' => '/repositories'
+        ];
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
 
-        $style->info('Execute getRepositories');
-
         if ($repositoryId === null) {
-            if (empty($this->devOverheidService->getRepositories()) === true) {
+            if (empty($this->devOverheidService->getDeveloperOverheidRepositories([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
         if ($repositoryId !== null
-            && empty($this->devOverheidService->getRepository($repositoryId)) === true
+            && empty($this->devOverheidService->getDeveloperOverheidRepositories([], $configuration, $repositoryId)) === true
         ) {
             return Command::FAILURE;
         }

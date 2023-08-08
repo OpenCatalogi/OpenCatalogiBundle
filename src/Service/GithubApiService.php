@@ -3,6 +3,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
+use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -85,6 +86,31 @@ class GithubApiService
 
     }//end __construct()
 
+    /**
+     * Get a repository through the repositories of the given source
+     *
+     * @param string $name   The name of the repository.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported repository as array.
+     */
+    public function getRepository(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $response = $this->callService->call($source, '/repos/'.$name);
+
+        $repository = json_decode($response->getBody()->getContents(), true);
+
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }//end if
+
+        return $repository;
+
+    }//end getRepository()
 
     /**
      * This function create or get the component of the repository.

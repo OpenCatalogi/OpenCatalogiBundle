@@ -5,6 +5,9 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\Entity;
 use App\Entity\Gateway;
 use App\Entity\Gateway as Source;
+use App\Entity\Gateway as Source;
+use App\Entity\Gateway as Source;
+use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use App\Service\SynchronizationService;
@@ -61,6 +64,16 @@ class DeveloperOverheidService
      */
     private GatewayResourceService $resourceService;
 
+    /**
+     * @var array
+     */
+    private array $data;
+
+    /**
+     * @var array
+     */
+    private array $configuration;
+
 
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
@@ -90,175 +103,9 @@ class DeveloperOverheidService
         $this->githubApiService = $githubApiService;
         $this->pluginLogger     = $pluginLogger;
         $this->resourceService  = $resourceService;
-
+        $this->data = [];
+        $this->configuration = [];
     }//end __construct()
-
-
-    /**
-     * Get repositories through the repositories of developer.overheid.nl/repositories.
-     *
-     * @todo duplicate with GithubPubliccodeService ?
-     *
-     * @return array|null
-     */
-    public function getRepositories(): ?array
-    {
-        $result = [];
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $repositories = $this->callService->getAllResults($source, '/repositories');
-
-        $this->pluginLogger->info('Found '.count($repositories).' repositories', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        foreach ($repositories as $repository) {
-            $result[] = $this->importRepository($repository);
-        }//end foreach
-
-        $this->entityManager->flush();
-
-        return $result;
-
-    }//end getRepositories()
-
-
-    /**
-     * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
-     *
-     * @todo duplicate with GithubPubliccodeService ?
-     *
-     * @param string $id
-     *
-     * @return array|null
-     */
-    public function getRepository(string $id): ?array
-    {
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->debug('Getting repository '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $response = $this->callService->call($source, '/repositories/'.$id);
-
-        $repository = json_decode($response->getBody()->getContents(), true);
-
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        $repository = $this->importRepository($repository);
-        if ($repository === null) {
-            return null;
-        }//end if
-
-        $this->entityManager->flush();
-
-        $this->pluginLogger->info('Found repository with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        return $repository->toArray();
-
-    }//end getRepository()
-
-
-    /**
-     * @todo duplicate with GithubPubliccodeService ?
-     *
-     * @param $repository
-     *
-     * @return ObjectEntity|null
-     */
-    public function importRepository($repository): ?ObjectEntity
-    {
-        // Do we have a source?
-        $source           = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repository['id']);
-        $synchronization = $this->syncService->synchronize($synchronization, $repository);
-
-        $repositoryObject = $synchronization->getObject();
-
-        $component = $this->githubApiService->connectComponent($repositoryObject);
-        if ($component !== null) {
-            $repositoryObject->setValue('component', $component);
-            $this->entityManager->persist($repositoryObject);
-            $this->entityManager->flush();
-        }//end if
-
-        return $repositoryObject;
-
-    }//end importRepository()
-
-
-    /**
-     * Get components through the components of developer.overheid.nl/apis.
-     *
-     * @todo duplicate with ComponentenCatalogusService ?
-     *
-     * @return array|null
-     */
-    public function getComponents(): ?array
-    {
-        $result = [];
-
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->debug('Trying to get all components from source '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $components = $this->callService->getAllResults($source, '/apis');
-
-        $this->pluginLogger->info('Found '.count($components).' components', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        foreach ($components as $component) {
-            $result[] = $this->importComponent($component);
-        }//end foreach
-
-        $this->entityManager->flush();
-
-        return $result;
-
-    }//end getComponents()
-
-
-    /**
-     * Get a component trough the components of developer.overheid.nl/apis/{id}.
-     *
-     * @todo duplicate with ComponentenCatalogusService ?
-     *
-     * @param string $id The id of the component to find.
-     *
-     * @return array|null
-     */
-    public function getComponent(string $id): ?array
-    {
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->debug('Trying to get component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $response = $this->callService->call($source, '/apis/'.$id);
-
-        $component = json_decode($response->getBody()->getContents(), true);
-
-        if ($component === null) {
-            $this->pluginLogger->error('Could not find a component with id: '.$id.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        $component = $this->importComponent($component);
-        if ($component === null) {
-            return null;
-        }//end if
-
-        $this->entityManager->flush();
-
-        $this->pluginLogger->info('Found component with id: '.$id, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        return $component->toArray();
-
-    }//end getComponent()
-
 
     /**
      * Turn a repo array into an object we can handle.
@@ -282,7 +129,6 @@ class DeveloperOverheidService
         return $synchronization->getObject();
 
     }//end handleRepositoryArray()
-
 
     /**
      * @param array        $componentArray  The component array to import.
@@ -343,8 +189,7 @@ class DeveloperOverheidService
         return null;
 
     }//end importLegalRepoOwnerThroughComponent()
-
-
+    
     /**
      * @todo duplicate with ComponentenCatalogusService ?
      *
@@ -354,12 +199,12 @@ class DeveloperOverheidService
      */
     public function importComponent(array $component): ?ObjectEntity
     {
-        // Do we have a source?
-        $source          = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.developerOverheid.source.json', 'open-catalogi/open-catalogi-bundle');
-        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping         = $this->resourceService->getMapping('https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        // Get the source, schema and mapping from the configuration array.
+        $source  = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $schema  = $this->resourceService->getSchema($this->configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping($this->configuration['mapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $schema, $component['id']);
 
         $this->pluginLogger->debug('Mapping object'.$component['service_name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -379,7 +224,10 @@ class DeveloperOverheidService
 
         $this->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
-        if ($component['related_repositories'] !== []) {
+        // @TODO The api is changed, is this still needed
+        if (key_exists('related_repositories', $component) === true
+            && $component['related_repositories'] !== []
+        ) {
             $repository       = $component['related_repositories'][0];
             $repositoryObject = $this->handleRepositoryArray($repository);
             $repositoryObject->setValue('component', $componentObject);
@@ -392,5 +240,206 @@ class DeveloperOverheidService
 
     }//end importComponent()
 
+    /**
+     * Get all components of the given source.
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     *
+     * @return array|null
+     */
+    public function getComponents(Source $source, string $endpoint): ?array
+    {
+        $components = $this->callService->getAllResults($source, $endpoint);
+        $this->pluginLogger->info('Found '.count($components).' components from '.$source->getName());
 
+        $result = [];
+        foreach ($components as $component) {
+            $result[] = $this->importComponent($component);
+        }
+
+        $this->entityManager->flush();
+
+        return $result;
+    }
+
+    /**
+     * Get a component of the given source with the given id.
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param string $componentId The given component id
+     *
+     * @return array|null
+     */
+    public function getComponent(Source $source, string $endpoint, string $componentId): ?array
+    {
+        $response = $this->callService->call($source, $endpoint .'/'.$componentId);
+        $component = json_decode($response->getBody()->getContents(), true);
+
+        if ($component === null) {
+            $this->pluginLogger->error('Could not find an component with id: '.$componentId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }
+
+        $component = $this->importComponent($component);
+        if ($component === null) {
+            return null;
+        }
+
+        $this->entityManager->flush();
+
+        $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $component->toArray();
+    }
+
+    /**
+     * Get all components or one component through the products of developer.overheid.nl/apis/{id}.
+     *
+     * @param array|null $data The data array from the request
+     * @param array|null $configuration The configuration array from the request
+     * @param string|null $componentId The given component id
+     *
+     * @return array|null
+     */
+    public function getDeveloperOverheidComponents(?array $data = [], ?array $configuration = [], ?string $componentId = null): ?array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        // Get the source from the configuration array.
+        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $endpoint = $this->configuration['endpoint'];
+
+        if ($componentId === null) {
+            return $this->getComponents($source, $endpoint);
+        }
+
+        return $this->getComponent($source, $endpoint, $componentId);
+    }//end getDeveloperOverheidComponents()
+    
+    /**
+     * @todo duplicate with GithubPubliccodeService ?
+     *
+     * @param $repository
+     *
+     * @return ObjectEntity|null
+     */
+    public function importRepository($repository): ?ObjectEntity
+    {
+        $schema  = $this->resourceService->getSchema($this->configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($repository['source'] === 'github') {
+            // Use the github source to import this repository.
+            $source           = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+            $name     = trim(\Safe\parse_url($repository['url'], PHP_URL_PATH), '/');
+            // Get the repository from github so we can work with the repository id.
+            $repository = $this->githubApiService->getRepository($name, $source);
+            $repositoryId = $repository['id'];
+        } else {
+            // Use the source of developer.overheid.
+            $source  = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+            // Use the repository name as the id to sync.
+            $repositoryId = $repository['name'];
+        }
+
+        $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $synchronization = $this->syncService->findSyncBySource($source, $schema, $repositoryId);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
+
+        $repositoryObject = $synchronization->getObject();
+
+        $component = $this->githubApiService->connectComponent($repositoryObject);
+        if ($component !== null) {
+            $repositoryObject->setValue('component', $component);
+            $this->entityManager->persist($repositoryObject);
+            $this->entityManager->flush();
+        }//end if
+
+        return $repositoryObject;
+
+    }//end importRepository()
+
+    /**
+     * Get all repositories of the given source.
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     *
+     * @return array|null
+     */
+    public function getRepositories(Source $source, string $endpoint): ?array
+    {
+        $repositories = $this->callService->getAllResults($source, $endpoint);
+        $this->pluginLogger->info('Found '.count($repositories).' repositories from '.$source->getName());
+
+        $result = [];
+        foreach ($repositories as $repository) {
+            $result[] = $this->importRepository($repository);
+        }
+
+        $this->entityManager->flush();
+
+        return $result;
+    }
+
+    /**
+     * Get a repository of the given source with the given id.
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param string $repositoryId The given repository id
+     *
+     * @return array|null
+     */
+    public function getRepository(Source $source, string $endpoint, string $repositoryId): ?array
+    {
+        $response = $this->callService->call($source, $endpoint .'/'.$repositoryId);
+        $repository = json_decode($response->getBody()->getContents(), true);
+
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find an repository with id: '.$repositoryId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }
+
+        $repository = $this->importRepository($repository);
+        if ($repository === null) {
+            return null;
+        }
+
+        $this->entityManager->flush();
+
+        $this->pluginLogger->info('Found repository with id: '.$repositoryId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $repository->toArray();
+    }
+
+    /**
+     * Get all repositories or one repository through the repositories of developer.overheid.nl/repositories/{id}.
+     *
+     * @param array|null $data The data array from the request
+     * @param array|null $configuration The configuration array from the request
+     * @param string|null $repositoryId The given repository id
+     *
+     * @return array|null
+     */
+    public function getDeveloperOverheidRepositories(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): ?array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        // Get the source from the configuration array.
+        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $endpoint = $this->configuration['endpoint'];
+
+        if ($repositoryId === null) {
+            return $this->getRepositories($source, $endpoint);
+        }
+
+        return $this->getRepository($source, $endpoint, $repositoryId);
+    }//end getDeveloperOverheidComponents()
+    
 }//end class
