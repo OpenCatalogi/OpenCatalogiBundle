@@ -157,7 +157,7 @@ class FederalizationService
 
         // Get all the catalogi
         $catalogi = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $this->catalogusEntity]);
-        
+
         if (isset($this->style) === true) {
             $this->style->info('Found '.count($catalogi).' Catalogi');
         }
@@ -310,7 +310,7 @@ class FederalizationService
         }//end foreach
 
         $this->entityManager->flush();
-    
+
         $this->logger->info('Synchronized '.count($synchonizedObjects).' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         if (isset($this->style) === true) {
             $this->style->info('Synchronized '.count($synchonizedObjects).' objects');
@@ -529,9 +529,10 @@ class FederalizationService
         ) {
             if ($defaultApplication !== null) {
                 $this->logger->error('The Default Application does not have a domain (or only the domain localhost)', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-                
+
                 return;
             }
+
             $this->getAppDomain($key + 1);
 
             return;
