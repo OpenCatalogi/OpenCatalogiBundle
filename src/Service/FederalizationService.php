@@ -70,6 +70,13 @@ class FederalizationService
      * @var Entity
      */
     private Entity $applicationEntity;
+    
+    /**
+     * A bool used to keep track if we are known in the Catalogi we are reading.
+     *
+     * @var bool
+     */
+    private bool $weAreKnown;
 
 
     /**
@@ -120,10 +127,11 @@ class FederalizationService
 
         // Sync them
         foreach ($catalogi as $catalogus) {
-            $reportOut = $this->readCatalogus($catalogus);
-
+            $this->weAreKnown = false;
+            $this->readCatalogus($catalogus);
+            
             // Check if we/this Catalogi is known in the catalogus we just read. If not, make ourselves known.
-            if (in_array('myDomain', array_column($reportOut['catalogi'], 'location')) === false) {
+            if ($this->weAreKnown === false) {
                 $this->makeOurselvesKnown($catalogus);
             }
         }
@@ -269,10 +277,6 @@ class FederalizationService
                 $this->entityManager->remove($synchronization->getObject());
 
                 $counter++;
-            } else if ($synchronization->getObject()->getEntity() === $this->catalogusEntity) {
-                $reportOut['catalogi'][] = [
-                    "location" => $synchronization->getObject()->getValue('location'),
-                ];
             }
         }
 
@@ -338,7 +342,16 @@ class FederalizationService
 
         switch ($reference) {
         case 'https://opencatalogi.nl/oc.catalogi.schema.json':
-            $entity   = $this->catalogusEntity;
+            // Let's not add ourselves as catalogi.
+            if (isset($object['embedded']['source']['location']) === true
+                && $object['embedded']['source']['location'] === 'myDomain'
+            ) {
+                // We need to keep track of this, so we don't add ourselves to the $source Catalogi later.
+                $this->weAreKnown = true;
+                return null;
+            }
+            
+            $entity = $this->catalogusEntity;
             $endpoint = '/api/catalogi';
             break;
         case 'https://opencatalogi.nl/oc.organisation.schema.json':
@@ -363,6 +376,11 @@ class FederalizationService
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
             $baseSync   = $object['_self']['synchronisations'][0];
             $externalId = $baseSync['sourceId'];
+            
+            // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
+            if ($baseSync['location'] === 'myDomain') {
+                return null;
+            }
         } else {
             // This catalogi is the source so let's roll
             $externalId = $object['_id'];
