@@ -82,7 +82,7 @@ class FederalizationGetCommand extends Command
 
             if ($catalogusObject === null) {
                 $style->error('Could not find ObjectEntity by id or name '.$catalogusId);
-    
+
                 return Command::FAILURE;
             }
 

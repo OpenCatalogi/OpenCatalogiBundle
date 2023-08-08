@@ -73,11 +73,11 @@ class FederalizationService
 
 
     /**
-     * @param EntityManagerInterface $entityManager       The entity manager
-     * @param SessionInterface       $session             The session interface
-     * @param CallService            $callService         The Call Service
-     * @param SynchronizationService $syncService         The synchronization service
-     * @param LoggerInterface        $pluginLogger        The plugin version of the logger interface
+     * @param EntityManagerInterface $entityManager The entity manager
+     * @param SessionInterface       $session       The session interface
+     * @param CallService            $callService   The Call Service
+     * @param SynchronizationService $syncService   The synchronization service
+     * @param LoggerInterface        $pluginLogger  The plugin version of the logger interface
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -86,11 +86,11 @@ class FederalizationService
         SynchronizationService $syncService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager       = $entityManager;
-        $this->session             = $session;
-        $this->callService         = $callService;
-        $this->syncService         = $syncService;
-        $this->logger              = $pluginLogger;
+        $this->entityManager = $entityManager;
+        $this->session       = $session;
+        $this->callService   = $callService;
+        $this->syncService   = $syncService;
+        $this->logger        = $pluginLogger;
 
     }//end __construct()
 
@@ -121,7 +121,7 @@ class FederalizationService
         // Sync them
         foreach ($catalogi as $catalogus) {
             $reportOut = $this->readCatalogus($catalogus);
-            
+
             // Check if we/this Catalogi is known in the catalogus we just read. If not, make ourselves known.
             if (in_array('myDomain', array_column($reportOut['catalogi'], 'location')) === false) {
                 $this->makeOurselvesKnown($catalogus);
@@ -131,8 +131,8 @@ class FederalizationService
         return $data;
 
     }//end catalogiHandler()
-    
-    
+
+
     /**
      * Will add information of ('us') the current Catalogi, to the given $catalogus source.
      *
@@ -146,36 +146,37 @@ class FederalizationService
         if ('myDomain' === 'localhost') {
             return;
         }
-        
+
         // Check if the past object is a Catalogi object.
         if ($catalogus->getEntity()->getReference() !== 'https://opencatalogi.nl/oc.catalogi.schema.json') {
             // readCatalogus() function will always (already) log an error.
             return;
         }
-    
+
         // Let's get the source for the catalogus
         $source = $catalogus->getValue('source');
         if ($source === null) {
             // readCatalogus() function will always (already) log an error.
             return;
         }
-    
+
         $sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')]);
-        
+
         $newCatalogi = [
             "source" => [
-                "name" => "myName",
+                "name"        => "myName",
                 "description" => "myDescription",
-                "location" => "myDomain"
-            ]
+                "location"    => "myDomain",
+            ],
         ];
-    
+
         $this->callService->call(
             $sourceObject,
             '/api/catalogi',
             'POST',
             ['body' => json_encode($newCatalogi)]
         );
+
     }//end makeOurselvesKnown()
 
 
@@ -207,7 +208,7 @@ class FederalizationService
         }
 
         $this->logger->info('Looking at '.$source->getValue('name').'(@:'.$source->getValue('location').')', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-    
+
         $sourceObject = $this->entityManager->getRepository('App:Gateway')->findBy(['location' => $source->getValue('location')]);
         if ($sourceObject === null) {
             $sourceObject = new Source();
@@ -268,9 +269,9 @@ class FederalizationService
                 $this->entityManager->remove($synchronization->getObject());
 
                 $counter++;
-            } elseif ($synchronization->getObject()->getEntity() === $this->catalogusEntity) {
+            } else if ($synchronization->getObject()->getEntity() === $this->catalogusEntity) {
                 $reportOut['catalogi'][] = [
-                    "location" => $synchronization->getObject()->getValue('location')
+                    "location" => $synchronization->getObject()->getValue('location'),
                 ];
             }
         }
@@ -337,25 +338,25 @@ class FederalizationService
 
         switch ($reference) {
         case 'https://opencatalogi.nl/oc.catalogi.schema.json':
-            $entity = $this->catalogusEntity;
+            $entity   = $this->catalogusEntity;
             $endpoint = '/api/catalogi';
             break;
         case 'https://opencatalogi.nl/oc.organisation.schema.json':
-            $entity = $this->organisationEntity;
+            $entity   = $this->organisationEntity;
             $endpoint = '/api/organisations';
             break;
         case 'https://opencatalogi.nl/oc.component.schema.json':
-            $entity = $this->componentEntity;
+            $entity   = $this->componentEntity;
             $endpoint = '/api/components';
             break;
         case 'https://opencatalogi.nl/oc.application.schema.json':
-            $entity = $this->applicationEntity;
+            $entity   = $this->applicationEntity;
             $endpoint = '/api/applications';
             break;
         default:
             // Unknown type, lets output something to IO
             return null;
-        }
+        }//end switch
 
         // Let's handle whatever we found
         if (isset($object['_self']['synchronisations']) === true && count($object['_self']['synchronisations']) !== 0) {
@@ -380,7 +381,7 @@ class FederalizationService
         if (isset($baseSync) === true) {
             $synchronization = $this->setSourcesSource($synchronization, $baseSync);
         }
-    
+
         $this->entityManager->persist($synchronization);
 
         // Lets sync
