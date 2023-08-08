@@ -38,9 +38,37 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
             '$id'         => 'https://opencatalogi.nl/ActionHandler/ComponentenCatalogusApplicationToGatewayHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusApplicationToGatewayHandler',
-            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'    => [],
-            'properties'  => [],
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus source.',
+            'required'    => ['source', 'mapping', 'schema', 'endpoint'],
+            'properties'  => [
+                'source' => [
+                    'type'        => 'string',
+                    'description' => 'The source of the componenten catalogus.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+                    'required'    => true
+                ],
+                'mapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for componenten catalogus application to oc application.',
+                    'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+                    'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+                    'required'    => true
+                ],
+                'schema' => [
+                    'type'        => 'string',
+                    'description' => 'The application entity.',
+                    'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'required'    => true
+                ],
+                'endpoint' => [
+                    'type'        => 'string',
+                    'description' => 'The endpoint for the source.',
+                    'example'     => '/products',
+                    'required'    => true
+                ],
+            ],
         ];
 
     }//end getConfiguration()
@@ -56,7 +84,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getApplications();
+        return $this->service->getComponentenCatalogusApplications($data, $configuration);
 
     }//end run()
 

@@ -58,21 +58,24 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $configuration = [
+            'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+            'mapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+            'schema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'endpoint' => '/components'
+        ];
 
         // Handle the command options.
         $componentId = $input->getOption('component', false);
 
-        $style->info('Execute getComponents');
-
         if ($componentId === null) {
-            if (empty($this->compCatService->getComponents()) === true) {
+            if (empty($this->compCatService->getComponentenCatalogusComponents([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
         if ($componentId !== null
-            && empty($this->compCatService->getComponent($componentId)) === true
+            && empty($this->compCatService->getComponentenCatalogusComponents([], $configuration, $componentId)) === true
         ) {
             return Command::FAILURE;
         }

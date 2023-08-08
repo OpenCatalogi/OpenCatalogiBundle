@@ -60,6 +60,16 @@ class ComponentenCatalogusService
      */
     private LoggerInterface $pluginLogger;
 
+    /**
+     * @var array
+     */
+    private array $data;
+
+    /**
+     * @var array
+     */
+    private array $configuration;
+
 
     /**
      * @param EntityManagerInterface   $entityManager   The Entity Manager Interface.
@@ -89,71 +99,10 @@ class ComponentenCatalogusService
         $this->donService      = $donService;
         $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
+        $this->data = [];
+        $this->configuration = [];
 
     }//end __construct()
-
-
-    /**
-     * Get applications through the products of https://componentencatalogus.commonground.nl/api/products.
-     *
-     * @return array|null
-     */
-    public function getApplications(): ?array
-    {
-        $result = [];
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $applications = $this->callService->getAllResults($source, '/products');
-
-        $this->pluginLogger->info('Found '.count($applications).' applications');
-        foreach ($applications as $application) {
-            $result[] = $this->importApplication($application);
-        }
-
-        $this->entityManager->flush();
-
-        return $result;
-
-    }//end getApplications()
-
-
-    /**
-     * Get an application through the products of https://componentencatalogus.commonground.nl/api/products/{id}.
-     *
-     * @param string $applicationId The id of the application to look for.
-     *
-     * @return array|null
-     */
-    public function getApplication(string $applicationId): ?array
-    {
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->info('Getting application '.$applicationId);
-        $response = $this->callService->call($source, '/products/'.$applicationId);
-
-        $application = json_decode($response->getBody()->getContents(), true);
-
-        if ($application === null) {
-            $this->pluginLogger->error('Could not find an application with id: '.$applicationId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }
-
-        $application = $this->importApplication($application);
-        if ($application === null) {
-            return null;
-        }
-
-        $this->entityManager->flush();
-
-        $this->pluginLogger->info('Found application with id: '.$applicationId, ['package' => 'open-catalogi/open-catalogi-bundle']);
-
-        return $application->toArray();
-
-    }//end getApplication()
-
 
     /**
      * Import the application into the data layer.
@@ -164,21 +113,21 @@ class ComponentenCatalogusService
      */
     public function importApplication(array $application): ?ObjectEntity
     {
-        // Do we have a source
-        $source            = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
-        $applicationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping           = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        // Get the source, entity and mapping
+        $source  = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $schema  = $this->resourceService->getSchema($this->configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping($this->configuration['mapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->syncService->findSyncBySource($source, $applicationEntity, $application['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $schema, $application['id']);
 
-        $this->pluginLogger->debug('Mapping object'.$application['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$mapping, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object '.$application['name']. ' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
-        $this->pluginLogger->info('Checking application '.$application['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $application);
 
         $applicationObject = $synchronization->getObject();
+
+        $this->pluginLogger->debug('Synced application: '.$applicationObject->getValue('name'), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         if ($application['components'] !== null) {
             $components = [];
@@ -199,73 +148,85 @@ class ComponentenCatalogusService
 
 
     /**
-     * Get components through the components of https://componentencatalogus.commonground.nl/api/components.
+     * Get all applications of the given source.
      *
-     * @todo duplicate with DeveloperOverheidService ?
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
      *
      * @return array|null
      */
-    public function getComponents(): ?array
+    public function getApplications(Source $source, string $endpoint): ?array
     {
+        $applications = $this->callService->getAllResults($source, $endpoint);
+        $this->pluginLogger->info('Found '.count($applications).' applications from '.$source->getName());
+
         $result = [];
-
-        // Do we have a source?
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $this->pluginLogger->debug('Trying to get all components from source '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
-
-        $components = $this->callService->getAllResults($source, '/components');
-
-        $this->pluginLogger->info('Found '.count($components).' components', ['package' => 'open-catalogi/open-catalogi-bundle']);
-        foreach ($components as $component) {
-            $result[] = $this->importComponent($component);
-        }//end foreach
+        foreach ($applications as $application) {
+            $result[] = $this->importApplication($application);
+        }
 
         $this->entityManager->flush();
 
         return $result;
-
-    }//end getComponents()
-
+    }
 
     /**
-     * Get a component trough the components of https://componentencatalogus.commonground.nl/api/components/{id}.
+     * Get an applications of the given source with the given id.
      *
-     * @todo duplicate with DeveloperOverheidService ?
-     *
-     * @param string $componentId The component id.
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param string $applicationId The given application id
      *
      * @return array|null
      */
-    public function getComponent(string $componentId): ?array
+    public function getApplication(Source $source, string $endpoint, string $applicationId): ?array
     {
-        // Do we have a source
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle');
+        $response = $this->callService->call($source, $endpoint .'/'.$applicationId);
+        $application = json_decode($response->getBody()->getContents(), true);
 
-        $this->pluginLogger->debug('Trying to get component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
-        $response = $this->callService->call($source, '/components/'.$componentId);
-
-        $component = json_decode($response->getBody()->getContents(), true);
-
-        if ($component === null) {
-            $this->pluginLogger->error('Could not find a component with id: '.$componentId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+        if ($application === null) {
+            $this->pluginLogger->error('Could not find an application with id: '.$applicationId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
-        }//end if
+        }
 
-        $component = $this->importComponent($component);
-        if ($component === null) {
+        $application = $this->importApplication($application);
+        if ($application === null) {
             return null;
-        }//end if
+        }
 
         $this->entityManager->flush();
 
-        $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->info('Found application with id: '.$applicationId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
-        return $component->toArray();
+        return $application->toArray();
+    }
 
-    }//end getComponent()
 
+    /**
+     * Get all applications or one application through the products of https://componentencatalogus.commonground.nl/api/products.
+     *
+     * @param array|null $data The data array from the request
+     * @param array|null $configuration The configuration array from the request
+     * @param string|null $applicationId The given application id
+     *
+     * @return array|null
+     */
+    public function getComponentenCatalogusApplications(?array $data = [], ?array $configuration = [], ?string $applicationId = null): ?array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        // Get the source from the configuration array.
+        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $endpoint = $this->configuration['endpoint'];
+
+        if ($applicationId === null) {
+            return $this->getApplications($source, $endpoint);
+        }
+
+        return $this->getApplication($source, $endpoint, $applicationId);
+    }//end getApplications()
 
     /**
      * Imports a repository through a component.
@@ -323,18 +284,15 @@ class ComponentenCatalogusService
      */
     public function importComponent(array $component): ?ObjectEntity
     {
-        // Do we have a source?
-        $source          = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.componentencatalogus.source.json', 'open-catalogi/open-catalogi-bundle', 'open-catalogi/open-catalogi-bundle');
-        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping         = $this->resourceService->getMapping('https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        // Get the source, schema and mapping from the configuration array.
+        $source  = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle', 'open-catalogi/open-catalogi-bundle');
+        $schema  = $this->resourceService->getSchema($this->configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping($this->configuration['mapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Handle sync.
-        $synchronization = $this->syncService->findSyncBySource($source, $componentEntity, $component['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $schema, $component['id']);
 
-        $this->pluginLogger->debug('Mapping object'.$component['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$mapping, ['package' => 'open-catalogi/open-catalogi-bundle']);
-
-        $this->pluginLogger->debug('Checking component '.$component['name'], ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object '.$component['name']. ' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         // Do the mapping of the component set two variables.
         $component = $componentArray = $this->mappingService->mapping($mapping, $component);
@@ -349,6 +307,8 @@ class ComponentenCatalogusService
         $synchronization = $this->syncService->synchronize($synchronization, $component);
         $componentObject = $synchronization->getObject();
 
+        $this->pluginLogger->debug('Synced component: '.$componentObject->getValue('name'), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
         $this->importRepositoryThroughComponent($componentArray, $componentObject);
         $this->donService->importLegalRepoOwnerThroughComponent($componentArray, $componentObject);
 
@@ -359,5 +319,86 @@ class ComponentenCatalogusService
 
     }//end importComponent()
 
+    /**
+     * Get all components of the given source.
+     *
+     * @todo duplicate with DeveloperOverheidService ?
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     *
+     * @return array|null
+     */
+    public function getComponents(Source $source, string $endpoint): ?array
+    {
+        $components = $this->callService->getAllResults($source, $endpoint);
+        $this->pluginLogger->info('Found '.count($components).' components from '.$source->getName());
+
+        $result = [];
+        foreach ($components as $component) {
+            $result[] = $this->importComponent($component);
+        }
+
+        $this->entityManager->flush();
+
+        return $result;
+    }//end getComponents()
+
+    /**
+     * Get an applications of the given source with the given id.
+     *
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param string $componentId The given component id
+     *
+     * @return array|null
+     */
+    public function getComponent(Source $source, string $endpoint, string $componentId): ?array
+    {
+        $response = $this->callService->call($source, $endpoint .'/'.$componentId);
+        $component = json_decode($response->getBody()->getContents(), true);
+
+        if ($component === null) {
+            $this->pluginLogger->error('Could not find an component with id: '.$componentId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }
+
+        $component = $this->importComponent($component);
+        if ($component === null) {
+            return null;
+        }
+
+        $this->entityManager->flush();
+
+        $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+        
+        return $component->toArray();
+    }
+
+    /**
+     * Get all the components or one component through the components of https://componentencatalogus.commonground.nl/api/components.
+     *
+     * @param array|null $data The data array from the request
+     * @param array|null $configuration The configuration array from the request
+     * @param string|null $componentId The given component id
+     *
+     * @return array|null
+     */
+    public function getComponentenCatalogusComponents(?array $data = [], ?array $configuration = [], ?string $componentId = null): ?array
+    {
+        $this->data = $data;
+        $this->configuration = $configuration;
+
+        // Get the source and endpoint from the configuration array.
+        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $endpoint = $this->configuration['endpoint'];
+
+        if ($componentId === null) {
+            return $this->getComponents($source, $endpoint);
+        }
+
+        return $this->getComponent($source, $endpoint, $componentId);
+    }//end getApplications()
 
 }//end class
