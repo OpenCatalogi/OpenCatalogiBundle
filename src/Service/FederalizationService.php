@@ -70,11 +70,11 @@ class FederalizationService
      * @var Entity
      */
     private Entity $applicationEntity;
-    
+
     /**
      * A bool used to keep track if we are known in the Catalogi we are reading.
      *
-     * @var bool
+     * @var boolean
      */
     private bool $weAreKnown;
 
@@ -129,7 +129,7 @@ class FederalizationService
         foreach ($catalogi as $catalogus) {
             $this->weAreKnown = false;
             $this->readCatalogus($catalogus);
-            
+
             // Check if we/this Catalogi is known in the catalogus we just read. If not, make ourselves known.
             if ($this->weAreKnown === false) {
                 $this->makeOurselvesKnown($catalogus);
@@ -350,8 +350,8 @@ class FederalizationService
                 $this->weAreKnown = true;
                 return null;
             }
-            
-            $entity = $this->catalogusEntity;
+
+            $entity   = $this->catalogusEntity;
             $endpoint = '/api/catalogi';
             break;
         case 'https://opencatalogi.nl/oc.organisation.schema.json':
@@ -376,7 +376,7 @@ class FederalizationService
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
             $baseSync   = $object['_self']['synchronisations'][0];
             $externalId = $baseSync['sourceId'];
-            
+
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSync['location'] === 'myDomain') {
                 return null;
