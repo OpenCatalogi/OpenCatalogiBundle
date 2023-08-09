@@ -47,8 +47,8 @@ class DeveloperOverheidService
 
 
     /**
-     * @param LoggerInterface        $pluginLogger          The plugin version of the logger interface.
-     * @param GatewayResourceService $resourceService       The Gateway Resource Service.
+     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
+     * @param GatewayResourceService $resourceService The Gateway Resource Service.
      * @pqram GetResourcesService    $getResourcesService   The Get Resources. Service.
      */
     public function __construct(
@@ -56,29 +56,31 @@ class DeveloperOverheidService
         GatewayResourceService $resourceService,
         GetResourcesService $getResourcesService
     ) {
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
+        $this->pluginLogger        = $pluginLogger;
+        $this->resourceService     = $resourceService;
         $this->getResourcesService = $getResourcesService;
-        $this->data = [];
-        $this->configuration = [];
+        $this->data                = [];
+        $this->configuration       = [];
+
     }//end __construct()
+
 
     /**
      * Get all components or one component through the products of developer.overheid.nl/apis/{id}.
      *
-     * @param array|null $data The data array from the request
-     * @param array|null $configuration The configuration array from the request
-     * @param string|null $componentId The given component id
+     * @param array|null  $data          The data array from the request
+     * @param array|null  $configuration The configuration array from the request
+     * @param string|null $componentId   The given component id
      *
      * @return array|null
      */
-    public function getDeveloperOverheidComponents(?array $data = [], ?array $configuration = [], ?string $componentId = null): ?array
+    public function getDeveloperOverheidComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
     {
-        $this->data = $data;
+        $this->data          = $data;
         $this->configuration = $configuration;
 
         // Get the source from the configuration array.
-        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
 
         if ($componentId === null) {
@@ -86,24 +88,26 @@ class DeveloperOverheidService
         }
 
         return $this->getResourcesService->getComponent($source, $endpoint, $componentId, $this->configuration);
+
     }//end getDeveloperOverheidComponents()
+
 
     /**
      * Get all repositories or one repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param array|null $data The data array from the request
-     * @param array|null $configuration The configuration array from the request
-     * @param string|null $repositoryId The given repository id
+     * @param array|null  $data          The data array from the request
+     * @param array|null  $configuration The configuration array from the request
+     * @param string|null $repositoryId  The given repository id
      *
      * @return array|null
      */
-    public function getDeveloperOverheidRepositories(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): ?array
+    public function getDeveloperOverheidRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
-        $this->data = $data;
+        $this->data          = $data;
         $this->configuration = $configuration;
 
         // Get the source from the configuration array.
-        $source = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
 
         if ($repositoryId === null) {
@@ -111,6 +115,8 @@ class DeveloperOverheidService
         }
 
         return $this->getResourcesService->getRepository($source, $endpoint, $repositoryId, $this->configuration);
-    }//end getDeveloperOverheidComponents()
+
+    }//end getDeveloperOverheidRepositories()
+
 
 }//end class

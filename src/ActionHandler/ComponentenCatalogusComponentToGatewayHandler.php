@@ -39,35 +39,40 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusComponentToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched components from the componenten catalogus source.',
-            'required'    => ['source', 'componentMapping', 'componentSchema', 'endpoint'],
+            'required'    => [
+                'source',
+                'componentMapping',
+                'componentSchema',
+                'endpoint',
+            ],
             'properties'  => [
-                'source' => [
+                'source'           => [
                     'type'        => 'string',
                     'description' => 'The source of the componenten catalogus.',
                     'example'     => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
                 'componentMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for componenten catalogus component to oc component.',
                     'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
                     'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'componentSchema' => [
+                'componentSchema'  => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'endpoint' => [
+                'endpoint'         => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/components',
-                    'required'    => true
-                ]
+                    'required'    => true,
+                ],
             ],
         ];
 

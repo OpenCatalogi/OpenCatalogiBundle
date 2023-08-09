@@ -84,6 +84,7 @@ class ImportResourcesService
 
     }//end __construct()
 
+
     /**
      * Imports a repository through a component.
      *
@@ -129,6 +130,7 @@ class ImportResourcesService
         return null;
 
     }//end importRepositoryThroughComponent()
+
 
     /**
      * @param array        $componentArray  The component array to import.
@@ -190,10 +192,11 @@ class ImportResourcesService
 
     }//end importLegalRepoOwnerThroughComponent()
 
+
     /**
      * @todo duplicate with ComponentenCatalogusService ?
      *
-     * @param array $component The component to import.
+     * @param array $component     The component to import.
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
@@ -210,7 +213,7 @@ class ImportResourcesService
         // Do the mapping of the component set two variables.
         $componentMapping = $componentArray = $this->mappingService->mapping($mapping, $component);
 
-        $this->pluginLogger->debug('Mapping object '.$componentMapping['name']. ' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object '.$componentMapping['name'].' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         // Unset component url before creating object, we don't want duplicate repositories.
         if (key_exists('url', $componentMapping) === true) {
@@ -239,6 +242,7 @@ class ImportResourcesService
 
     }//end importComponent()
 
+
     /**
      * @todo duplicate with GithubPubliccodeService ?
      *
@@ -249,23 +253,23 @@ class ImportResourcesService
      */
     public function importRepository($repository, array $configuration): ?ObjectEntity
     {
-        $schema  = $this->resourceService->getSchema($configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+        $schema = $this->resourceService->getSchema($configuration['schema'], 'open-catalogi/open-catalogi-bundle');
 
         if ($repository['source'] === 'github') {
             // Use the github source to import this repository.
-            $source           = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+            $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
             // Do we have the api key set of the source.
             if ($this->githubApiService->checkGithubAuth($source) === false) {
                 return null;
             }//end if
 
-            $name     = trim(\Safe\parse_url($repository['url'], PHP_URL_PATH), '/');
+            $name = trim(\Safe\parse_url($repository['url'], PHP_URL_PATH), '/');
             // Get the repository from github so we can work with the repository id.
-            $repository = $this->githubApiService->getRepository($name, $source);
+            $repository   = $this->githubApiService->getRepository($name, $source);
             $repositoryId = $repository['id'];
         } else {
             // Use the source of developer.overheid.
-            $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
+            $source = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
             // Use the repository name as the id to sync.
             $repositoryId = $repository['name'];
         }
@@ -287,10 +291,11 @@ class ImportResourcesService
 
     }//end importRepository()
 
+
     /**
      * Import the application into the data layer.
      *
-     * @param array $application The application to import.
+     * @param array $application   The application to import.
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
@@ -304,7 +309,7 @@ class ImportResourcesService
 
         $synchronization = $this->syncService->findSyncBySource($source, $schema, $application['id']);
 
-        $this->pluginLogger->debug('Mapping object '.$application['name']. ' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapping object '.$application['name'].' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $application);
@@ -329,5 +334,6 @@ class ImportResourcesService
         return $applicationObject;
 
     }//end importApplication()
+
 
 }//end class
