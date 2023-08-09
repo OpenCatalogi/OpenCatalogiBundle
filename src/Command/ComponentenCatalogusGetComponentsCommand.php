@@ -60,8 +60,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     {
         $configuration = [
             'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-            'mapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'schema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
             'endpoint' => '/components'
         ];
 

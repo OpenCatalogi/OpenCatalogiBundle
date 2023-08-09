@@ -39,7 +39,7 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusComponentToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched components from the componenten catalogus source.',
-            'required'    => ['source', 'mapping', 'schema', 'endpoint'],
+            'required'    => ['source', 'componentMapping', 'componentSchema', 'endpoint'],
             'properties'  => [
                 'source' => [
                     'type'        => 'string',
@@ -48,14 +48,14 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
                     'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
                     'required'    => true
                 ],
-                'mapping' => [
+                'componentMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for componenten catalogus component to oc component.',
                     'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
                     'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
                     'required'    => true
                 ],
-                'schema' => [
+                'componentSchema' => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',

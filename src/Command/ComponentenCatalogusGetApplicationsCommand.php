@@ -61,9 +61,11 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     {
         $configuration = [
             'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-            'mapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
-            'schema' => 'https://opencatalogi.nl/oc.application.schema.json',
-            'endpoint' => '/products'
+            'applicationMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+            'applicationSchema' => 'https://opencatalogi.nl/oc.application.schema.json',
+            'endpoint' => '/products',
+            'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json'
         ];
 
         // Handle the command options.

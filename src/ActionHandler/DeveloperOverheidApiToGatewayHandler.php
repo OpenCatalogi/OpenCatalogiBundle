@@ -39,7 +39,7 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'DeveloperOverheidApiToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched apis from the developer overheid source.',
-            'required'    => ['source', 'mapping', 'schema', 'endpoint'],
+            'required'    => ['source', 'componentMapping', 'componentSchema', 'endpoint'],
             'properties'  => [
                 'source' => [
                     'type'        => 'string',
@@ -48,14 +48,14 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'required'    => true
                 ],
-                'mapping' => [
+                'componentMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for developer overheid apis to oc component.',
                     'example'     => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
                     'reference'   => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
                     'required'    => true
                 ],
-                'schema' => [
+                'componentSchema' => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',

@@ -87,6 +87,25 @@ class GithubApiService
     }//end __construct()
 
     /**
+     * Check the auth of the github source.
+     *
+     * @param Source $source The given source to check the api key.
+     *
+     * @return bool|null If the api key is set or not.
+     */
+    public function checkGithubAuth(Source $source): ?bool
+    {
+        if ($source->getApiKey() === null) {
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return false;
+        }//end if
+
+        return true;
+
+    }//end checkGithubAuth()
+
+    /**
      * Get a repository through the repositories of the given source
      *
      * @param string $name   The name of the repository.

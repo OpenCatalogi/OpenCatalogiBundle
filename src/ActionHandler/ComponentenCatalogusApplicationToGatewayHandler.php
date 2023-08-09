@@ -39,7 +39,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus source.',
-            'required'    => ['source', 'mapping', 'schema', 'endpoint'],
+            'required'    => ['source', 'applicationMapping', 'applicationSchema', 'endpoint', 'componentMapping', 'componentSchema'],
             'properties'  => [
                 'source' => [
                     'type'        => 'string',
@@ -48,16 +48,16 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
                     'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
                     'required'    => true
                 ],
-                'mapping' => [
+                'applicationMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for componenten catalogus application to oc application.',
                     'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
                     'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
                     'required'    => true
                 ],
-                'schema' => [
+                'applicationSchema' => [
                     'type'        => 'string',
-                    'description' => 'The application entity.',
+                    'description' => 'The application schema.',
                     'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true
@@ -66,6 +66,20 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
                     'type'        => 'string',
                     'description' => 'The endpoint for the source.',
                     'example'     => '/products',
+                    'required'    => true
+                ],
+                'componentMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for componenten catalogus component to oc component.',
+                    'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+                    'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+                    'required'    => true
+                ],
+                'componentSchema' => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
                     'required'    => true
                 ],
             ],

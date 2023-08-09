@@ -61,8 +61,8 @@ class DeveloperOverheidGetComponentsCommand extends Command
     {
         $configuration = [
             'source' => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
-            'mapping' => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
-            'schema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'componentMapping' => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
             'endpoint' => '/apis'
         ];
 
