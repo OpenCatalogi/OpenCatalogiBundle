@@ -272,6 +272,9 @@ class FederalizationService
             $sourceObject->setLocation($source->getValue('location'));
             $this->entityManager->persist($sourceObject);
             $this->entityManager->flush();
+            if (isset($this->style) === true) {
+                $this->style->writeln('Created a new Source for '.$source->getValue('location'));
+            }
         }
 
         // Let's grab ALL the objects for an external source
@@ -289,8 +292,7 @@ class FederalizationService
         if (isset($this->style) === true) {
             $this->style->info('Found '.count($objects).' objects');
         }
-
-        $synchonizedObjects  = [];
+        
         $this->alreadySynced = [];
 
         // Handle new objects
@@ -307,18 +309,12 @@ class FederalizationService
                 continue;
             }
 
-            $synchonizedObjects[] = $synchronization->getSourceId();
             $this->entityManager->persist($synchronization);
 
-            // Lets save every so often
-            if ($counter >= 100) {
+            // Let's show progress every so often
+            if (isset($this->style) === true && $counter >= 100) {
                 $counter = 0;
-                $this->entityManager->flush();
-
-                if (isset($this->style) === true) {
-                    $this->style->writeln('Flushed 100 objects...');
-                    $this->style->writeln('Total synchronizations, incl. sub-objects: '.count($this->alreadySynced));
-                }
+                $this->style->writeln('Total synchronizations done so far, incl. sub-objects: '.count($this->alreadySynced));
             }
         }//end foreach
 
@@ -334,7 +330,7 @@ class FederalizationService
 
         $counter = 0;
         foreach ($synchronizations as $synchronization) {
-            if (in_array($synchronization->getSourceId(), $synchonizedObjects) === false) {
+            if (in_array($synchronization->getId()->toString(), $this->alreadySynced) === false) {
                 $this->entityManager->remove($synchronization->getObject());
 
                 $counter++;
@@ -371,6 +367,10 @@ class FederalizationService
             $source->setDescription($sourceSync['source']['description']);
             $source->setLocation($sourceSync['source']['location']);
             $this->entityManager->persist($source);
+            $this->entityManager->flush();
+            if (isset($this->style) === true) {
+                $this->style->writeln('Created a new Source for '.$source->getValue('location'));
+            }
         }
 
         $synchronization = $this->syncService->findSyncBySource($source, $entity, $sourceSync['sourceId']);
@@ -458,11 +458,14 @@ class FederalizationService
         }
 
         $this->entityManager->persist($synchronization);
-
+    
         // Lets sync
-        $object                = $this->preventCascading($object, $source);
-        $synchronization       = $this->syncService->synchronize($synchronization, $object);
+        $object = $this->preventCascading($object, $source);
+        $synchronization = $this->syncService->synchronize($synchronization, $object);
+    
         $this->alreadySynced[] = $synchronization->getId()->toString();
+        $this->entityManager->flush();
+    
         return $synchronization;
 
     }//end handleObject()
