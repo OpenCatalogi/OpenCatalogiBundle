@@ -312,7 +312,7 @@ class FederalizationService
             $this->entityManager->persist($synchronization);
 
             // Let's show progress every so often
-            if (isset($this->style) === true && $counter >= 100) {
+            if (isset($this->style) === true && $counter >= 50) {
                 $counter = 0;
                 $this->style->writeln('Total synchronizations done so far, incl. sub-objects: '.count($this->alreadySynced));
             }
@@ -462,10 +462,14 @@ class FederalizationService
         // Lets sync
         $object          = $this->preventCascading($object, $source);
         $synchronization = $this->syncService->synchronize($synchronization, $object);
-
         $this->alreadySynced[] = $synchronization->getId()->toString();
-        $this->entityManager->flush();
-
+        
+        // We always want to flush new Components, because this is the only type of object we will encounter multiple times.
+        // And this prevents the creation of duplicate synchronizations + objects for the same Components.
+        if ($entity === $this->componentEntity) {
+            $this->entityManager->flush();
+        }
+    
         return $synchronization;
 
     }//end handleObject()
