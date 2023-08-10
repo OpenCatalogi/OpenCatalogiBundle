@@ -317,15 +317,16 @@ class FederalizationService
 
                 if (isset($this->style) === true) {
                     $this->style->writeln('Flushed 100 objects...');
+                    $this->style->writeln('Total synchronizations, incl. sub-objects: '.count($this->alreadySynced));
                 }
             }
         }//end foreach
 
         $this->entityManager->flush();
 
-        $this->logger->info('Synchronized '.count($synchonizedObjects).' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->logger->info('Synchronized '.count($this->alreadySynced).' objects', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         if (isset($this->style) === true) {
-            $this->style->info('Synchronized '.count($synchonizedObjects).' objects');
+            $this->style->info('Synchronized '.count($this->alreadySynced).' objects');
         }
 
         // Now we can check if any objects where removed ->  Don't do this for now
@@ -434,9 +435,9 @@ class FederalizationService
         }//end switch
 
         // Let's handle whatever we found
-        if (isset($object['_self']['synchronisations']) === true && count($object['_self']['synchronisations']) !== 0) {
+        if (isset($object['_self']['synchronizations']) === true && count($object['_self']['synchronizations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
-            $baseSync = $object['_self']['synchronisations'][0];
+            $baseSync   = $object['_self']['synchronizations'][0];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSync['location'] === $this->currentDomain) {
