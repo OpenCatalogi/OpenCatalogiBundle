@@ -228,7 +228,7 @@ class FederalizationService
             'POST',
             ['body' => json_encode($newCatalogi)]
         );
-    
+
         $this->logger->info('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         if (isset($this->style) === true) {
             $this->style->writeln('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation());
