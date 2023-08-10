@@ -91,7 +91,7 @@ class FederalizationService
      * @var string
      */
     private string $currentDomain;
-    
+
     /**
      * An array to keep track of synchronization id's we already synced (from the same source)
      *
@@ -290,7 +290,7 @@ class FederalizationService
             $this->style->info('Found '.count($objects).' objects');
         }
 
-        $synchonizedObjects = [];
+        $synchonizedObjects  = [];
         $this->alreadySynced = [];
 
         // Handle new objects
@@ -371,10 +371,9 @@ class FederalizationService
             $source->setLocation($sourceSync['source']['location']);
             $this->entityManager->persist($source);
         }
-    
+
         $synchronization = $this->syncService->findSyncBySource($source, $entity, $sourceSync['sourceId']);
-    
-    
+
         $synchronization->setEndpoint($sourceSync['endpoint']);
 
         return $synchronization;
@@ -437,13 +436,13 @@ class FederalizationService
         // Let's handle whatever we found
         if (isset($object['_self']['synchronisations']) === true && count($object['_self']['synchronisations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
-            $baseSync   = $object['_self']['synchronisations'][0];
+            $baseSync = $object['_self']['synchronisations'][0];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSync['location'] === $this->currentDomain) {
                 return null;
             }
-    
+
             // Let's use the synchronization from that original source.
             $synchronization = $this->getSourceSync($entity, $baseSync);
         } else {
@@ -451,7 +450,7 @@ class FederalizationService
             $synchronization = $this->syncService->findSyncBySource($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
         }
-        
+
         // Let's improve performance a bit, by not repeating the same synchronizations.
         if (in_array($synchronization->getId()->toString(), $this->alreadySynced) === true) {
             return $synchronization;
@@ -460,8 +459,8 @@ class FederalizationService
         $this->entityManager->persist($synchronization);
 
         // Lets sync
-        $object = $this->preventCascading($object, $source);
-        $synchronization = $this->syncService->synchronize($synchronization, $object);
+        $object                = $this->preventCascading($object, $source);
+        $synchronization       = $this->syncService->synchronize($synchronization, $object);
         $this->alreadySynced[] = $synchronization->getId()->toString();
         return $synchronization;
 
