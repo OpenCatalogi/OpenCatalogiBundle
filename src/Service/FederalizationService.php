@@ -460,16 +460,16 @@ class FederalizationService
         $this->entityManager->persist($synchronization);
 
         // Lets sync
-        $object          = $this->preventCascading($object, $source);
-        $synchronization = $this->syncService->synchronize($synchronization, $object);
+        $object                = $this->preventCascading($object, $source);
+        $synchronization       = $this->syncService->synchronize($synchronization, $object);
         $this->alreadySynced[] = $synchronization->getId()->toString();
-        
+
         // We always want to flush new Components, because this is the only type of object we will encounter multiple times.
         // And this prevents the creation of duplicate synchronizations + objects for the same Components.
         if ($entity === $this->componentEntity) {
             $this->entityManager->flush();
         }
-    
+
         return $synchronization;
 
     }//end handleObject()
