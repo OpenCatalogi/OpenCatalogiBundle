@@ -292,7 +292,7 @@ class FederalizationService
         if (isset($this->style) === true) {
             $this->style->info('Found '.count($objects).' objects');
         }
-        
+
         $this->alreadySynced = [];
 
         // Handle new objects
@@ -458,14 +458,14 @@ class FederalizationService
         }
 
         $this->entityManager->persist($synchronization);
-    
+
         // Lets sync
-        $object = $this->preventCascading($object, $source);
+        $object          = $this->preventCascading($object, $source);
         $synchronization = $this->syncService->synchronize($synchronization, $object);
-    
+
         $this->alreadySynced[] = $synchronization->getId()->toString();
         $this->entityManager->flush();
-    
+
         return $synchronization;
 
     }//end handleObject()
