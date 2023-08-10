@@ -437,7 +437,7 @@ class FederalizationService
         // Let's handle whatever we found
         if (isset($object['_self']['synchronizations']) === true && count($object['_self']['synchronizations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
-            $baseSync   = $object['_self']['synchronizations'][0];
+            $baseSync = $object['_self']['synchronizations'][0];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSync['location'] === $this->currentDomain) {
