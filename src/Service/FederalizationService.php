@@ -98,6 +98,13 @@ class FederalizationService
      * @var array
      */
     private array $alreadySynced = [];
+    
+    private const SCHEMAS_TO_SYNC = [
+        'https://opencatalogi.nl/oc.catalogi.schema.json',
+        'https://opencatalogi.nl/oc.organisation.schema.json',
+        'https://opencatalogi.nl/oc.component.schema.json',
+        'https://opencatalogi.nl/oc.application.schema.json'
+    ];
 
 
     /**
@@ -228,10 +235,10 @@ class FederalizationService
             'POST',
             ['body' => json_encode($newCatalogi)]
         );
-
-        $this->logger->info('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+    
+        $this->logger->info('Created a new Catalogi object (source: '.$newCatalogi['source']['location'].') in Catalogi '.$sourceObject->getLocation(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         if (isset($this->style) === true) {
-            $this->style->writeln('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation());
+            $this->style->writeln('Created a new Catalogi object (source: '.$newCatalogi['source']['location'].') in Catalogi '.$sourceObject->getLocation());
         }
 
     }//end makeOurselvesKnown()
@@ -470,12 +477,8 @@ class FederalizationService
         $object                = $this->preventCascading($object, $source);
         $synchronization       = $this->syncService->synchronize($synchronization, $object);
         $this->alreadySynced[] = $synchronization->getId()->toString();
-
-        // We always want to flush new Components, because this is the only type of object we will encounter multiple times.
-        // And this prevents the creation of duplicate synchronizations + objects for the same Components.
-        if ($entity === $this->componentEntity) {
-            $this->entityManager->flush();
-        }
+    
+        $this->entityManager->flush();
 
         return $synchronization;
 
@@ -499,27 +502,35 @@ class FederalizationService
         foreach ($object['embedded'] as $key => $value) {
             if (is_array($value) === true && isset($value['_self']['schema']['ref']) === false) {
                 foreach ($value as $subKey => $subValue) {
-                    $synchronization = $this->handleObject($subValue, $source);
-                    if ($synchronization === null) {
-                        $object[$key][$subKey] = null;
-                        continue;
+                    $object[$key][$subKey] = $subValue;
+                    
+                    if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC)) {
+                        $synchronization = $this->handleObject($subValue, $source);
+                        if ($synchronization === null) {
+                            $object[$key][$subKey] = null;
+                            continue;
+                        }
+    
+                        $this->entityManager->persist($synchronization);
+                        $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
                     }
-
-                    $this->entityManager->persist($synchronization);
-                    $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
                 }
 
                 continue;
             }
-
-            $synchronization = $this->handleObject($value, $source);
-            if ($synchronization === null) {
-                $object[$key] = null;
-                continue;
+    
+            $object[$key] = $value;
+    
+            if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
+                $synchronization = $this->handleObject($value, $source);
+                if ($synchronization === null) {
+                    $object[$key] = null;
+                    continue;
+                }
+                
+                $this->entityManager->persist($synchronization);
+                $object[$key] = $synchronization->getObject()->getId()->toString();
             }
-
-            $this->entityManager->persist($synchronization);
-            $object[$key] = $synchronization->getObject()->getId()->toString();
         }//end foreach
 
         unset($object['embedded']);
