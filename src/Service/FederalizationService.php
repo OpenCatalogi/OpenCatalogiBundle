@@ -91,6 +91,13 @@ class FederalizationService
      * @var string
      */
     private string $currentDomain;
+    
+    /**
+     * An array to keep track of synchronization id's we already synced (from the same source)
+     *
+     * @var array
+     */
+    private array $alreadySynced = [];
 
 
     /**
@@ -284,6 +291,7 @@ class FederalizationService
         }
 
         $synchonizedObjects = [];
+        $this->alreadySynced = [];
 
         // Handle new objects
         $counter = 0;
@@ -347,31 +355,31 @@ class FederalizationService
     /**
      * Checks if the source object contains a source, and if so, set the source that has been found.
      *
-     * @param Synchronization $synchronization The synchronization to update
-     * @param array           $sourceSync      The synchronization in the original data
+     * @param Entity $entity     The entity
+     * @param array  $sourceSync The synchronization in the original data
      *
      * @return Synchronization The updated synchronization
      */
-    private function setSourcesSource(Synchronization $synchronization, array $sourceSync): Synchronization
+    private function getSourceSync(Entity $entity, array $sourceSync): Synchronization
     {
-        $synchronization->setEndpoint($sourceSync['endpoint']);
-        $synchronization->setSourceId($sourceSync['sourceId']);
-
         // If this Source does not exist, create it.
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSync['gateway']['location']]);
+        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSync['source']['location']]);
         if ($source === null) {
             $source = new Source();
-            $source->setName($sourceSync['gateway']['name']);
-            $source->setDescription($sourceSync['gateway']['description']);
-            $source->setLocation($sourceSync['gateway']['location']);
+            $source->setName($sourceSync['source']['name']);
+            $source->setDescription($sourceSync['source']['description']);
+            $source->setLocation($sourceSync['source']['location']);
             $this->entityManager->persist($source);
         }
-
-        $synchronization->setSource($source);
+    
+        $synchronization = $this->syncService->findSyncBySource($source, $entity, $sourceSync['sourceId']);
+    
+    
+        $synchronization->setEndpoint($sourceSync['endpoint']);
 
         return $synchronization;
 
-    }//end setSourcesSource()
+    }//end getSourceSync()
 
 
     /**
@@ -430,36 +438,32 @@ class FederalizationService
         if (isset($object['_self']['synchronisations']) === true && count($object['_self']['synchronisations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
             $baseSync   = $object['_self']['synchronisations'][0];
-            $externalId = $baseSync['sourceId'];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSync['location'] === $this->currentDomain) {
                 return null;
             }
+    
+            // Let's use the synchronization from that original source.
+            $synchronization = $this->getSourceSync($entity, $baseSync);
         } else {
             // This catalogi is the source so let's roll. Note: this is the most reliable way to find id's of objects!
-            $externalId = $object['_self']['id'];
-        }
-
-        // Let's see if we already have a synchronisation.
-        $synchronization = $this->entityManager->getRepository('App:Synchronization')->findOneBy(['sourceId' => $externalId]);
-        if ($synchronization === null) {
-            // If not, we create a synchronization for this object.
-            $synchronization = new Synchronization($source, $entity);
+            $synchronization = $this->syncService->findSyncBySource($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
-            $synchronization->setSourceId($externalId);
         }
-
-        // If we found something in a catalogi of which that catalogi is not the source lets use the synchronization from that original source instead.
-        if (isset($baseSync) === true) {
-            $synchronization = $this->setSourcesSource($synchronization, $baseSync);
+        
+        // Let's improve performance a bit, by not repeating the same synchronizations.
+        if (in_array($synchronization->getId()->toString(), $this->alreadySynced) === true) {
+            return $synchronization;
         }
 
         $this->entityManager->persist($synchronization);
 
         // Lets sync
         $object = $this->preventCascading($object, $source);
-        return $this->syncService->synchronize($synchronization, $object);
+        $synchronization = $this->syncService->synchronize($synchronization, $object);
+        $this->alreadySynced[] = $synchronization->getId()->toString();
+        return $synchronization;
 
     }//end handleObject()
 
