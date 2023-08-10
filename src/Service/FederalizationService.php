@@ -468,8 +468,8 @@ class FederalizationService
      * Handle all subObjects in the embedded array. Creating (or updating) synchronizations and objects for all embedded objects.
      * Will also unset this embedded array after and set uuid's instead, so we have a non-cascading $object array before we synchronize.
      *
-     * @param array $object The object to handle.
-     * @param Source $source The Source.
+     * @param  array  $object The object to handle.
+     * @param  Source $source The Source.
      * @return array The update object array.
      */
     private function preventCascading(array $object, Source $source): array
@@ -477,7 +477,7 @@ class FederalizationService
         if (isset($object['embedded']) === false) {
             return $object;
         }
-        
+
         foreach ($object['embedded'] as $key => $value) {
             if (is_array($value) === true && isset($value['_self']['schema']['ref']) === false) {
                 foreach ($value as $subKey => $subValue) {
@@ -486,24 +486,29 @@ class FederalizationService
                         $object[$key][$subKey] = null;
                         continue;
                     }
+
                     $this->entityManager->persist($synchronization);
                     $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
                 }
+
                 continue;
             }
-            
+
             $synchronization = $this->handleObject($value, $source);
             if ($synchronization === null) {
                 $object[$key] = null;
                 continue;
             }
+
             $this->entityManager->persist($synchronization);
             $object[$key] = $synchronization->getObject()->getId()->toString();
-        }
+        }//end foreach
+
         unset($object['embedded']);
-        
+
         return $object;
-    }//end preventCascading();
+
+    }//end preventCascading()
 
 
     /**
