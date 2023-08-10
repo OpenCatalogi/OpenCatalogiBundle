@@ -228,6 +228,11 @@ class FederalizationService
             'POST',
             ['body' => json_encode($newCatalogi)]
         );
+    
+        $this->logger->info('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (isset($this->style) === true) {
+            $this->style->writeln('Created a new Catalogi object (source: '.$newCatalogi['location'].') in Catalogi '.$sourceObject->getLocation());
+        }
 
     }//end makeOurselvesKnown()
 
@@ -272,6 +277,7 @@ class FederalizationService
             $sourceObject->setLocation($source->getValue('location'));
             $this->entityManager->persist($sourceObject);
             $this->entityManager->flush();
+            $this->logger->info('Created a new Source for '.$source->getValue('location'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             if (isset($this->style) === true) {
                 $this->style->writeln('Created a new Source for '.$source->getValue('location'));
             }
@@ -368,6 +374,7 @@ class FederalizationService
             $source->setLocation($sourceSync['source']['location']);
             $this->entityManager->persist($source);
             $this->entityManager->flush();
+            $this->logger->info('Created a new Source for '.$source->getValue('location'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             if (isset($this->style) === true) {
                 $this->style->writeln('Created a new Source for '.$source->getValue('location'));
             }
