@@ -440,7 +440,7 @@ class FederalizationService
             $baseSync = $object['_self']['synchronizations'][0];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
-            if ($baseSync['location'] === $this->currentDomain) {
+            if ($baseSync['source']['location'] === $this->currentDomain) {
                 return null;
             }
 
