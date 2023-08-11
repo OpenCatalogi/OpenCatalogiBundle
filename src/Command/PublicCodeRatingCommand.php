@@ -61,21 +61,22 @@ class PublicCodeRatingCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-
+        $configuration = [
+            'ratingSchema' => 'https://opencatalogi.nl/oc.rating.schema.json',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
+        ];
+        
         // Handle the command options
         $componentId = $input->getOption('component', false);
-
-        $style->info('Execute enrichComponentsWithRating');
-
+        
         if ($componentId === null) {
-            if ($this->ratingService->enrichComponentsWithRating() === null) {
+            if ($this->ratingService->enrichComponentsWithRating([], $configuration) === null) {
                 return Command::FAILURE;
             }
         }
 
         if ($componentId !== null
-            && $this->ratingService->enrichComponentWithRating($componentId) === null
+            && $this->ratingService->enrichComponentsWithRating([], $configuration, $componentId) === null
         ) {
             return Command::FAILURE;
         }
