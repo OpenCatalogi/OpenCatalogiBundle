@@ -9,6 +9,7 @@ use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Common\Collections\Criteria;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
@@ -29,11 +30,6 @@ class EnrichPubliccodeFromGithubUrlService
     private CallService $callService;
 
     /**
-     * @var MappingService
-     */
-    private MappingService $mappingService;
-
-    /**
      * @var GithubPubliccodeService
      */
     private GithubPubliccodeService $githubService;
@@ -49,6 +45,11 @@ class EnrichPubliccodeFromGithubUrlService
     private GatewayResourceService $resourceService;
 
     /**
+     * @var GithubApiService
+     */
+    private GithubApiService $githubApiService;
+
+    /**
      * @var array
      */
     private array $configuration;
@@ -62,25 +63,25 @@ class EnrichPubliccodeFromGithubUrlService
     /**
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param CallService             $callService     The Call Service
-     * @param MappingService          $mappingService  The Mapping Service
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
      * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
      * @param GatewayResourceService  $resourceService The Gateway Resource Service.
+     * @param GithubApiService $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        MappingService $mappingService,
         GithubPubliccodeService $githubService,
         LoggerInterface $pluginLogger,
-        GatewayResourceService $resourceService
+        GatewayResourceService $resourceService,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager   = $entityManager;
         $this->callService     = $callService;
         $this->githubService   = $githubService;
-        $this->mappingService  = $mappingService;
         $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
+        $this->githubApiService = $githubApiService;
         $this->configuration   = [];
         $this->data            = [];
 
@@ -88,21 +89,25 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * This function fetches repository data.
+     * This function gets the publiccode file from the github api.
      *
-     * @param string $publiccodeUrl endpoint to request
+     * @param string $repositoryUrl The url of the repository
      *
-     * @throws GuzzleException
+     * @throws GuzzleException|Exception
      *
-     * @return array|null|Response
+     * @return array|null
      */
-    public function getPubliccodeFromUrl(string $repositoryUrl)
+    public function getPubliccodeFromUrl(string $repositoryUrl): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($this->githubApiService->checkGithubAuth($source) === false) {
+            return null;
+        }//end if
 
         $possibleEndpoints = [
-            '/repos/'.$repositoryUrl.'/contents/publiccode.yaml',
-            '/repos/'.$repositoryUrl.'/contents/publiccode.yml',
+            '/'.$repositoryUrl.'/contents/publiccode.yaml',
+            '/'.$repositoryUrl.'/contents/publiccode.yml',
         ];
 
         foreach ($possibleEndpoints as $endpoint) {
@@ -113,7 +118,7 @@ class EnrichPubliccodeFromGithubUrlService
             }
 
             if (isset($response) === true) {
-                return $this->githubService->parsePubliccode($repositoryUrl, $response);
+                return $this->githubService->parsePubliccode($repositoryUrl, $response, $source);
             }
         }
 
@@ -123,17 +128,17 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * This function fetches repository data.
+     * This function gets the publiccode file from the github user content.
      *
-     * @param string $publiccodeUrl endpoint to request
+     * @param string $repositoryUrl The url of the repository
      *
      * @throws GuzzleException
      *
-     * @return array|null|Response
+     * @return array|null
      */
-    public function getPubliccodeFromRawUserContent(string $repositoryUrl)
+    public function getPubliccodeFromRawUserContent(string $repositoryUrl): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
 
         $possibleEndpoints = [
             '/'.$repositoryUrl.'/main/publiccode.yaml',
@@ -153,7 +158,11 @@ class EnrichPubliccodeFromGithubUrlService
                 $yamlEncoder = new YamlEncoder();
 
                 // @TODO: Use the CallService decodeBody
-                return $yamlEncoder->decode($response->getBody()->getContents(), 'yaml');
+                $decodedResponse = $yamlEncoder->decode($response->getBody()->getContents(), 'yaml');
+
+                if (is_array($decodedResponse) === true) {
+                    return $decodedResponse;
+                }
             }
         }
 
@@ -163,7 +172,7 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * @TODO
+     * This function gets and maps the publiccode file
      *
      * @param ObjectEntity $repository
      * @param string       $repositoryUrl
@@ -178,16 +187,14 @@ class EnrichPubliccodeFromGithubUrlService
 
         // Get the publiccode through the raw.githubusercontent source
         $publiccode = $this->getPubliccodeFromRawUserContent($url);
-        if (is_array($publiccode) === true) {
-            $this->githubService->mapPubliccode($repository, $publiccode);
+        if ($publiccode !== null) {
+            return $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration);
         }
 
         // If still not found, get the publiccode through the api.github source
-        if ($publiccode === null) {
-            $publiccode = $this->getPubliccodeFromUrl($url);
-            if (is_array($publiccode) === true) {
-                $this->githubService->mapPubliccode($repository, $publiccode);
-            }
+        $publiccode = $this->getPubliccodeFromUrl($url);
+        if (is_array($publiccode) === true) {
+            return $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration);
         }
 
         return $repository;
@@ -196,46 +203,52 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * @param array|null  $data          data set at the start of the handler
-     * @param array|null  $configuration configuration of the action
-     * @param string|null $repositoryId
+     * This function gets the publiccode through the repository url and enriches the object.
+     *
+     * @param array|null $data data set at the start of the handler
+     * @param array|null $configuration configuration of the action
+     * @param string|null $repositoryId The given repository id
      *
      * @return array dataset at the end of the handler
+     * @throws Exception
      */
     public function enrichPubliccodeFromGithubUrlHandler(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
 
+        // If we are testing for one repository.
         if ($repositoryId !== null) {
-            // If we are testing for one repository.
             $repository = $this->entityManager->find('App:ObjectEntity', $repositoryId);
             if ($repository instanceof ObjectEntity === true
                 && $repository->getValue('publiccode_url') === null
             ) {
                 $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
+
+                return $this->data;
             }
 
             if ($repository instanceof ObjectEntity === false) {
                 $this->pluginLogger->error('Could not find given repository');
+
+                return $this->data;
             }
         }
 
-        if ($repositoryId === null) {
-            $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        // Set the memory limit for this function.
+        ini_set('memory_limit', $this->configuration['memoryLimit']);
+        // Set the criteria to not overload the function.
+        $criteria = Criteria::create()->orderBy(['dateModified' => Criteria::ASC])->setMaxResults($this->configuration['maxResults']);
 
-            // If we want to do it for al repositories.
-            $this->pluginLogger->debug('Looping through repositories');
-            foreach ($repositoryEntity->getObjectEntities() as $repository) {
-                if ($repository->getValue('publiccode_url') === null) {
-                    $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
-                }
+        // If we want to do it for al repositories.
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+
+        $this->pluginLogger->debug('Looping through repositories');
+        foreach ($repositorySchema->getObjectEntities()->matching($criteria) as $repository) {
+            if ($repository->getValue('publiccode_url') === null) {
+                $this->enrichRepositoryWithPubliccode($repository, $repository->getValue('url'));
             }
         }
-
-        $this->entityManager->flush();
-
-        $this->pluginLogger->debug('enrichPubliccodeFromGithubUrlHandler finished');
 
         return $this->data;
 

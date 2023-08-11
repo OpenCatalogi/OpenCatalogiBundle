@@ -39,8 +39,56 @@ class EnrichPubliccodeFromGithubUrlHandler implements ActionHandlerInterface
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'EnrichPubliccodeFromGithubUrlHandler',
             'description' => 'This handler checks repositories for publuccode.yaml or publiccode.yml',
-            'required'    => [],
-            'properties'  => [],
+            'required'    => ['githubSource', 'usercontentSource', 'repositorySchema', 'componentSchema', 'componentMapping', 'memoryLimit', 'maxResults'],
+            'properties'  => [
+                'githubSource' => [
+                    'type'        => 'string',
+                    'description' => 'The source of the developer overheid.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true
+                ],
+                'usercontentSource' => [
+                    'type'        => 'string',
+                    'description' => 'The source of the developer overheid.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'required'    => true
+                ],
+                'repositorySchema' => [
+                    'type'        => 'string',
+                    'description' => 'The repository schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'required'    => true
+                ],
+                'componentSchema' => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'required'    => true
+                ],
+                'componentMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The publiccode component mapping.',
+                    'example'     => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'required'    => true
+                ],
+                'memoryLimit' => [
+                    'type'        => 'string',
+                    'description' => 'The memory limit of the function',
+                    'example'     => '2G',
+                    'required'    => true
+                ],
+                'maxResults' => [
+                    'type'        => 'string',
+                    'description' => 'The max results of the repositories.',
+                    'example'     => 100,
+                    'required'    => true
+                ]
+            ],
         ];
 
     }//end getConfiguration()
