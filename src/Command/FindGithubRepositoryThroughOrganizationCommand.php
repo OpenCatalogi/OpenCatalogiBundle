@@ -60,15 +60,15 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'githubSource' => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'organisationSchema' => 'https://opencatalogi.nl/oc.organisation.schema.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
-            'openCatalogiMapping' => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json'
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'organisationSchema'  => 'https://opencatalogi.nl/oc.organisation.schema.json',
+            'componentSchema'     => 'https://opencatalogi.nl/oc.component.schema.json',
+            'openCatalogiMapping' => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
         ];
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
-        
+
         if ($organisationId === null) {
             if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration)) === true) {
                 return Command::FAILURE;

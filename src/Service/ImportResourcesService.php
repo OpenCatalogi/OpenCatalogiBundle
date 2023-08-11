@@ -276,7 +276,7 @@ class ImportResourcesService
             $source = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
             // Use the repository name as the id to sync.
             $repositoryId = $repository['name'];
-        }
+        }//end if
 
         $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization = $this->syncService->findSyncBySource($source, $schema, $repositoryId);

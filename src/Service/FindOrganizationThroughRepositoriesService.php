@@ -70,13 +70,13 @@ class FindOrganizationThroughRepositoriesService
 
 
     /**
-     * @param CallService             $callService       The call service
-     * @param EntityManagerInterface  $entityManager     The entity manager
-     * @param GithubApiService        $githubApiService  The github api service
-     * @param GithubPubliccodeService $gitService        The Github publiccode service
-     * @param SynchronizationService  $syncService       The synchonization service
-     * @param LoggerInterface         $pluginLogger      The plugin version of the logger interface
-     * @param GatewayResourceService  $resourceService   The Gateway Resource Service.
+     * @param CallService             $callService      The call service
+     * @param EntityManagerInterface  $entityManager    The entity manager
+     * @param GithubApiService        $githubApiService The github api service
+     * @param GithubPubliccodeService $gitService       The Github publiccode service
+     * @param SynchronizationService  $syncService      The synchonization service
+     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface
+     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
      */
     public function __construct(
         CallService $callService,
@@ -267,8 +267,8 @@ class FindOrganizationThroughRepositoriesService
 
 
     /**
-     * @param ObjectEntity $repository the repository where we want to find an organisation for
-     * @param array $createdOrganizations the already created organizations during a parent loop so we dont waste time/performance on the same organizations
+     * @param ObjectEntity $repository           the repository where we want to find an organisation for
+     * @param array        $createdOrganizations the already created organizations during a parent loop so we dont waste time/performance on the same organizations
      *
      * @return ObjectEntity|null
      * @throws Exception
@@ -388,7 +388,6 @@ class FindOrganizationThroughRepositoriesService
         foreach ($repositorySchema->getObjectEntities() as $repository) {
             $this->enrichRepositoryWithOrganisation($repository, $createdOrganizations);
         }
-
 
         $this->pluginLogger->debug('findOrganizationThroughRepositoriesHandler finished', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
