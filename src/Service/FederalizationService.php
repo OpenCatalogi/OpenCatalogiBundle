@@ -465,17 +465,19 @@ class FederalizationService
             $synchronization = $this->syncService->findSyncBySource($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
         }
+
         $this->entityManager->persist($synchronization);
 
         // Let's improve performance a bit, by not repeating the same synchronizations.
         if (in_array($synchronization->getId()->toString(), $this->alreadySynced) === true) {
             return $synchronization;
         }
+
         $this->alreadySynced[] = $synchronization->getId()->toString();
 
         // Lets sync
-        $object                = $this->preventCascading($object, $source);
-        $synchronization       = $this->syncService->synchronize($synchronization, $object);
+        $object          = $this->preventCascading($object, $source);
+        $synchronization = $this->syncService->synchronize($synchronization, $object);
 
         $this->entityManager->flush();
 
@@ -508,24 +510,25 @@ class FederalizationService
                     if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
                         // Prevent this type of object from cascading. Sync it and set uuid instead.
                         $object[$key] = $this->handleSubObject($object[$key], $source, $subKey, $subValue);
-                    
+
                         continue;
                     }
-                    
+
                     // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
                     $object[$key][$subKey] = $this->preventCascading($subValue, $source);
                 }
 
                 continue;
             }
+
             // Else this key (example: Application = {object}) contains a single object.
             if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
                 // Prevent this type of object from cascading. Sync it and set uuid instead.
                 $object = $this->handleSubObject($object, $source, $key, $value);
-            
+
                 continue;
             }
-    
+
             // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
             $object[$key] = $this->preventCascading($value, $source);
         }//end foreach
@@ -535,17 +538,17 @@ class FederalizationService
         return $object;
 
     }//end preventCascading()
-    
-    
+
+
     /**
      * Handles a single subObjects in the embedded array. Preventing cascading for objects with schema ref present in $this::SCHEMAS_TO_SYNC.
      * Creating (or updating) synchronization and object for this object ($key+$value).
      * So we do not create duplicate objects for objects with schema ref present in $this::SCHEMAS_TO_SYNC because of cascading.
      *
-     * @param array $object The main object array.
+     * @param array  $object The main object array.
      * @param Source $source The Source.
-     * @param mixed $key The key of a single object in the main object array.
-     * @param array $value The value of a single object in the main object array.
+     * @param mixed  $key    The key of a single object in the main object array.
+     * @param array  $value  The value of a single object in the main object array.
      *
      * @return array The updated main object array.
      */
@@ -555,15 +558,16 @@ class FederalizationService
         $synchronization = $this->handleObject($value, $source);
         if ($synchronization === null) {
             $object[$key] = null;
-            
+
             return $object;
         }
-    
+
         $this->entityManager->persist($synchronization);
         $object[$key] = $synchronization->getObject()->getId()->toString();
-        
+
         return $object;
-    }
+
+    }//end handleSubObject()
 
 
     /**
