@@ -421,7 +421,7 @@ class FederalizationService
         case 'https://opencatalogi.nl/oc.catalogi.schema.json':
             // Let's not add ourselves as catalogi.
             if (isset($object['embedded']['source']['location']) === true
-                && $object['embedded']['source']['location'] === $this->currentDomain
+                && $object['embedded']['source']['location'] === 'https://'.$this->currentDomain
             ) {
                 // We need to keep track of this, so we don't add ourselves to the $source Catalogi later.
                 $this->weAreKnown = true;
@@ -454,7 +454,7 @@ class FederalizationService
             $baseSync = $object['_self']['synchronizations'][0];
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
-            if ($baseSync['source']['location'] === $this->currentDomain) {
+            if ($baseSync['source']['location'] === 'https://'.$this->currentDomain) {
                 return null;
             }
 
@@ -465,18 +465,17 @@ class FederalizationService
             $synchronization = $this->syncService->findSyncBySource($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
         }
+        $this->entityManager->persist($synchronization);
 
         // Let's improve performance a bit, by not repeating the same synchronizations.
         if (in_array($synchronization->getId()->toString(), $this->alreadySynced) === true) {
             return $synchronization;
         }
-
-        $this->entityManager->persist($synchronization);
+        $this->alreadySynced[] = $synchronization->getId()->toString();
 
         // Lets sync
         $object                = $this->preventCascading($object, $source);
         $synchronization       = $this->syncService->synchronize($synchronization, $object);
-        $this->alreadySynced[] = $synchronization->getId()->toString();
 
         $this->entityManager->flush();
 
@@ -486,8 +485,11 @@ class FederalizationService
 
 
     /**
-     * Handle all subObjects in the embedded array. Creating (or updating) synchronizations and objects for all embedded objects.
-     * Will also unset this embedded array after and set uuid's instead, so we have a non-cascading $object array before we synchronize.
+     * Handle all subObjects in the embedded array. Preventing cascading for objects with schema ref present in $this::SCHEMAS_TO_SYNC.
+     * Creating (or updating) synchronizations and objects for all these objects.
+     * Will also unset this embedded array after and set uuid's instead for these objects.
+     * So we do not create duplicate objects for objects with schema ref present in $this::SCHEMAS_TO_SYNC because of cascading.
+     * Other objects with schema ref not present in $this::SCHEMAS_TO_SYNC will still be cascaded.
      *
      * @param  array  $object The object to handle.
      * @param  Source $source The Source.
@@ -501,39 +503,30 @@ class FederalizationService
 
         foreach ($object['embedded'] as $key => $value) {
             if (is_array($value) === true && isset($value['_self']['schema']['ref']) === false) {
+                // If this key (example: Components = [0={obj},1={obj}]) contains an array of objects.
                 foreach ($value as $subKey => $subValue) {
                     if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
-                        $synchronization = $this->handleObject($subValue, $source);
-                        if ($synchronization === null) {
-                            $object[$key][$subKey] = null;
-                            continue;
-                        }
-
-                        $this->entityManager->persist($synchronization);
-                        $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
-
+                        // Prevent this type of object from cascading. Sync it and set uuid instead.
+                        $object[$key] = $this->handleSubObject($object[$key], $source, $subKey, $subValue);
+                    
                         continue;
                     }
-
+                    
+                    // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
                     $object[$key][$subKey] = $this->preventCascading($subValue, $source);
                 }
 
                 continue;
             }
-
+            // Else this key (example: Application = {object}) contains a single object.
             if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
-                $synchronization = $this->handleObject($value, $source);
-                if ($synchronization === null) {
-                    $object[$key] = null;
-                    continue;
-                }
-
-                $this->entityManager->persist($synchronization);
-                $object[$key] = $synchronization->getObject()->getId()->toString();
-
+                // Prevent this type of object from cascading. Sync it and set uuid instead.
+                $object = $this->handleSubObject($object, $source, $key, $value);
+            
                 continue;
             }
-
+    
+            // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
             $object[$key] = $this->preventCascading($value, $source);
         }//end foreach
 
@@ -542,6 +535,35 @@ class FederalizationService
         return $object;
 
     }//end preventCascading()
+    
+    
+    /**
+     * Handles a single subObjects in the embedded array. Preventing cascading for objects with schema ref present in $this::SCHEMAS_TO_SYNC.
+     * Creating (or updating) synchronization and object for this object ($key+$value).
+     * So we do not create duplicate objects for objects with schema ref present in $this::SCHEMAS_TO_SYNC because of cascading.
+     *
+     * @param array $object The main object array.
+     * @param Source $source The Source.
+     * @param mixed $key The key of a single object in the main object array.
+     * @param array $value The value of a single object in the main object array.
+     *
+     * @return array The updated main object array.
+     */
+    private function handleSubObject(array $object, Source $source, $key, array $value): array
+    {
+        // Handle the sub-object so that we have a synchronization and object for it.
+        $synchronization = $this->handleObject($value, $source);
+        if ($synchronization === null) {
+            $object[$key] = null;
+            
+            return $object;
+        }
+    
+        $this->entityManager->persist($synchronization);
+        $object[$key] = $synchronization->getObject()->getId()->toString();
+        
+        return $object;
+    }
 
 
     /**
