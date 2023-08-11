@@ -125,7 +125,8 @@ class GithubEventService
         $this->data                = [];
 
     }//end __construct()
-    
+
+
     /**
      * Get a organization from the given name.
      *

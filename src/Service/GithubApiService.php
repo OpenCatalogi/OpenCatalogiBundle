@@ -87,6 +87,7 @@ class GithubApiService
 
     }//end __construct()
 
+
     /**
      * Check the auth of the github source.
      *
@@ -105,6 +106,7 @@ class GithubApiService
         return true;
 
     }//end checkGithubAuth()
+
 
     /**
      * Get a repository through the repositories of the given source
@@ -139,6 +141,7 @@ class GithubApiService
         return $repository;
 
     }//end getRepository()
+
 
     /**
      * This function create or get the component of the repository.

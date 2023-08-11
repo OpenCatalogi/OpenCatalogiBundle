@@ -39,35 +39,40 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'DeveloperOverheidApiToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched apis from the developer overheid source.',
-            'required'    => ['source', 'componentMapping', 'componentSchema', 'endpoint'],
+            'required'    => [
+                'source',
+                'componentMapping',
+                'componentSchema',
+                'endpoint',
+            ],
             'properties'  => [
-                'source' => [
+                'source'           => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
                 'componentMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for developer overheid apis to oc component.',
                     'example'     => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
                     'reference'   => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'componentSchema' => [
+                'componentSchema'  => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'endpoint' => [
+                'endpoint'         => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/apis',
-                    'required'    => true
-                ]
+                    'required'    => true,
+                ],
             ],
         ];
 

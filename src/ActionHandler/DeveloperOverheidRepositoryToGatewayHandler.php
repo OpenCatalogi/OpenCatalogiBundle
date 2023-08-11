@@ -39,28 +39,32 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'DeveloperOverheidRepositoryToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched repositories from the developer overheid source.',
-            'required'    => ['source', 'schema', 'endpoint'],
+            'required'    => [
+                'source',
+                'schema',
+                'endpoint',
+            ],
             'properties'  => [
-                'source' => [
+                'source'   => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'schema' => [
+                'schema'   => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
                 'endpoint' => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/repositories',
-                    'required'    => true
-                ]
+                    'required'    => true,
+                ],
             ],
         ];
 

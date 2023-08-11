@@ -42,9 +42,9 @@ class GetResourcesService
 
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
-     * @param CallService            $callService      The Call Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
+     * @param EntityManagerInterface $entityManager         The Entity Manager Interface.
+     * @param CallService            $callService           The Call Service.
+     * @param LoggerInterface        $pluginLogger          The plugin version of the logger interface.
      * @param ImportResourcesService $importResourceService The Import Resources Service.
      */
     public function __construct(
@@ -53,9 +53,9 @@ class GetResourcesService
         LoggerInterface $pluginLogger,
         ImportResourcesService $importResourceService
     ) {
-        $this->entityManager    = $entityManager;
-        $this->callService      = $callService;
-        $this->pluginLogger     = $pluginLogger;
+        $this->entityManager         = $entityManager;
+        $this->callService           = $callService;
+        $this->pluginLogger          = $pluginLogger;
         $this->importResourceService = $importResourceService;
 
     }//end __construct()
@@ -64,9 +64,9 @@ class GetResourcesService
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      */
@@ -83,21 +83,23 @@ class GetResourcesService
         $this->entityManager->flush();
 
         return $result;
-    }
+
+    }//end getComponents()
+
 
     /**
      * Get a component of the given source with the given id.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param string $componentId The given component id
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param string $componentId   The given component id
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      */
     public function getComponent(Source $source, string $endpoint, string $componentId, array $configuration): ?array
     {
-        $response = $this->callService->call($source, $endpoint .'/'.$componentId);
+        $response  = $this->callService->call($source, $endpoint.'/'.$componentId);
         $component = json_decode($response->getBody()->getContents(), true);
 
         if ($component === null) {
@@ -116,14 +118,16 @@ class GetResourcesService
         $this->pluginLogger->info('Found component with id: '.$componentId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $component->toArray();
-    }
+
+    }//end getComponent()
+
 
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      */
@@ -140,21 +144,23 @@ class GetResourcesService
         $this->entityManager->flush();
 
         return $result;
-    }
+
+    }//end getRepositories()
+
 
     /**
      * Get a repository of the given source with the given id.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param string $repositoryId The given repository id
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param string $repositoryId  The given repository id
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      */
     public function getRepository(Source $source, string $endpoint, string $repositoryId, array $configuration): ?array
     {
-        $response = $this->callService->call($source, $endpoint .'/'.$repositoryId);
+        $response   = $this->callService->call($source, $endpoint.'/'.$repositoryId);
         $repository = json_decode($response->getBody()->getContents(), true);
 
         if ($repository === null) {
@@ -173,15 +179,17 @@ class GetResourcesService
         $this->pluginLogger->info('Found repository with id: '.$repositoryId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $repository->toArray();
-    }
+
+    }//end getRepository()
+
 
     /**
      * Get all applications of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
-     * 
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
+     *
      * @return array|null
      */
     public function getApplications(Source $source, string $endpoint, array $configuration): ?array
@@ -197,21 +205,23 @@ class GetResourcesService
         $this->entityManager->flush();
 
         return $result;
-    }
+
+    }//end getApplications()
+
 
     /**
      * Get an applications of the given source with the given id.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
      * @param string $applicationId The given application id
-     * @param array $configuration The configuration array
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      */
     public function getApplication(Source $source, string $endpoint, string $applicationId, array $configuration): ?array
     {
-        $response = $this->callService->call($source, $endpoint .'/'.$applicationId);
+        $response    = $this->callService->call($source, $endpoint.'/'.$applicationId);
         $application = json_decode($response->getBody()->getContents(), true);
 
         if ($application === null) {
@@ -230,6 +240,8 @@ class GetResourcesService
         $this->pluginLogger->info('Found application with id: '.$applicationId, ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         return $application->toArray();
-    }
+
+    }//end getApplication()
+
 
 }//end class

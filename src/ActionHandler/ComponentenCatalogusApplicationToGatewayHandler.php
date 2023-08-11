@@ -39,48 +39,55 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusApplicationToGatewayHandler',
             'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus source.',
-            'required'    => ['source', 'applicationMapping', 'applicationSchema', 'endpoint', 'componentMapping', 'componentSchema'],
+            'required'    => [
+                'source',
+                'applicationMapping',
+                'applicationSchema',
+                'endpoint',
+                'componentMapping',
+                'componentSchema',
+            ],
             'properties'  => [
-                'source' => [
+                'source'             => [
                     'type'        => 'string',
                     'description' => 'The source of the componenten catalogus.',
                     'example'     => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
                 'applicationMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for componenten catalogus application to oc application.',
                     'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
                     'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'applicationSchema' => [
+                'applicationSchema'  => [
                     'type'        => 'string',
                     'description' => 'The application schema.',
                     'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'endpoint' => [
+                'endpoint'           => [
                     'type'        => 'string',
                     'description' => 'The endpoint for the source.',
                     'example'     => '/products',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'componentMapping' => [
+                'componentMapping'   => [
                     'type'        => 'string',
                     'description' => 'The mapping for componenten catalogus component to oc component.',
                     'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
                     'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
-                'componentSchema' => [
+                'componentSchema'    => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
-                    'required'    => true
+                    'required'    => true,
                 ],
             ],
         ];
