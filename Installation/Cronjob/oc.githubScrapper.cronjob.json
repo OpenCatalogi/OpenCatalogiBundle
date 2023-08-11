@@ -7,6 +7,5 @@
     "crontab": "*/5 * * * *",
     "throws": [
         "opencatalogi.github"
-    ],
-    "isEnabled": false
+    ]
 }
