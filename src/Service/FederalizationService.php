@@ -502,9 +502,7 @@ class FederalizationService
         foreach ($object['embedded'] as $key => $value) {
             if (is_array($value) === true && isset($value['_self']['schema']['ref']) === false) {
                 foreach ($value as $subKey => $subValue) {
-                    $object[$key][$subKey] = $subValue;
-
-                    if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC)) {
+                    if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
                         $synchronization = $this->handleObject($subValue, $source);
                         if ($synchronization === null) {
                             $object[$key][$subKey] = null;
@@ -513,14 +511,14 @@ class FederalizationService
 
                         $this->entityManager->persist($synchronization);
                         $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
+                    
+                        continue;
                     }
+                    $object[$key][$subKey] = $this->preventCascading($subValue, $source);
                 }
 
                 continue;
             }
-
-            $object[$key] = $value;
-
             if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
                 $synchronization = $this->handleObject($value, $source);
                 if ($synchronization === null) {
@@ -530,7 +528,10 @@ class FederalizationService
 
                 $this->entityManager->persist($synchronization);
                 $object[$key] = $synchronization->getObject()->getId()->toString();
+            
+                continue;
             }
+            $object[$key] = $this->preventCascading($value, $source);
         }//end foreach
 
         unset($object['embedded']);
