@@ -262,6 +262,10 @@ class ImportResourcesService
             $name     = trim(\Safe\parse_url($repository['url'], PHP_URL_PATH), '/');
             // Get the repository from github so we can work with the repository id.
             $repository = $this->githubApiService->getRepository($name, $source);
+            if ($repository === null) {
+                return null;
+            }
+
             $repositoryId = $repository['id'];
         } else {
             // Use the source of developer.overheid.
