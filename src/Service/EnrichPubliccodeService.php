@@ -28,24 +28,9 @@ class EnrichPubliccodeService
     private CallService $callService;
 
     /**
-     * @var MappingService
-     */
-    private MappingService $mappingService;
-
-    /**
      * @var GithubPubliccodeService
      */
     private GithubPubliccodeService $githubService;
-
-    /**
-     * @var array
-     */
-    private array $configuration;
-
-    /**
-     * @var array
-     */
-    private array $data;
 
     /**
      * @var LoggerInterface
@@ -57,30 +42,44 @@ class EnrichPubliccodeService
      */
     private GatewayResourceService $resourceService;
 
+    /**
+     * @var GithubApiService
+     */
+    private GithubApiService $githubApiService;
+
+    /**
+     * @var array
+     */
+    private array $configuration;
+
+    /**
+     * @var array
+     */
+    private array $data;
+
 
     /**
      * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
      * @param CallService             $callService     The Call Service
-     * @param MappingService          $mappingService  The Mapping Service
      * @param GithubPubliccodeService $githubService   The Github Publiccode Service
      * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
      * @param GatewayResourceService  $resourceService The Gateway Resource Service.
+     * @param GithubApiService $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
-        MappingService $mappingService,
         GithubPubliccodeService $githubService,
         LoggerInterface $pluginLogger,
-        GatewayResourceService $resourceService
+        GatewayResourceService $resourceService,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager   = $entityManager;
         $this->callService     = $callService;
         $this->githubService   = $githubService;
-        $this->mappingService  = $mappingService;
         $this->pluginLogger    = $pluginLogger;
         $this->resourceService = $resourceService;
-
+        $this->githubApiService = $githubApiService;
         $this->configuration = [];
         $this->data          = [];
 
@@ -88,17 +87,20 @@ class EnrichPubliccodeService
 
 
     /**
-     * This function fetches repository data.
+     * This function gets the publiccode through the publiccode url
      *
-     * @param string $publiccodeUrl endpoint to request
+     * @param string $publiccodeUrl the publiccode url
      *
-     * @throws GuzzleException
+     * @throws GuzzleException|Exception
      *
-     * @return array|null|Response
+     * @return array|null
      */
-    public function getPubliccodeFromUrl(string $publiccodeUrl)
+    public function getPubliccodeFromUrl(string $publiccodeUrl): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        if ($this->githubApiService->checkGithubAuth($source) === false) {
+            return null;
+        }//end if
 
         try {
             $response = $this->callService->call($source, '/'.$publiccodeUrl);
@@ -107,7 +109,7 @@ class EnrichPubliccodeService
         }
 
         if (isset($response) === true) {
-            return $this->githubService->parsePubliccode($publiccodeUrl, $response);
+            return $this->githubService->parsePubliccode($publiccodeUrl, $response, $source);
         }
 
         return null;
@@ -119,7 +121,7 @@ class EnrichPubliccodeService
      * @param ObjectEntity $repository    The repository object.
      * @param string       $publiccodeUrl The publiccode url.
      *
-     * @throws GuzzleException
+     * @throws GuzzleException|Exception
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
@@ -127,8 +129,10 @@ class EnrichPubliccodeService
     {
         $url = trim(\Safe\parse_url($publiccodeUrl, PHP_URL_PATH), '/');
         if (($publiccode = $this->getPubliccodeFromUrl($url)) !== null) {
-            $this->githubService->mapPubliccode($repository, $publiccode);
+            $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration);
         }
+
+        $this->entityManager->flush();
 
         return $repository;
 
@@ -136,9 +140,11 @@ class EnrichPubliccodeService
 
 
     /**
-     * @param array|null  $data          Data set at the start of the handler.
-     * @param array|null  $configuration Configuration of the action.
-     * @param string|null $repositoryId  The repository id.
+     * @param array|null $data Data set at the start of the handler.
+     * @param array|null $configuration Configuration of the action.
+     * @param string|null $repositoryId The repository id.
+     *
+     * @throws Exception
      *
      * @return array dataset at the end of the handler
      */
@@ -152,26 +158,28 @@ class EnrichPubliccodeService
             if (($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) !== null) {
                 if (($publiccodeUrl = $repository->getValue('publiccode_url')) !== null) {
                     $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
-                }
-            } else {
-                $this->pluginLogger->error('Could not find given repository');
-            }
-        } else {
-            $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-            // If we want to do it for al repositories.
-            $this->pluginLogger->debug('Looping through repositories');
-            foreach ($repositoryEntity->getObjectEntities() as $repository) {
-                if (($publiccodeUrl = $repository->getValue('publiccode_url')) !== null) {
-                    $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
+                    return $this->data;
                 }
+            } 
+            
+            if($repository === null) {
+                $this->pluginLogger->error('Could not find given repository');
+                
+                return $this->data;
             }
         }
 
-        $this->entityManager->flush();
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
-        $this->pluginLogger->debug('enrichPubliccodeHandler finished');
-
+        // If we want to do it for al repositories.
+        $this->pluginLogger->debug('Looping through repositories');
+        foreach ($repositorySchema->getObjectEntities() as $repository) {
+            if (($publiccodeUrl = $repository->getValue('publiccode_url')) !== null) {
+                $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
+            }
+        }
+        
         return $this->data;
 
     }//end enrichPubliccodeHandler()

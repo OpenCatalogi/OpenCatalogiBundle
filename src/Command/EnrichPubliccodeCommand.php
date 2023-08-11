@@ -58,19 +58,22 @@ class EnrichPubliccodeCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
-
+        $configuration = [
+            'githubSource' => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'componentMapping' => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+        ];
+        
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
-
-        $style->info('Execute enrichPubliccodeHandler');
-
+        
         if ($repositoryId === null) {
-            $this->enrichService->enrichPubliccodeHandler();
+            $this->enrichService->enrichPubliccodeHandler([], $configuration);
         }
 
         if ($repositoryId !== null
-            && empty($this->enrichService->enrichPubliccodeHandler([], [], $repositoryId)) === true
+            && empty($this->enrichService->enrichPubliccodeHandler([], $configuration, $repositoryId)) === true
         ) {
             return Command::FAILURE;
         }
