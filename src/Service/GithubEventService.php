@@ -174,10 +174,10 @@ class GithubEventService
             return null;
         }
 
-        $organizationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping            = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping            = $this->resourceService->getMapping($this->configuration['organisationMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->syncService->findSyncBySource($source, $organizationEntity, $organizationArray['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $organizationArray);
 
@@ -203,7 +203,7 @@ class GithubEventService
     {
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
         if ($this->githubApiService->checkGithubAuth($source) === false) {
             return null;
@@ -235,8 +235,8 @@ class GithubEventService
             return $this->data;
         }
 
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
         $repositoryArray = $this->githubApiService->getRepository($name, $source);
@@ -249,7 +249,7 @@ class GithubEventService
 
         $repositoryArray['name'] = str_replace('-', ' ', $repositoryArray['name']);
 
-        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['id']);
 
         $this->pluginLogger->debug('Mapping object '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
