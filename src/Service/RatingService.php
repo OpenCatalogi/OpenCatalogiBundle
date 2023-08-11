@@ -69,10 +69,9 @@ class RatingService
     /**
      * Create Rating for all components.
      *
-     *
      * @param ?array      $data          data set at the start of the handler (not needed here)
      * @param ?array      $configuration configuration of the action          (not needed here)
-     * @param string|null $componentId  optional component id.
+     * @param string|null $componentId   optional component id.
      *
      * @throws Exception
      *
@@ -119,12 +118,14 @@ class RatingService
         $this->entityManager->flush();
 
         return $component->toArray();
+
     }//end enrichComponentsWithRating()
+
 
     /**
      * Rate a component.
      *
-     * @param ObjectEntity $component    The component to rate.
+     * @param ObjectEntity $component The component to rate.
      *
      * @throws Exception
      *
@@ -132,7 +133,7 @@ class RatingService
      */
     public function rateComponent(ObjectEntity $component): ObjectEntity
     {
-        $ratingSchema    = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
+        $ratingSchema = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
 
         $ratingComponent = $this->ratingList($component);
 

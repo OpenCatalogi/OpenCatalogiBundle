@@ -60,9 +60,9 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'githubSource' => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'repositoryMapping' => 'https://api.github.com/oc.githubRepository.mapping.json',
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
             'repositoriesMapping' => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json',
         ];
 

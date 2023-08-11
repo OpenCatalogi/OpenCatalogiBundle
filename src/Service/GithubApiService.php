@@ -126,7 +126,7 @@ class GithubApiService
             $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
-        if (isset($response) === false){
+        if (isset($response) === false) {
             return null;
         }
 

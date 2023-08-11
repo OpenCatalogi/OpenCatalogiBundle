@@ -59,15 +59,15 @@ class EnrichPubliccodeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'githubSource' => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'githubSource'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
             'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
             'componentMapping' => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
         ];
-        
+
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
-        
+
         if ($repositoryId === null) {
             $this->enrichService->enrichPubliccodeHandler([], $configuration);
         }

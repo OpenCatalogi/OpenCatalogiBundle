@@ -62,13 +62,13 @@ class PublicCodeRatingCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'ratingSchema' => 'https://opencatalogi.nl/oc.rating.schema.json',
+            'ratingSchema'    => 'https://opencatalogi.nl/oc.rating.schema.json',
             'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
         ];
-        
+
         // Handle the command options
         $componentId = $input->getOption('component', false);
-        
+
         if ($componentId === null) {
             if ($this->ratingService->enrichComponentsWithRating([], $configuration) === null) {
                 return Command::FAILURE;

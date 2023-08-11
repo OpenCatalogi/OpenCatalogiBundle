@@ -76,13 +76,13 @@ class FindGithubRepositoryThroughOrganizationService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
-     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
-     * @param CallService             $callService     The Call Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface
-     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
-     * @param MappingService          $mappingService  The Mapping Service
-     * @param GithubApiService $githubApiService The Github API Service
+     * @param EntityManagerInterface  $entityManager    The Entity Manager Interface
+     * @param GithubPubliccodeService $githubService    The Github Publiccode Service
+     * @param CallService             $callService      The Call Service
+     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface
+     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
+     * @param MappingService          $mappingService   The Mapping Service
+     * @param GithubApiService        $githubApiService The Github API Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -93,14 +93,14 @@ class FindGithubRepositoryThroughOrganizationService
         MappingService $mappingService,
         GithubApiService $githubApiService
     ) {
-        $this->callService     = $callService;
-        $this->entityManager   = $entityManager;
-        $this->githubService   = $githubService;
-        $this->pluginLogger    = $pluginLogger;
-        $this->resourceService = $resourceService;
-        $this->mappingService  = $mappingService;
+        $this->callService      = $callService;
+        $this->entityManager    = $entityManager;
+        $this->githubService    = $githubService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
+        $this->mappingService   = $mappingService;
         $this->githubApiService = $githubApiService;
-        $this->yaml            = new Yaml();
+        $this->yaml             = new Yaml();
 
         $this->configuration = [];
         $this->data          = [];
@@ -112,7 +112,7 @@ class FindGithubRepositoryThroughOrganizationService
      * This function is searching for repositories containing a publiccode.yaml file.
      *
      * @param string $organizationName
-     * @param Source $source The given source.
+     * @param Source $source           The given source.
      *
      * @return array|null
      */
@@ -150,7 +150,7 @@ class FindGithubRepositoryThroughOrganizationService
      * This function is searching for repositories containing a publiccode.yaml file.
      *
      * @param string $organizationName used as path to fetch from
-     * @param Source $source The given source.
+     * @param Source $source           The given source.
      *
      * @throws Exception
      *
@@ -220,11 +220,10 @@ class FindGithubRepositoryThroughOrganizationService
      * @param string       $url          The url of the repository.
      * @param ObjectEntity $organization The organisation object.
      * @param string       $type         The type of the organisation.
-     * @param Source $source The given source.
+     * @param Source       $source       The given source.
      *
      * @return array|null
      * @throws GuzzleException|LoaderError|SyntaxError|Exception
-     *
      */
     public function getOrganisationRepo(string $url, ObjectEntity $organization, string $type, Source $source): ?ObjectEntity
     {

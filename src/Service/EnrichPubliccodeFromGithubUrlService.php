@@ -61,12 +61,12 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
-     * @param CallService             $callService     The Call Service
-     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
-     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
-     * @param GithubApiService $githubApiService The Github API Service.
+     * @param EntityManagerInterface  $entityManager    The Entity Manager Interface
+     * @param CallService             $callService      The Call Service
+     * @param GithubPubliccodeService $githubService    The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface.
+     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
+     * @param GithubApiService        $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -76,14 +76,14 @@ class EnrichPubliccodeFromGithubUrlService
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService
     ) {
-        $this->entityManager   = $entityManager;
-        $this->callService     = $callService;
-        $this->githubService   = $githubService;
-        $this->pluginLogger    = $pluginLogger;
-        $this->resourceService = $resourceService;
+        $this->entityManager    = $entityManager;
+        $this->callService      = $callService;
+        $this->githubService    = $githubService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
         $this->githubApiService = $githubApiService;
-        $this->configuration   = [];
-        $this->data            = [];
+        $this->configuration    = [];
+        $this->data             = [];
 
     }//end __construct()
 
@@ -205,9 +205,9 @@ class EnrichPubliccodeFromGithubUrlService
     /**
      * This function gets the publiccode through the repository url and enriches the object.
      *
-     * @param array|null $data data set at the start of the handler
-     * @param array|null $configuration configuration of the action
-     * @param string|null $repositoryId The given repository id
+     * @param array|null  $data          data set at the start of the handler
+     * @param array|null  $configuration configuration of the action
+     * @param string|null $repositoryId  The given repository id
      *
      * @return array dataset at the end of the handler
      * @throws Exception

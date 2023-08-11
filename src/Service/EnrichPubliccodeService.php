@@ -59,12 +59,12 @@ class EnrichPubliccodeService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager   The Entity Manager Interface
-     * @param CallService             $callService     The Call Service
-     * @param GithubPubliccodeService $githubService   The Github Publiccode Service
-     * @param LoggerInterface         $pluginLogger    The plugin version of the logger interface.
-     * @param GatewayResourceService  $resourceService The Gateway Resource Service.
-     * @param GithubApiService $githubApiService The Github API Service.
+     * @param EntityManagerInterface  $entityManager    The Entity Manager Interface
+     * @param CallService             $callService      The Call Service
+     * @param GithubPubliccodeService $githubService    The Github Publiccode Service
+     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface.
+     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
+     * @param GithubApiService        $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -74,14 +74,14 @@ class EnrichPubliccodeService
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService
     ) {
-        $this->entityManager   = $entityManager;
-        $this->callService     = $callService;
-        $this->githubService   = $githubService;
-        $this->pluginLogger    = $pluginLogger;
-        $this->resourceService = $resourceService;
+        $this->entityManager    = $entityManager;
+        $this->callService      = $callService;
+        $this->githubService    = $githubService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
         $this->githubApiService = $githubApiService;
-        $this->configuration = [];
-        $this->data          = [];
+        $this->configuration    = [];
+        $this->data             = [];
 
     }//end __construct()
 
@@ -140,9 +140,9 @@ class EnrichPubliccodeService
 
 
     /**
-     * @param array|null $data Data set at the start of the handler.
-     * @param array|null $configuration Configuration of the action.
-     * @param string|null $repositoryId The repository id.
+     * @param array|null  $data          Data set at the start of the handler.
+     * @param array|null  $configuration Configuration of the action.
+     * @param string|null $repositoryId  The repository id.
      *
      * @throws Exception
      *
@@ -161,11 +161,11 @@ class EnrichPubliccodeService
 
                     return $this->data;
                 }
-            } 
-            
-            if($repository === null) {
+            }
+
+            if ($repository === null) {
                 $this->pluginLogger->error('Could not find given repository');
-                
+
                 return $this->data;
             }
         }
@@ -179,7 +179,7 @@ class EnrichPubliccodeService
                 $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
             }
         }
-        
+
         return $this->data;
 
     }//end enrichPubliccodeHandler()

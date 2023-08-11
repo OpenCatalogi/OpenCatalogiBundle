@@ -112,16 +112,18 @@ class GithubPubliccodeService
         $this->pluginLogger     = $pluginLogger;
         $this->yaml             = new Yaml();
 
-        $this->data = [];
+        $this->data          = [];
         $this->configuration = [];
+
     }//end __construct()
+
 
     /**
      * This function searches for all repositories with a publiccode or one repository
      *
-     * @param array|null $data data set at the start of the handler
-     * @param array|null $configuration configuration of the action
-     * @param string|null $repositoryId The given repository id
+     * @param array|null  $data          data set at the start of the handler
+     * @param array|null  $configuration configuration of the action
+     * @param string|null $repositoryId  The given repository id
      *
      * @return array dataset at the end of the handler
      * @throws Exception
@@ -136,8 +138,8 @@ class GithubPubliccodeService
             return $this->getRepository($repositoryId);
         }
 
-
         return $this->getRepositories();
+
     }//end findGithubRepositories()
 
 
@@ -189,7 +191,6 @@ class GithubPubliccodeService
      * @throws GuzzleException|LoaderError|SyntaxError
      *
      * @return array|null The imported repository as array.
-     *
      */
     public function getRepository(string $repositoryId): ?array
     {
@@ -214,29 +215,30 @@ class GithubPubliccodeService
             return null;
         }//end if
 
-        $repositoryMapping = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
+        $repositoryMapping  = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
         $repository['name'] = str_replace('-', ' ', $repository['name']);
 
         return $this->importRepository($repository, $repository['id'], $repositoryMapping);
+
     }//end getRepository()
+
 
     /**
      * Maps a repository object and creates/updates a Synchronization.
      *
-     * @param array $repository The repository array that will be imported
-     * @param string $repositoryId The id of the repository to find the sync object
+     * @param array   $repository        The repository array that will be imported
+     * @param string  $repositoryId      The id of the repository to find the sync object
      * @param Mapping $repositoryMapping The mapping of the repository
      *
      * @throws GuzzleException|LoaderError|SyntaxError|Exception
      *
      * @return array The repository object as array
-     *
      */
     public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping): array
     {
         // Do we have a source
-        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        $repositorySchema  = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryId);
         $synchronization->setMapping($repositoryMapping);
@@ -245,7 +247,7 @@ class GithubPubliccodeService
 
         $repositoryObject = $synchronization->getObject();
 
-        $this->pluginLogger->debug('Mapped object'.$repositoryObject->getValue('name').'. '. 'With the mapping object ' . $repositoryMapping->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Mapped object'.$repositoryObject->getValue('name').'. '.'With the mapping object '.$repositoryMapping->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $component = $this->githubApiService->connectComponent($repositoryObject);
         if ($component !== null) {
@@ -528,18 +530,17 @@ class GithubPubliccodeService
     /**
      * This function maps the publiccode to a component.
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param array        $publiccode The publiccode array for updating the component object.
-     * @param array $configuration The configuration array
+     * @param ObjectEntity $repository    The repository object.
+     * @param array        $publiccode    The publiccode array for updating the component object.
+     * @param array        $configuration The configuration array
      *
      * @throws Exception
      *
      * @return ObjectEntity|null The repository with the updated component from the publiccode url.
-     *
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration): ?ObjectEntity
     {
-        $componentEntity   = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentEntity  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
 
         if (($component = $repository->getValue('component')) === false) {
@@ -581,7 +582,6 @@ class GithubPubliccodeService
      * @throws Exception
      *
      * @return array|null The parsed publiccode of the given repository.
-     *
      */
     public function parsePubliccode(string $repositoryUrl, $response, Source $source): ?array
     {
@@ -607,5 +607,6 @@ class GithubPubliccodeService
         return null;
 
     }//end parsePubliccode()
+
 
 }//end class

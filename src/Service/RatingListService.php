@@ -35,8 +35,8 @@ class RatingListService
 
 
     /**
-     * @param GithubApiService       $githubApiService The github Api Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
+     * @param GithubApiService $githubApiService The github Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface.
      */
     public function __construct(
         GithubApiService $githubApiService,
@@ -53,8 +53,8 @@ class RatingListService
     /**
      * Rates the name of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -77,8 +77,8 @@ class RatingListService
     /**
      * Rates the url of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -120,8 +120,8 @@ class RatingListService
     /**
      * Rates the landing url of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -144,8 +144,8 @@ class RatingListService
     /**
      * Rates the software version of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -168,8 +168,8 @@ class RatingListService
     /**
      * Rates the release date of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -192,8 +192,8 @@ class RatingListService
     /**
      * Rates the logo of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -216,8 +216,8 @@ class RatingListService
     /**
      * Rates the roadmap of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -240,8 +240,8 @@ class RatingListService
     /**
      * Rates the development status of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -264,8 +264,8 @@ class RatingListService
     /**
      * Rates the software type of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -288,8 +288,8 @@ class RatingListService
     /**
      * Rates the platforms of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -312,8 +312,8 @@ class RatingListService
     /**
      * Rates the categories of the component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $ratingArray The rating array.
+     * @param ObjectEntity $component   The component to rate.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -337,7 +337,7 @@ class RatingListService
      * Rates the localised name of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -361,7 +361,7 @@ class RatingListService
      * Rates the short description of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -385,7 +385,7 @@ class RatingListService
      * Rates the long description of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -409,7 +409,7 @@ class RatingListService
      * Rates the api documentation of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -433,7 +433,7 @@ class RatingListService
      * Rates the features of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -457,7 +457,7 @@ class RatingListService
      * Rates the screenshots of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -481,7 +481,7 @@ class RatingListService
      * Rates the screenshots of the description.
      *
      * @param ObjectEntity $descriptionObject The description to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -505,7 +505,7 @@ class RatingListService
      * Rates the license of the legal object.
      *
      * @param ObjectEntity $legalObject The legal object to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -529,7 +529,7 @@ class RatingListService
      * Rates the copy right owner.
      *
      * @param ObjectEntity $mainOwnerObject The main copyright owner to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray     The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -553,7 +553,7 @@ class RatingListService
      * Rates the repo owner.
      *
      * @param ObjectEntity $repoOwnerObject The repo owner to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray     The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -577,7 +577,7 @@ class RatingListService
      * Rates the authors file of the legal object.
      *
      * @param ObjectEntity $legalObject The legal object to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -601,7 +601,7 @@ class RatingListService
      * Rates the type of the maintenace object.
      *
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -625,7 +625,7 @@ class RatingListService
      * Rates the type of the maintenace object.
      *
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
@@ -649,7 +649,7 @@ class RatingListService
      * Rates the type of the maintenace object.
      *
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
-     * @param array $ratingArray The rating array.
+     * @param array        $ratingArray       The rating array.
      *
      * @return array Dataset at the end of the handler.
      */
