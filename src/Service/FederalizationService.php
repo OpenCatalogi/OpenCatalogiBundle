@@ -511,14 +511,16 @@ class FederalizationService
 
                         $this->entityManager->persist($synchronization);
                         $object[$key][$subKey] = $synchronization->getObject()->getId()->toString();
-                    
+
                         continue;
                     }
+
                     $object[$key][$subKey] = $this->preventCascading($subValue, $source);
                 }
 
                 continue;
             }
+
             if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
                 $synchronization = $this->handleObject($value, $source);
                 if ($synchronization === null) {
@@ -528,9 +530,10 @@ class FederalizationService
 
                 $this->entityManager->persist($synchronization);
                 $object[$key] = $synchronization->getObject()->getId()->toString();
-            
+
                 continue;
             }
+
             $object[$key] = $this->preventCascading($value, $source);
         }//end foreach
 
