@@ -12,6 +12,7 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Log\LoggerInterface;
 
 class GithubApiService
@@ -117,7 +118,15 @@ class GithubApiService
     {
         $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
-        $response = $this->callService->call($source, '/repos/'.$name);
+        try {
+            $response = $this->callService->call($source, '/repos/'.$name);
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === false){
+            return null;
+        }
 
         $repository = json_decode($response->getBody()->getContents(), true);
 
