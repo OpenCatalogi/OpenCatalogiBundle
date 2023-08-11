@@ -3,7 +3,7 @@
     "$id": "https://opencatalogi.nl/cronjob/oc.openCatalogi.cronjob.json",
     "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
     "version": "0.0.1",
-    "description": "This cronjob fires all the open catalogi actions ever 5 minutes",
+    "description": "This cronjob fires the opencatalogi actions that enriches the repositories, components and organizations ever 5 minutes",
     "crontab": "*/5 * * * *",
     "throws": [
         "opencatalogi.default.listens"
