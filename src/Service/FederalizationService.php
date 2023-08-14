@@ -386,14 +386,41 @@ class FederalizationService
                 $this->style->writeln('Created a new Source for '.$source->getValue('location'));
             }
         }
-
-        $synchronization = $this->syncService->findSyncBySource($source, $entity, $sourceSync['sourceId']);
-
+    
+        // Find the Synchronization
+        $synchronization = $this->findSync($source, $entity, $sourceSync['sourceId']);
         $synchronization->setEndpoint($sourceSync['endpoint']);
 
         return $synchronization;
 
     }//end getSourceSync()
+    
+    
+    /**
+     * First look into the unitOfWork if the Synchronization already 'exists', in case we haven't flushed it yet.
+     * If it doesn't exit there we can look into DB and else create a new Synchronization.
+     *
+     * @param Source $source   The source that is requested
+     * @param Entity $entity   The entity that is requested
+     * @param string $sourceId The id of the object in the source
+     *
+     * @return Synchronization|null A Synchronization found, else null.
+     */
+    private function findSync(Source $source, Entity $entity, string $sourceId): ?Synchronization
+    {
+        // In case we haven't flushed the previous synchronizations yet, also check unitOfWork.
+        foreach ($this->entityManager->getUnitOfWork()->getScheduledEntityInsertions() as $insertion) {
+            if ($insertion instanceof Synchronization === true
+                && $insertion->getSource() === $source
+                && $insertion->getEntity() === $entity
+                && $insertion->getSourceId() === $sourceId
+            ) {
+                return $insertion;
+            }
+        }
+        
+        return $this->syncService->findSyncBySource($source, $entity, $sourceId);
+    }
 
 
     /**
@@ -462,7 +489,8 @@ class FederalizationService
             $synchronization = $this->getSourceSync($entity, $baseSync);
         } else {
             // This catalogi is the source so let's roll. Note: this is the most reliable way to find id's of objects!
-            $synchronization = $this->syncService->findSyncBySource($source, $entity, $object['_self']['id']);
+            
+            $synchronization = $this->findSync($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
         }
 
@@ -474,6 +502,16 @@ class FederalizationService
         }
 
         $this->alreadySynced[] = $synchronization->getId()->toString();
+    
+        // The preventCascading function needs $synchronization to have a ->getObject()->getId()
+        if ($synchronization->getObject() === null) {
+            $objectEntity = new ObjectEntity($synchronization->getEntity());
+            // Let's prevent warning overload about users:
+            $objectEntity = $this->syncService->setDefaultOwner($objectEntity);
+            $this->entityManager->persist($objectEntity);
+            $synchronization->setObject($objectEntity);
+            $this->entityManager->persist($synchronization);
+        }
 
         // Lets sync
         $object          = $this->preventCascading($object, $source);
