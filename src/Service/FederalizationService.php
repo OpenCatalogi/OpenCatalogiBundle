@@ -221,6 +221,8 @@ class FederalizationService
 
         $sourceObject = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $source->getValue('location')]);
 
+        // todo: maybe use callService here to (double)check if the $sourceObject Source really doesn't have a Catalogi with $this->currentDomain as embedded.source.location.
+        
         $newCatalogi = [
             "source" => [
                 "name"        => preg_replace('/^api\./', '', $this->currentDomain).' Source',
