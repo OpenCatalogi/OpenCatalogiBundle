@@ -386,7 +386,7 @@ class FederalizationService
                 $this->style->writeln('Created a new Source for '.$source->getValue('location'));
             }
         }
-    
+
         // Find the Synchronization
         $synchronization = $this->findSync($source, $entity, $sourceSync['sourceId']);
         $synchronization->setEndpoint($sourceSync['endpoint']);
@@ -394,8 +394,8 @@ class FederalizationService
         return $synchronization;
 
     }//end getSourceSync()
-    
-    
+
+
     /**
      * First look into the unitOfWork if the Synchronization already 'exists', in case we haven't flushed it yet.
      * If it doesn't exit there we can look into DB and else create a new Synchronization.
@@ -418,9 +418,10 @@ class FederalizationService
                 return $insertion;
             }
         }
-        
+
         return $this->syncService->findSyncBySource($source, $entity, $sourceId);
-    }
+
+    }//end findSync()
 
 
     /**
@@ -489,7 +490,6 @@ class FederalizationService
             $synchronization = $this->getSourceSync($entity, $baseSync);
         } else {
             // This catalogi is the source so let's roll. Note: this is the most reliable way to find id's of objects!
-            
             $synchronization = $this->findSync($source, $entity, $object['_self']['id']);
             $synchronization->setEndpoint($endpoint);
         }
@@ -502,7 +502,7 @@ class FederalizationService
         }
 
         $this->alreadySynced[] = $synchronization->getId()->toString();
-    
+
         // The preventCascading function needs $synchronization to have a ->getObject()->getId()
         if ($synchronization->getObject() === null) {
             $objectEntity = new ObjectEntity($synchronization->getEntity());
