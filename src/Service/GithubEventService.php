@@ -160,7 +160,7 @@ class GithubEventService
      * @param string $organizationName The name of the organization
      * @param Source $source           The github api source.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */
@@ -196,7 +196,7 @@ class GithubEventService
      *
      * @param array $githubEvent The github event data from the request.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */
@@ -279,7 +279,7 @@ class GithubEventService
      * @param ?array $data          Data set at the start of the handler.
      * @param ?array $configuration Configuration of the action.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */

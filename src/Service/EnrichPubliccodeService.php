@@ -98,7 +98,9 @@ class EnrichPubliccodeService
     public function getPubliccodeFromUrl(string $publiccodeUrl): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        if ($this->githubApiService->checkGithubAuth($source) === false) {
+        if ($source === null
+            || $this->githubApiService->checkGithubAuth($source) === false
+        ) {
             return null;
         }//end if
 

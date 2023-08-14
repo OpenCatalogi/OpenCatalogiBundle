@@ -130,7 +130,7 @@ class GithubApiService
             return null;
         }
 
-        $repository = json_decode($response->getBody()->getContents(), true);
+        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
 
         if ($repository === null) {
             $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);

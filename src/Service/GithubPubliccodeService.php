@@ -125,10 +125,10 @@ class GithubPubliccodeService
      * @param array|null  $configuration configuration of the action
      * @param string|null $repositoryId  The given repository id
      *
-     * @return array dataset at the end of the handler
+     * @return array|null dataset at the end of the handler
      * @throws Exception
      */
-    public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): array
+    public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
@@ -188,7 +188,7 @@ class GithubPubliccodeService
      *
      * @param string $repositoryId The id of the repository.
      *
-     * @throws GuzzleException|LoaderError|SyntaxError
+     * @throws GuzzleException|LoaderError|SyntaxError|Exception
      *
      * @return array|null The imported repository as array.
      */

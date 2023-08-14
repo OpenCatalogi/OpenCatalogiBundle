@@ -101,7 +101,9 @@ class EnrichPubliccodeFromGithubUrlService
     {
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
 
-        if ($this->githubApiService->checkGithubAuth($source) === false) {
+        if ($source === null
+            || $this->githubApiService->checkGithubAuth($source) === false
+        ) {
             return null;
         }//end if
 
@@ -139,6 +141,10 @@ class EnrichPubliccodeFromGithubUrlService
     public function getPubliccodeFromRawUserContent(string $repositoryUrl): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($source === null) {
+            return $this->data;
+        }
 
         $possibleEndpoints = [
             '/'.$repositoryUrl.'/main/publiccode.yaml',

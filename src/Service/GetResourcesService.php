@@ -125,11 +125,12 @@ class GetResourcesService
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param array  $configuration The configuration array
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param array $configuration The configuration array
      *
      * @return array|null
+     * @throws \Exception
      */
     public function getRepositories(Source $source, string $endpoint, array $configuration): ?array
     {
@@ -138,7 +139,7 @@ class GetResourcesService
 
         $result = [];
         foreach ($repositories as $repository) {
-            $result[] = $this->importResourceService->importRepository($repository, $configuration);
+            $result[] = $this->importResourceService->importDevRepository($repository, $configuration);
         }
 
         $this->entityManager->flush();
@@ -151,12 +152,13 @@ class GetResourcesService
     /**
      * Get a repository of the given source with the given id.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param string $repositoryId  The given repository id
-     * @param array  $configuration The configuration array
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
+     * @param string $repositoryId The given repository id
+     * @param array $configuration The configuration array
      *
      * @return array|null
+     * @throws \Exception
      */
     public function getRepository(Source $source, string $endpoint, string $repositoryId, array $configuration): ?array
     {
@@ -169,7 +171,7 @@ class GetResourcesService
             return null;
         }
 
-        $repository = $this->importResourceService->importRepository($repository, $configuration);
+        $repository = $this->importResourceService->importDevRepository($repository, $configuration);
         if ($repository === null) {
             return null;
         }
@@ -242,6 +244,119 @@ class GetResourcesService
         return $application->toArray();
 
     }//end getApplication()
+
+    /**
+     * This function fetches repository data.
+     *
+     * @param Source $source The github source
+     * @param string $slug endpoint to request
+     *
+     * @return array|null
+     */
+    public function getRepositoryFromUrl(Source $source, string $slug): ?array
+    {
+        try {
+            $response = $this->callService->call($source, '/repos/'.$slug);
+        } catch (Exception $e) {
+            $this->pluginLogger->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === true) {
+            $repository = $this->callService->decodeResponse($source, $response, 'application/json');
+            $this->pluginLogger->info("Fetch and decode went succesfull for /repos/$slug", ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return $repository;
+        }//end if
+
+        return null;
+
+    }//end getRepositoryFromUrl()
+
+    /**
+     * Get an organisation from https://api.github.com/orgs/{org}.
+     *
+     * @param Source $source The github source
+     * @param string $name The name of the organisation
+     * @param array $configuration The configuration array
+     *
+     * @return ObjectEntity|null
+     */
+    public function getOrganisation(Source $source, string $name, array $configuration): ?ObjectEntity
+    {
+        $this->pluginLogger->info('Getting organisation '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        try {
+            $response = $this->callService->call($source, '/orgs/'.$name);
+        } catch (Exception $e) {
+            $this->pluginLogger->error('Error found trying to fetch /orgs/'.$name.' '.$e->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === true) {
+            $organisation = json_decode($response->getBody()->getContents(), true);
+            $this->pluginLogger->info("Fetch and decode went succesfull for /orgs/$name", ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }//end if
+
+        if (isset($organisation) === false) {
+            $this->pluginLogger->error('Could not find an organisation with name: '.$name.' and with source: '.$source->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }//end if
+
+        $organisation = $this->importResourceService->importOrganisation($organisation, $configuration);
+        if ($organisation === null) {
+            return null;
+        }//end if
+
+        $this->entityManager->flush();
+
+        $this->pluginLogger->debug('Found organisation with name: '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $organisation;
+
+    }//end getOrganisation()
+
+    /**
+     * Get an organisation from https://api.github.com/orgs/{org}/repos.
+     *
+     * @param Source $source The github source
+     * @param string $name The name of the organisation
+     * @param array $configuration The configuration array
+     * @return array|null
+     * @throws \Exception
+     */
+    public function getOrganisationRepos(Source $source, string $name, array $configuration): ?array
+    {
+
+        $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
+
+        $repositories = json_decode($response->getBody()->getContents(), true);
+
+        if ($repositories === null) {
+            $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
+
+            return null;
+        }//end if
+
+        $owns = [];
+        foreach ($repositories as $repository) {
+            // Import the github repository.
+            $repositoryObject = $this->importResourceService->importGithubRepository($repository, $configuration);
+
+            // Get the connected component and set it to the owns array.
+            if ($component = $repositoryObject->getValue('component')) {
+                $owns[] = $component;
+                continue;
+            }//end if
+
+        }//end foreach
+
+        $this->pluginLogger->debug('Found '.count($owns).' repos from organisation with name: '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $owns;
+
+    }//end getOrganisationRepos()
+
 
 
 }//end class

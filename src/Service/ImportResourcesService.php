@@ -13,6 +13,8 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 /**
  *  This class handles the interaction with developer.overheid.nl.
@@ -96,6 +98,10 @@ class ImportResourcesService
     public function importRepositoryThroughComponent(array $componentArray, ObjectEntity $componentObject): ?ObjectEntity
     {
         $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        if ($repositoryEntity === null) {
+            return null;
+        }
+
         // If the component isn't already set to a repository create or get the repo and set it to the component url.
         if (key_exists('url', $componentArray) === true
             && key_exists('url', $componentArray['url']) === true
@@ -142,6 +148,11 @@ class ImportResourcesService
     {
         $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
         $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
+        if ($organisationEntity === null
+            || $legalEntity === null
+        ){
+            return null;
+        }
 
         // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
         if (key_exists('legal', $componentArray) === true
@@ -194,7 +205,7 @@ class ImportResourcesService
 
 
     /**
-     * @todo duplicate with ComponentenCatalogusService ?
+     * This function imports a component
      *
      * @param array $component     The component to import.
      * @param array $configuration The configuration array
@@ -207,6 +218,13 @@ class ImportResourcesService
         $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $schema  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($source === null
+            || $schema === null
+            || $mapping === null
+        ){
+            return null;
+        }
 
         $synchronization = $this->syncService->findSyncBySource($source, $schema, $component['id']);
 
@@ -244,22 +262,28 @@ class ImportResourcesService
 
 
     /**
-     * @todo duplicate with GithubPubliccodeService ?
+     * This function imports the repository of developer overheid
      *
-     * @param $repository
+     * @param array $repository
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
+     * @throws \Exception
      */
-    public function importRepository($repository, array $configuration): ?ObjectEntity
+    public function importDevRepository(array $repository, array $configuration): ?ObjectEntity
     {
-        $schema = $this->resourceService->getSchema($configuration['schema'], 'open-catalogi/open-catalogi-bundle');
+        $schema = $this->resourceService->getSchema($configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($schema === null) {
+            return null;
+        }
 
         if ($repository['source'] === 'github') {
             // Use the github source to import this repository.
             $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
             // Do we have the api key set of the source.
-            if ($this->githubApiService->checkGithubAuth($source) === false) {
+            if ($source === null
+                || $this->githubApiService->checkGithubAuth($source) === false
+            ) {
                 return null;
             }//end if
 
@@ -274,12 +298,60 @@ class ImportResourcesService
         } else {
             // Use the source of developer.overheid.
             $source = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
+            if ($source === null) {
+                return null;
+            }
             // Use the repository name as the id to sync.
             $repositoryId = $repository['name'];
         }//end if
 
         $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $synchronization = $this->syncService->findSyncBySource($source, $schema, $repositoryId);
+        $synchronization = $this->syncService->synchronize($synchronization, $repository);
+
+        $repositoryObject = $synchronization->getObject();
+
+        $component = $this->githubApiService->connectComponent($repositoryObject);
+        if ($component !== null) {
+            $repositoryObject->setValue('component', $component);
+            $this->entityManager->persist($repositoryObject);
+            $this->entityManager->flush();
+        }//end if
+
+        return $repositoryObject;
+
+    }//end importRepository()
+
+    /**
+     * This function import the repositories from github
+     *
+     * @param array $repository
+     * @param array $configuration The configuration array
+     *
+     * @return ObjectEntity|null
+     * @throws \Exception
+     */
+    public function importGithubRepository(array $repository, array $configuration): ?ObjectEntity
+    {
+        $schema = $this->resourceService->getSchema($configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping($configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($source === null
+            || $schema === null
+            || $mapping === null
+        ){
+            return null;
+        }
+        
+        // Do we have the api key set of the source.
+        if ($this->githubApiService->checkGithubAuth($source) === false) {
+            return null;
+        }//end if
+
+        $this->pluginLogger->info('Checking repository '.$repository['name'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $synchronization = $this->syncService->findSyncBySource($source, $schema, $repository['id']);
+        $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
@@ -311,6 +383,13 @@ class ImportResourcesService
         $schema  = $this->resourceService->getSchema($configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping = $this->resourceService->getMapping($configuration['applicationMapping'], 'open-catalogi/open-catalogi-bundle');
 
+        if ($source === null
+            || $schema === null
+            || $mapping === null
+        ){
+            return null;
+        }
+
         $synchronization = $this->syncService->findSyncBySource($source, $schema, $application['id']);
 
         $this->pluginLogger->debug('Mapping object '.$application['name'].' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
@@ -339,5 +418,39 @@ class ImportResourcesService
 
     }//end importApplication()
 
+    /**
+     * @param array $organisation The organization that is being imported
+     * @param array $configuration The configuration array
+     *
+     * @return ObjectEntity|null
+     */
+    public function importOrganisation(array $organisation, array $configuration): ?ObjectEntity
+    {
+        // Do we have a source?
+        $source              = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $organisationSchema  = $this->resourceService->getSchema($configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $organisationMapping = $this->resourceService->getMapping($configuration['organisationMapping'], 'open-catalogi/open-catalogi-bundle');
 
+        if ($source === null
+            || $organisationSchema === null
+            || $organisationMapping === null
+        ){
+            return null;
+        }
+
+        $synchronization = $this->syncService->findSyncBySource($source, $organisationSchema, $organisation['id']);
+
+        $this->pluginLogger->debug('Mapping object'.$organisation['login'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$organisationMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $this->pluginLogger->debug('Checking organisation '.$organisation['login'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $synchronization->setMapping($organisationMapping);
+        $synchronization = $this->syncService->synchronize($synchronization, $organisation);
+        $this->pluginLogger->debug('Organisation synchronization created with id: '.$synchronization->getId()->toString(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $synchronization->getObject();
+
+    }//end importOrganisation()
+
+    
 }//end class
