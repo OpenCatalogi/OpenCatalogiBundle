@@ -189,7 +189,7 @@ class FederalizationService
 
         return $data;
 
-    }//end catalogiHandler()
+    }//end federalizationHandler()
 
 
     /**
