@@ -60,6 +60,11 @@ class FindGithubRepositoryThroughOrganizationService
     private GithubApiService $githubApiService;
 
     /**
+     * @var ImportResourcesService
+     */
+    private ImportResourcesService $importResourcesService;
+
+    /**
      * @var Yaml
      */
     private Yaml $yaml;
@@ -83,6 +88,7 @@ class FindGithubRepositoryThroughOrganizationService
      * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
      * @param MappingService          $mappingService   The Mapping Service
      * @param GithubApiService        $githubApiService The Github API Service
+     * @param ImportResourcesService $importResourcesService The Import Resources Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -91,7 +97,8 @@ class FindGithubRepositoryThroughOrganizationService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService,
         MappingService $mappingService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        ImportResourcesService $importResourcesService
     ) {
         $this->callService      = $callService;
         $this->entityManager    = $entityManager;
@@ -100,6 +107,7 @@ class FindGithubRepositoryThroughOrganizationService
         $this->resourceService  = $resourceService;
         $this->mappingService   = $mappingService;
         $this->githubApiService = $githubApiService;
+        $this->importResourcesService = $importResourcesService;
         $this->yaml             = new Yaml();
 
         $this->configuration = [];
@@ -175,45 +183,6 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end getGithubRepoFromOrganization()
 
-
-    /**
-     * Get or create a component for the given repository.
-     *
-     * @param ObjectEntity $repositoryObject The repository object.
-     * @param ObjectEntity $organization     The organisation object.
-     * @param string       $type             The type of the organisation.
-     *
-     * @throws Exception
-     *
-     * @return array|null
-     */
-    public function setRepositoryComponent(ObjectEntity $repositoryObject, ObjectEntity $organization, string $type): ?ObjectEntity
-    {
-        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-
-        $component = $repositoryObject->getValue('component');
-        if ($component === false) {
-            $component = new ObjectEntity($componentSchema);
-        }//end if
-
-        $component->hydrate(
-            [
-                'name'   => $repositoryObject->getValue('name'),
-                'url'    => $repositoryObject,
-                // Set the organisation to usedBy if type is uses.
-                'usedBy' => $type == 'use' ? [$organization] : [],
-            ]
-        );
-        $repositoryObject->setValue('component', $component);
-        $this->entityManager->persist($repositoryObject);
-        $this->entityManager->persist($component);
-        $this->entityManager->flush();
-
-        return $component;
-
-    }//end setRepositoryComponent()
-
-
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
@@ -238,19 +207,21 @@ class FindGithubRepositoryThroughOrganizationService
         $response = $this->callService->call($source, '/repos/'.$name);
 
         $repository = json_decode($response->getBody()->getContents(), true);
-
         if ($repository === null) {
             $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
 
             return null;
         }//end if
 
-        $repositoryObject = $this->githubService->importRepository($repository);
-        $this->entityManager->persist($repositoryObject);
-        $this->entityManager->flush();
+        $repositoryObject = $this->importResourcesService->importGithubRepository($repository, $this->configuration);
         $this->pluginLogger->debug('Found repo from organisation with name: '.$name);
 
-        return $this->setRepositoryComponent($repositoryObject, $organization, $type);
+        if ($type === 'use') {
+            $component = $repositoryObject->getValue('component');
+            $component->setValue('usedBy', [$organization]);
+        }
+
+        return $repositoryObject;
 
     }//end getOrganisationRepo()
 
@@ -267,24 +238,33 @@ class FindGithubRepositoryThroughOrganizationService
     public function getOrganizationCatalogi(ObjectEntity $organization): void
     {
         // Do we have a source?
+        //usercontentSource
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        if ($this->githubApiService->checkGithubAuth($source) === false) {
+        $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+        if ($source === null
+            || $usercontentSource === null
+            || $this->githubApiService->checkGithubAuth($source) === false
+        ) {
             return;
         }//end if
 
-        if ($this->getGithubRepoFromOrganization($organization->getValue('name'), $source) === null) {
+        if (($githubRepo = $this->getGithubRepoFromOrganization($organization->getValue('name'), $source)) === null) {
             return;
         }//end if
 
         $this->pluginLogger->debug('Github repo found and fetched for '.$organization->getName());
 
-        if (($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'), $source)) === null) {
+        if (($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'), $usercontentSource)) === null) {
             return;
         }//end if
 
         $this->pluginLogger->debug('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
         $mapping           = $this->resourceService->getMapping($this->configuration['openCatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
+        if ($mapping === null) {
+            return;
+        }
+
         $organizationArray = $this->mappingService->mapping($mapping, $openCatalogi);
 
         $organization->hydrate($organizationArray);
