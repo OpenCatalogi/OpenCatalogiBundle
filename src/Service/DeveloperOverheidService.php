@@ -74,7 +74,7 @@ class DeveloperOverheidService
      *
      * @return array|null
      */
-    public function getDeveloperOverheidComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
+    public function getComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
@@ -82,6 +82,12 @@ class DeveloperOverheidService
         // Get the source from the configuration array.
         $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
+
+        if ($source === null
+            && $endpoint === null
+        ) {
+            return $this->data;
+        }
 
         if ($componentId === null) {
             return $this->getResourcesService->getComponents($source, $endpoint, $this->configuration);
@@ -101,7 +107,7 @@ class DeveloperOverheidService
      *
      * @return array|null
      */
-    public function getDeveloperOverheidRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
+    public function getRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
@@ -109,6 +115,12 @@ class DeveloperOverheidService
         // Get the source from the configuration array.
         $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
+
+        if ($source === null
+            && $endpoint === null
+        ) {
+            return $this->data;
+        }
 
         if ($repositoryId === null) {
             return $this->getResourcesService->getRepositories($source, $endpoint, $this->configuration);

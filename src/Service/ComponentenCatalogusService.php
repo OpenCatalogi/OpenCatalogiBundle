@@ -74,7 +74,7 @@ class ComponentenCatalogusService
      *
      * @return array|null
      */
-    public function getComponentenCatalogusApplications(?array $data=[], ?array $configuration=[], ?string $applicationId=null): ?array
+    public function getApplications(?array $data=[], ?array $configuration=[], ?string $applicationId=null): ?array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
@@ -82,6 +82,12 @@ class ComponentenCatalogusService
         // Get the source from the configuration array.
         $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
+
+        if ($source === null
+            && $endpoint === null
+        ) {
+            return $this->data;
+        }
 
         if ($applicationId === null) {
             return $this->getResourcesService->getApplications($source, $endpoint, $this->configuration);
@@ -101,7 +107,7 @@ class ComponentenCatalogusService
      *
      * @return array|null
      */
-    public function getComponentenCatalogusComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
+    public function getComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
     {
         $this->data          = $data;
         $this->configuration = $configuration;
@@ -109,6 +115,12 @@ class ComponentenCatalogusService
         // Get the source and endpoint from the configuration array.
         $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
+
+        if ($source === null
+            && $endpoint === null
+        ) {
+            return $this->data;
+        }
 
         if ($componentId === null) {
             return $this->getResourcesService->getComponents($source, $endpoint, $this->configuration);

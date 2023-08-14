@@ -59,23 +59,23 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'source'           => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+            'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
             'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
-            'endpoint'         => '/components',
+            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'endpoint' => '/components'
         ];
 
         // Handle the command options.
         $componentId = $input->getOption('component', false);
 
         if ($componentId === null) {
-            if (empty($this->compCatService->getComponentenCatalogusComponents([], $configuration)) === true) {
+            if (empty($this->compCatService->getComponents([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
         if ($componentId !== null
-            && empty($this->compCatService->getComponentenCatalogusComponents([], $configuration, $componentId)) === true
+            && empty($this->compCatService->getComponents([], $configuration, $componentId)) === true
         ) {
             return Command::FAILURE;
         }

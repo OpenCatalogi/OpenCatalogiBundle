@@ -80,7 +80,7 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the componenten catalogus componenten to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -89,7 +89,7 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getComponentenCatalogusComponents($data, $configuration);
+        return $this->service->getComponents($data, $configuration);
 
     }//end run()
 

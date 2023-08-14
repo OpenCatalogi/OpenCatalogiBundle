@@ -80,7 +80,7 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the developer overheid components to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -89,7 +89,7 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getDeveloperOverheidComponents($data, $configuration);
+        return $this->service->getComponents($data, $configuration);
 
     }//end run()
 

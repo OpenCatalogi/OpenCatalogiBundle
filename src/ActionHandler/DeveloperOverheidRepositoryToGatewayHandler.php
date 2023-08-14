@@ -41,7 +41,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
             'description' => 'This is a action to create objects from the fetched repositories from the developer overheid source.',
             'required'    => [
                 'source',
-                'schema',
+                'repositorySchema',
                 'endpoint',
             ],
             'properties'  => [
@@ -52,9 +52,9 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'required'    => true,
                 ],
-                'schema'   => [
+                'repositorySchema'   => [
                     'type'        => 'string',
-                    'description' => 'The component schema.',
+                    'description' => 'The repository schema.',
                     'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'required'    => true,
@@ -72,7 +72,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the developer overheid repositories to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -81,7 +81,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getDeveloperOverheidRepositories($data, $configuration);
+        return $this->service->getRepositories($data, $configuration);
 
     }//end run()
 
