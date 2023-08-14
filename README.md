@@ -32,7 +32,6 @@ OpenCatalogi kijkt standaard mee op:
 
 Deze bundle is beschikbaar onder [EUPL](https://eupl.eu/1.2/nl/) licentie.
 
-
 ## Backend Installation Instructions
 
 The OpenCatalogi backend codebase utilizes the Common Gateway as an open-source installation framework. This means that the OpenCatalogi library, in its core form, functions as a plugin on this Framework. To learn more about the Common Gateway, you can refer to the documentation [here](https://commongateway.readthedocs.io/en/latest/).
@@ -47,15 +46,15 @@ To install the backend, follow the steps below:
 
 ### OpenCatalogiBundle Installation - Admin-UI
 
-1. After successfully installing the Gateway, access the admin-ui and log in.
-2. In the left menu, navigate to "Plugins" to view a list of installed plugins. If you don't find the "OpenCatalogi" plugin listed here, you can search for it by clicking on "Search" in the upper-right corner and typing "OpenCatalogi" in the search bar.
-3. Click on the "OpenCatalogi" card and then click on the "Install" button to install the plugin.
-4. While the admin-ui allows you to install, upgrade, or remove bundles, to load all the required data (schemas, endpoints, sources), you need to execute the initialization command in a terminal.
+1.  After successfully installing the Gateway, access the admin-ui and log in.
+2.  In the left menu, navigate to "Plugins" to view a list of installed plugins. If you don't find the "OpenCatalogi" plugin listed here, you can search for it by clicking on "Search" in the upper-right corner and typing "OpenCatalogi" in the search bar.
+3.  Click on the "OpenCatalogi" card and then click on the "Install" button to install the plugin.
+4.  While the admin-ui allows you to install, upgrade, or remove bundles, to load all the required data (schemas, endpoints, sources), you need to execute the initialization command in a terminal.
 
 ### OpenCatalogiBundle Installation - Terminal
 
-1. Open a terminal and run the following command to install the OpenCatalogi bundle:
-```docker-compose exec php composer require open-catalogi/open-catalogi-bundle```
+1.  Open a terminal and run the following command to install the OpenCatalogi bundle:
+    `docker-compose exec php composer require open-catalogi/open-catalogi-bundle`
 
 ## Frontend Installation Instructions
 
@@ -63,21 +62,18 @@ For instructions on setting up the frontend, please refer to the [Frontend Repos
 
 ## Admin UI Configuration Instructions
 
-1. Scopes Configuration:
-- Add the following scopes under `Default Anonymous`:
-  ```
-  schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET
-  schemas.https://opencatalogi.nl/oc.application.schema.json.GET
-  schemas.https://opencatalogi.nl/oc.component.schema.json.GET
-  schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET
-  schemas.https://opencatalogi.nl/oc.repository.schema.json.GET
-  ```
+1.  Scopes Configuration:
 
-2. GitHub API Source Configuration:
-- Add your personal [GitHub token](https://github.com/settings/personal-access-tokens/new) as the API key:
-  ```
-  Bearer {{ here_a_github_token }}
-  ```
+*   Add the following scopes under `Default Anonymous`:
+        schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET
+        schemas.https://opencatalogi.nl/oc.application.schema.json.GET
+        schemas.https://opencatalogi.nl/oc.component.schema.json.GET
+        schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET
+        schemas.https://opencatalogi.nl/oc.repository.schema.json.GET
+
+2.  GitHub API Source Configuration:
+
+*   Add your personal [GitHub token](https://github.com/settings/personal-access-tokens/new) as the API key:
+        Bearer {{ here_a_github_token }}
 
 Please replace placeholders like `{{ here_a_github_token }}` with your actual GitHub token.
-
