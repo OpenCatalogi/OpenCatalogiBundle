@@ -3,8 +3,8 @@
     "$id": "https://opencatalogi.nl/cronjob/oc.federalization.cronjob.json",
     "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
     "version": "0.0.1",
-    "description": "This cronjob fires all the open catalogi federalization action ever night at 03:00",
-    "crontab": "0 3 * * *",
+    "description": "This cronjob fires all the open catalogi federalization action ever night at 02:00",
+    "crontab": "0 2 * * *",
     "throws": [
         "opencatalogi.federalization"
     ]
