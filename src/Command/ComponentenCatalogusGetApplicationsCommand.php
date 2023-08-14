@@ -60,12 +60,12 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+            'source'             => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
             'applicationMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
-            'applicationSchema' => 'https://opencatalogi.nl/oc.application.schema.json',
-            'endpoint' => '/products',
-            'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json'
+            'applicationSchema'  => 'https://opencatalogi.nl/oc.application.schema.json',
+            'endpoint'           => '/products',
+            'componentMapping'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+            'componentSchema'    => 'https://opencatalogi.nl/oc.component.schema.json',
         ];
 
         // Handle the command options.

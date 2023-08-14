@@ -57,7 +57,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'usercontentSource' => [
+                'usercontentSource'   => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
@@ -71,7 +71,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'required'    => true,
                 ],
-                'repositoryMapping' => [
+                'repositoryMapping'   => [
                     'type'        => 'string',
                     'description' => 'The mapping for github repository to oc repository.',
                     'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',

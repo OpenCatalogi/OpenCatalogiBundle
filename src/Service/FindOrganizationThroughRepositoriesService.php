@@ -55,10 +55,10 @@ class FindOrganizationThroughRepositoriesService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager    The entity manager
-     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface
-     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
-     * @param GetResourcesService $getResourcesService The Get Resource Service
+     * @param EntityManagerInterface $entityManager       The entity manager
+     * @param LoggerInterface        $pluginLogger        The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService     The Gateway Resource Service.
+     * @param GetResourcesService    $getResourcesService The Get Resource Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -66,9 +66,9 @@ class FindOrganizationThroughRepositoriesService
         GatewayResourceService $resourceService,
         GetResourcesService $getResourcesService
     ) {
-        $this->entityManager    = $entityManager;
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
+        $this->entityManager       = $entityManager;
+        $this->pluginLogger        = $pluginLogger;
+        $this->resourceService     = $resourceService;
         $this->getResourcesService = $getResourcesService;
 
         $this->configuration = [];

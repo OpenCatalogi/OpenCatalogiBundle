@@ -59,14 +59,14 @@ class FindOrganizationThroughRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'githubSource' => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'organisationSchema' => 'https://opencatalogi.nl/oc.organisation.schema.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'organisationSchema'  => 'https://opencatalogi.nl/oc.organisation.schema.json',
+            'componentSchema'     => 'https://opencatalogi.nl/oc.component.schema.json',
             'organisationMapping' => 'https://api.github.com/oc.githubOrganisation.mapping.json',
-            'repositoryMapping' => 'https://api.github.com/oc.githubRepository.mapping.json'
+            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
         ];
-        
+
         // Handle the command options
         $repositoryId = $input->getOption('repositoryId', false);
 

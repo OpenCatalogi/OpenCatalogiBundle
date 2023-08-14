@@ -95,7 +95,7 @@ class ComponentenCatalogusService
 
         return $this->getResourcesService->getApplication($source, $endpoint, $applicationId, $this->configuration);
 
-    }//end getComponentenCatalogusApplications()
+    }//end getApplications()
 
 
     /**
@@ -128,7 +128,7 @@ class ComponentenCatalogusService
 
         return $this->getResourcesService->getComponent($source, $endpoint, $componentId, $this->configuration);
 
-    }//end getComponentenCatalogusComponents()
+    }//end getComponents()
 
 
 }//end class

@@ -150,7 +150,7 @@ class ImportResourcesService
         $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
         if ($organisationEntity === null
             || $legalEntity === null
-        ){
+        ) {
             return null;
         }
 
@@ -222,7 +222,7 @@ class ImportResourcesService
         if ($source === null
             || $schema === null
             || $mapping === null
-        ){
+        ) {
             return null;
         }
 
@@ -301,6 +301,7 @@ class ImportResourcesService
             if ($source === null) {
                 return null;
             }
+
             // Use the repository name as the id to sync.
             $repositoryId = $repository['name'];
         }//end if
@@ -320,7 +321,8 @@ class ImportResourcesService
 
         return $repositoryObject;
 
-    }//end importRepository()
+    }//end importDevRepository()
+
 
     /**
      * This function import the repositories from github
@@ -333,17 +335,17 @@ class ImportResourcesService
      */
     public function importGithubRepository(array $repository, array $configuration): ?ObjectEntity
     {
-        $schema = $this->resourceService->getSchema($configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $source = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $schema  = $this->resourceService->getSchema($configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $source  = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $mapping = $this->resourceService->getMapping($configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
         if ($source === null
             || $schema === null
             || $mapping === null
-        ){
+        ) {
             return null;
         }
-        
+
         // Do we have the api key set of the source.
         if ($this->githubApiService->checkGithubAuth($source) === false) {
             return null;
@@ -365,7 +367,7 @@ class ImportResourcesService
 
         return $repositoryObject;
 
-    }//end importRepository()
+    }//end importGithubRepository()
 
 
     /**
@@ -386,7 +388,7 @@ class ImportResourcesService
         if ($source === null
             || $schema === null
             || $mapping === null
-        ){
+        ) {
             return null;
         }
 
@@ -418,8 +420,9 @@ class ImportResourcesService
 
     }//end importApplication()
 
+
     /**
-     * @param array $organisation The organization that is being imported
+     * @param array $organisation  The organization that is being imported
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
@@ -434,7 +437,7 @@ class ImportResourcesService
         if ($source === null
             || $organisationSchema === null
             || $organisationMapping === null
-        ){
+        ) {
             return null;
         }
 
@@ -452,5 +455,5 @@ class ImportResourcesService
 
     }//end importOrganisation()
 
-    
+
 }//end class

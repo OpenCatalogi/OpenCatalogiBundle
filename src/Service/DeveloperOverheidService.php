@@ -95,7 +95,7 @@ class DeveloperOverheidService
 
         return $this->getResourcesService->getComponent($source, $endpoint, $componentId, $this->configuration);
 
-    }//end getDeveloperOverheidComponents()
+    }//end getComponents()
 
 
     /**
@@ -128,7 +128,7 @@ class DeveloperOverheidService
 
         return $this->getResourcesService->getRepository($source, $endpoint, $repositoryId, $this->configuration);
 
-    }//end getDeveloperOverheidRepositories()
+    }//end getRepositories()
 
 
 }//end class

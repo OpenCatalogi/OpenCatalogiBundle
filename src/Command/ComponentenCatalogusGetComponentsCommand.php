@@ -59,10 +59,10 @@ class ComponentenCatalogusGetComponentsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'source' => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+            'source'           => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
             'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
-            'endpoint' => '/components'
+            'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
+            'endpoint'         => '/components',
         ];
 
         // Handle the command options.

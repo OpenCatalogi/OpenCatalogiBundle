@@ -125,9 +125,9 @@ class GetResourcesService
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -152,10 +152,10 @@ class GetResourcesService
     /**
      * Get a repository of the given source with the given id.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param string $repositoryId The given repository id
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param string $repositoryId  The given repository id
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -245,11 +245,12 @@ class GetResourcesService
 
     }//end getApplication()
 
+
     /**
      * This function fetches repository data.
      *
      * @param Source $source The github source
-     * @param string $slug endpoint to request
+     * @param string $slug   endpoint to request
      *
      * @return array|null
      */
@@ -272,12 +273,13 @@ class GetResourcesService
 
     }//end getRepositoryFromUrl()
 
+
     /**
      * Get an organisation from https://api.github.com/orgs/{org}.
      *
-     * @param Source $source The github source
-     * @param string $name The name of the organisation
-     * @param array $configuration The configuration array
+     * @param Source $source        The github source
+     * @param string $name          The name of the organisation
+     * @param array  $configuration The configuration array
      *
      * @return ObjectEntity|null
      */
@@ -315,12 +317,13 @@ class GetResourcesService
 
     }//end getOrganisation()
 
+
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
-     * @param Source $source The github source
-     * @param string $name The name of the organisation
-     * @param array $configuration The configuration array
+     * @param  Source $source        The github source
+     * @param  string $name          The name of the organisation
+     * @param  array  $configuration The configuration array
      * @return array|null
      * @throws \Exception
      */
@@ -348,7 +351,6 @@ class GetResourcesService
                 $owns[] = $component;
                 continue;
             }//end if
-
         }//end foreach
 
         $this->pluginLogger->debug('Found '.count($owns).' repos from organisation with name: '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -356,7 +358,6 @@ class GetResourcesService
         return $owns;
 
     }//end getOrganisationRepos()
-
 
 
 }//end class

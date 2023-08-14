@@ -45,21 +45,21 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                 'endpoint',
             ],
             'properties'  => [
-                'source'   => [
+                'source'           => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'required'    => true,
                 ],
-                'repositorySchema'   => [
+                'repositorySchema' => [
                     'type'        => 'string',
                     'description' => 'The repository schema.',
                     'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'required'    => true,
                 ],
-                'endpoint' => [
+                'endpoint'         => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/repositories',

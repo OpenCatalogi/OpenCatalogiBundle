@@ -60,15 +60,15 @@ class DeveloperOverheidGetComponentsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'source' => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+            'source'           => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
             'componentMapping' => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
-            'endpoint' => '/apis'
+            'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
+            'endpoint'         => '/apis',
         ];
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
-        
+
         if ($componentId === null) {
             if (empty($this->devOverheidService->getComponents([], $configuration)) === true) {
                 return Command::FAILURE;

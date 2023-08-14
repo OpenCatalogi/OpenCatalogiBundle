@@ -45,7 +45,7 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
                 'organisationSchema',
                 'componentSchema',
                 'organisationMapping',
-                'repositoryMapping'
+                'repositoryMapping',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -83,7 +83,7 @@ class FindOrganizationThroughRepositoriesHandler implements ActionHandlerInterfa
                     'reference'   => 'https://api.github.com/oc.githubOrganisation.mapping.json',
                     'required'    => true,
                 ],
-                'repositoryMapping' => [
+                'repositoryMapping'   => [
                     'type'        => 'string',
                     'description' => 'The mapping for github repository to oc repository.',
                     'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',

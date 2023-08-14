@@ -81,14 +81,14 @@ class FindGithubRepositoryThroughOrganizationService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager    The Entity Manager Interface
-     * @param GithubPubliccodeService $githubService    The Github Publiccode Service
-     * @param CallService             $callService      The Call Service
-     * @param LoggerInterface         $pluginLogger     The plugin version of the logger interface
-     * @param GatewayResourceService  $resourceService  The Gateway Resource Service.
-     * @param MappingService          $mappingService   The Mapping Service
-     * @param GithubApiService        $githubApiService The Github API Service
-     * @param ImportResourcesService $importResourcesService The Import Resources Service
+     * @param EntityManagerInterface  $entityManager          The Entity Manager Interface
+     * @param GithubPubliccodeService $githubService          The Github Publiccode Service
+     * @param CallService             $callService            The Call Service
+     * @param LoggerInterface         $pluginLogger           The plugin version of the logger interface
+     * @param GatewayResourceService  $resourceService        The Gateway Resource Service.
+     * @param MappingService          $mappingService         The Mapping Service
+     * @param GithubApiService        $githubApiService       The Github API Service
+     * @param ImportResourcesService  $importResourcesService The Import Resources Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -100,15 +100,15 @@ class FindGithubRepositoryThroughOrganizationService
         GithubApiService $githubApiService,
         ImportResourcesService $importResourcesService
     ) {
-        $this->callService      = $callService;
-        $this->entityManager    = $entityManager;
-        $this->githubService    = $githubService;
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
-        $this->mappingService   = $mappingService;
-        $this->githubApiService = $githubApiService;
+        $this->callService            = $callService;
+        $this->entityManager          = $entityManager;
+        $this->githubService          = $githubService;
+        $this->pluginLogger           = $pluginLogger;
+        $this->resourceService        = $resourceService;
+        $this->mappingService         = $mappingService;
+        $this->githubApiService       = $githubApiService;
         $this->importResourcesService = $importResourcesService;
-        $this->yaml             = new Yaml();
+        $this->yaml                   = new Yaml();
 
         $this->configuration = [];
         $this->data          = [];
@@ -183,6 +183,7 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end getGithubRepoFromOrganization()
 
+
     /**
      * Get an organisation from https://api.github.com/orgs/{org}/repos.
      *
@@ -238,8 +239,8 @@ class FindGithubRepositoryThroughOrganizationService
     public function getOrganizationCatalogi(ObjectEntity $organization): void
     {
         // Do we have a source?
-        //usercontentSource
-        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        // usercontentSource
+        $source            = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null
             || $usercontentSource === null
@@ -260,7 +261,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         $this->pluginLogger->debug('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
-        $mapping           = $this->resourceService->getMapping($this->configuration['openCatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
+        $mapping = $this->resourceService->getMapping($this->configuration['openCatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
         if ($mapping === null) {
             return;
         }

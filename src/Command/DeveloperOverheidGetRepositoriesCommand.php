@@ -60,9 +60,9 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = [
-            'source' => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+            'source'           => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
             'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'endpoint' => '/repositories'
+            'endpoint'         => '/repositories',
         ];
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
