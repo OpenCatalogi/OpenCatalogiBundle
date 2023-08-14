@@ -154,7 +154,7 @@ class FederalizationService
      *
      * @return array THe result data from the handler
      */
-    public function catalogiHandler(array $data=[], array $configuration=[]): array
+    public function federalizationHandler(array $data=[], array $configuration=[]): array
     {
         // Setup base data
         $this->prepareObjectEntities();

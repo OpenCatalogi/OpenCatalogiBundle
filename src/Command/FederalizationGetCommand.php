@@ -72,7 +72,7 @@ class FederalizationGetCommand extends Command
         $catalogusId = $input->getOption('catalogus', false);
 
         if ($catalogusId === null) {
-            $this->fedService->catalogiHandler();
+            $this->fedService->federalizationHandler();
         }
 
         if ($catalogusId !== null) {
