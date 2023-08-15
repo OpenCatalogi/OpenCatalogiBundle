@@ -546,30 +546,14 @@ class FederalizationService
             if (is_array($value) === true && isset($value['_self']['schema']['ref']) === false) {
                 // If this key (example: Components = [0={obj},1={obj}]) contains an array of objects.
                 foreach ($value as $subKey => $subValue) {
-                    if (in_array($subValue['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
-                        // Prevent this type of object from cascading. Sync it and set uuid instead.
-                        $object[$key] = $this->handleSubObject($object[$key], $source, $subKey, $subValue);
-
-                        continue;
-                    }
-
-                    // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
-                    $object[$key][$subKey] = $this->preventCascading($subValue, $source);
+                    $object[$key] = $this->handleSubObject($object[$key], $source, $subKey, $subValue);
                 }
 
                 continue;
             }
 
             // Else this key (example: Application = {object}) contains a single object.
-            if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
-                // Prevent this type of object from cascading. Sync it and set uuid instead.
-                $object = $this->handleSubObject($object, $source, $key, $value);
-
-                continue;
-            }
-
-            // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
-            $object[$key] = $this->preventCascading($value, $source);
+            $object = $this->handleSubObject($object, $source, $key, $value);
         }//end foreach
 
         unset($object['embedded']);
@@ -593,17 +577,24 @@ class FederalizationService
      */
     private function handleSubObject(array $object, Source $source, $key, array $value): array
     {
-        // Handle the sub-object so that we have a synchronization and object for it.
-        $synchronization = $this->handleObject($value, $source);
-        if ($synchronization === null) {
-            $object[$key] = null;
-
+        if (in_array($value['_self']['schema']['ref'], $this::SCHEMAS_TO_SYNC) === true) {
+            // Handle the sub-object so that we have a synchronization and object for it.
+            $synchronization = $this->handleObject($value, $source);
+            if ($synchronization === null) {
+                $object[$key] = null;
+        
+                return $object;
+            }
+    
+            $this->entityManager->persist($synchronization);
+            $object[$key] = $synchronization->getObject()->getId()->toString();
+    
             return $object;
         }
-
-        $this->entityManager->persist($synchronization);
-        $object[$key] = $synchronization->getObject()->getId()->toString();
-
+    
+        // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
+        $object[$key] = $this->preventCascading($value, $source);
+        
         return $object;
 
     }//end handleSubObject()
