@@ -582,19 +582,19 @@ class FederalizationService
             $synchronization = $this->handleObject($value, $source);
             if ($synchronization === null) {
                 $object[$key] = null;
-        
+
                 return $object;
             }
-    
+
             $this->entityManager->persist($synchronization);
             $object[$key] = $synchronization->getObject()->getId()->toString();
-    
+
             return $object;
         }
-    
+
         // Still cascade other "schema ref" objects like normal, but check for $this::SCHEMAS_TO_SYNC sub-objects.
         $object[$key] = $this->preventCascading($value, $source);
-        
+
         return $object;
 
     }//end handleSubObject()
