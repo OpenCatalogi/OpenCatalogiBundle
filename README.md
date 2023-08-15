@@ -65,15 +65,15 @@ For instructions on setting up the frontend, please refer to the [Frontend Repos
 1.  Scopes Configuration:
 
 *   Add the following scopes under `Default Anonymous`:
-        schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET
-        schemas.https://opencatalogi.nl/oc.application.schema.json.GET
-        schemas.https://opencatalogi.nl/oc.component.schema.json.GET
-        schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET
-        schemas.https://opencatalogi.nl/oc.repository.schema.json.GET
+    schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET
+    schemas.https://opencatalogi.nl/oc.application.schema.json.GET
+    schemas.https://opencatalogi.nl/oc.component.schema.json.GET
+    schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET
+    schemas.https://opencatalogi.nl/oc.repository.schema.json.GET
 
 2.  GitHub API Source Configuration:
 
 *   Add your personal [GitHub token](https://github.com/settings/personal-access-tokens/new) as the API key:
-        Bearer {{ here_a_github_token }}
+    Bearer {{ here\_a\_github\_token }}
 
 Please replace placeholders like `{{ here_a_github_token }}` with your actual GitHub token.
