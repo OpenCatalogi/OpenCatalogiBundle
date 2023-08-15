@@ -154,7 +154,7 @@ class FederalizationService
      *
      * @return array THe result data from the handler
      */
-    public function federalizationHandler(array $data = [], array $configuration = []): array
+    public function federalizationHandler(array $data=[], array $configuration=[]): array
     {
         // Setup base data
         $this->prepareObjectEntities();
@@ -646,7 +646,7 @@ class FederalizationService
      *
      * @return void
      */
-    private function getAppDomain(int $key = 0): void
+    private function getAppDomain(int $key=0): void
     {
         $this->currentDomain = 'localhost';
 
