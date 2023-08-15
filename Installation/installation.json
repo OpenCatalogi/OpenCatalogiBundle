@@ -90,6 +90,21 @@
         "path": ["search"],
         "pathRegex": "^(search)$",
         "methods": ["GET"]
+      },
+      {
+        "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.federalization.endpoint.json",
+        "version": "0.0.1",
+        "name": "Federalization Search",
+        "description": "Generic Federalization Search Endpoint",
+        "schemas": [
+          "https://opencatalogi.nl/oc.application.schema.json",
+          "https://opencatalogi.nl/oc.organisation.schema.json",
+          "https://opencatalogi.nl/oc.component.schema.json",
+          "https://opencatalogi.nl/oc.catalogi.schema.json"
+        ],
+        "path": ["federalization"],
+        "pathRegex": "^(federalization)$",
+        "methods": ["GET"]
       }
     ],
     "schemas": [

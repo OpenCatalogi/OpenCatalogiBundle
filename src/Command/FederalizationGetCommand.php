@@ -16,7 +16,7 @@ class FederalizationGetCommand extends Command
     /**
      * @var string
      */
-    protected static $defaultName = 'opencatalogi:fedaralization:get';
+    protected static $defaultName = 'opencatalogi:federalization:get';
 
     /**
      * @var FederalizationService
@@ -51,7 +51,7 @@ class FederalizationGetCommand extends Command
     {
         $this
             ->setDescription('This command gets al or a single catalogi from the federalized network')
-            ->setHelp('This command allows you to run further installation an configuration actions afther installing a plugin')
+            ->setHelp('This command allows you to run further installation an configuration actions after installing a plugin')
             ->addOption('catalogus', 'c', InputOption::VALUE_OPTIONAL, 'Get a single catalogue by id or name');
 
     }//end configure()
@@ -66,11 +66,13 @@ class FederalizationGetCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $style = new SymfonyStyle($input, $output);
+        $this->fedService->setStyle($style);
+
         // Handle the command options
         $catalogusId = $input->getOption('catalogus', false);
 
         if ($catalogusId === null) {
-            $this->fedService->catalogiHandler();
+            $this->fedService->federalizationHandler();
         }
 
         if ($catalogusId !== null) {
@@ -81,9 +83,9 @@ class FederalizationGetCommand extends Command
             }
 
             if ($catalogusObject === null) {
-                $style->error('Could not find object entity by id or name '.$catalogusId);
+                $style->error('Could not find ObjectEntity by id or name '.$catalogusId);
 
-                return 1;
+                return Command::FAILURE;
             }
 
             $this->fedService->readCatalogus($catalogusObject);

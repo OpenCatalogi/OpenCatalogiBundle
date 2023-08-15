@@ -8,7 +8,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService;
 /**
  * Handles the federalisation cron actions for open catalogi. e.g. getting data from other catalogi.
  */
-class CatalogiHandler implements ActionHandlerInterface
+class FederalizationHandler implements ActionHandlerInterface
 {
 
     /**
@@ -35,9 +35,9 @@ class CatalogiHandler implements ActionHandlerInterface
     public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://opencatalogi.nl/ActionHandler/CatalogiHandler.ActionHandler.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/FederalizationHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'CatalogiHandler',
+            'title'       => 'FederalizationHandler',
             'description' => 'Syncs  all the know catalogi',
             'required'    => [],
             'properties'  => [],
@@ -56,7 +56,7 @@ class CatalogiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->catalogiHandler($data, $configuration);
+        return $this->service->federalizationHandler($data, $configuration);
 
     }//end run()
 
