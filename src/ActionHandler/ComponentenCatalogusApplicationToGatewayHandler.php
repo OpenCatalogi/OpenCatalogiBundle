@@ -38,16 +38,65 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
             '$id'         => 'https://opencatalogi.nl/ActionHandler/ComponentenCatalogusApplicationToGatewayHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'ComponentenCatalogusApplicationToGatewayHandler',
-            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'    => [],
-            'properties'  => [],
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus source.',
+            'required'    => [
+                'source',
+                'applicationMapping',
+                'applicationSchema',
+                'endpoint',
+                'componentMapping',
+                'componentSchema',
+            ],
+            'properties'  => [
+                'source'             => [
+                    'type'        => 'string',
+                    'description' => 'The source of the componenten catalogus.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+                    'required'    => true,
+                ],
+                'applicationMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for componenten catalogus application to oc application.',
+                    'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+                    'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+                    'required'    => true,
+                ],
+                'applicationSchema'  => [
+                    'type'        => 'string',
+                    'description' => 'The application schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'required'    => true,
+                ],
+                'endpoint'           => [
+                    'type'        => 'string',
+                    'description' => 'The endpoint for the source.',
+                    'example'     => '/products',
+                    'required'    => true,
+                ],
+                'componentMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for componenten catalogus component to oc component.',
+                    'example'     => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+                    'reference'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+                    'required'    => true,
+                ],
+                'componentSchema'    => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the componenten catalogus application to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -56,7 +105,7 @@ class ComponentenCatalogusApplicationToGatewayHandler implements ActionHandlerIn
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getApplications();
+        return $this->service->getApplications($data, $configuration);
 
     }//end run()
 

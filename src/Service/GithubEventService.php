@@ -128,54 +128,6 @@ class GithubEventService
 
 
     /**
-     * Check the auth of the github source.
-     *
-     * @param Source $source The given source to check the api key.
-     *
-     * @return bool|null If the api key is set or not.
-     */
-    public function checkGithubAuth(Source $source): ?bool
-    {
-        if ($source->getApiKey() === null) {
-            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return false;
-        }//end if
-
-        return true;
-
-    }//end checkGithubAuth()
-
-
-    /**
-     * Get a repository through the repositories of developer.overheid.nl/repositories/{id}.
-     *
-     * @param string $name   The name of the repository.
-     * @param Source $source The source to sync from.
-     *
-     * @return array|null The imported repository as array.
-     */
-    public function getRepository(string $name, Source $source): ?array
-    {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        // $name     = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
-        $response = $this->callService->call($source, '/repos/'.$name);
-
-        $repository = json_decode($response->getBody()->getContents(), true);
-
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        return $repository;
-
-    }//end getRepository()
-
-
-    /**
      * Get a organization from the given name.
      *
      * @param string $name   The name of the organization.
@@ -208,7 +160,7 @@ class GithubEventService
      * @param string $organizationName The name of the organization
      * @param Source $source           The github api source.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */
@@ -223,10 +175,10 @@ class GithubEventService
             return null;
         }
 
-        $organizationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping            = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping            = $this->resourceService->getMapping($this->configuration['organisationMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $synchronization = $this->syncService->findSyncBySource($source, $organizationEntity, $organizationArray['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['id']);
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $organizationArray);
 
@@ -244,7 +196,7 @@ class GithubEventService
      *
      * @param array $githubEvent The github event data from the request.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */
@@ -252,9 +204,9 @@ class GithubEventService
     {
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
-        if ($this->checkGithubAuth($source) === false) {
+        if ($this->githubApiService->checkGithubAuth($source) === false) {
             return null;
         }//end if
 
@@ -284,11 +236,11 @@ class GithubEventService
             return $this->data;
         }
 
-        $repositoryEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $mapping          = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
-        $repositoryArray = $this->getRepository($name, $source);
+        $repositoryArray = $this->githubApiService->getRepository($name, $source);
         if ($repositoryArray === null) {
             // Return error if repository is not found.
             $this->data['response'] = new Response('Cannot find repository with url: '.$repositoryUrl, 404);
@@ -298,7 +250,7 @@ class GithubEventService
 
         $repositoryArray['name'] = str_replace('-', ' ', $repositoryArray['name']);
 
-        $synchronization = $this->syncService->findSyncBySource($source, $repositoryEntity, $repositoryArray['id']);
+        $synchronization = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['id']);
 
         $this->pluginLogger->debug('Mapping object '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$mapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -327,7 +279,7 @@ class GithubEventService
      * @param ?array $data          Data set at the start of the handler.
      * @param ?array $configuration Configuration of the action.
      *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
      *
      * @return array|null The data with the repository in the response array.
      */

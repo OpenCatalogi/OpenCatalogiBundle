@@ -38,16 +38,49 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
             '$id'         => 'https://opencatalogi.nl/ActionHandler/DeveloperOverheidApiToGatewayHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'DeveloperOverheidApiToGatewayHandler',
-            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'    => [],
-            'properties'  => [],
+            'description' => 'This is a action to create objects from the fetched apis from the developer overheid source.',
+            'required'    => [
+                'source',
+                'componentMapping',
+                'componentSchema',
+                'endpoint',
+            ],
+            'properties'  => [
+                'source'           => [
+                    'type'        => 'string',
+                    'description' => 'The source of the developer overheid.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+                    'required'    => true,
+                ],
+                'componentMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for developer overheid apis to oc component.',
+                    'example'     => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
+                    'reference'   => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
+                    'required'    => true,
+                ],
+                'componentSchema'  => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'required'    => true,
+                ],
+                'endpoint'         => [
+                    'type'        => 'string',
+                    'description' => 'The endpoint of the source.',
+                    'example'     => '/apis',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the developer overheid components to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -56,7 +89,7 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getComponents();
+        return $this->service->getComponents($data, $configuration);
 
     }//end run()
 

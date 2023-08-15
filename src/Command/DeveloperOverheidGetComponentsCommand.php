@@ -59,21 +59,24 @@ class DeveloperOverheidGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $configuration = [
+            'source'           => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
+            'componentMapping' => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
+            'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
+            'endpoint'         => '/apis',
+        ];
 
         // Handle the command options
         $componentId = $input->getOption('component', false);
 
-        $style->info('Execute getComponents');
-
         if ($componentId === null) {
-            if (empty($this->devOverheidService->getComponents()) === true) {
+            if (empty($this->devOverheidService->getComponents([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
         if ($componentId !== null
-            && empty($this->devOverheidService->getComponent($componentId)) === true
+            && empty($this->devOverheidService->getComponents([], $configuration, $componentId)) === true
         ) {
             return Command::FAILURE;
         }

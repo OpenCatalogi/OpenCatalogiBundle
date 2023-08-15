@@ -14,19 +14,9 @@ class RatingListService
 {
 
     /**
-     * @var EntityManagerInterface
-     */
-    private EntityManagerInterface $entityManager;
-
-    /**
      * @var GithubApiService
      */
     private GithubApiService $githubApiService;
-
-    /**
-     * @var GatewayResourceService
-     */
-    private GatewayResourceService $resourceService;
 
     /**
      * @var LoggerInterface
@@ -45,20 +35,14 @@ class RatingListService
 
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager.
-     * @param GithubApiService       $githubApiService The github Api Service.
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
+     * @param GithubApiService $githubApiService The github Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface.
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
         GithubApiService $githubApiService,
-        GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger
     ) {
-        $this->entityManager    = $entityManager;
         $this->githubApiService = $githubApiService;
-        $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
         $this->configuration    = [];
         $this->data             = [];
@@ -72,9 +56,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateName(ObjectEntity $component, array $ratingArray): array
     {
@@ -98,9 +80,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateUrl(ObjectEntity $component, array $ratingArray): array
     {
@@ -143,9 +123,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateLandingUrl(ObjectEntity $component, array $ratingArray): array
     {
@@ -169,9 +147,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateSoftwareVersion(ObjectEntity $component, array $ratingArray): array
     {
@@ -195,9 +171,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateReleaseDate(ObjectEntity $component, array $ratingArray): array
     {
@@ -221,9 +195,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateLogo(ObjectEntity $component, array $ratingArray): array
     {
@@ -247,9 +219,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateRoadmap(ObjectEntity $component, array $ratingArray): array
     {
@@ -273,9 +243,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateDevelopmentStatus(ObjectEntity $component, array $ratingArray): array
     {
@@ -299,9 +267,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateSoftwareType(ObjectEntity $component, array $ratingArray): array
     {
@@ -325,9 +291,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function ratePlatforms(ObjectEntity $component, array $ratingArray): array
     {
@@ -351,9 +315,7 @@ class RatingListService
      * @param ObjectEntity $component   The component to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateCategories(ObjectEntity $component, array $ratingArray): array
     {
@@ -377,9 +339,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateLocalisedName(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -403,9 +363,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateShortDescription(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -429,9 +387,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateLongDescription(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -455,9 +411,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateApiDocumentation(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -481,9 +435,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateFeatures(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -507,9 +459,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateScreenshots(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -533,9 +483,7 @@ class RatingListService
      * @param ObjectEntity $descriptionObject The description to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateVideos(ObjectEntity $descriptionObject, array $ratingArray): array
     {
@@ -559,9 +507,7 @@ class RatingListService
      * @param ObjectEntity $legalObject The legal object to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateLicense(ObjectEntity $legalObject, array $ratingArray): array
     {
@@ -585,9 +531,7 @@ class RatingListService
      * @param ObjectEntity $mainOwnerObject The main copyright owner to rate.
      * @param array        $ratingArray     The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateCopyOwner(ObjectEntity $mainOwnerObject, array $ratingArray): array
     {
@@ -611,9 +555,7 @@ class RatingListService
      * @param ObjectEntity $repoOwnerObject The repo owner to rate.
      * @param array        $ratingArray     The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateRepoOwner(ObjectEntity $repoOwnerObject, array $ratingArray): array
     {
@@ -637,9 +579,7 @@ class RatingListService
      * @param ObjectEntity $legalObject The legal object to rate.
      * @param array        $ratingArray The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateAuthorsFile(ObjectEntity $legalObject, array $ratingArray): array
     {
@@ -663,9 +603,7 @@ class RatingListService
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateType(ObjectEntity $maintenanceObject, array $ratingArray): array
     {
@@ -689,9 +627,7 @@ class RatingListService
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateContractors(ObjectEntity $maintenanceObject, array $ratingArray): array
     {
@@ -715,9 +651,7 @@ class RatingListService
      * @param ObjectEntity $maintenanceObject The maintenance object to rate.
      * @param array        $ratingArray       The rating array.
      *
-     * @throws Exception|GuzzleException
-     *
-     * @return ObjectEntity|null Dataset at the end of the handler.
+     * @return array Dataset at the end of the handler.
      */
     public function rateContacts(ObjectEntity $maintenanceObject, array $ratingArray): array
     {

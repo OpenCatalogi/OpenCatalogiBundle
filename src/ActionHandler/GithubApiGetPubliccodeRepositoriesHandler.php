@@ -39,8 +39,42 @@ class GithubApiGetPubliccodeRepositoriesHandler implements ActionHandlerInterfac
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'GithubApiGetPubliccodeRepositoriesHandler',
             'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
-            'required'    => [],
-            'properties'  => [],
+            'required'    => [
+                'githubSource',
+                'repositorySchema',
+                'repositoryMapping',
+                'repositoriesMapping',
+            ],
+            'properties'  => [
+                'githubSource'        => [
+                    'type'        => 'string',
+                    'description' => 'The source of the github api.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'repositorySchema'    => [
+                    'type'        => 'string',
+                    'description' => 'The repository schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'required'    => true,
+                ],
+                'repositoryMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for github repository to oc repository.',
+                    'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
+                    'required'    => true,
+                ],
+                'repositoriesMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for github repositories to oc repository.',
+                    'example'     => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()

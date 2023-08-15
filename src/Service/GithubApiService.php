@@ -3,6 +3,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
 use App\Entity\Entity;
+use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
@@ -11,6 +12,7 @@ use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use GuzzleHttp\Exception\ClientException;
 use Psr\Log\LoggerInterface;
 
 class GithubApiService
@@ -84,6 +86,61 @@ class GithubApiService
         $this->data          = [];
 
     }//end __construct()
+
+
+    /**
+     * Check the auth of the github source.
+     *
+     * @param Source $source The given source to check the api key.
+     *
+     * @return bool|null If the api key is set or not.
+     */
+    public function checkGithubAuth(Source $source): ?bool
+    {
+        if ($source->getApiKey() === null) {
+            $this->pluginLogger->error('No auth set for Source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return false;
+        }//end if
+
+        return true;
+
+    }//end checkGithubAuth()
+
+
+    /**
+     * Get a repository through the repositories of the given source
+     *
+     * @param string $name   The name of the repository.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported repository as array.
+     */
+    public function getRepository(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        try {
+            $response = $this->callService->call($source, '/repos/'.$name);
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === false) {
+            return null;
+        }
+
+        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
+
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }//end if
+
+        return $repository;
+
+    }//end getRepository()
 
 
     /**
