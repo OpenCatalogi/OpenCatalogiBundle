@@ -59,21 +59,24 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $configuration = [
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
+            'repositoriesMapping' => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json',
+        ];
 
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);
 
-        $style->info('Execute getRepositories');
-
         if ($repositoryId === null) {
-            if ($this->githubService->getRepositories() === false) {
+            if ($this->githubService->findGithubRepositories([], $configuration) === false) {
                 return Command::FAILURE;
             }
         }
 
         if ($repositoryId !== null
-            && $this->githubService->getRepository($repositoryId) === null
+            && $this->githubService->findGithubRepositories([], $configuration, $repositoryId) === null
         ) {
             return Command::FAILURE;
         }

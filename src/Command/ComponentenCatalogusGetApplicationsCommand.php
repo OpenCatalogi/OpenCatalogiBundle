@@ -2,6 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -58,20 +59,26 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $configuration = [
+            'source'             => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
+            'applicationMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
+            'applicationSchema'  => 'https://opencatalogi.nl/oc.application.schema.json',
+            'endpoint'           => '/products',
+            'componentMapping'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
+            'componentSchema'    => 'https://opencatalogi.nl/oc.component.schema.json',
+        ];
 
         // Handle the command options.
         $applicationId = $input->getOption('application', false);
-        $style->info('Execute getApplications');
 
         if ($applicationId === null) {
-            if ($this->compCatService->getApplications() === null) {
+            if ($this->compCatService->getApplications([], $configuration) === null) {
                 return Command::FAILURE;
             }
         }
 
         if ($applicationId !== null
-            && $this->compCatService->getApplication($applicationId) === null
+            && $this->compCatService->getApplications([], $configuration, $applicationId) === null
         ) {
             return Command::FAILURE;
         }

@@ -1,0 +1,11 @@
+{
+    "title": "Open Catalogi",
+    "$id": "https://opencatalogi.nl/cronjob/oc.rating.cronjob.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
+    "version": "0.0.1",
+    "description": "This cronjob fires the rating actionHandler ever 5 minutes",
+    "crontab": "*/5 * * * *",
+    "throws": [
+        "opencatalogi.rating.handler"
+    ]
+}

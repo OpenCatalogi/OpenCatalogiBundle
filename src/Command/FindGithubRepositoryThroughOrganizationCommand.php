@@ -59,22 +59,26 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $style = new SymfonyStyle($input, $output);
+        $configuration = [
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'usercontentSource'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
+            'organisationSchema'  => 'https://opencatalogi.nl/oc.organisation.schema.json',
+            'componentSchema'     => 'https://opencatalogi.nl/oc.component.schema.json',
+            'openCatalogiMapping' => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
+        ];
 
         // Handle the command options
         $organisationId = $input->getOption('organisationId', false);
 
-        $style->info('Execute findGithubRepositoryThroughOrganizationHandler');
-
         if ($organisationId === null) {
-            if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler()) === true) {
+            if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
-        if ($organisationId !== null
-            && empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], [], $organisationId)) === true
-        ) {
+        if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration, $organisationId)) === true) {
             return Command::FAILURE;
         }
 

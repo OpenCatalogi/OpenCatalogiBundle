@@ -39,8 +39,26 @@ class RatingHandler implements ActionHandlerInterface
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'RatingHandler',
             'description' => 'This handler sets the rating of a component',
-            'required'    => [],
-            'properties'  => [],
+            'required'    => [
+                'ratingSchema',
+                'componentSchema',
+            ],
+            'properties'  => [
+                'ratingSchema'    => [
+                    'type'        => 'string',
+                    'description' => 'The rating schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'required'    => true,
+                ],
+                'componentSchema' => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'required'    => true,
+                ],
+            ],
         ];
 
     }//end getConfiguration()
@@ -56,7 +74,12 @@ class RatingHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->ratingHandler($data, $configuration);
+        $componentId = null;
+        if (array_key_exists('id', $this->data['response']) === true) {
+            $componentId = $this->data['response']['id'];
+        }//end if
+
+        return $this->service->enrichComponentsWithRating([], $configuration, $componentId);
 
     }//end run()
 

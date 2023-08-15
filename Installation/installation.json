@@ -117,6 +117,14 @@
         "reference": "https://opencatalogi.nl/oc.repository.schema.json",
         "path": "repositories",
         "methods": []
+      },
+      {
+        "reference": "https://opencatalogi.nl/EventEndpoint/oc.githubEvent.endpoint.json",
+        "path": "github_events",
+        "methods": ["POST"],
+        "throws": [
+          "opencatalogi.githubevents.trigger"
+        ]
       }
     ]
   }

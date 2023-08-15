@@ -2,11 +2,10 @@
     "title": "Github scrapper",
     "$id": "https://opencatalogi.nl/cronjob/oc.githubScrapper.cronjob.json",
     "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
-    "version": "0.0.1",
-    "description": "This cronjob fires all the open catalogi github actions ever 5 minutes",
+    "version": "0.0.2",
+    "description": "This cronjob fires the search repositories with a publiccode file action ever 5 minutes",
     "crontab": "*/5 * * * *",
     "throws": [
         "opencatalogi.github"
-    ],
-    "isEnabled": false
+    ]
 }
