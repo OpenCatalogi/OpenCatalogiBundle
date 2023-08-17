@@ -391,9 +391,9 @@ class FederalizationService
             $source->setLocation($sourceSyncSource['location']);
             $this->entityManager->persist($source);
             $this->entityManager->flush();
-            $this->logger->info('Created a new Source for '.$source->getValue('location'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            $this->logger->info('Created a new Source for '.$source->getLocation(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             if (isset($this->style) === true) {
-                $this->style->writeln('Created a new Source for '.$source->getValue('location'));
+                $this->style->writeln('Created a new Source for '.$source->getLocation());
             }
         }
 
