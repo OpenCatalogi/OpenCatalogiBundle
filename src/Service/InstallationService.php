@@ -14,9 +14,9 @@ class InstallationService implements InstallerInterface
     private EntityManagerInterface $entityManager;
 
     /**
-     * For these schemas we want to set max depth to 1, not to 5
+     * For these schemas we want to set max depth to 2, not to 5
      */
-    private const MAX_DEPTH_1 = [
+    private const MAX_DEPTH_2 = [
         "https://opencatalogi.nl/oc.application.schema.json",
         "https://opencatalogi.nl/oc.organisation.schema.json",
     ];
@@ -63,7 +63,7 @@ class InstallationService implements InstallerInterface
 
     /**
      * Sets the max depth of all entities to 5 because OC has a lot of nested objects.
-     * Except for entities defined in $this::MAX_DEPTH_1
+     * Except for entities defined in $this::MAX_DEPTH_2
      *
      * @TODO: find a better solution for this? We can set max depth in the schema.json files as well.
      *
@@ -73,8 +73,8 @@ class InstallationService implements InstallerInterface
     {
         $entities = $this->entityManager->getRepository('App:Entity')->findAll();
         foreach ($entities as $entity) {
-            if (in_array($entity->getReference(), $this::MAX_DEPTH_1)) {
-                $entity->setMaxDepth(1);
+            if (in_array($entity->getReference(), $this::MAX_DEPTH_2)) {
+                $entity->setMaxDepth(2);
                 $this->entityManager->persist($entity);
 
                 continue;
