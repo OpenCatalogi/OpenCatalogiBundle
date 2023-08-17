@@ -373,13 +373,15 @@ class FederalizationService
      */
     private function getSourceSync(Entity $entity, array $sourceSync): Synchronization
     {
+        $sourceSyncSource = ($sourceSync['gateway'] ?? $sourceSync['source']);
+
         // If this Source does not exist, create it.
-        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSync['source']['location']]);
+        $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSyncSource['location']]);
         if ($source === null) {
             $source = new Source();
-            $source->setName($sourceSync['source']['name']);
-            $source->setDescription($sourceSync['source']['description']);
-            $source->setLocation($sourceSync['source']['location']);
+            $source->setName($sourceSyncSource['name']);
+            $source->setDescription(($sourceSyncSource['description'] ?? $sourceSyncSource['name']));
+            $source->setLocation($sourceSyncSource['location']);
             $this->entityManager->persist($source);
             $this->entityManager->flush();
             $this->logger->info('Created a new Source for '.$source->getValue('location'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -480,10 +482,11 @@ class FederalizationService
         // Let's handle whatever we found
         if (isset($object['_self']['synchronizations']) === true && count($object['_self']['synchronizations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
-            $baseSync = $object['_self']['synchronizations'][0];
+            $baseSync       = $object['_self']['synchronizations'][0];
+            $baseSyncSource = ($baseSync['gateway'] ?? $baseSync['source']);
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
-            if ($baseSync['source']['location'] === 'https://'.$this->currentDomain) {
+            if ($baseSyncSource['location'] === 'https://'.$this->currentDomain) {
                 return null;
             }
 
@@ -665,7 +668,7 @@ class FederalizationService
         }
 
         // If this application has no domains or only the domain localhost, try looking for another application.
-        if (empty($application->getDomains() === true)
+        if (empty($application->getDomains()) === true
             || (count($application->getDomains()) === 1 && $application->getDomains()[0] === 'localhost')
         ) {
             if ($defaultApplication !== null) {
