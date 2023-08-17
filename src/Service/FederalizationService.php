@@ -161,7 +161,7 @@ class FederalizationService
 
         // Get the application domain we use the register this Catalogi to other Catalogi installations.
         $this->getAppDomain();
-        
+
         // Comment out the following if statement when testing on localhost.
         if ($this->currentDomain === 'localhost') {
             // PUT THIS IF STATEMENT BACK AFTER TESTING ON LOCALHOST!
