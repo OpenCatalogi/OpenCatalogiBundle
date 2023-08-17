@@ -373,14 +373,14 @@ class FederalizationService
      */
     private function getSourceSync(Entity $entity, array $sourceSync): Synchronization
     {
-        $sourceSyncSource = $sourceSync['gateway'] ?? $sourceSync['source'];
-        
+        $sourceSyncSource = ($sourceSync['gateway'] ?? $sourceSync['source']);
+
         // If this Source does not exist, create it.
         $source = $this->entityManager->getRepository('App:Gateway')->findOneBy(['location' => $sourceSyncSource['location']]);
         if ($source === null) {
             $source = new Source();
             $source->setName($sourceSyncSource['name']);
-            $source->setDescription($sourceSyncSource['description'] ?? $sourceSyncSource['name']);
+            $source->setDescription(($sourceSyncSource['description'] ?? $sourceSyncSource['name']));
             $source->setLocation($sourceSyncSource['location']);
             $this->entityManager->persist($source);
             $this->entityManager->flush();
@@ -482,8 +482,8 @@ class FederalizationService
         // Let's handle whatever we found
         if (isset($object['_self']['synchronizations']) === true && count($object['_self']['synchronizations']) !== 0) {
             // We found something in a catalogi of which that catalogi is not the source, so we need to synchronize from the original source
-            $baseSync = $object['_self']['synchronizations'][0];
-            $baseSyncSource = $baseSync['gateway'] ?? $baseSync['source'];
+            $baseSync       = $object['_self']['synchronizations'][0];
+            $baseSyncSource = ($baseSync['gateway'] ?? $baseSync['source']);
 
             // Let's prevent loops, if we are the Source, don't create a Synchronization or Source for it.
             if ($baseSyncSource['location'] === 'https://'.$this->currentDomain) {
