@@ -165,7 +165,7 @@ class FederalizationService
         // Comment out the following if statement when testing on localhost.
         if ($this->currentDomain === 'localhost') {
             // PUT THIS IF STATEMENT BACK AFTER TESTING ON LOCALHOST!
-            $this->logger->warning('If you are testing on localhost you need to disable an if statement for this to work.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+            $this->logger->warning('If you are testing on localhost you need to disable an if statement in the FederalizationService for this to work.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             return $data;
         }
 
