@@ -1,0 +1,19 @@
+{
+  "title": "Developer Overheid Repository To Gateway Action",
+  "$id": "https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.2",
+  "listens": ["opencatalogi.bronnen.trigger"],
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidRepositoryToGatewayHandler",
+  "conditions": {
+    "==": [
+      1,
+      1
+    ]
+  },
+  "configuration": {
+    "source": "https://opencatalogi.nl/source/oc.developerOverheid.source.json",
+    "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
+    "endpoint": "/repositories"
+  }
+}

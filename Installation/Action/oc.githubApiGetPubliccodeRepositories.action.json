@@ -1,0 +1,20 @@
+{
+  "title": "Github Api Get Publiccode Repositories Action",
+  "$id": "https://opencatalogi.nl/action/oc.GithubApiGetPubliccodeRepositoriesAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.2",
+  "listens": ["opencatalogi.github"],
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubApiGetPubliccodeRepositoriesHandler",
+  "conditions": {
+    "==": [
+      1,
+      1
+    ]
+  },
+  "configuration": {
+    "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
+    "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
+    "repositoriesMapping": "https://api.github.com/oc.githubPubliccodeRepository.mapping.json"
+  }
+}
