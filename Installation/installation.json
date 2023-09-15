@@ -16,65 +16,6 @@
       "https://opencatalogi.nl/source/oc.GitHubAPI.source.json"
     ]
   },
-  "actions": {
-    "handlers": [
-      {
-        "reference": "https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\ComponentenCatalogusApplicationToGatewayHandler",
-        "listens": ["opencatalogi.bronnen.trigger"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\ComponentenCatalogusComponentToGatewayHandler",
-        "listens": ["opencatalogi.bronnen.trigger"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.DeveloperOverheidApiToGatewayAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidApiToGatewayHandler",
-        "listens": ["opencatalogi.bronnen.trigger"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidRepositoryToGatewayHandler",
-        "listens": ["opencatalogi.bronnen.trigger"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.EnrichPubliccodeFromGithubUrlAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\EnrichPubliccodeFromGithubUrlHandler",
-        "listens": ["opencatalogi.default.listens"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.EnrichPubliccodeAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\EnrichPubliccodeHandler",
-        "listens": ["opencatalogi.default.listens"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindGithubRepositoryThroughOrganizationHandler",
-        "listens": ["opencatalogi.default.listens"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.FindOrganizationThroughRepositoriesAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindOrganizationThroughRepositoriesHandler",
-        "listens": ["opencatalogi.default.listens"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.GithubApiGetPubliccodeRepositoriesAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubApiGetPubliccodeRepositoriesHandler",
-        "listens": ["opencatalogi.github"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.RatingAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\RatingHandler",
-        "listens": ["opencatalogi.rating.handler"]
-      },
-      {
-        "reference": "https://opencatalogi.nl/action/oc.GithubEventAction.action.json",
-        "actionHandler": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubEventHandler",
-        "listens": ["opencatalogi.githubevents.trigger"]
-      }
-    ]
-  },
   "endpoints": {
     "multipleSchemas": [
       {

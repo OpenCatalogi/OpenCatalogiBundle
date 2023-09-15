@@ -1,0 +1,20 @@
+{
+  "title": "Developer Overheid Api To Gateway Action",
+  "$id": "https://opencatalogi.nl/action/oc.DeveloperOverheidApiToGatewayAction.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.2",
+  "listens": ["opencatalogi.bronnen.trigger"],
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidApiToGatewayHandler",
+  "conditions": {
+    "==": [
+      1,
+      1
+    ]
+  },
+  "configuration": {
+    "source": "https://opencatalogi.nl/source/oc.developerOverheid.source.json",
+    "componentMapping": "https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json",
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
+    "endpoint": "/apis"
+  }
+}
