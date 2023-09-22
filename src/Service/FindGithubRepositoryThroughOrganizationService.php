@@ -115,6 +115,7 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end __construct()
 
+
     /**
      * Override configuration from other services.
      *
@@ -125,7 +126,8 @@ class FindGithubRepositoryThroughOrganizationService
     public function setConfiguration(array $configuration): void
     {
         $this->configuration = $configuration;
-    }
+
+    }//end setConfiguration()
 
 
     /**
