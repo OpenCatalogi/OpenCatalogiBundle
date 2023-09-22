@@ -115,6 +115,18 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end __construct()
 
+    /**
+     * Override configuration from other services.
+     *
+     * @param array $configuration The new configuration array.
+     *
+     * @return void
+     */
+    public function setConfiguration(array $configuration): void
+    {
+        $this->configuration = $configuration;
+    }
+
 
     /**
      * This function is searching for repositories containing a publiccode.yaml file.

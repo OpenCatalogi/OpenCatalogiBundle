@@ -184,6 +184,16 @@ class GithubEventService
 
         $organizationObject = $synchronization->getObject();
 
+        $this->organizationService->setConfiguration([
+            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'usercontentSource'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
+            'organisationSchema'  => 'https://opencatalogi.nl/oc.organisation.schema.json',
+            'componentSchema'     => 'https://opencatalogi.nl/oc.component.schema.json',
+            'openCatalogiMapping' => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
+        ]);
+
         $this->organizationService->getOrganizationCatalogi($organizationObject);
 
         return $organizationObject;
