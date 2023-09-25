@@ -184,6 +184,9 @@ class GithubEventService
 
         $organizationObject = $synchronization->getObject();
 
+        $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $this->organizationService->setConfiguration($action->getConfiguration());
+
         $this->organizationService->getOrganizationCatalogi($organizationObject);
 
         return $organizationObject;
@@ -262,6 +265,9 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
+        $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.EnrichPubliccodeFromGithubUrlAction.action.json', 'open-catalogi/open-catalogi-bundle');
+
+        $this->enrichPubliccode->setConfiguration($action->getConfiguration());
         $repository = $this->enrichPubliccode->enrichRepositoryWithPubliccode($repository, $repositoryUrl);
 
         $componentResponse['component'] = $repository->getValue('component')->toArray();
