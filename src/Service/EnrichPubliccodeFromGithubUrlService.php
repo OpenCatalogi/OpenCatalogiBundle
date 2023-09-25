@@ -87,6 +87,7 @@ class EnrichPubliccodeFromGithubUrlService
 
     }//end __construct()
 
+
     /**
      * Sets the global configuration of this service.
      *
@@ -97,6 +98,7 @@ class EnrichPubliccodeFromGithubUrlService
     public function setConfiguration(array $configuration): void
     {
         $this->configuration = $configuration;
+
     }//end setConfiguration()
 
 
