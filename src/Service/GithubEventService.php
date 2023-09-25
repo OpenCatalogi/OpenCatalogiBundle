@@ -210,7 +210,9 @@ class GithubEventService
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
         if ($this->githubApiService->checkGithubAuth($source) === false) {
-            return null;
+            $this->data['response'] = new Response('Auth is not set for the source with location: '.$source->getLocation(), 404);
+
+            return $this->data;
         }//end if
 
         $name         = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
