@@ -87,6 +87,18 @@ class EnrichPubliccodeFromGithubUrlService
 
     }//end __construct()
 
+    /**
+     * Sets the global configuration of this service.
+     *
+     * @param array $configuration The configuration to make the global configuration.
+     *
+     * @return void
+     */
+    public function setConfiguration(array $configuration): void
+    {
+        $this->configuration = $configuration;
+    }//end setConfiguration()
+
 
     /**
      * This function gets the publiccode file from the github api.
