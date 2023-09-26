@@ -518,7 +518,6 @@ class FederalizationService
         if ($synchronization->getObject() === null) {
             $objectEntity = new ObjectEntity($synchronization->getEntity());
             // Let's prevent warning overload about users:
-            $objectEntity = $this->syncService->setDefaultOwner($objectEntity);
             $this->entityManager->persist($objectEntity);
             $synchronization->setObject($objectEntity);
             $this->entityManager->persist($synchronization);
