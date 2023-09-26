@@ -159,7 +159,7 @@ class FederalizationService
         if ($this->session->get('io')) {
             $this->setStyle($this->session->get('io'));
         }
-        
+
         // Setup base data
         $this->prepareObjectEntities();
 
