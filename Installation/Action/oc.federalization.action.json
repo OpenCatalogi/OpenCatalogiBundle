@@ -5,6 +5,12 @@
   "version": "0.0.1",
   "listens": ["opencatalogi.federalization"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FederalizationHandler",
+  "conditions": {
+    "==": [
+      1,
+      1
+    ]
+  },
   "configuration": [],
   "isLockable": true,
   "isEnabled": false
