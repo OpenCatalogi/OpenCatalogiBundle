@@ -311,5 +311,5 @@ jobs:
           git config --local user.name "GitHub Action"
           git pull
           git add *.puml *.svg *.md
-          git commit -m "Add generated puml, md and README files based on plugin installation files" || echo "No changes to commit"
+          git commit -m "Add generated puml,svg,md and README files based on plugin installation files" || echo "No changes to commit"
           git push
