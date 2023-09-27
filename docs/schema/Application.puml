@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Application
 footer: Common Gateway Plugin
 header: Schema
+
 class Application {
   + name: string
   + shortDescription: string

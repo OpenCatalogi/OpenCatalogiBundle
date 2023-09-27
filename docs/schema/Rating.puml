@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Rating
 footer: Common Gateway Plugin
 header: Schema
+
 class Rating {
   + rating: integer
   + maxRating: integer

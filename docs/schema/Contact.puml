@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Contact
 footer: Common Gateway Plugin
 header: Schema
+
 class Contact {
   + name: string
   + email: string

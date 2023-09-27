@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Owner
 footer: Common Gateway Plugin
 header: Schema
+
 class Owner {
   + fullName: string
   + email: string

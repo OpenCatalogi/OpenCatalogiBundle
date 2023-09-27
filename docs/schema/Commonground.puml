@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Commonground
 footer: Common Gateway Plugin
 header: Schema
+
 class Commonground {
   + intendedOrganisations: array
   + installationType: string
