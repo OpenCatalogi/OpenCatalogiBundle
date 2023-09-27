@@ -1,0 +1,190 @@
+@startuml
+class Commonground {
+  + intendedOrganisations: array
+  + installationType: string
+  + layerType: string
+}
+class Description {
+  + id: string
+  + localisedName: string
+  + shortDescription: string
+  + longDescription: string
+  + documentation: string
+  + apiDocumentation: string
+  + features: array
+  + screenshots: array
+  + videos: array
+  + awards: array
+}
+class Localisation {
+  + localisationReady: boolean
+  + availableLanguages: array
+}
+class ApplicationSync {
+  + name: string
+  + shortDescription: string
+  + description: string
+  + detailPageImageUrl: string
+  + documentationUrl: string
+  + demoUrl: string
+  + bpmnProcessUrl: string
+  + isPublished: boolean
+  + owner: array
+  + components: array
+}
+class DependsOn {
+  + open: array
+  + proprietary: array
+  + hardware: array
+}
+class Nl {
+  + commonground: Any
+  + gemma: Any
+  + apm: object
+  + upl: array
+}
+class Organisation {
+  + name: string
+  + description: string
+  + logo: string
+  + supports: array
+  + owns: array
+  + uses: array
+  + token: string
+  + github: string
+  + gitlab: string
+  + website: string
+  + phone: string
+  + email: string
+  + type: string
+  + catalogusAPI: string
+}
+class Maintenance {
+  + type: string
+  + contractors: array
+  + contacts: array
+}
+class Application {
+  + name: string
+  + shortDescription: string
+  + description: string
+  + detailPageImageUrl: string
+  + documentationUrl: string
+  + demoUrl: string
+  + bpmnProcessUrl: string
+  + isPublished: boolean
+  + owner: Any
+  + components: array
+}
+class Source {
+  + name: string
+  + description: string
+  + location: string
+}
+class Owner {
+  + fullName: string
+  + email: string
+  + pictureUrl: string
+}
+class Installation {
+  + organization: string
+  + component: string
+  + version: string
+  + environment: string
+}
+class Contractor {
+  + organisation: Any
+  + until: string
+}
+class IntendedAudience {
+  + countries: array
+  + unsupportedCountries: array
+  + scope: array
+}
+class Component {
+  + applicationId: string
+  + name: string
+  + applicationSuite: Any
+  + url: Any
+  + landingURL: string
+  + isBasedOn: string
+  + softwareVersion: string
+  + releaseDate: string
+  + logo: string
+  + platforms: array
+  + categories: array
+  + usedBy: array
+  + roadmap: string
+  + developmentStatus: string
+  + softwareType: string
+  + intendedAudience: Any
+  + description: Any
+  + legal: Any
+  + maintenance: Any
+  + localisation: Any
+  + dependsOn: Any
+  + nl: Any
+  + inputTypes: array
+  + outputTypes: array
+  + rating: Any
+}
+class GithubEvent {
+  + source: string
+}
+class Gemma {
+  + bedrijfsfuncties: array
+  + bedrijfsservices: array
+  + applicatiefunctie: string
+  + model: string
+  + referentieComponenten: array
+}
+class Catalogi {
+  + source: Any
+  + organisation: Any
+  + rsin: string
+  + pki: string
+}
+class Dependency {
+  + id: string
+  + name: string
+  + version: string
+}
+class Repository {
+  + organisation: Any
+  + component: Any
+  + source: string
+  + name: string
+  + url: string
+  + avatar_url: string
+  + last_change: string
+  + stars: number
+  + fork_count: number
+  + issue_open_count: number
+  + merge_request_open_count: number
+  + programming_languages: array
+  + topics: array
+  + content: string
+  + publiccode_url: string
+  + default_owner: string
+}
+class Legal {
+  + license: string
+  + mainCopyrightOwner: Any
+  + repoOwner: Any
+  + authorsFile: string
+}
+class Contact {
+  + name: string
+  + email: string
+  + phone: string
+  + affiliation: string
+}
+class Rating {
+  + rating: integer
+  + maxRating: integer
+  + results: array
+}
+class ComponentUrl {
+  + repositoryUrl: string
+}
+@enduml
