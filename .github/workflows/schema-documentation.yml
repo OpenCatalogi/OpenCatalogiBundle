@@ -167,6 +167,128 @@ jobs:
               f.write("\n@enduml\n")
           EOF
 
+      # Let create the mardown documents
+      - name: Find JSON files and Generate Markdown
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          # Embedded Python script to generate .md files from JSON Schema
+          python << 'EOF'
+          import json
+          import os
+
+          repo_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_REF'].split('/')[-1]}"
+
+          all_action_classes = []
+          all_collection_classes = []
+          all_cronjob_classes = []
+          all_mapping_classes = []
+          all_schema_classes = []
+          all_security_classes = []
+          all_source_classes = []
+
+          def generate_markdown(schema, md_file_path, svg_file_name):
+           with open(md_file_path, 'w') as md_file:
+               title = schema.get('title', 'Untitled')
+               md_file.write(f"# {title}\n\n")
+               md_file.write(f"{schema.get('description', 'No description available.')}\n\n")
+               absolute_svg_url = f"{repo_url}/docs/schema/{svg_file_name}"
+               md_file.write(f"![Class Diagram]({absolute_svg_url})\n\n")
+               md_file.write("## Properties\n\n")
+               md_file.write("| Property | Type | Description | Required |\n")
+               md_file.write("|----------|------|-------------|----------|\n")
+               required_fields = schema.get('required', [])
+               properties = schema.get('properties', {})
+               for prop, details in properties.items():
+                   is_required = "Yes" if prop in required_fields else "No"
+                   md_file.write(f"| {prop} | {details.get('type', 'Any')} | {details.get('description', 'N/A')} | {is_required} |\n")
+               all_schema_classes.append((title, md_file_path))
+
+          for root, dirs, files in os.walk("."):
+           for file in files:
+               if file.endswith("schema.json"):
+                   schema_file_path = os.path.join(root, file)
+                   with open(schema_file_path, 'r') as f:
+                       schema = json.load(f)
+                   base_name = os.path.basename(schema_file_path).replace(".schema.json", "")
+                   md_file_name = base_name + ".md"
+                   svg_file_name = base_name + ".svg"
+                   md_file_path = os.path.join("docs/schema", md_file_name)
+                   generate_markdown(schema, md_file_path, svg_file_name)
+
+          # Generate a generic README.md in docs/action
+          with open("docs/action/README.md", 'w') as f:
+           f.write("# Action Documentation\n\n")
+           f.write("## Table of Actions\n\n")
+           f.write("| Action | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_action_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
+
+          # Generate a generic README.md in docs/collection
+          with open("docs/collection/README.md", 'w') as f:
+           f.write("# Collection Documentation\n\n")
+           f.write("## Table of collections\n\n")
+           f.write("| Collection | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_collection_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+
+          # Generate a generic README.md in docs/cronjob
+          with open("docs/cronjob/README.md", 'w') as f:
+           f.write("# cronjob Documentation\n\n")
+           f.write("## Table of Cronjobs\n\n")
+           f.write("| cronjob | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_cronjob_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+
+          # Generate a generic README.md in docs/mapping
+          with open("docs/mapping/README.md", 'w') as f:
+           f.write("#Mapping Documentation\n\n")
+           f.write("## Table of mappings\n\n")
+           f.write("| Mapping | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_mapping_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+
+          # Generate a generic README.md in docs/schema
+          with open("docs/schema/README.md", 'w') as f:
+           f.write("# Schema Documentation\n\n")
+           f.write("## Table of Classes\n\n")
+           f.write("| Class | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_schema_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
+
+          # Generate a generic README.md in docs/security
+          with open("docs/security/README.md", 'w') as f:
+           f.write("# Security Documentation\n\n")
+           f.write("## Table of Security Groups\n\n")
+           f.write("| Security | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_security_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
+
+          # Generate a generic README.md in docs/source
+          with open("docs/source/README.md", 'w') as f:
+           f.write("#Source Documentation\n\n")
+           f.write("## Table of Sources\n\n")
+           f.write("| Class | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_source_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")         
+
+          EOF
+
       # Commit and push changes
       - name: Commit and Push Generated Files
         run: |
@@ -174,7 +296,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git pull
           git add *.puml *.svg *.md
-          git commit -m "Add generated puml files based on plugin installation files" || echo "No changes to commit"
+          git commit -m "Add generated puml, md and README files based on plugin installation files" || echo "No changes to commit"
           git push
 
   generate_svg:
@@ -194,177 +316,3 @@ jobs:
           message: "Render PlantUML files"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  generate_md:
-    runs-on: ubuntu-latest
-    name: Generate markdown files
-    needs: generate_svg
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Create docs/action directory if it doesn't exist
-        run: |
-          mkdir -p docs/action
-
-      - name: Create docs/collection directory if it doesn't exist
-        run: |
-          mkdir -p docs/collection
-
-      - name: Create docs/cronjob directory if it doesn't exist
-        run: |
-          mkdir -p docs/cronjob
-
-      - name: Create docs/mapping directory if it doesn't exist
-        run: |
-          mkdir -p docs/mapping
-
-      - name: Create docs/schema directory if it doesn't exist
-        run: |
-          mkdir -p docs/schema
-
-      - name: Create docs/security directory if it doesn't exist
-        run: |
-          mkdir -p docs/security
-
-      - name: Create docs/source directory if it doesn't exist
-        run: |
-          mkdir -p docs/source
-
-      # Let create the mardown documents
-      - name: Find JSON files and Generate Markdown
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          # Embedded Python script to generate .md files from JSON Schema
-          python << 'EOF'
-          import json
-          import os
-          
-          repo_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_REF'].split('/')[-1]}"
-          
-          all_action_classes = []
-          all_collection_classes = []
-          all_cronjob_classes = []
-          all_mapping_classes = []
-          all_schema_classes = []
-          all_security_classes = []
-          all_source_classes = []
-          
-          def generate_markdown(schema, md_file_path, svg_file_name):
-           with open(md_file_path, 'w') as md_file:
-               title = schema.get('title', 'Untitled')
-               md_file.write(f"# {title}\n\n")
-               md_file.write(f"{schema.get('description', 'No description available.')}\n\n")
-               absolute_svg_url = f"{repo_url}/docs/schema/{svg_file_name}"
-               md_file.write(f"![Class Diagram]({absolute_svg_url})\n\n")
-               md_file.write("## Properties\n\n")
-               md_file.write("| Property | Type | Description | Required |\n")
-               md_file.write("|----------|------|-------------|----------|\n")
-               required_fields = schema.get('required', [])
-               properties = schema.get('properties', {})
-               for prop, details in properties.items():
-                   is_required = "Yes" if prop in required_fields else "No"
-                   md_file.write(f"| {prop} | {details.get('type', 'Any')} | {details.get('description', 'N/A')} | {is_required} |\n")
-               all_schema_classes.append((title, md_file_path))
-          
-          for root, dirs, files in os.walk("."):
-           for file in files:
-               if file.endswith("schema.json"):
-                   schema_file_path = os.path.join(root, file)
-                   with open(schema_file_path, 'r') as f:
-                       schema = json.load(f)
-                   base_name = os.path.basename(schema_file_path).replace(".schema.json", "")
-                   md_file_name = base_name + ".md"
-                   svg_file_name = base_name + ".svg"
-                   md_file_path = os.path.join("docs/schema", md_file_name)
-                   generate_markdown(schema, md_file_path, svg_file_name)
-          
-          # Generate a generic README.md in docs/action
-          with open("docs/action/README.md", 'w') as f:
-           f.write("# Action Documentation\n\n")
-           f.write("## Table of Actions\n\n")
-           f.write("| Action | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_action_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
-          
-          # Generate a generic README.md in docs/collection
-          with open("docs/collection/README.md", 'w') as f:
-           f.write("# Collection Documentation\n\n")
-           f.write("## Table of collections\n\n")
-           f.write("| Collection | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_collection_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
-          
-          # Generate a generic README.md in docs/cronjob
-          with open("docs/cronjob/README.md", 'w') as f:
-           f.write("# cronjob Documentation\n\n")
-           f.write("## Table of Cronjobs\n\n")
-           f.write("| cronjob | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_cronjob_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
-          
-          # Generate a generic README.md in docs/mapping
-          with open("docs/mapping/README.md", 'w') as f:
-           f.write("#Mapping Documentation\n\n")
-           f.write("## Table of mappings\n\n")
-           f.write("| Mapping | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_mapping_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
-          
-          # Generate a generic README.md in docs/schema
-          with open("docs/schema/README.md", 'w') as f:
-           f.write("# Schema Documentation\n\n")
-           f.write("## Table of Classes\n\n")
-           f.write("| Class | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_schema_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
-          
-          # Generate a generic README.md in docs/security
-          with open("docs/security/README.md", 'w') as f:
-           f.write("# Security Documentation\n\n")
-           f.write("## Table of Security Groups\n\n")
-           f.write("| Security | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_security_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
-          
-          # Generate a generic README.md in docs/source
-          with open("docs/source/README.md", 'w') as f:
-           f.write("#Source Documentation\n\n")
-           f.write("## Table of Sources\n\n")
-           f.write("| Class | Documentation |\n")
-           f.write("|-------|--------------|\n")
-           for title, md_file_path in all_source_classes:
-               md_file_name = os.path.basename(md_file_path)
-               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")         
-          
-          EOF
-
-      # Commit and push changes
-      - name: Commit and Push Generated Files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git pull
-          git add *.puml *.svg *.md
-          git commit -m "Add generated  MD and README files based on plugin installation files" || echo "No changes to commit"
-          git push
