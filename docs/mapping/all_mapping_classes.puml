@@ -1,6 +1,6 @@
 @startuml
 title: All mappings
-footer: Common Gateway Plugin |
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Mapping
 
 @enduml

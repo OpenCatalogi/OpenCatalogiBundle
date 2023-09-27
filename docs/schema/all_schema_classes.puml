@@ -1,6 +1,6 @@
 @startuml
 title: All schemas
-footer: Common Gateway Plugin |
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Schema
 class Commonground {
   + intendedOrganisations: array

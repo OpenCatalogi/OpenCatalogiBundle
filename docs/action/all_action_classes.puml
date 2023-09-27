@@ -1,6 +1,6 @@
 @startuml
 title: All actions
-footer: Common Gateway Plugin |
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Action
 
 @enduml

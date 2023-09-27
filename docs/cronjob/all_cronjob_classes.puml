@@ -1,6 +1,6 @@
 @startuml
 title: All cronjobs
-footer: Common Gateway Plugin |
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Cronjob
 
 @enduml
