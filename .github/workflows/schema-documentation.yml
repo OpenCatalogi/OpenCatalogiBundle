@@ -130,27 +130,27 @@ jobs:
 
       - name: Generate SVG from PUMl
         run: |
-          for puml_file in docs/action/*.puml; do
-            # plantuml -tsvg $puml_file
-          done
-          for puml_file in docs/collection/*.puml; do
-            # plantuml -tsvg $puml_file
-          done 
-          for puml_file in docs/cronjob/*.puml; do
-            # plantuml -tsvg $puml_file
-          done
+          #for puml_file in docs/action/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done
+          #for puml_file in docs/collection/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done 
+          #for puml_file in docs/cronjob/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done
           for puml_file in docs/mapping/*.puml; do
             plantuml -tsvg $puml_file
           done
           for puml_file in docs/schema/*.puml; do
             plantuml -tsvg $puml_file
           done
-          for puml_file in docs/security/*.puml; do
-            # plantuml -tsvg $puml_file
-          done
-          for puml_file in docs/source/*.puml; do
-            # plantuml -tsvg $puml_file
-          done
+          #for puml_file in docs/security/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done
+          #for puml_file in docs/source/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done
 
       # Let create the mardown documents
       - name: Find JSON Schema files and Generate Markdown
