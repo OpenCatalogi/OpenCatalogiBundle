@@ -1,3 +1,6 @@
 @startuml
+title: All collections
+footer: Common Gateway Plugin |
+header: Collection
 
 @enduml

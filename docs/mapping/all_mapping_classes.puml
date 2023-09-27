@@ -1,3 +1,6 @@
 @startuml
+title: All mappings
+footer: Common Gateway Plugin |
+header: Mapping
 
 @enduml

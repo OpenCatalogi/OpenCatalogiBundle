@@ -1,4 +1,7 @@
 @startuml
+title: 
+footer: Common Gateway Plugin
+header: Schema
 class Localisation {
   + localisationReady: boolean
   + availableLanguages: array

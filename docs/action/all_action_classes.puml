@@ -1,3 +1,6 @@
 @startuml
+title: All actions
+footer: Common Gateway Plugin |
+header: Action
 
 @enduml

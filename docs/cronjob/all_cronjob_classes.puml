@@ -1,3 +1,6 @@
 @startuml
+title: All cronjobs
+footer: Common Gateway Plugin |
+header: Cronjob
 
 @enduml
