@@ -23,9 +23,33 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y plantuml
 
+      - name: Create docs/action directory if it doesn't exist
+        run: |
+          mkdir -p docs/action
+
+      - name: Create docs/collection directory if it doesn't exist
+        run: |
+          mkdir -p docs/collection
+
+      - name: Create docs/cronjob directory if it doesn't exist
+        run: |
+          mkdir -p docs/cronjob
+
+      - name: Create docs/mapping directory if it doesn't exist
+        run: |
+          mkdir -p docs/mapping
+
       - name: Create docs/schema directory if it doesn't exist
         run: |
           mkdir -p docs/schema
+
+      - name: Create docs/security directory if it doesn't exist
+        run: |
+          mkdir -p docs/security
+
+      - name: Create docs/source directory if it doesn't exist
+        run: |
+          mkdir -p docs/
 
       - name: Find JSON Schema files and Generate PUMl
         run: |
@@ -79,7 +103,13 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git pull
-          git add docs/schema/*.puml docs/schema/*.svg
+          git add docs/action/*.puml docs/action/*.svg docs/action/*.md
+          git add docs/collection/*.puml docs/collection/*.svg docs/collection/*.md
+          git add docs/cronjob/*.puml docs/cronjob/*.svg docs/cronjob/*.md
+          git add docs/mapping/*.puml docs/mapping/*.svg docs/mapping/*.md
+          git add docs/schema/*.puml docs/schema/*.svg docs/schema/*.md
+          git add docs/security/*.puml docs/security/*.svg docs/security/*.md
+          git add docs/source/*.puml docs/source/*.svg docs/source/*.md
           git commit -m "Add generated PlantUML and SVG files" || echo "No changes to commit"
           git push
 
