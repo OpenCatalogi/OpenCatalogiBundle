@@ -97,17 +97,17 @@ jobs:
               f.write("\n".join(all_action_classes))
               f.write("\n@enduml\n")
           
-          with open("docs/schema/all_collection_classes.puml", 'w') as f:
+          with open("docs/collection/all_collection_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("\n".join(all_collection_classes))
               f.write("\n@enduml\n")
           
-          with open("docs/schema/all_cronjob_classes.puml", 'w') as f:
+          with open("docs/cronjob/all_cronjob_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("\n".join(all_cronjob_classes))
               f.write("\n@enduml\n")
           
-          with open("docs/schema/all_mapping_classes.puml", 'w') as f:
+          with open("docs/mapping/all_mapping_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("\n".join(all_mapping_classes))
               f.write("\n@enduml\n")          
@@ -117,12 +117,12 @@ jobs:
               f.write("\n".join(all_schema_classes))
               f.write("\n@enduml\n")
           
-          with open("docs/schema/all_security_classes.puml", 'w') as f:
+          with open("docs/security/all_security_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("\n".join(all_security_classes))
               f.write("\n@enduml\n")
           
-          with open("docs/schema/all_source_classes.puml", 'w') as f:
+          with open("docs/source/all_source_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("\n".join(all_source_classes))
               f.write("\n@enduml\n")
