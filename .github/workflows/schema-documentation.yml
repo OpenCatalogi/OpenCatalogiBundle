@@ -49,7 +49,7 @@ jobs:
 
       - name: Create docs/source directory if it doesn't exist
         run: |
-          mkdir -p docs/
+          mkdir -p docs/source
 
       - name: Find JSON Schema files and Generate PUMl
         run: |
