@@ -82,7 +82,7 @@ jobs:
           git add docs/schema/*.puml docs/schema/*.svg
           git commit -m "Add generated PlantUML and SVG files" || echo "No changes to commit"
           git push
-          
+
   generate-markdown:
     runs-on: ubuntu-latest
 
@@ -187,33 +187,49 @@ jobs:
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
           GITHUB_REF: ${{ github.ref }}
+
         run: |
-          # Embedded Python script to generate .puml, .svg and .md files from Mapping JSON
+          # Embedded Python script to generate .md files from JSON Schema
           python << 'EOF'
           import json
           import os
 
           repo_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_REF'].split('/')[-1]}"
+          all_classes = []
 
-          def generate_docs(mapping, puml_file_path, md_file_path):
-              # Your logic to generate .puml, .md and .svg files based on the mapping.json
-              # Refer to the existing logic for schema files as a guide
+          def generate_mapping_markdown(schema, md_file_path, svg_file_name):
+           with open(md_file_path, 'w') as md_file:
+               title = schema.get('title', 'Untitled')
+               md_file.write(f"# {title}\n\n")
+               md_file.write(f"{schema.get('description', 'No description available.')}\n\n")
+               absolute_svg_url = f"{repo_url}/docs/mapping/{svg_file_name}"
+               md_file.write(f"![Class Diagram]({absolute_svg_url})\n\n")
+          
+               md_file.write("## Mapping\n\n")
+          
+               md_file.write("## Cast\n\n")
 
           for root, dirs, files in os.walk("."):
-              for file in files:
-                  if file.endswith(".mapping.json"):
-                      mapping_file_path = os.path.join(root, file)
-                      with open(mapping_file_path, 'r') as f:
-                          mapping = json.load(f)
-                      base_name = os.path.basename(mapping_file_path).replace(".mapping.json", "")
-                      puml_file_name = base_name + ".puml"
-                      md_file_name = base_name + ".md"
-                      puml_file_path = os.path.join("docs/mapping", puml_file_name)
-                      md_file_path = os.path.join("docs/mapping", md_file_name)
-                      generate_docs(mapping, puml_file_path, md_file_path)
+           for file in files:
+               if file.endswith("mapping.json"):
+                   schema_file_path = os.path.join(root, file)
+                   with open(schema_file_path, 'r') as f:
+                       schema = json.load(f)
+                   base_name = os.path.basename(schema_file_path).replace(".mapping.json", "")
+                   md_file_name = base_name + ".md"
+                   svg_file_name = base_name + ".svg"
+                   md_file_path = os.path.join("docs/mapping", md_file_name)
+                   generate_mapping_markdown(schema, md_file_path, svg_file_name)
 
-          # Generate SVG from PUMl
-          os.system("plantuml -tsvg docs/mapping/*.puml")
+          # Generate a generic README.md in docs/mapping
+          with open("docs/mapping/README.md", 'w') as f:
+           f.write("# Mapping Documentation\n\n")
+           f.write("## Table of Mappings \n\n")
+           f.write("| Mapping | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
           EOF
 
       # Commit and push changes
