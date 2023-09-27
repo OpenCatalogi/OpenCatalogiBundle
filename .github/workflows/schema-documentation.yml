@@ -139,9 +139,9 @@ jobs:
           #for puml_file in docs/cronjob/*.puml; do
           #  plantuml -tsvg $puml_file
           #done
-          for puml_file in docs/mapping/*.puml; do
-            plantuml -tsvg $puml_file
-          done
+          #for puml_file in docs/mapping/*.puml; do
+          #  plantuml -tsvg $puml_file
+          #done
           for puml_file in docs/schema/*.puml; do
             plantuml -tsvg $puml_file
           done
