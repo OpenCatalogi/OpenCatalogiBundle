@@ -1,3 +1,6 @@
 @startuml
+title: All sources
+footer: Common Gateway Plugin |
+header: Source
 
 @enduml

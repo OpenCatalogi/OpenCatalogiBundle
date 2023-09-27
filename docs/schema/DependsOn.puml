@@ -1,4 +1,7 @@
 @startuml
+title: 
+footer: Common Gateway Plugin
+header: Schema
 class DependsOn {
   + open: array
   + proprietary: array
