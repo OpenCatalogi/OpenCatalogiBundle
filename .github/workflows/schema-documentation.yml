@@ -91,9 +91,9 @@ jobs:
           
               with open(puml_file_path, 'w') as puml_file:
                   puml_file.write("@startuml\n")
-                  puml_file.write("title: ".title)
-                  puml_file.write("footer: Common Gateway Plugin")
-                  puml_file.write("header: Schema")           
+                  puml_file.write("title: \n")
+                  puml_file.write("footer: Common Gateway Plugin\n")
+                  puml_file.write("header: Schema\n")           
           
                   puml_file.write("\n".join(class_def))
                   puml_file.write("\n@enduml\n")
@@ -113,7 +113,7 @@ jobs:
           with open("docs/action/all_action_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All actions")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Action")  
               f.write("\n".join(all_action_classes))
               f.write("\n@enduml\n")
@@ -121,7 +121,7 @@ jobs:
           with open("docs/collection/all_collection_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All collections")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Collection")  
               f.write("\n".join(all_collection_classes))
               f.write("\n@enduml\n")
@@ -129,7 +129,7 @@ jobs:
           with open("docs/cronjob/all_cronjob_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All cronjobs")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Cronjob")  
               f.write("\n".join(all_cronjob_classes))
               f.write("\n@enduml\n")
@@ -137,7 +137,7 @@ jobs:
           with open("docs/mapping/all_mapping_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All mappings")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Mapping")  
               f.write("\n".join(all_mapping_classes))
               f.write("\n@enduml\n")          
@@ -145,7 +145,7 @@ jobs:
           with open("docs/schema/all_schema_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All schemas")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Schema")  
               f.write("\n".join(all_schema_classes))
               f.write("\n@enduml\n")
@@ -153,16 +153,16 @@ jobs:
           with open("docs/security/all_security_classes.puml", 'w') as f:
               f.write("@startuml\n")
               f.write("title: All security groups")
-              f.write('footer: Common Gateway Plugin')
+              f.write("footer: Common Gateway Plugin |")
               f.write("header: Security")  
               f.write("\n".join(all_security_classes))
               f.write("\n@enduml\n")
           
           with open("docs/source/all_source_classes.puml", 'w') as f:
               f.write("@startuml\n")
-              f.write("title: All sources")
-              f.write('footer: Common Gateway Plugin')
-              f.write("header: Source")  
+              f.write("title: All sources\n")
+              f.write("footer: Common Gateway Plugin |\n")
+              f.write("header: Source\n")  
               f.write("\n".join(all_source_classes))
               f.write("\n@enduml\n")
           EOF
