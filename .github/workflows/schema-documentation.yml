@@ -179,8 +179,8 @@ jobs:
 
   generate_svg:
     runs-on: ubuntu-latest
-    name: svg
-    needs: puml
+    name: Generate SVG files
+    needs: generate-puml
 
     steps:
       - name: checkout
