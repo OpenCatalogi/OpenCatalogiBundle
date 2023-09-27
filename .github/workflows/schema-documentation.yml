@@ -6,8 +6,9 @@ on:
   push: # Trigger on any push
 
 jobs:
-  generate-puml-and-svg:
+  generate-puml:
     runs-on: ubuntu-latest
+    name: puml
 
     steps:
       - name: Checkout code
@@ -166,30 +167,38 @@ jobs:
               f.write("\n@enduml\n")
           EOF
 
-      - name: Generate SVG from PUMl
+      # Commit and push changes
+      - name: Commit and Push Generated Files
         run: |
-          #for puml_file in docs/action/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done
-          #for puml_file in docs/collection/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done 
-          #for puml_file in docs/cronjob/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done
-          #for puml_file in docs/mapping/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done
-          for puml_file in docs/schema/*.puml; do
-            plantuml -tsvg $puml_file
-          done
-          #for puml_file in docs/security/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done
-          #for puml_file in docs/source/*.puml; do
-          #  plantuml -tsvg $puml_file
-          #done
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull
+          git add *.puml *.svg *.md
+          git commit -m "Add generated puml files based on plugin installation files" || echo "No changes to commit"
+          git push
 
+  generate_svg:
+    runs-on: ubuntu-latest
+    name: svg
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: plantuml
+        id: plantuml
+        uses: grassedge/generate-plantuml-action@v1.5
+        with:
+          message: "Render PlantUML files"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  generate_md:
+    runs-on: ubuntu-latest
+    name: markdown
+
+    steps:
       # Let create the mardown documents
       - name: Find JSON files and Generate Markdown
         env:
@@ -319,5 +328,5 @@ jobs:
           git config --local user.name "GitHub Action"
           git pull
           git add *.puml *.svg *.md
-          git commit -m "Add generated PlantUML, SVG, MD and README files based on plugin installation files" || echo "No changes to commit"
+          git commit -m "Add generated  MD and README files based on plugin installation files" || echo "No changes to commit"
           git push
