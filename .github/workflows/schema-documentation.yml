@@ -180,6 +180,7 @@ jobs:
   generate_svg:
     runs-on: ubuntu-latest
     name: svg
+    needs: puml
 
     steps:
       - name: checkout
@@ -199,6 +200,42 @@ jobs:
     name: markdown
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Create docs/action directory if it doesn't exist
+        run: |
+          mkdir -p docs/action
+
+      - name: Create docs/collection directory if it doesn't exist
+        run: |
+          mkdir -p docs/collection
+
+      - name: Create docs/cronjob directory if it doesn't exist
+        run: |
+          mkdir -p docs/cronjob
+
+      - name: Create docs/mapping directory if it doesn't exist
+        run: |
+          mkdir -p docs/mapping
+
+      - name: Create docs/schema directory if it doesn't exist
+        run: |
+          mkdir -p docs/schema
+
+      - name: Create docs/security directory if it doesn't exist
+        run: |
+          mkdir -p docs/security
+
+      - name: Create docs/source directory if it doesn't exist
+        run: |
+          mkdir -p docs/source
+
       # Let create the mardown documents
       - name: Find JSON files and Generate Markdown
         env:
