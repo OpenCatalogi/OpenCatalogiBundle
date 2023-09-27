@@ -58,16 +58,22 @@ jobs:
           import json
           import os
           
-          all_classes = []
+          all_action_classes = []
+          all_collection_classes = []
+          all_cronjob_classes = []
+          all_mapping_classes = []
+          all_schema_classes = []
+          all_security_classes = []
+          all_source_classes = []
           
-          def generate_puml(schema, puml_file_path):
+          def generate_schema_puml(schema, puml_file_path):
               title = schema.get('title', 'Untitled').replace(" ", "")  # Remove spaces from title
               class_def = [f"class {title} {{"]
               properties = schema.get('properties', {})
               for prop, details in properties.items():
                   class_def.append(f"  + {prop}: {details.get('type', 'Any')}")
               class_def.append("}")
-              all_classes.append("\n".join(class_def))
+              all_schema_classes.append("\n".join(class_def))
           
               with open(puml_file_path, 'w') as puml_file:
                   puml_file.write("@startuml\n")
@@ -82,53 +88,71 @@ jobs:
                           schema = json.load(f)
                       puml_file_name = os.path.basename(schema_file_path).replace("schema.json", "puml")
                       puml_file_path = os.path.join("docs/schema", puml_file_name)
-                      generate_puml(schema, puml_file_path)
+                      generate_schema_puml(schema, puml_file_path)
           
           # Generate an additional .puml file that includes all classes
-          with open("docs/schema/all_classes.puml", 'w') as f:
+          
+          with open("docs/action/all_action_classes.puml", 'w') as f:
               f.write("@startuml\n")
-              f.write("\n".join(all_classes))
+              f.write("\n".join(all_action_classes))
+              f.write("\n@enduml\n")
+          
+          with open("docs/schema/all_collection_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_collection_classes))
+              f.write("\n@enduml\n")
+          
+          with open("docs/schema/all_cronjob_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_cronjob_classes))
+              f.write("\n@enduml\n")
+          
+          with open("docs/schema/all_mapping_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_mapping_classes))
+              f.write("\n@enduml\n")          
+          
+          with open("docs/schema/all_schema_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_schema_classes))
+              f.write("\n@enduml\n")
+          
+          with open("docs/schema/all_security_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_security_classes))
+              f.write("\n@enduml\n")
+          
+          with open("docs/schema/all_source_classes.puml", 'w') as f:
+              f.write("@startuml\n")
+              f.write("\n".join(all_source_classes))
               f.write("\n@enduml\n")
           EOF
 
       - name: Generate SVG from PUMl
         run: |
+          for puml_file in docs/action/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/collection/*.puml; do
+            plantuml -tsvg $puml_file
+          done 
+          for puml_file in docs/cronjob/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/mapping/*.puml; do
+            plantuml -tsvg $puml_file
+          done
           for puml_file in docs/schema/*.puml; do
             plantuml -tsvg $puml_file
           done
+          for puml_file in docs/security/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/source/*.puml; do
+            plantuml -tsvg $puml_file
+          done
 
-      # Commit and push changes
-      - name: Commit and Push Generated Files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git pull
-          git add docs/action/*.puml docs/action/*.svg docs/action/*.md
-          git add docs/collection/*.puml docs/collection/*.svg docs/collection/*.md
-          git add docs/cronjob/*.puml docs/cronjob/*.svg docs/cronjob/*.md
-          git add docs/mapping/*.puml docs/mapping/*.svg docs/mapping/*.md
-          git add docs/schema/*.puml docs/schema/*.svg docs/schema/*.md
-          git add docs/security/*.puml docs/security/*.svg docs/security/*.md
-          git add docs/source/*.puml docs/source/*.svg docs/source/*.md
-          git commit -m "Add generated PlantUML and SVG files" || echo "No changes to commit"
-          git push
-
-  generate-markdown:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Create docs/schema directory if it doesn't exist
-        run: |
-          mkdir -p docs/schema
-
+      # Let create the mardown documents
       - name: Find JSON Schema files and Generate Markdown
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
@@ -140,7 +164,14 @@ jobs:
           import os
           
           repo_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_REF'].split('/')[-1]}"
-          all_classes = []
+          
+          all_action_classes = []
+          all_collection_classes = []
+          all_cronjob_classes = []
+          all_mapping_classes = []
+          all_schema_classes = []
+          all_security_classes = []
+          all_source_classes = []
           
           def generate_markdown(schema, md_file_path, svg_file_name):
            with open(md_file_path, 'w') as md_file:
@@ -157,7 +188,7 @@ jobs:
                for prop, details in properties.items():
                    is_required = "Yes" if prop in required_fields else "No"
                    md_file.write(f"| {prop} | {details.get('type', 'Any')} | {details.get('description', 'N/A')} | {is_required} |\n")
-               all_classes.append((title, md_file_path))
+               all_schema_classes.append((title, md_file_path))
           
           for root, dirs, files in os.walk("."):
            for file in files:
@@ -171,95 +202,76 @@ jobs:
                    md_file_path = os.path.join("docs/schema", md_file_name)
                    generate_markdown(schema, md_file_path, svg_file_name)
           
+          # Generate a generic README.md in docs/action
+          with open("docs/action/README.md", 'w') as f:
+           f.write("# Action Documentation\n\n")
+           f.write("## Table of Actions\n\n")
+           f.write("| Action | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_action_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
+          
+          # Generate a generic README.md in docs/collection
+          with open("docs/collection/README.md", 'w') as f:
+           f.write("# Collection Documentation\n\n")
+           f.write("## Table of collections\n\n")
+           f.write("| Collection | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_collection_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+          
+          # Generate a generic README.md in docs/schema
+          with open("docs/cronjob/README.md", 'w') as f:
+           f.write("# cronjob Documentation\n\n")
+           f.write("## Table of Cronjobs\n\n")
+           f.write("| cronjob | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_cronjob_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+          
+          # Generate a generic README.md in docs/mapping
+          with open("docs/mapping/README.md", 'w') as f:
+           f.write("#Mapping Documentation\n\n")
+           f.write("## Table of mappings\n\n")
+           f.write("| Mapping | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_mapping_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
+          
           # Generate a generic README.md in docs/schema
           with open("docs/schema/README.md", 'w') as f:
            f.write("# Schema Documentation\n\n")
            f.write("## Table of Classes\n\n")
            f.write("| Class | Documentation |\n")
            f.write("|-------|--------------|\n")
-           for title, md_file_path in all_classes:
+           for title, md_file_path in all_schema_classes:
                md_file_name = os.path.basename(md_file_path)
                f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
-          EOF
-
-      # Commit and push changes
-      - name: Commit and Push Generated Files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git pull
-          git add docs/schema/*.md
-          git commit -m "Add generated Markdown files" || echo "No changes to commit"
-          git push
-
-  generate-mapping-docs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
-
-      - name: Install PlantUML
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y plantuml
-
-      - name: Create docs/mapping directory if it doesn't exist
-        run: |
-          mkdir -p docs/mapping
-
-      - name: Find Mapping JSON files and Generate Documentation
-        env:
-          GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_REF: ${{ github.ref }}
-
-        run: |
-          # Embedded Python script to generate .md files from JSON Schema
-          python << 'EOF'
-          import json
-          import os
-
-          repo_url = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/blob/{os.environ['GITHUB_REF'].split('/')[-1]}"
-          all_classes = []
-
-          def generate_mapping_markdown(schema, md_file_path, svg_file_name):
-           with open(md_file_path, 'w') as md_file:
-               title = schema.get('title', 'Untitled')
-               md_file.write(f"# {title}\n\n")
-               md_file.write(f"{schema.get('description', 'No description available.')}\n\n")
-               absolute_svg_url = f"{repo_url}/docs/mapping/{svg_file_name}"
-               md_file.write(f"![Class Diagram]({absolute_svg_url})\n\n")
           
-               md_file.write("## Mapping\n\n")
-          
-               md_file.write("## Cast\n\n")
-
-          for root, dirs, files in os.walk("."):
-           for file in files:
-               if file.endswith("mapping.json"):
-                   schema_file_path = os.path.join(root, file)
-                   with open(schema_file_path, 'r') as f:
-                       schema = json.load(f)
-                   base_name = os.path.basename(schema_file_path).replace(".mapping.json", "")
-                   md_file_name = base_name + ".md"
-                   svg_file_name = base_name + ".svg"
-                   md_file_path = os.path.join("docs/mapping", md_file_name)
-                   generate_mapping_markdown(schema, md_file_path, svg_file_name)
-
-          # Generate a generic README.md in docs/mapping
-          with open("docs/mapping/README.md", 'w') as f:
-           f.write("# Mapping Documentation\n\n")
-           f.write("## Table of Mappings \n\n")
-           f.write("| Mapping | Documentation |\n")
+          # Generate a generic README.md in docs/schema
+          with open("docs/security/README.md", 'w') as f:
+           f.write("# Security Documentation\n\n")
+           f.write("## Table of Security Groups\n\n")
+           f.write("| Security | Documentation |\n")
            f.write("|-------|--------------|\n")
-           for title, md_file_path in all_classes:
+           for title, md_file_path in all_security_classes:
                md_file_name = os.path.basename(md_file_path)
                f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
+          
+          # Generate a generic README.md in docs/source
+          with open("docs/source/README.md", 'w') as f:
+           f.write("#Source Documentation\n\n")
+           f.write("## Table of Sources\n\n")
+           f.write("| Class | Documentation |\n")
+           f.write("|-------|--------------|\n")
+           for title, md_file_path in all_source_classes:
+               md_file_name = os.path.basename(md_file_path)
+               f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")         
+          
           EOF
 
       # Commit and push changes
@@ -268,6 +280,12 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git pull
+          git add docs/action/*.puml docs/action/*.svg docs/action/*.md
+          git add docs/collection/*.puml docs/collection/*.svg docs/collection/*.md
+          git add docs/cronjob/*.puml docs/cronjob/*.svg docs/cronjob/*.md
           git add docs/mapping/*.puml docs/mapping/*.svg docs/mapping/*.md
-          git commit -m "Add generated Mapping documentation" || echo "No changes to commit"
+          git add docs/schema/*.puml docs/schema/*.svg docs/schema/*.md
+          git add docs/security/*.puml docs/security/*.svg docs/security/*.md
+          git add docs/source/*.puml docs/source/*.svg docs/source/*.md
+          git commit -m "Add generated PlantUML and SVG files" || echo "No changes to commit"
           git push
