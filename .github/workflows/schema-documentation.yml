@@ -131,13 +131,13 @@ jobs:
       - name: Generate SVG from PUMl
         run: |
           for puml_file in docs/action/*.puml; do
-            plantuml -tsvg $puml_file
+            # plantuml -tsvg $puml_file
           done
           for puml_file in docs/collection/*.puml; do
-            plantuml -tsvg $puml_file
+            # plantuml -tsvg $puml_file
           done 
           for puml_file in docs/cronjob/*.puml; do
-            plantuml -tsvg $puml_file
+            # plantuml -tsvg $puml_file
           done
           for puml_file in docs/mapping/*.puml; do
             plantuml -tsvg $puml_file
@@ -146,10 +146,10 @@ jobs:
             plantuml -tsvg $puml_file
           done
           for puml_file in docs/security/*.puml; do
-            plantuml -tsvg $puml_file
+            # plantuml -tsvg $puml_file
           done
           for puml_file in docs/source/*.puml; do
-            plantuml -tsvg $puml_file
+            # plantuml -tsvg $puml_file
           done
 
       # Let create the mardown documents
@@ -222,7 +222,7 @@ jobs:
                md_file_name = os.path.basename(md_file_path)
                f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")          
           
-          # Generate a generic README.md in docs/schema
+          # Generate a generic README.md in docs/cronjob
           with open("docs/cronjob/README.md", 'w') as f:
            f.write("# cronjob Documentation\n\n")
            f.write("## Table of Cronjobs\n\n")
@@ -252,7 +252,7 @@ jobs:
                md_file_name = os.path.basename(md_file_path)
                f.write(f"| {title} | [{md_file_name}]({md_file_name}) |\n")
           
-          # Generate a generic README.md in docs/schema
+          # Generate a generic README.md in docs/security
           with open("docs/security/README.md", 'w') as f:
            f.write("# Security Documentation\n\n")
            f.write("## Table of Security Groups\n\n")
