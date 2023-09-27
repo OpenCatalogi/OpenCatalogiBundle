@@ -289,6 +289,21 @@ jobs:
 
           EOF
 
+      - name: Generate SVG from PUMl
+        run: |
+          for puml_file in docs/mapping/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/schema/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/security/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+          for puml_file in docs/source/*.puml; do
+            plantuml -tsvg $puml_file
+          done
+
       # Commit and push changes
       - name: Commit and Push Generated Files
         run: |
@@ -298,21 +313,3 @@ jobs:
           git add *.puml *.svg *.md
           git commit -m "Add generated puml, md and README files based on plugin installation files" || echo "No changes to commit"
           git push
-
-  generate_svg:
-    runs-on: ubuntu-latest
-    name: Generate SVG files
-    needs: generate-puml
-
-    steps:
-      - name: checkout
-        uses: actions/checkout@v1
-        with:
-          fetch-depth: 1
-      - name: plantuml
-        id: plantuml
-        uses: grassedge/generate-plantuml-action@v1.5
-        with:
-          message: "Render PlantUML files"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
