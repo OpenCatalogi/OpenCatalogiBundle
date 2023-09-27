@@ -1,0 +1,8 @@
+@startuml
+class Installation {
+  + organization: string
+  + component: string
+  + version: string
+  + environment: string
+}
+@enduml

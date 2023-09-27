@@ -1,0 +1,20 @@
+@startuml
+class Repository {
+  + organisation: Any
+  + component: Any
+  + source: string
+  + name: string
+  + url: string
+  + avatar_url: string
+  + last_change: string
+  + stars: number
+  + fork_count: number
+  + issue_open_count: number
+  + merge_request_open_count: number
+  + programming_languages: array
+  + topics: array
+  + content: string
+  + publiccode_url: string
+  + default_owner: string
+}
+@enduml

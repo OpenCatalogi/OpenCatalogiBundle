@@ -1,0 +1,9 @@
+@startuml
+class Gemma {
+  + bedrijfsfuncties: array
+  + bedrijfsservices: array
+  + applicatiefunctie: string
+  + model: string
+  + referentieComponenten: array
+}
+@enduml

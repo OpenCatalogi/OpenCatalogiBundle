@@ -1,0 +1,7 @@
+@startuml
+class IntendedAudience {
+  + countries: array
+  + unsupportedCountries: array
+  + scope: array
+}
+@enduml

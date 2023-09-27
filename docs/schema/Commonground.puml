@@ -1,0 +1,7 @@
+@startuml
+class Commonground {
+  + intendedOrganisations: array
+  + installationType: string
+  + layerType: string
+}
+@enduml

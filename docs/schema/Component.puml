@@ -1,0 +1,29 @@
+@startuml
+class Component {
+  + applicationId: string
+  + name: string
+  + applicationSuite: Any
+  + url: Any
+  + landingURL: string
+  + isBasedOn: string
+  + softwareVersion: string
+  + releaseDate: string
+  + logo: string
+  + platforms: array
+  + categories: array
+  + usedBy: array
+  + roadmap: string
+  + developmentStatus: string
+  + softwareType: string
+  + intendedAudience: Any
+  + description: Any
+  + legal: Any
+  + maintenance: Any
+  + localisation: Any
+  + dependsOn: Any
+  + nl: Any
+  + inputTypes: array
+  + outputTypes: array
+  + rating: Any
+}
+@enduml

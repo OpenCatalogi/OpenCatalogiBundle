@@ -1,0 +1,7 @@
+@startuml
+class DependsOn {
+  + open: array
+  + proprietary: array
+  + hardware: array
+}
+@enduml

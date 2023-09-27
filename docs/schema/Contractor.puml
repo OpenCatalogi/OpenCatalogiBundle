@@ -1,0 +1,6 @@
+@startuml
+class Contractor {
+  + organisation: Any
+  + until: string
+}
+@enduml

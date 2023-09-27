@@ -1,0 +1,8 @@
+@startuml
+class Nl {
+  + commonground: Any
+  + gemma: Any
+  + apm: object
+  + upl: array
+}
+@enduml

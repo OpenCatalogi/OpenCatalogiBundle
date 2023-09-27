@@ -1,0 +1,7 @@
+@startuml
+class Owner {
+  + fullName: string
+  + email: string
+  + pictureUrl: string
+}
+@enduml

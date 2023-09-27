@@ -1,0 +1,5 @@
+@startuml
+class GithubEvent {
+  + source: string
+}
+@enduml
