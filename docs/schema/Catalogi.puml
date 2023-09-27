@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Catalogi
 footer: Common Gateway Plugin
 header: Schema
+
 class Catalogi {
   + source: Any
   + organisation: Any

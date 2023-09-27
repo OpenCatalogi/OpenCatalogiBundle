@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Organisation
 footer: Common Gateway Plugin
 header: Schema
+
 class Organisation {
   + name: string
   + description: string

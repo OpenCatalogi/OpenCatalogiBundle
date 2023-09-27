@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Source
 footer: Common Gateway Plugin
 header: Schema
+
 class Source {
   + name: string
   + description: string

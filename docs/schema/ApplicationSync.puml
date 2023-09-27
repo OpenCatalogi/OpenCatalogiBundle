@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: ApplicationSync
 footer: Common Gateway Plugin
 header: Schema
+
 class ApplicationSync {
   + name: string
   + shortDescription: string

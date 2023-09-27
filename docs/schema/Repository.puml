@@ -1,7 +1,8 @@
 @startuml
-title: 
+title: Repository
 footer: Common Gateway Plugin
 header: Schema
+
 class Repository {
   + organisation: Any
   + component: Any
