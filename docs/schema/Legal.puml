@@ -1,6 +1,6 @@
 @startuml
 title: Legal
-footer: Common Gateway Plugin
+footer: Common Gateway Plugin | {repo_owner} | {repo_name} 
 header: Schema
 
 class Legal {

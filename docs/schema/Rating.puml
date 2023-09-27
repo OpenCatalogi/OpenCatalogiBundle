@@ -1,6 +1,6 @@
 @startuml
 title: Rating
-footer: Common Gateway Plugin
+footer: Common Gateway Plugin | {repo_owner} | {repo_name} 
 header: Schema
 
 class Rating {
