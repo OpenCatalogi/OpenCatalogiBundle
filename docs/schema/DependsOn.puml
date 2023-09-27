@@ -1,6 +1,6 @@
 @startuml
 title: DependsOn
-footer: Common Gateway Plugin | {repo_owner} | {repo_name} 
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Schema
 
 class DependsOn {

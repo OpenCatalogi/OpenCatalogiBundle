@@ -1,6 +1,6 @@
 @startuml
 title: All sources
-footer: Common Gateway Plugin |
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
 header: Source
 
 @enduml
