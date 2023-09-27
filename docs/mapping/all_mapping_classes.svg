@@ -1,1 +1,18 @@
-<?xml version="1.0" encoding="us-ascii" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="79px" preserveAspectRatio="none" style="width:349px;height:79px;background:#FFFFFF;" version="1.1" viewBox="0 0 349 79" width="349px" zoomAndPan="magnify"><defs/><g><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="47" x="294" y="9.2822">Mapping</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="105" x="118" y="35.6357">All mappings</text><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="341" x="0" y="69.2197">Common Gateway Plugin | Opencatalogi | Opencatalogibundle</text><!--SRC=[NSmn2e0m3030lQ_8Ezp4mKdq2z766aYJeYaY-7WHDyTRpjc56cX586CfhEa8gvdJta1dEPj2ZqudNZ19JQnmmrX85tGKI_pZN3KAGTW8uriCt_a0]--></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="65px" preserveAspectRatio="none" style="width:313px;height:65px;" version="1.1" viewBox="0 0 313 65" width="313px" zoomAndPan="magnify"><defs/><g><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacingAndGlyphs" textLength="41" x="260" y="9.2822">Mapping</text><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="112" x="94.5" y="28.3486">All mappings</text><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacingAndGlyphs" textLength="301" x="0" y="51.876">Common Gateway Plugin | Opencatalogi | Opencatalogibundle</text><!--MD5=[be94cadce143da472fd73e1a033227d6]
+@startuml
+title: All mappings
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
+header: Mapping
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 UTC 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.20.1+1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: null
+--></g></svg>

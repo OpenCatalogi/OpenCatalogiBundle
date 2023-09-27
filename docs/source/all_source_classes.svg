@@ -1,1 +1,18 @@
-<?xml version="1.0" encoding="us-ascii" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="79px" preserveAspectRatio="none" style="width:349px;height:79px;background:#FFFFFF;" version="1.1" viewBox="0 0 349 79" width="349px" zoomAndPan="magnify"><defs/><g><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="38" x="303" y="9.2822">Source</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="89" x="126" y="35.6357">All sources</text><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacing" textLength="341" x="0" y="69.2197">Common Gateway Plugin | Opencatalogi | Opencatalogibundle</text><!--SRC=[AyaioKcrKd3CoL4epYyjIaujvahBpoz9BR9ISCxFpStFKt1FB4ajJwnK2CWfJS_CKwXHy2z8pKjEB4dCoK_FHECcbUQbvAGgS6Ma9gQ0Z0W66ma0]--></g></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="65px" preserveAspectRatio="none" style="width:313px;height:65px;" version="1.1" viewBox="0 0 313 65" width="313px" zoomAndPan="magnify"><defs/><g><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacingAndGlyphs" textLength="34" x="267" y="9.2822">Source</text><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacingAndGlyphs" textLength="94" x="103.5" y="28.3486">All sources</text><text fill="#888888" font-family="sans-serif" font-size="10" lengthAdjust="spacingAndGlyphs" textLength="301" x="0" y="51.876">Common Gateway Plugin | Opencatalogi | Opencatalogibundle</text><!--MD5=[5d3fb8d7d98c5affa9c1326c2d420b70]
+@startuml
+title: All sources
+footer: Common Gateway Plugin | Opencatalogi | Opencatalogibundle 
+header: Source
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 UTC 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.20.1+1
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: null
+--></g></svg>
