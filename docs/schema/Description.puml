@@ -1,0 +1,14 @@
+@startuml
+class Description {
+  + id: string
+  + localisedName: string
+  + shortDescription: string
+  + longDescription: string
+  + documentation: string
+  + apiDocumentation: string
+  + features: array
+  + screenshots: array
+  + videos: array
+  + awards: array
+}
+@enduml

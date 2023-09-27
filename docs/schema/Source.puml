@@ -1,0 +1,7 @@
+@startuml
+class Source {
+  + name: string
+  + description: string
+  + location: string
+}
+@enduml

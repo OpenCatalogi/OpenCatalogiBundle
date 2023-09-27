@@ -1,0 +1,8 @@
+@startuml
+class Legal {
+  + license: string
+  + mainCopyrightOwner: Any
+  + repoOwner: Any
+  + authorsFile: string
+}
+@enduml

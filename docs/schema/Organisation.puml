@@ -1,0 +1,18 @@
+@startuml
+class Organisation {
+  + name: string
+  + description: string
+  + logo: string
+  + supports: array
+  + owns: array
+  + uses: array
+  + token: string
+  + github: string
+  + gitlab: string
+  + website: string
+  + phone: string
+  + email: string
+  + type: string
+  + catalogusAPI: string
+}
+@enduml

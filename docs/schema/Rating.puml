@@ -1,0 +1,7 @@
+@startuml
+class Rating {
+  + rating: integer
+  + maxRating: integer
+  + results: array
+}
+@enduml

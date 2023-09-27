@@ -1,0 +1,8 @@
+@startuml
+class Catalogi {
+  + source: Any
+  + organisation: Any
+  + rsin: string
+  + pki: string
+}
+@enduml

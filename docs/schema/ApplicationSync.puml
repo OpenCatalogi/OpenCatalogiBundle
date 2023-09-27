@@ -1,0 +1,14 @@
+@startuml
+class ApplicationSync {
+  + name: string
+  + shortDescription: string
+  + description: string
+  + detailPageImageUrl: string
+  + documentationUrl: string
+  + demoUrl: string
+  + bpmnProcessUrl: string
+  + isPublished: boolean
+  + owner: array
+  + components: array
+}
+@enduml

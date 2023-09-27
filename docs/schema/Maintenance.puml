@@ -1,0 +1,7 @@
+@startuml
+class Maintenance {
+  + type: string
+  + contractors: array
+  + contacts: array
+}
+@enduml

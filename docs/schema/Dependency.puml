@@ -1,0 +1,7 @@
+@startuml
+class Dependency {
+  + id: string
+  + name: string
+  + version: string
+}
+@enduml
