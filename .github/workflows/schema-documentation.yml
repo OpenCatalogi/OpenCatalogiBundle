@@ -91,9 +91,9 @@ jobs:
           
               with open(puml_file_path, 'w') as puml_file:
                   puml_file.write("@startuml\n")
-                  f.write("title: ".title)
-                  f.write('footer: Common Gateway Plugin')
-                  f.write("header: Schema")           
+                  puml_file.write("title: ".title)
+                  puml_file.write("footer: Common Gateway Plugin")
+                  puml_file.write("header: Schema")           
           
                   puml_file.write("\n".join(class_def))
                   puml_file.write("\n@enduml\n")
