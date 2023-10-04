@@ -10,8 +10,8 @@ env: # Change these to your preferences any image url can also be a base encoded
   GITHUB_DOCS_DIRECTORY_PATHS: '[]'
 
   # Links
-  SLACK_URL: "https://join.slack.com/t/conductionworkspace/shared_invite/zt-1y5kerime-amWEvljvnLvo5S3YfU_jzg"
-  READ_THE_DOCS_URL: "https://commongateway.readthedocs.io/en/latest/"
+  SLACK_URL: "https://samenorganiseren.slack.com/archives/C049GJ0QNHW"
+  READ_THE_DOCS_URL: "https://opencatalogi.readthedocs.io/en/latest/"
 
   # Navbar
   NAVBAR_LOGO_URL: "https://conduction.nl/wp-content/uploads/2021/07/cropped-conductionlogo-1.png"
