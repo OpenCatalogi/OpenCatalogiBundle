@@ -12,8 +12,8 @@
     "fork_count": "forks_count",
     "issue_open_count": "open_issues_count",
     "source": "github",
-    "forked_from": "{% if fork === true && parent.html_url|default %}parent.html_url{% endif %}",
-    "archived": "{% if archived|default %}{{ archived }}{% endif %}"
+    "forked_from": "{% if fork == true and parent.html_url|default %}{{ parent.html_url }}{% endif %}",
+    "archived": "{% if archived|default %}{{ archived }}{% else %}false{% endif %}"
   },
   "cast": {
     "archived": "boolean"
