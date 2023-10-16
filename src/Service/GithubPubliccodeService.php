@@ -552,7 +552,7 @@ class GithubPubliccodeService
 
         $forkedFrom = $repository->getValue('forked_from');
         if ($forkedFrom !== null) {
-            $componentArray['basedOn'] = $forkedFrom;
+            $componentArray['isBasedOn'] = $forkedFrom;
         }
 
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
