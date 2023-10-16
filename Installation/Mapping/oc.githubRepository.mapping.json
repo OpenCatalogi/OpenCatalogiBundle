@@ -11,7 +11,8 @@
     "stars": "stargazers_count",
     "fork_count": "forks_count",
     "issue_open_count": "open_issues_count",
-    "source": "github"
+    "source": "github",
+    "forked_from": "{% if fork === true && parent.html_url|default %}parent.html_url{% endif %}"
   }
 }
 

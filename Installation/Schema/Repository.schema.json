@@ -57,6 +57,9 @@
     },
     "default_owner": {
       "type": "string"
+    },
+    "forked_from": {
+      "type": "string"
     }
   }
 }

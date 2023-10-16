@@ -551,6 +551,12 @@ class GithubPubliccodeService
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
+
+        $forkedFrom = $repository->getValue('forked_from');
+        if($forkedFrom !== null) {
+            $componentArray['basedOn'] = $forkedFrom;
+        }
+
         $component->hydrate($componentArray);
         // set the name
         $component->hydrate(['name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name')]);
