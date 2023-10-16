@@ -551,8 +551,8 @@ class GithubPubliccodeService
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $forkedFrom = $repository->getValue('forked_from');
-        if ($forkedFrom !== null) {
-            $componentArray['isBasedOn'] = $forkedFrom;
+        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
+            $publiccode['isBasedOn'] = $forkedFrom;
         }
 
         // Set developmentStatus obsolete when repository is archived.
