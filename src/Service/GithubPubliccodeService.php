@@ -162,7 +162,7 @@ class GithubPubliccodeService
         $result      = [];
         $queryConfig = [];
 
-        $queryConfig['query'] = ['q' => 'publiccode in:path path:/ extension:yaml extension:yml'];
+        $queryConfig['query'] = ['q' => 'filename:publiccode extension:yaml extension:yml'];
 
         // Find on publiccode.yaml.
         $repositories = $this->callService->getAllResults($source, '/search/code', $queryConfig);
