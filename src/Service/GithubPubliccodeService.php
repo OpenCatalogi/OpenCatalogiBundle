@@ -555,6 +555,11 @@ class GithubPubliccodeService
             $componentArray['isBasedOn'] = $forkedFrom;
         }
 
+        // Set developmentStatus obsolete when repository is archived.
+        if ($repository->getValue('archived') === true) {
+            $publiccode['developmentStatus'] = 'obsolete';
+        }
+
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
 
         $component->hydrate($componentArray);

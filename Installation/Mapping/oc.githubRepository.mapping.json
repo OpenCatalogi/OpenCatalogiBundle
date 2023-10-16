@@ -2,7 +2,7 @@
   "title": "GithubApiToRepository",
   "$id": "https://api.github.com/oc.githubRepository.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "name",
@@ -12,7 +12,11 @@
     "fork_count": "forks_count",
     "issue_open_count": "open_issues_count",
     "source": "github",
-    "forked_from": "{% if fork === true && parent.html_url|default %}parent.html_url{% endif %}"
+    "forked_from": "{% if fork === true && parent.html_url|default %}parent.html_url{% endif %}",
+    "archived": "{% if archived|default %}{{ archived }}{% endif %}"
+  },
+  "cast": {
+    "archived": "boolean"
   }
 }
 
