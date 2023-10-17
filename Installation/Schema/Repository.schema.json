@@ -62,7 +62,7 @@
       "type": "string"
     },
     "archived": {
-      "type": "bool"
+      "type": "boolean"
     }
   }
 }
