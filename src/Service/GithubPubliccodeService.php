@@ -550,7 +550,18 @@ class GithubPubliccodeService
         $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
+        $forkedFrom = $repository->getValue('forked_from');
+        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
+            $publiccode['isBasedOn'] = $forkedFrom;
+        }
+
+        // Set developmentStatus obsolete when repository is archived.
+        if ($repository->getValue('archived') === true) {
+            $publiccode['developmentStatus'] = 'obsolete';
+        }
+
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
+
         $component->hydrate($componentArray);
         // set the name
         $component->hydrate(['name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name')]);
