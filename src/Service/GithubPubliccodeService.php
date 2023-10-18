@@ -605,7 +605,6 @@ class GithubPubliccodeService
             $publiccode = \Safe\base64_decode($publiccode['content']);
         }//end if
 
-        var_dump($publiccode);die();
         // @TODO Use decodeResponse from the callService.
         try {
             $parsedPubliccode = $this->yaml->parse($publiccode);
