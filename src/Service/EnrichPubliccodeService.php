@@ -97,25 +97,17 @@ class EnrichPubliccodeService
      */
     public function getPubliccodeFromUrl(string $publiccodeUrl): ?array
     {
-        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        if ($source === null
-            || $this->githubApiService->checkGithubAuth($source) === false
-        ) {
-            return null;
-        }//end if
+        // Get the path from the url to make the call.
+        $endpoint = \Safe\parse_url($publiccodeUrl)['path'];
+        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
 
         try {
-            $response = $this->callService->call($source, '/'.$publiccodeUrl);
+            $response = $this->callService->call($source, $endpoint);
         } catch (Exception $e) {
             $this->pluginLogger->error('Error found trying to fetch '.$publiccodeUrl.' '.$e->getMessage());
         }
 
-        if (isset($response) === true) {
-            return $this->githubService->parsePubliccode($publiccodeUrl, $response, $source);
-        }
-
-        return null;
-
+        return $this->callService->decodeResponse($source, $response, 'text/yaml');
     }//end getPubliccodeFromUrl()
 
 
@@ -129,8 +121,7 @@ class EnrichPubliccodeService
      */
     public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
     {
-        $url = trim(\Safe\parse_url($publiccodeUrl, PHP_URL_PATH), '/');
-        if (($publiccode = $this->getPubliccodeFromUrl($url)) !== null) {
+        if (($publiccode = $this->getPubliccodeFromUrl($publiccodeUrl)) !== null) {
             $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration);
         }
 
