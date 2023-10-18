@@ -331,7 +331,7 @@ class GetResourcesService
     {
 
         $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        
+
         $repositories = $this->callService->getAllResults($source, '/orgs/'.$name.'/repos');
 
         if ($repositories === null) {
