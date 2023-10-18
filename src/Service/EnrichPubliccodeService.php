@@ -99,7 +99,7 @@ class EnrichPubliccodeService
     {
         // Get the path from the url to make the call.
         $endpoint = \Safe\parse_url($publiccodeUrl)['path'];
-        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+        $source   = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, $endpoint);
@@ -108,6 +108,7 @@ class EnrichPubliccodeService
         }
 
         return $this->callService->decodeResponse($source, $response, 'text/yaml');
+
     }//end getPubliccodeFromUrl()
 
 
