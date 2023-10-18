@@ -145,7 +145,7 @@ class GithubPubliccodeService
 
     /**
      * Get repositories through the repositories of https://api.github.com/search/code
-     * with query ?q=publiccode+in:path+path:/+extension:yaml+extension:yml.
+     * with query ?q=filename:publiccode extension:yaml extension:yml.
      *
      * @throws Exception
      *
@@ -166,11 +166,14 @@ class GithubPubliccodeService
 
         // Find on publiccode.yaml.
         $repositories = $this->callService->getAllResults($source, '/search/code', $queryConfig);
-
+        
         $this->pluginLogger->debug('Found '.count($repositories).' repositories.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $repositoriesMapping = $this->resourceService->getMapping($this->configuration['repositoriesMapping'], 'open-catalogi/open-catalogi-bundle');
         foreach ($repositories as $repository) {
+            // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent
+            $publiccodeUrlQuery = \Safe\parse_url($repository['url'])['query'];
+            $repository['urlReference'] = explode('ref=', $publiccodeUrlQuery)[1];
             $repository['repository']['name'] = str_replace('-', ' ', $repository['repository']['name']);
 
             $result[] = $this->importRepository($repository, $repository['repository']['id'], $repositoriesMapping);
@@ -602,6 +605,7 @@ class GithubPubliccodeService
             $publiccode = \Safe\base64_decode($publiccode['content']);
         }//end if
 
+        var_dump($publiccode);die();
         // @TODO Use decodeResponse from the callService.
         try {
             $parsedPubliccode = $this->yaml->parse($publiccode);
