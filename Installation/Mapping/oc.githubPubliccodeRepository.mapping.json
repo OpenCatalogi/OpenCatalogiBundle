@@ -1,13 +1,13 @@
 {
-  "title": "GithubApiPubliccodeRepositoryTotRepository",
+  "title": "GithubApiPubliccodeRepositoryToRepository",
   "$id": "https://api.github.com/oc.githubPubliccodeRepository.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "repository.name",
     "url": "repository.html_url",
-    "publiccode_url": "git_url",
+    "publiccode_url": "https://raw.githubusercontent.com/{{repository.full_name}}/{{urlReference}}/{{name}}",
     "source": "github"
   }
 }
