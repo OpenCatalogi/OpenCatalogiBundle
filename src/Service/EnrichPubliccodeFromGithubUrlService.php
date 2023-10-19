@@ -101,6 +101,7 @@ class EnrichPubliccodeFromGithubUrlService
 
     }//end setConfiguration()
 
+
     /**
      * This function gets the publiccode file from the github user content.
      *
@@ -126,13 +127,14 @@ class EnrichPubliccodeFromGithubUrlService
         }
 
         return $this->callService->decodeResponse($source, $response, 'text/yaml');
+
     }//end getPubliccodeFromRawUserContent()
 
 
     /**
      * This function gets and maps the publiccode file
      *
-     * @param ObjectEntity $repository The repository object.
+     * @param ObjectEntity $repository    The repository object.
      * @param string       $repositoryUrl The repository url.
      *
      * @throws Exception
@@ -171,7 +173,7 @@ class EnrichPubliccodeFromGithubUrlService
         foreach ($repositories['items'] as $githubRepository) {
             // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent
             $publiccodeUrlQuery = \Safe\parse_url($githubRepository['url'])['query'];
-            $urlReference = explode('ref=', $publiccodeUrlQuery)[1];
+            $urlReference       = explode('ref=', $publiccodeUrlQuery)[1];
 
             $publiccodeUrls[] = $publiccodeUrl = "https://raw.githubusercontent.com/{$githubRepository['repository']['full_name']}/{$urlReference}/{$githubRepository['path']}";
 

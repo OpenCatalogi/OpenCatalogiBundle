@@ -100,7 +100,7 @@ class EnrichPubliccodeService
     {
         // Get the path from the url to make the call.
         $endpoint = \Safe\parse_url($publiccodeUrl)['path'];
-        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+        $source   = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, $endpoint);
@@ -111,7 +111,7 @@ class EnrichPubliccodeService
         if (isset($response) === true) {
             try {
                 $publiccode = $this->callService->decodeResponse($source, $response, 'text/yaml');
-            } catch (ParseException|Exception $e) {
+            } catch (ParseException | Exception $e) {
                 $this->pluginLogger->error('Error found trying to decode response. '.$e->getMessage());
             }
         }
@@ -121,12 +121,13 @@ class EnrichPubliccodeService
         }
 
         return null;
+
     }//end getPubliccodeFromUrl()
 
 
     /**
-     * @param ObjectEntity $repository The repository object.
-     * @param array $publiccodeUrls The publiccode urls.
+     * @param ObjectEntity $repository     The repository object.
+     * @param array        $publiccodeUrls The publiccode urls.
      *
      * @throws Exception
      *

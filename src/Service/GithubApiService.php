@@ -146,23 +146,23 @@ class GithubApiService
     /**
      * This function create or get the component of the repository.
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param string|null $publiccodeUrl The publiccode url.
+     * @param ObjectEntity $repository    The repository object.
+     * @param string|null  $publiccodeUrl The publiccode url.
      *
      * @return ObjectEntity|null
      */
-    public function connectComponent(ObjectEntity $repository, ?string $publiccodeUrl = null): ?ObjectEntity
+    public function connectComponent(ObjectEntity $repository, ?string $publiccodeUrl=null): ?ObjectEntity
     {
         $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $cacheComponents      = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
+        $cacheComponents = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
 
         if ($cacheComponents === []) {
             $component = new ObjectEntity($componentEntity);
             $component->hydrate(
                 [
-                    'name' => $repository->getValue('name'),
-                    'url'  => $repository,
-                    'publiccodeUrl' => $publiccodeUrl
+                    'name'          => $repository->getValue('name'),
+                    'url'           => $repository,
+                    'publiccodeUrl' => $publiccodeUrl,
                 ]
             );
             $this->entityManager->persist($component);

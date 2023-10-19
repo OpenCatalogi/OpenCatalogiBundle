@@ -172,10 +172,10 @@ class GithubPubliccodeService
         $repositoriesMapping = $this->resourceService->getMapping($this->configuration['repositoriesMapping'], 'open-catalogi/open-catalogi-bundle');
         foreach ($repositories as $repository) {
             // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent
-            $publiccodeUrlQuery = \Safe\parse_url($repository['url'])['query'];
-            $repository['urlReference'] = explode('ref=', $publiccodeUrlQuery)[1];
+            $publiccodeUrlQuery               = \Safe\parse_url($repository['url'])['query'];
+            $repository['urlReference']       = explode('ref=', $publiccodeUrlQuery)[1];
             $repository['repository']['name'] = str_replace('-', ' ', $repository['repository']['name']);
-            $publiccodeUrl = "https://raw.githubusercontent.com/{$repository['repository']['full_name']}/{$repository['urlReference']}/{$repository['path']}";
+            $publiccodeUrl                    = "https://raw.githubusercontent.com/{$repository['repository']['full_name']}/{$repository['urlReference']}/{$repository['path']}";
 
             $repositoryObject = $this->importRepository($repository, $repository['repository']['id'], $repositoriesMapping, $publiccodeUrl);
 
@@ -232,16 +232,16 @@ class GithubPubliccodeService
     /**
      * Maps a repository object and creates/updates a Synchronization.
      *
-     * @param array $repository The repository array that will be imported
-     * @param string $repositoryId The id of the repository to find the sync object
-     * @param Mapping $repositoryMapping The mapping of the repository
-     * @param string|null $publiccodeUrl The publiccode url
+     * @param array       $repository        The repository array that will be imported
+     * @param string      $repositoryId      The id of the repository to find the sync object
+     * @param Mapping     $repositoryMapping The mapping of the repository
+     * @param string|null $publiccodeUrl     The publiccode url
      *
      * @throws Exception
      *
      * @return ObjectEntity The repository object as array
      */
-    public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping, ?string $publiccodeUrl = null): ObjectEntity
+    public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping, ?string $publiccodeUrl=null): ObjectEntity
     {
         // Do we have a source
         $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
@@ -257,7 +257,7 @@ class GithubPubliccodeService
         if (empty($publiccodeUrl) === false) {
             $repositoryObject->setValue('publiccode_urls', [$publiccodeUrl]);
         }
-        
+
         $this->pluginLogger->debug('Mapped object'.$repositoryObject->getValue('name').'. '.'With the mapping object '.$repositoryMapping->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $component = $this->githubApiService->connectComponent($repositoryObject, $publiccodeUrl);
@@ -536,16 +536,16 @@ class GithubPubliccodeService
     /**
      * This function maps the publiccode to a component.
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param array $publiccode The publiccode array for updating the component object.
-     * @param array $configuration The configuration array
-     * @param string|null $publiccodeUrl The publicce url
+     * @param ObjectEntity $repository    The repository object.
+     * @param array        $publiccode    The publiccode array for updating the component object.
+     * @param array        $configuration The configuration array
+     * @param string|null  $publiccodeUrl The publicce url
      *
      * @throws Exception
      *
      * @return ObjectEntity|null The repository with the updated component from the publiccode url.
      */
-    public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration, ?string $publiccodeUrl = null): ?ObjectEntity
+    public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration, ?string $publiccodeUrl=null): ?ObjectEntity
     {
         $componentEntity  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
@@ -556,9 +556,9 @@ class GithubPubliccodeService
             ) {
                 $component = $repoComponent;
                 $component->setValue('publiccodeUrl', $publiccodeUrl);
-            }elseif ($repoComponent instanceof ObjectEntity === true
+            } else if ($repoComponent instanceof ObjectEntity === true
                 && $repoComponent->getValue('publiccodeUrl') === $publiccodeUrl
-            ){
+            ) {
                 $component = $repoComponent;
             }
         }
@@ -604,5 +604,6 @@ class GithubPubliccodeService
         return $repository;
 
     }//end mapPubliccode()
+
 
 }//end class
