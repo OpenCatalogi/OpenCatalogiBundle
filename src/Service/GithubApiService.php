@@ -146,30 +146,31 @@ class GithubApiService
     /**
      * This function create or get the component of the repository.
      *
-     * @param ObjectEntity $repository The repository object.
-     *
-     * @throws Exception
+     * @param ObjectEntity $repository    The repository object.
+     * @param string|null  $publiccodeUrl The publiccode url.
      *
      * @return ObjectEntity|null
      */
-    public function connectComponent(ObjectEntity $repository): ?ObjectEntity
+    public function connectComponent(ObjectEntity $repository, ?string $publiccodeUrl=null): ?ObjectEntity
     {
         $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $components      = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
+        $cacheComponents = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
 
-        if ($components === []) {
+        if ($cacheComponents === []) {
             $component = new ObjectEntity($componentEntity);
             $component->hydrate(
                 [
-                    'name' => $repository->getValue('name'),
-                    'url'  => $repository,
+                    'name'          => $repository->getValue('name'),
+                    'url'           => $repository,
+                    'publiccodeUrl' => $publiccodeUrl,
                 ]
             );
             $this->entityManager->persist($component);
+            $this->entityManager->flush();
         }//end if
 
-        if (count($components) === 1) {
-            $component = $this->entityManager->find('App:ObjectEntity', $components[0]['_self']['id']);
+        if (count($cacheComponents) === 1) {
+            $component = $this->entityManager->find('App:ObjectEntity', $cacheComponents[0]['_self']['id']);
         }//end if
 
         if (isset($component) === true) {

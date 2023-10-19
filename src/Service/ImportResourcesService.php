@@ -12,6 +12,7 @@ use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -268,7 +269,7 @@ class ImportResourcesService
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function importDevRepository(array $repository, array $configuration): ?ObjectEntity
     {
@@ -313,11 +314,6 @@ class ImportResourcesService
         $repositoryObject = $synchronization->getObject();
 
         $component = $this->githubApiService->connectComponent($repositoryObject);
-        if ($component !== null) {
-            $repositoryObject->setValue('component', $component);
-            $this->entityManager->persist($repositoryObject);
-            $this->entityManager->flush();
-        }//end if
 
         return $repositoryObject;
 
@@ -331,7 +327,7 @@ class ImportResourcesService
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function importGithubRepository(array $repository, array $configuration): ?ObjectEntity
     {
@@ -359,11 +355,6 @@ class ImportResourcesService
         $repositoryObject = $synchronization->getObject();
 
         $component = $this->githubApiService->connectComponent($repositoryObject);
-        if ($component !== null) {
-            $repositoryObject->setValue('component', $component);
-            $this->entityManager->persist($repositoryObject);
-            $this->entityManager->flush();
-        }//end if
 
         return $repositoryObject;
 
