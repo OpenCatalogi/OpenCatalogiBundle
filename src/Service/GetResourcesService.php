@@ -331,9 +331,8 @@ class GetResourcesService
     {
 
         $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $response = $this->callService->call($source, '/orgs/'.$name.'/repos');
 
-        $repositories = json_decode($response->getBody()->getContents(), true);
+        $repositories = $this->callService->getAllResults($source, '/orgs/'.$name.'/repos');
 
         if ($repositories === null) {
             $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
