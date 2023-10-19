@@ -172,11 +172,14 @@ class GithubPubliccodeService
         $repositoriesMapping = $this->resourceService->getMapping($this->configuration['repositoriesMapping'], 'open-catalogi/open-catalogi-bundle');
         foreach ($repositories as $repository) {
             // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent
-            $publiccodeUrlQuery               = \Safe\parse_url($repository['url'])['query'];
-            $repository['urlReference']       = explode('ref=', $publiccodeUrlQuery)[1];
+            $publiccodeUrlQuery = \Safe\parse_url($repository['url'])['query'];
+            $repository['urlReference'] = explode('ref=', $publiccodeUrlQuery)[1];
             $repository['repository']['name'] = str_replace('-', ' ', $repository['repository']['name']);
+            $publiccodeUrl = "https://raw.githubusercontent.com/{$repository['repository']['full_name']}/{$repository['urlReference']}/{$repository['path']}";
 
-            $result[] = $this->importRepository($repository, $repository['repository']['id'], $repositoriesMapping);
+            $repositoryObject = $this->importRepository($repository, $repository['repository']['id'], $repositoriesMapping, $publiccodeUrl);
+
+            $result[] = $repositoryObject->toArray();
         }
 
         $this->entityManager->flush();
@@ -221,7 +224,7 @@ class GithubPubliccodeService
         $repositoryMapping  = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
         $repository['name'] = str_replace('-', ' ', $repository['name']);
 
-        return $this->importRepository($repository, $repository['id'], $repositoryMapping);
+        return $this->importRepository($repository, $repository['id'], $repositoryMapping)->toArray();
 
     }//end getRepository()
 
@@ -229,15 +232,16 @@ class GithubPubliccodeService
     /**
      * Maps a repository object and creates/updates a Synchronization.
      *
-     * @param array   $repository        The repository array that will be imported
-     * @param string  $repositoryId      The id of the repository to find the sync object
+     * @param array $repository The repository array that will be imported
+     * @param string $repositoryId The id of the repository to find the sync object
      * @param Mapping $repositoryMapping The mapping of the repository
+     * @param string|null $publiccodeUrl The publiccode url
      *
-     * @throws GuzzleException|LoaderError|SyntaxError|Exception
+     * @throws Exception
      *
-     * @return array The repository object as array
+     * @return ObjectEntity The repository object as array
      */
-    public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping): array
+    public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping, ?string $publiccodeUrl = null): ObjectEntity
     {
         // Do we have a source
         $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
@@ -250,16 +254,15 @@ class GithubPubliccodeService
 
         $repositoryObject = $synchronization->getObject();
 
+        if (empty($publiccodeUrl) === false) {
+            $repositoryObject->setValue('publiccode_urls', [$publiccodeUrl]);
+        }
+        
         $this->pluginLogger->debug('Mapped object'.$repositoryObject->getValue('name').'. '.'With the mapping object '.$repositoryMapping->getName(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
-        $component = $this->githubApiService->connectComponent($repositoryObject);
-        if ($component !== null) {
-            $repositoryObject->setValue('component', $component);
-            $this->entityManager->persist($repositoryObject);
-            $this->entityManager->flush();
-        }//end if
+        $component = $this->githubApiService->connectComponent($repositoryObject, $publiccodeUrl);
 
-        return $repositoryObject->toArray();
+        return $repositoryObject;
 
     }//end importRepository()
 
@@ -533,22 +536,37 @@ class GithubPubliccodeService
     /**
      * This function maps the publiccode to a component.
      *
-     * @param ObjectEntity $repository    The repository object.
-     * @param array        $publiccode    The publiccode array for updating the component object.
-     * @param array        $configuration The configuration array
+     * @param ObjectEntity $repository The repository object.
+     * @param array $publiccode The publiccode array for updating the component object.
+     * @param array $configuration The configuration array
+     * @param string|null $publiccodeUrl The publicce url
      *
      * @throws Exception
      *
      * @return ObjectEntity|null The repository with the updated component from the publiccode url.
      */
-    public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration): ?ObjectEntity
+    public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration, ?string $publiccodeUrl = null): ?ObjectEntity
     {
         $componentEntity  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        if (($component = $repository->getValue('component')) === false) {
+        foreach ($repository->getValue('components') as $repoComponent) {
+            if ($repoComponent instanceof ObjectEntity === true
+                && $repoComponent->getValue('publiccodeUrl') === null
+            ) {
+                $component = $repoComponent;
+                $component->setValue('publiccodeUrl', $publiccodeUrl);
+            }elseif ($repoComponent instanceof ObjectEntity === true
+                && $repoComponent->getValue('publiccodeUrl') === $publiccodeUrl
+            ){
+                $component = $repoComponent;
+            }
+        }
+
+        if (isset($component) === false) {
             $component = new ObjectEntity($componentEntity);
-        }//end if
+            $component->setValue('publiccodeUrl', $publiccodeUrl);
+        }
 
         $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -578,49 +596,13 @@ class GithubPubliccodeService
         // $component = $this->createContractors($publiccode, $component);
         // $component = $this->createContacts($publiccode, $component);
         $this->entityManager->persist($component);
-        $repository->setValue('component', $component);
+        $components[] = $component;
+        $repository->setValue('components', $components);
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 
         return $repository;
 
     }//end mapPubliccode()
-
-
-    /**
-     * This function parses the publiccode.
-     *
-     * @param string $repositoryUrl The repository url.
-     * @param $response      The response of the get publiccode call.
-     *
-     * @throws Exception
-     *
-     * @return array|null The parsed publiccode of the given repository.
-     */
-    public function parsePubliccode(string $repositoryUrl, $response, Source $source): ?array
-    {
-        $publiccode = $this->callService->decodeResponse($source, $response, 'application/json');
-
-        if (is_array($publiccode) === true && key_exists('content', $publiccode) === true) {
-            $publiccode = \Safe\base64_decode($publiccode['content']);
-        }//end if
-
-        // @TODO Use decodeResponse from the callService.
-        try {
-            $parsedPubliccode = $this->yaml->parse($publiccode);
-        } catch (Exception $e) {
-            $this->pluginLogger->debug('Not able to parse '.$publiccode.' '.$e->getMessage().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        }
-
-        if (isset($parsedPubliccode) === true) {
-            $this->pluginLogger->debug("Fetch and decode went succesfull for $repositoryUrl.", ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return $parsedPubliccode;
-        }//end if
-
-        return null;
-
-    }//end parsePubliccode()
-
 
 }//end class

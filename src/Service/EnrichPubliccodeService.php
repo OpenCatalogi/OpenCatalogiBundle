@@ -13,6 +13,7 @@ use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 class EnrichPubliccodeService
 {
@@ -99,7 +100,7 @@ class EnrichPubliccodeService
     {
         // Get the path from the url to make the call.
         $endpoint = \Safe\parse_url($publiccodeUrl)['path'];
-        $source   = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
 
         try {
             $response = $this->callService->call($source, $endpoint);
@@ -107,23 +108,36 @@ class EnrichPubliccodeService
             $this->pluginLogger->error('Error found trying to fetch '.$publiccodeUrl.' '.$e->getMessage());
         }
 
-        return $this->callService->decodeResponse($source, $response, 'text/yaml');
+        if (isset($response) === true) {
+            try {
+                $publiccode = $this->callService->decodeResponse($source, $response, 'text/yaml');
+            } catch (ParseException|Exception $e) {
+                $this->pluginLogger->error('Error found trying to decode response. '.$e->getMessage());
+            }
+        }
 
+        if (isset($publiccode) === true) {
+            return $publiccode;
+        }
+
+        return null;
     }//end getPubliccodeFromUrl()
 
 
     /**
-     * @param ObjectEntity $repository    The repository object.
-     * @param string       $publiccodeUrl The publiccode url.
+     * @param ObjectEntity $repository The repository object.
+     * @param array $publiccodeUrls The publiccode urls.
      *
-     * @throws GuzzleException|Exception
+     * @throws Exception
      *
      * @return ObjectEntity|null dataset at the end of the handler
      */
-    public function enrichRepositoryWithPubliccode(ObjectEntity $repository, string $publiccodeUrl): ?ObjectEntity
+    public function enrichRepositoryWithPubliccode(ObjectEntity $repository, array $publiccodeUrls): ?ObjectEntity
     {
-        if (($publiccode = $this->getPubliccodeFromUrl($publiccodeUrl)) !== null) {
-            $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration);
+        foreach ($publiccodeUrls as $publiccodeUrl) {
+            if (($publiccode = $this->getPubliccodeFromUrl($publiccodeUrl)) !== null) {
+                $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration, $publiccodeUrl);
+            }
         }
 
         $this->entityManager->flush();
@@ -150,8 +164,8 @@ class EnrichPubliccodeService
         if ($repositoryId !== null) {
             // If we are testing for one repository.
             if (($repository = $this->entityManager->find('App:ObjectEntity', $repositoryId)) !== null) {
-                if (($publiccodeUrl = $repository->getValue('publiccode_url')) !== null) {
-                    $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
+                if (($publiccodeUrls = $repository->getValue('publiccode_urls')) !== []) {
+                    $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrls);
 
                     return $this->data;
                 }
@@ -169,8 +183,8 @@ class EnrichPubliccodeService
         // If we want to do it for al repositories.
         $this->pluginLogger->debug('Looping through repositories');
         foreach ($repositorySchema->getObjectEntities() as $repository) {
-            if (($publiccodeUrl = $repository->getValue('publiccode_url')) !== null) {
-                $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrl);
+            if (($publiccodeUrls = $repository->getValue('publiccode_urls')) !== []) {
+                $this->enrichRepositoryWithPubliccode($repository, $publiccodeUrls);
             }
         }
 
