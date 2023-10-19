@@ -2,15 +2,19 @@
   "title": "Repository",
   "$id": "https://opencatalogi.nl/oc.repository.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "object",
   "description": "",
   "properties": {
     "organisation": {
       "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
     },
-    "component": {
-      "$ref": "https://opencatalogi.nl/oc.component.schema.json"
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
+      },
+      "inversedBy": "url"
     },
     "source": {
       "type": "string",
@@ -52,8 +56,11 @@
     "content": {
       "type": "string"
     },
-    "publiccode_url": {
-      "type": "string"
+    "publiccode_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "default_owner": {
       "type": "string"
