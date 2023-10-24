@@ -283,11 +283,11 @@ class FindGithubRepositoryThroughOrganizationService
         $organizationArray = $this->mappingService->mapping($mapping, $openCatalogi);
         // Set the values to the array that cannot be overwritten.
         $organizationArray[] = [
-            'github' => $organization->getValue('github'),
-            'type' => $organization->getValue('type'),
+            'github'   => $organization->getValue('github'),
+            'type'     => $organization->getValue('type'),
             'supports' => $organization->getValue('type'),
-            'owns' => $organization->getValue('owns'),
-            'uses' => $organization->getValue('uses'),
+            'owns'     => $organization->getValue('owns'),
+            'uses'     => $organization->getValue('uses'),
         ];
 
         $organization->hydrate($organizationArray, true);
