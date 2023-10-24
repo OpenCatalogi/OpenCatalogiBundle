@@ -20,7 +20,7 @@
     "supports": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
+      "description": "A list of components supported by this organisation",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
@@ -28,7 +28,7 @@
     "owns": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
+      "description": "A list of components owned by this organisation",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
@@ -36,7 +36,7 @@
     "uses": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of  components supported by this organisation",
+      "description": "A list of components used by this organisation",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
@@ -74,10 +74,8 @@
       "example": "public",
       "description": "The type of this organisation"
     },
-    "catalogusAPI": {
-      "type": "string",
-      "format": "uri",
-      "nullable": true
+    "catalogus": {
+      "$ref": "https://opencatalogi.nl/oc.catalogus.schema.json"
     }
   }
 }
