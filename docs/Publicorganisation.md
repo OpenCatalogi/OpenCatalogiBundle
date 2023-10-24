@@ -19,8 +19,10 @@ name: 'Public Organization Name'   # for example  name: 'Gemeente Rotterdam'
 # The official website of the public organization
 website: 'https://www.publicorganizationwebsite.com'    # for example  website: 'https://www.rotterdam.nl'
 
-# The (optional) location of your own open catalogi installation
-catalogusAPI: "'https://catalogus.publicorganizationwebsite.com/api"
+# The (optional) location of your own open catalogi installation and frontend
+catalogus:
+  catalogusAPI: "'https://catalogus.publicorganizationwebsite.com/api"
+  catalogusUrl: "'https://catalogus.publicorganizationwebsite.com/api"
 
 # The contact details of the public organization
 contact:
@@ -62,7 +64,8 @@ De volgende tabel geeft een overzicht van alle eigenschappen in de openCatalogi.
 |name| 	String                  | 	The official name of the public organization                                                                                       |
 |website| 	String (URL)            | 	The official website of the public organization                                                                                    |
 |logo| 	String                  | 	The image of the organization|
-|catalogusAPI| 	String                  | 	The catalogus API of the organization|
+|catalogus.catalogusAPI| 	String                  | 	The catalogus API of the organization|
+|catalogus.catalogusUrl| 	String (URL)                 | 	The catalogus URL of the organization|
 |contact| 	Object                  | 	The contact details of the public organization|                                                                                     |
 |contact.email| 	String                  | 	The public contact email of the public organization                                                                                |
 |contact.phone| 	String                  | 	The public contact phone number of the public organization                                                                         |
