@@ -133,8 +133,9 @@ class FindOrganizationThroughRepositoriesService
                 $this->entityManager->persist($repository);
 
                 // get organisation component and set the property
-                if (($owns = $this->getResourcesService->getOrganisationRepos($sourceObject, $githubRepository['owner']['login'], $this->configuration)) !== null) {
-                    $organisation->setValue('owns', $owns);
+                if (($data = $this->getResourcesService->getOrganisationRepos($sourceObject, $githubRepository['owner']['login'], $this->configuration)) !== null) {
+                    $organisation->setValue('owns', $data);
+                    $organisation->setValue('uses', $data);
                 }
 
                 $this->entityManager->persist($organisation);
