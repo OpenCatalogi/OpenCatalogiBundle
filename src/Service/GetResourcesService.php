@@ -259,7 +259,7 @@ class GetResourcesService
     {
         try {
             $response = $this->callService->call($source, '/repos/'.$slug);
-        } catch (ClientException|Exception $e) {
+        } catch (ClientException | Exception $e) {
             $this->pluginLogger->error('Error found trying to fetch /repos/'.$slug.' '.$e->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
@@ -346,7 +346,7 @@ class GetResourcesService
             // Import the github repository.
             $repositoryObject = $this->importResourceService->importGithubRepository($repository, $configuration);
 
-            if ($repositoryObject instanceof ObjectEntity === false){
+            if ($repositoryObject instanceof ObjectEntity === false) {
                 continue;
             }
 
