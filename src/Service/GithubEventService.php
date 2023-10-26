@@ -207,7 +207,6 @@ class GithubEventService
     {
         $repositoryUrl = $githubEvent['repository']['html_url'];
 
-
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
         if ($this->githubApiService->checkGithubAuth($source) === false) {
@@ -244,7 +243,7 @@ class GithubEventService
 
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
-//        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        // $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
@@ -277,10 +276,12 @@ class GithubEventService
 
         if ($repository->getValue('components')->count() === 0) {
             $component = new ObjectEntity($componentSchema);
-            $component->hydrate([
-                'name' => $repository->getValue('name'),
-                'url' => $repository,
-            ]);
+            $component->hydrate(
+                [
+                    'name' => $repository->getValue('name'),
+                    'url'  => $repository,
+                ]
+            );
             $this->entityManager->persist($component);
             $this->entityManager->flush();
         }
