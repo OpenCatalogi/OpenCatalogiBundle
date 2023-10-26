@@ -60,6 +60,7 @@ class EnrichPubliccodeCommand extends Command
     {
         $configuration = [
             'githubSource'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'usercontentSource' => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
             'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
             'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
             'componentMapping' => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
