@@ -444,8 +444,8 @@ class FindGithubRepositoryThroughOrganizationService
             return null;
         }
 
-        $organizationSchema = $this->resourceService->getSchema($this->configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $mapping            = $this->resourceService->getMapping($this->configuration['organisationMapping'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping            = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['id']);
         $synchronization->setMapping($mapping);
@@ -467,8 +467,6 @@ class FindGithubRepositoryThroughOrganizationService
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported organization as array.
-     *
-     * @TODO: move usages in different services here
      */
     public function getOrganization(string $name, Source $source): ?array
     {
