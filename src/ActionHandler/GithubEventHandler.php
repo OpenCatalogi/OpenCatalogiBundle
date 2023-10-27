@@ -43,8 +43,9 @@ class GithubEventHandler implements ActionHandlerInterface
                 'githubSource',
                 'repositorySchema',
                 'repositoryMapping',
-                'organisationSchema',
-                'organisationMapping',
+                'organizationSchema',
+                'organizationMapping',
+                'componentSchema'
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -68,18 +69,25 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
-                'organisationSchema'  => [
+                'organizationSchema'  => [
                     'type'        => 'string',
-                    'description' => 'The organisation schema.',
+                    'description' => 'The organization schema.',
                     'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'required'    => true,
                 ],
-                'organisationMapping' => [
+                'organizationMapping' => [
                     'type'        => 'string',
-                    'description' => 'The mapping for github organisation to oc organisation.',
+                    'description' => 'The mapping for github organization to oc organisation.',
                     'example'     => 'https://api.github.com/oc.githubOrganisation.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOrganisation.mapping.json',
+                    'required'    => true,
+                ],
+                'componentSchema'  => [
+                    'type'        => 'string',
+                    'description' => 'The component schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
                     'required'    => true,
                 ],
             ],
