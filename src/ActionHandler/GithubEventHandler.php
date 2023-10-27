@@ -45,7 +45,7 @@ class GithubEventHandler implements ActionHandlerInterface
                 'repositoryMapping',
                 'organizationSchema',
                 'organizationMapping',
-                'componentSchema'
+                'componentSchema',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -83,7 +83,7 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://api.github.com/oc.githubOrganisation.mapping.json',
                     'required'    => true,
                 ],
-                'componentSchema'  => [
+                'componentSchema'     => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',

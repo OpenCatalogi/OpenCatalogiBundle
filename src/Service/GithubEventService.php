@@ -105,7 +105,7 @@ class GithubEventService
      * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
      * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
      * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
-     * @param FindOrganizationThroughRepositoriesService $findOrganization The find organization through repositories service.
+     * @param FindOrganizationThroughRepositoriesService     $findOrganization    The find organization through repositories service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -128,11 +128,12 @@ class GithubEventService
         $this->organizationService = $organizationService;
         $this->resourceService     = $resourceService;
         $this->pluginLogger        = $pluginLogger;
-        $this->findOrganization = $findOrganization;
+        $this->findOrganization    = $findOrganization;
         $this->configuration       = [];
         $this->data                = [];
 
     }//end __construct()
+
 
     /**
      * Get a organization from the given name.
@@ -200,11 +201,12 @@ class GithubEventService
 
     }//end createOrganization()
 
+
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param Source $source The github api source
-     * @param string $name The name of the repository
+     * @param Source $source        The github api source
+     * @param string $name          The name of the repository
      * @param string $repositoryUrl The url of the repository
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
@@ -213,11 +215,11 @@ class GithubEventService
      */
     public function createRepository(Source $source, string $name, string $repositoryUrl): ?ObjectEntity
     {
-        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping            = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $orgMapping          = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
+        $orgMapping         = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
         $repositoryArray = $this->githubApiService->getRepository($name, $source);
@@ -273,7 +275,8 @@ class GithubEventService
         $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         return $orgSync->getObject();
-    }
+
+    }//end createRepository()
 
 
     /**
@@ -329,7 +332,7 @@ class GithubEventService
 
         return $this->data;
 
-    }//end createRepository()
+    }//end githubEvent()
 
 
     /**
