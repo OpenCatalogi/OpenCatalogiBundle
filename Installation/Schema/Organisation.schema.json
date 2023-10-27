@@ -41,6 +41,15 @@
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
     },
+    "relatedOrganizations": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "A list of organizations related to this organization",
+      "items": {
+        "$ref": "https://opencatalogi.nl/oc.organization.schema.json"
+      },
+      "inversedBy": "relatedOrganizations"
+    },
     "token": {
       "type": "string",
       "description": "An optional NL-Design token that contains the organisations style"
