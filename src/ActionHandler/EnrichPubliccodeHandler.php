@@ -41,33 +41,41 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
             'description' => 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'    => [
                 'githubSource',
+                'usercontentSource',
                 'repositorySchema',
                 'componentSchema',
                 'componentMapping',
             ],
             'properties'  => [
-                'githubSource'     => [
+                'githubSource'      => [
                     'type'        => 'string',
-                    'description' => 'The source of the developer overheid.',
+                    'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'repositorySchema' => [
+                'usercontentSource' => [
+                    'type'        => 'string',
+                    'description' => 'The source of the github raw usercontent.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'required'    => true,
+                ],
+                'repositorySchema'  => [
                     'type'        => 'string',
                     'description' => 'The repository schema.',
                     'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'required'    => true,
                 ],
-                'componentSchema'  => [
+                'componentSchema'   => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
                     'required'    => true,
                 ],
-                'componentMapping' => [
+                'componentMapping'  => [
                     'type'        => 'string',
                     'description' => 'The publiccode component mapping.',
                     'example'     => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
