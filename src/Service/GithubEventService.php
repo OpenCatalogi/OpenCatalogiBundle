@@ -126,6 +126,7 @@ class GithubEventService
 
     }//end __construct()
 
+
     /**
      * This function creates/updates the repository with the github event response.
      *
@@ -164,7 +165,6 @@ class GithubEventService
 
         // Check if the organizationName is set.
         if (isset($organizationName) === true) {
-
             $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
             $this->organizationService->setConfiguration($action->getConfiguration());
 

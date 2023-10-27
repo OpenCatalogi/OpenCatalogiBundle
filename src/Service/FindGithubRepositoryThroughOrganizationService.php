@@ -341,7 +341,7 @@ class FindGithubRepositoryThroughOrganizationService
         $organization->setValue('supports', $supports);
 
         $members = [];
-        if(isset($openCatalogi['members']) === true){
+        if (isset($openCatalogi['members']) === true) {
             foreach ($openCatalogi['members'] as $organizationUrl) {
                 $name         = trim(\Safe\parse_url($organizationUrl, PHP_URL_PATH), '/');
                 $explodedName = explode('/', $name);
@@ -357,8 +357,8 @@ class FindGithubRepositoryThroughOrganizationService
                         $organizationName = $explodedName[0];
                     }
                 }
-                $members[] = $this->createOrganization($organizationName, $usercontentSource);
 
+                $members[] = $this->createOrganization($organizationName, $usercontentSource);
             }
         }
 
@@ -420,6 +420,7 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end findGithubRepositoryThroughOrganizationHandler()
 
+
     /**
      * This function creates/updates the organization with the github event response.
      *
@@ -457,6 +458,7 @@ class FindGithubRepositoryThroughOrganizationService
         return $organizationObject;
 
     }//end createOrganization()
+
 
     /**
      * Get an organization from the given name.
