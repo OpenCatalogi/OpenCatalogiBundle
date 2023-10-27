@@ -105,7 +105,7 @@ class GithubEventService
      * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
      * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
      * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
-     * @param FindOrganizationThroughRepositoriesService     $findOrganization    The find organization through repositories service.
+     * @param FindOrganizationThroughRepositoriesService $findOrganization The find organization through repositories service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -128,12 +128,11 @@ class GithubEventService
         $this->organizationService = $organizationService;
         $this->resourceService     = $resourceService;
         $this->pluginLogger        = $pluginLogger;
-        $this->findOrganization    = $findOrganization;
+        $this->findOrganization = $findOrganization;
         $this->configuration       = [];
         $this->data                = [];
 
     }//end __construct()
-
 
     /**
      * Get a organization from the given name.
@@ -201,12 +200,74 @@ class GithubEventService
 
     }//end createOrganization()
 
+    /**
+     * This function creates/updates the organization through the repository.
+     *
+     * @param Source $source The github api source
+     * @param array $repositoryArray The repository from github api
+     * @param string $repositoryUrl The url of the repository
+     *
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
+     *
+     * @return ObjectEntity|null The organization of the repository.
+     */
+    public function importOrganizationThroughRepo(Source $source, array $repositoryArray, string $repositoryUrl): ?ObjectEntity
+    {
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $orgMapping          = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        $ownerName = $repositoryArray['owner']['html_url'];
+
+        $orgSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['id']);
+
+        $this->pluginLogger->debug('The mapping object '.$orgMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking organization '.$ownerName.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $orgSync->setMapping($orgMapping);
+        $orgSync = $this->syncService->synchronize($orgSync, $repositoryArray['owner']);
+        $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $orgSync->getObject();
+    }
+
+    /**
+     * This function gets the publiccode(s) of the repository.
+     *
+     * @param ObjectEntity $repository The repository
+     * @param string $repositoryUrl The url of the repository
+     *
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
+     *
+     * @return ObjectEntity The repository
+     */
+    public function importComponentsThroughRepo(ObjectEntity $repository, string $repositoryUrl): ObjectEntity
+    {
+        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+
+        // Get publiccode.
+        $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.EnrichPubliccodeFromGithubUrlAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $this->enrichPubliccode->setConfiguration($action->getConfiguration());
+        $repository = $this->enrichPubliccode->enrichRepositoryWithPubliccode($repository, $repositoryUrl);
+
+        // If there is no component create one.
+        if ($repository->getValue('components')->count() === 0) {
+            $component = new ObjectEntity($componentSchema);
+            $component->hydrate([
+                'name' => $repository->getValue('name'),
+                'url' => $repository,
+            ]);
+            $this->entityManager->persist($component);
+            $this->entityManager->flush();
+        }
+
+        return $repository;
+    }
 
     /**
      * This function creates/updates the repository with the github event response.
      *
-     * @param Source $source        The github api source
-     * @param string $name          The name of the repository
+     * @param Source $source The github api source
+     * @param string $name The name of the repository
      * @param string $repositoryUrl The url of the repository
      *
      * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
@@ -215,11 +276,8 @@ class GithubEventService
      */
     public function createRepository(Source $source, string $name, string $repositoryUrl): ?ObjectEntity
     {
-        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $mapping            = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $orgMapping         = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Get repository from github.
         $repositoryArray = $this->githubApiService->getRepository($name, $source);
@@ -244,39 +302,11 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
-        $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.EnrichPubliccodeFromGithubUrlAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $repository = $this->importComponentsThroughRepo($repository, $repositoryUrl);
+        $organization = $this->importOrganizationThroughRepo($source, $repositoryArray, $repositoryUrl);
 
-        // Get publiccode.
-        $this->enrichPubliccode->setConfiguration($action->getConfiguration());
-        $repository = $this->enrichPubliccode->enrichRepositoryWithPubliccode($repository, $repositoryUrl);
-
-        // If there is no component create one.
-        if ($repository->getValue('components')->count() === 0) {
-            $component = new ObjectEntity($componentSchema);
-            $component->hydrate(
-                [
-                    'name' => $repository->getValue('name'),
-                    'url'  => $repository,
-                ]
-            );
-            $this->entityManager->persist($component);
-            $this->entityManager->flush();
-        }
-
-        $ownerName = $repositoryArray['owner']['html_url'];
-
-        $orgSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['id']);
-
-        $this->pluginLogger->debug('The mapping object '.$orgMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('Checking organization '.$ownerName.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $orgSync->setMapping($orgMapping);
-        $orgSync = $this->syncService->synchronize($orgSync, $repositoryArray['owner']);
-        $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        return $orgSync->getObject();
-
-    }//end createRepository()
+        return $organization;
+    }
 
 
     /**
@@ -332,7 +362,7 @@ class GithubEventService
 
         return $this->data;
 
-    }//end githubEvent()
+    }//end createRepository()
 
 
     /**
