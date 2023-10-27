@@ -41,6 +41,7 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
             'description' => 'This handler checks repositories for publuccode.yaml or publiccode.yml',
             'required'    => [
                 'githubSource',
+                'usercontentSource',
                 'repositorySchema',
                 'componentSchema',
                 'componentMapping',
@@ -48,9 +49,16 @@ class EnrichPubliccodeHandler implements ActionHandlerInterface
             'properties'  => [
                 'githubSource'     => [
                     'type'        => 'string',
-                    'description' => 'The source of the developer overheid.',
+                    'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'usercontentSource'     => [
+                    'type'        => 'string',
+                    'description' => 'The source of the github raw usercontent.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
                     'required'    => true,
                 ],
                 'repositorySchema' => [
