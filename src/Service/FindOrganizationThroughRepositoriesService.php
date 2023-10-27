@@ -114,7 +114,9 @@ class FindOrganizationThroughRepositoriesService
                 return null;
             }
 
-            $githubRepository = $this->getResourcesService->getRepositoryFromUrl($sourceObject, $name);
+            if (($githubRepository = $this->getResourcesService->getRepositoryFromUrl($sourceObject, $name)) === null) {
+                return null;
+            }
 
             // Check if we didnt already loop through this organization during this loop
             if (isset($githubRepository['owner']['login']) === true
@@ -133,8 +135,8 @@ class FindOrganizationThroughRepositoriesService
                 $this->entityManager->persist($repository);
 
                 // get organisation component and set the property
-                if (($owns = $this->getResourcesService->getOrganisationRepos($sourceObject, $githubRepository['owner']['login'], $this->configuration)) !== null) {
-                    $organisation->setValue('owns', $owns);
+                if (($data = $this->getResourcesService->getOrganisationRepos($sourceObject, $githubRepository['owner']['login'], $this->configuration)) !== null) {
+                    $organisation->setValue('owns', $data);
                 }
 
                 $this->entityManager->persist($organisation);
