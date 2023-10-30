@@ -443,7 +443,6 @@ class FindGithubRepositoryThroughOrganizationService
 
         $organizationArray = $this->getOrganization($organizationName, $source);
 
-
         // If the organization is null return this->data
         if ($organizationArray === null) {
             $this->data['response'] = new Response('Could not find a organization with name: '.$organizationName.' and with source: '.$source->getName().'.', 404);
