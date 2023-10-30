@@ -153,6 +153,10 @@ class FindGithubRepositoryThroughOrganizationService
             '/'.$organizationName.'/.github/main/openCatalogi.yml',
             '/'.$organizationName.'/.github/master/openCatalogi.yaml',
             '/'.$organizationName.'/.github/master/openCatalogi.yml',
+            '/'.$organizationName.'/.github/main/opencatalogi.yaml',
+            '/'.$organizationName.'/.github/main/opencatalogi.yml',
+            '/'.$organizationName.'/.github/master/opencatalogi.yaml',
+            '/'.$organizationName.'/.github/master/opencatalogi.yml',
         ];
 
         foreach ($possibleEndpoints as $endpoint) {
@@ -241,7 +245,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         if ($type === 'use') {
             $component = $repositoryObject->getValue('component');
-            $component->setValue('usedBy', [$organization]);
+            $component && $component->setValue('usedBy', [$organization]);
         }
 
         return $repositoryObject;
@@ -362,7 +366,7 @@ class FindGithubRepositoryThroughOrganizationService
             }
         }
 
-        $organization->setValue('members', $members);
+        $organization->hydrate(['members' => $members]);
 
         $this->entityManager->persist($organization);
         $this->entityManager->flush();
@@ -435,7 +439,10 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function createOrganization(string $organizationName, Source $source): ?ObjectEntity
     {
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+
         $organizationArray = $this->getOrganization($organizationName, $source);
+
 
         // If the organization is null return this->data
         if ($organizationArray === null) {

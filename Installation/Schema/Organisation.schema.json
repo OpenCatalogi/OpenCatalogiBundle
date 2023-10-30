@@ -42,14 +42,13 @@
       },
       "inversedBy": "usedBy"
     },
-    "relatedOrganizations": {
+    "members": {
       "type": "array",
       "uniqueItems": true,
       "description": "A list of organizations related to this organization",
       "items": {
-        "$ref": "https://opencatalogi.nl/oc.organization.schema.json"
-      },
-      "inversedBy": "relatedOrganizations"
+        "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
+      }
     },
     "token": {
       "type": "string",
