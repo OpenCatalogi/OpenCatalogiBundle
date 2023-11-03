@@ -280,6 +280,16 @@ class GithubPubliccodeService
 
         $componentSync = $this->syncService->synchronize($componentSync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject, 'publiccodeUrl' => $publiccodeUrl]);
 
+        $organization = $this->importOrganizationThroughRepo($source, $repository);
+
+        $repositoryObject->hydrate(['organisation' => $organization]);
+
+        $this->entityManager->persist($componentSync);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->persist($synchronization);
+
+        $this->entityManager->flush();
+
         return $repositoryObject;
 
     }//end importRepository()
@@ -659,6 +669,38 @@ class GithubPubliccodeService
         return $repository;
 
     }//end mapPubliccode()
+
+    /**
+     * This function creates/updates the organization through the repository.
+     *
+     * @param Source $source          The github api source
+     * @param array  $repositoryArray The repository from github api
+     * @param string $repositoryUrl   The url of the repository
+     *
+     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
+     *
+     * @return ObjectEntity|null The organization of the repository.
+     */
+    public function importOrganizationThroughRepo(Source $source, array $repositoryArray): ?ObjectEntity
+    {
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $orgMapping         = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
+
+
+        $ownerName = $repositoryArray['owner']['html_url'];
+
+        $orgSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['id']);
+
+        $this->pluginLogger->debug('The mapping object '.$orgMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Checking organization '.$ownerName.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $orgSync->setMapping($orgMapping);
+        $orgSync = $this->syncService->synchronize($orgSync, $repositoryArray['owner']);
+        $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $orgSync->getObject();
+
+    }//end importOrganizationThroughRepo()
 
 
 }//end class
