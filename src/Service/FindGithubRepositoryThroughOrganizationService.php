@@ -312,7 +312,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         if (key_exists('name', $organizationArray)
             && empty($organizationArray['name']) === true
-        ){
+        ) {
             $organizationArray['name'] = $organization->getValue('name');
         }
 
