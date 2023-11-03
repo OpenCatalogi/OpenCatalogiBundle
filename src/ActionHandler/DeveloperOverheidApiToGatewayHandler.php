@@ -47,57 +47,57 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
                 'githubSource',
                 'repositorySchema',
                 'repositoryEndpoint',
-                'repositoryMapping'
+                'repositoryMapping',
             ],
             'properties'  => [
-                'source'           => [
+                'source'             => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'required'    => true,
                 ],
-                'componentMapping' => [
+                'componentMapping'   => [
                     'type'        => 'string',
                     'description' => 'The mapping for developer overheid apis to oc component.',
                     'example'     => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
                     'reference'   => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
                     'required'    => true,
                 ],
-                'componentSchema'  => [
+                'componentSchema'    => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
                     'required'    => true,
                 ],
-                'endpoint'         => [
+                'endpoint'           => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/apis',
                     'required'    => true,
                 ],
-                'githubSource'           => [
+                'githubSource'       => [
                     'type'        => 'string',
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'repositorySchema'  => [
+                'repositorySchema'   => [
                     'type'        => 'string',
                     'description' => 'The repository schema.',
                     'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
                     'required'    => true,
                 ],
-                'repositoryEndpoint'         => [
+                'repositoryEndpoint' => [
                     'type'        => 'string',
                     'description' => 'The endpoint for repositories.',
                     'example'     => '/repositories',
                     'required'    => true,
                 ],
-                'repositoryMapping' => [
+                'repositoryMapping'  => [
                     'type'        => 'string',
                     'description' => 'The mapping for github repository to oc repository.',
                     'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',
