@@ -64,6 +64,10 @@ class DeveloperOverheidGetComponentsCommand extends Command
             'componentMapping' => 'https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json',
             'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
             'endpoint'         => '/apis',
+            'githubSource'           => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryEndpoint'         => '/repositories',
+            'repositoryMapping' => 'https://api.github.com/oc.githubRepository.mapping.json'
         ];
 
         // Handle the command options

@@ -63,6 +63,10 @@ class ComponentenCatalogusGetComponentsCommand extends Command
             'componentMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
             'componentSchema'  => 'https://opencatalogi.nl/oc.component.schema.json',
             'endpoint'         => '/components',
+            'githubSource'           => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
+            'repositoryEndpoint'         => '/repositories',
+            'repositoryMapping' => 'https://api.github.com/oc.githubRepository.mapping.json'
         ];
 
         // Handle the command options.
