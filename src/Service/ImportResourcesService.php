@@ -69,7 +69,7 @@ class ImportResourcesService
 
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
-     * @param CallService $callService The Call Service.
+     * @param CallService            $callService      The Call Service.
      * @param CacheService           $cacheService     The Cache Service.
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param MappingService         $mappingService   The Mapping Service.
@@ -88,7 +88,7 @@ class ImportResourcesService
         GatewayResourceService $resourceService
     ) {
         $this->entityManager    = $entityManager;
-        $this->callService = $callService;
+        $this->callService      = $callService;
         $this->cacheService     = $cacheService;
         $this->syncService      = $syncService;
         $this->mappingService   = $mappingService;
@@ -104,7 +104,7 @@ class ImportResourcesService
      *
      * @param array        $componentArray  The array to translate.
      * @param ObjectEntity $componentObject The resulting component object.
-     * @param array $configuration The configuration array.
+     * @param array        $configuration   The configuration array.
      *
      * @return ObjectEntity|null
      */
@@ -118,8 +118,7 @@ class ImportResourcesService
         if (key_exists('url', $componentArray) === true
             && key_exists('url', $componentArray['url']) === true
             && empty($componentArray['url']['url']) === false
-        ){
-
+        ) {
             $parsedUrl = \Safe\parse_url($componentArray['url']['url']);
 
             if (key_exists('host', $parsedUrl) === false) {
@@ -128,52 +127,53 @@ class ImportResourcesService
 
             $domain = \Safe\parse_url($componentArray['url']['url'])['host'];
 
-            switch ($domain){
-                case 'github.com':
+            switch ($domain) {
+            case 'github.com':
 
-                    if (key_exists('path', $parsedUrl) === false) {
-                        return null;
-                    }
-                    $path = trim(\Safe\parse_url($componentArray['url']['url'])['path'], '/');
+                if (key_exists('path', $parsedUrl) === false) {
+                    return null;
+                }
 
-                    $githubSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-                    if ($this->githubApiService->checkGithubAuth($githubSource) === false) {
-                        return null;
-                    }//end if
+                $path = trim(\Safe\parse_url($componentArray['url']['url'])['path'], '/');
 
-                    $this->pluginLogger->debug('Getting repository with url'.$componentArray['url']['url'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                $githubSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+                if ($this->githubApiService->checkGithubAuth($githubSource) === false) {
+                    return null;
+                }//end if
 
+                $this->pluginLogger->debug('Getting repository with url'.$componentArray['url']['url'].'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+                try {
+                    $response = $this->callService->call($githubSource, '/repos/'.$path);
+                } catch (RequestException $requestException) {
+                    $this->pluginLogger->error($requestException->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                }
+
+                if (isset($response) === true) {
                     try {
-                        $response   = $this->callService->call($githubSource, '/repos/'.$path);
-                    } catch (RequestException $requestException) {
-                        $this->pluginLogger->error($requestException->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                        $repository = $this->callService->decodeResponse($githubSource, $response);
+                    } catch (Exception $exception) {
+                        $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
                     }
+                }
 
-                    if (isset($response) === true) {
-                        try {
-                            $repository   = $this->callService->decodeResponse($githubSource, $response);
-                        } catch (Exception $exception) {
-                            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-                        }
-                    }
+                if (isset($repository) === true) {
+                    return $this->importGithubRepository($repository, $configuration);
+                }
+                break;
+            case 'gitlab.com':
+                $source = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
 
-                    if (isset($repository) === true) {
-                        return $this->importGithubRepository($repository, $configuration);
-                    }
-                    break;
-                case 'gitlab.com':
-                    $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
+                $sync = $this->syncService->findSyncBySource($source, $repositoryEntity, $componentArray['url']['url']);
+                $sync = $this->syncService->synchronize($sync, ['url' => $componentArray['url']['url'], 'name' => $componentArray['url']['name']]);
 
-                    $sync = $this->syncService->findSyncBySource($source, $repositoryEntity, $componentArray['url']['url']);
-                    $sync = $this->syncService->synchronize($sync, ['url' => $componentArray['url']['url'], 'name' => $componentArray['url']['name']]);
-
-                    return $sync->getObject();
+                return $sync->getObject();
 
                     break;
-                default:
-                    // Throw exception
-            }
-        }
+            default:
+                // Throw exception
+            }//end switch
+        }//end if
 
         return null;
 
@@ -299,13 +299,13 @@ class ImportResourcesService
         if ($repository === null) {
             return $componentObject;
         }
-        
+
         $componentObject->setValue('url', $repository);
         $this->entityManager->persist($componentObject);
         $this->entityManager->flush();
 
         $githubSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-        $sync = $this->syncService->findSyncBySource($githubSource, $schema, $repository->getValue('url'));
+        $sync         = $this->syncService->findSyncBySource($githubSource, $schema, $repository->getValue('url'));
         if ($sync->getObject() === null) {
             $sync->setObject($componentObject);
             $this->entityManager->persist($sync);
@@ -407,10 +407,9 @@ class ImportResourcesService
 
         $repositoryObject = $synchronization->getObject();
 
-//        if ($repositoryObject->getValue('components')->count() === 0) {
-//            $component = $this->githubApiService->connectComponent($repositoryObject);
-//        }
-
+        // if ($repositoryObject->getValue('components')->count() === 0) {
+        // $component = $this->githubApiService->connectComponent($repositoryObject);
+        // }
         return $repositoryObject;
 
     }//end importGithubRepository()

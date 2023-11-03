@@ -245,10 +245,10 @@ class GithubPubliccodeService
     public function importRepository(array $repository, string $repositoryId, Mapping $repositoryMapping, ?string $publiccodeUrl=null): ObjectEntity
     {
         // Do we have a source
-        $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $source            = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $usercontentSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
-        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema  = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryId);
         $synchronization->setMapping($repositoryMapping);
@@ -550,13 +550,14 @@ class GithubPubliccodeService
 
     }//end createContacts()
 
+
     /**
      * This function maps the publiccode to a component.
      *
      * @param ObjectEntity $repository    The repository object.
      * @param array        $publiccode    The publiccode array for updating the component object.
      * @param array        $configuration The configuration array
-     * @param string  $publiccodeUrl The publicce url
+     * @param string       $publiccodeUrl The publicce url
      *
      * @throws Exception
      *
@@ -565,10 +566,9 @@ class GithubPubliccodeService
     public function findPubliccodeSync(ObjectEntity $repository, array $configuration, string $publiccodeUrl): ?Synchronization
     {
         $usercontentSource = $this->resourceService->getSource($configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
-        $componentEntity  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentEntity   = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
 
         foreach ($repository->getValue('components') as $component) {
-
             if ($component->getValue('publiccodeUrl') === $publiccodeUrl) {
                 return $this->syncService->findSyncBySource($usercontentSource, $componentEntity, $publiccodeUrl);
             }
@@ -594,10 +594,12 @@ class GithubPubliccodeService
 
                 return $this->syncService->synchronize($sync, ['name' => $repository->getValue('name'), 'url' => $repository]);
             }
-        }
+        }//end foreach
 
         return null;
-    }
+
+    }//end findPubliccodeSync()
+
 
     /**
      * This function maps the publiccode to a component.
@@ -605,7 +607,7 @@ class GithubPubliccodeService
      * @param ObjectEntity $repository    The repository object.
      * @param array        $publiccode    The publiccode array for updating the component object.
      * @param array        $configuration The configuration array
-     * @param string  $publiccodeUrl The publicce url
+     * @param string       $publiccodeUrl The publicce url
      *
      * @throws Exception
      *
@@ -613,7 +615,7 @@ class GithubPubliccodeService
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration, string $publiccodeUrl): ?ObjectEntity
     {
-        $githubSource = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $githubSource     = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
 
         $sync = $this->findPubliccodeSync($repository, $configuration, $publiccodeUrl);
@@ -621,6 +623,7 @@ class GithubPubliccodeService
         if (isset($sync) === false) {
             return $repository;
         }
+
         $component = $sync->getObject();
 
         $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
