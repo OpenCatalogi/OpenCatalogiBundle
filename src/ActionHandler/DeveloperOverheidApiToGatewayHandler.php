@@ -44,6 +44,10 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
                 'componentMapping',
                 'componentSchema',
                 'endpoint',
+                'githubSource',
+                'repositorySchema',
+                'repositoryEndpoint',
+                'repositoryMapping'
             ],
             'properties'  => [
                 'source'           => [
@@ -71,6 +75,33 @@ class DeveloperOverheidApiToGatewayHandler implements ActionHandlerInterface
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/apis',
+                    'required'    => true,
+                ],
+                'githubSource'           => [
+                    'type'        => 'string',
+                    'description' => 'The source of the github api.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'repositorySchema'  => [
+                    'type'        => 'string',
+                    'description' => 'The repository schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
+                    'required'    => true,
+                ],
+                'repositoryEndpoint'         => [
+                    'type'        => 'string',
+                    'description' => 'The endpoint for repositories.',
+                    'example'     => '/repositories',
+                    'required'    => true,
+                ],
+                'repositoryMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for github repository to oc repository.',
+                    'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
             ],
