@@ -406,10 +406,7 @@ class ImportResourcesService
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
-
-        // if ($repositoryObject->getValue('components')->count() === 0) {
-        // $component = $this->githubApiService->connectComponent($repositoryObject);
-        // }
+        
         return $repositoryObject;
 
     }//end importGithubRepository()

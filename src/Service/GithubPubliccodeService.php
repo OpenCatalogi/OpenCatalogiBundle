@@ -280,6 +280,8 @@ class GithubPubliccodeService
 
         $componentSync = $this->syncService->synchronize($componentSync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject, 'publiccodeUrl' => $publiccodeUrl]);
 
+        $this->entityManager->flush();
+
         return $repositoryObject;
 
     }//end importRepository()

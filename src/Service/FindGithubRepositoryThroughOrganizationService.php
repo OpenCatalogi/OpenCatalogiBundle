@@ -225,7 +225,6 @@ class FindGithubRepositoryThroughOrganizationService
     {
 
         $source            = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        $usercontentSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
         $componentSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $domain = \Safe\parse_url($url, PHP_URL_HOST);
@@ -247,10 +246,8 @@ class FindGithubRepositoryThroughOrganizationService
 
         $repositoryObject = $this->importResourcesService->importGithubRepository($repository, $this->configuration);
 
-        $sync = $this->syncService->findSyncBySource($usercontentSource, $componentSchema, $repositoryObject->getValue('url'));
-        $sync = $this->syncService->synchronize($sync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject]);
-
-        $this->entityManager->persist($sync);
+        $sync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryObject->getValue('url'));
+        $this->syncService->synchronize($sync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject]);
 
         $this->pluginLogger->debug('Found repo from organisation with name: '.$name);
 
