@@ -55,8 +55,8 @@ class GetResourcesService
     /**
      * @param EntityManagerInterface $entityManager         The Entity Manager Interface.
      * @param CallService            $callService           The Call Service.
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
-     * @param SynchronizationService $syncService The Synchronisation Service.
+     * @param GatewayResourceService $resourceService       The Gateway Resource Service.
+     * @param SynchronizationService $syncService           The Synchronisation Service.
      * @param LoggerInterface        $pluginLogger          The plugin version of the logger interface.
      * @param ImportResourcesService $importResourceService The Import Resources Service.
      */
@@ -70,8 +70,8 @@ class GetResourcesService
     ) {
         $this->entityManager         = $entityManager;
         $this->callService           = $callService;
-        $this->syncService = $syncService;
-        $this->resourceService = $resourceService;
+        $this->syncService           = $syncService;
+        $this->resourceService       = $resourceService;
         $this->pluginLogger          = $pluginLogger;
         $this->importResourceService = $importResourceService;
 
@@ -346,7 +346,7 @@ class GetResourcesService
      */
     public function getOrganisationRepos(Source $source, string $name, array $configuration): ?array
     {
-        $componentSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $this->pluginLogger->info('Getting repos from organisation '.$name, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 

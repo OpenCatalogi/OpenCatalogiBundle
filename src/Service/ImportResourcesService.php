@@ -406,7 +406,7 @@ class ImportResourcesService
         $synchronization = $this->syncService->synchronize($synchronization, $repository);
 
         $repositoryObject = $synchronization->getObject();
-        
+
         return $repositoryObject;
 
     }//end importGithubRepository()
