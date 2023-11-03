@@ -2,8 +2,9 @@
   "title": "Github Api Get Publiccode Repositories Action",
   "$id": "https://opencatalogi.nl/action/oc.GithubApiGetPubliccodeRepositoriesAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
-  "listens": ["opencatalogi.github"],
+  "version": "0.0.3",
+  "priority": 2,
+  "listens": ["opencatalogi.bronnen.trigger"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubApiGetPubliccodeRepositoriesHandler",
   "conditions": {
     "==": [
