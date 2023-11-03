@@ -670,6 +670,7 @@ class GithubPubliccodeService
 
     }//end mapPubliccode()
 
+
     /**
      * This function creates/updates the organization through the repository.
      *
@@ -685,7 +686,6 @@ class GithubPubliccodeService
     {
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         $orgMapping         = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
-
 
         $ownerName = $repositoryArray['owner']['html_url'];
 
