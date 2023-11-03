@@ -75,8 +75,10 @@ class RatingHandler implements ActionHandlerInterface
     public function run(array $data, array $configuration): array
     {
         $componentId = null;
-        if (array_key_exists('id', $this->data['response']) === true) {
-            $componentId = $this->data['response']['id'];
+        if (key_exists('response', $data) === true
+            && key_exists('id', $data['response']) === true
+        ) {
+            $componentId = $data['response']['id'];
         }//end if
 
         return $this->service->enrichComponentsWithRating([], $configuration, $componentId);
