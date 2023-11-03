@@ -2,8 +2,9 @@
   "title": "Componenten Catalogus Application To Gateway",
   "$id": "https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "priority": 1,
+  "isLockable": true,
   "listens": ["opencatalogi.bronnen.trigger"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\ComponentenCatalogusApplicationToGatewayHandler",
   "conditions": {
@@ -18,6 +19,10 @@
     "applicationSchema": "https://opencatalogi.nl/oc.application.schema.json",
     "endpoint": "/products",
     "componentMapping": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json",
-    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json"
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
+    "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
+    "repositoryEndpoint": "/repositories",
+    "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json"
   }
 }
