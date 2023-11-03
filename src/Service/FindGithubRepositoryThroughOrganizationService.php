@@ -310,6 +310,12 @@ class FindGithubRepositoryThroughOrganizationService
             'uses'     => $organization->getValue('uses'),
         ];
 
+        if (key_exists('name', $organizationArray)
+            && empty($organizationArray['name']) === true
+        ){
+            $organizationArray['name'] = $organization->getValue('name');
+        }
+
         $organization->hydrate($organizationArray, true);
         $this->entityManager->persist($organization);
         $this->entityManager->flush();
