@@ -2,8 +2,10 @@
   "title": "Github Event Action",
   "$id": "https://opencatalogi.nl/action/oc.GithubEventAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
-  "listens": ["opencatalogi.githubevents.trigger"],
+  "version": "0.0.3",
+  "listens": [
+    "opencatalogi.githubevents.trigger"
+  ],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubEventHandler",
   "conditions": {
     "==": [
@@ -15,7 +17,8 @@
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
-    "organisationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
-    "organisationMapping": "https://api.github.com/oc.githubOrganisation.mapping.json"
+    "organizationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
+    "organizationMapping": "https://api.github.com/oc.githubOrganisation.mapping.json",
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json"
   }
 }

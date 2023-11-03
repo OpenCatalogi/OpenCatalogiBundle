@@ -246,6 +246,10 @@ class GithubEventService
         $repository   = $this->importComponentsThroughRepo($repository, $repositoryUrl);
         $organization = $this->importOrganizationThroughRepo($source, $repositoryArray, $repositoryUrl);
 
+        $repository->hydrate(['organisation' => $organization]);
+
+        $this->entityManager->persist($repository);
+
         return $organization;
 
     }//end createRepository()
