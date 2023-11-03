@@ -262,8 +262,7 @@ class GithubPubliccodeService
         if ($publiccodeUrl === null) {
             $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryObject->getValue('url'));
 
-            if ($componentSync->getObject() !== null
-            ) {
+            if ($componentSync->getObject() !== null) {
                 $publiccodeUrl = $componentSync->getObject()->getValue('publiccodeUrl');
             }
         }
@@ -272,8 +271,7 @@ class GithubPubliccodeService
             $repositoryObject->setValue('publiccode_urls', [$publiccodeUrl]);
             $componentSync = $this->syncService->findSyncBySource($usercontentSource, $componentSchema, $publiccodeUrl);
 
-            if ($componentSync->getObject() !== null
-            ) {
+            if ($componentSync->getObject() !== null) {
                 $publiccodeUrl = $componentSync->getObject()->getValue('publiccodeUrl');
             }
         }

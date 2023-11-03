@@ -1,5 +1,5 @@
 {
-  "$id": "https://opencatalogi.nl/SecurityGroup/anonymous.securityGroup.json",
+  "$id": "https://docs.commongateway.nl/securityGroup/default.anonymous.securityGroup.json",
   "$schema": "https://docs.commongateway.nl/schemas/SecurityGroup.schema.json",
   "version": "0.0.1",
   "title": "Anonymous SecurityGroup",
