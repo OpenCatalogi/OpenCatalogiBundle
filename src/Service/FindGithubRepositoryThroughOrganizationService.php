@@ -256,6 +256,8 @@ class FindGithubRepositoryThroughOrganizationService
             $component && $component->setValue('usedBy', [$organization]);
         }
 
+        $this->entityManager->persist($repositoryObject);
+
         return $repositoryObject;
 
     }//end getOrganisationRepo()
@@ -270,7 +272,7 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return void
      */
-    public function getOrganizationCatalogi(ObjectEntity $organization): void
+    public function getOrganizationCatalogi(ObjectEntity $organization): ObjectEntity
     {
         // Do we have a source?
         // usercontentSource
@@ -280,24 +282,24 @@ class FindGithubRepositoryThroughOrganizationService
             || $usercontentSource === null
             || $this->githubApiService->checkGithubAuth($source) === false
         ) {
-            return;
+            return $organization;
         }//end if
 
         if (($githubRepo = $this->getGithubRepoFromOrganization($organization->getValue('name'), $source)) === null) {
-            return;
+            return $organization;
         }//end if
 
         $this->pluginLogger->debug('Github repo found and fetched for '.$organization->getName());
 
         if (($openCatalogi = $this->getOpenCatalogiFromGithubRepo($organization->getValue('name'), $usercontentSource)) === null) {
-            return;
+            return $organization;
         }//end if
 
         $this->pluginLogger->debug('OpenCatalogi.yml or OpenCatalogi.yaml found and fetched for '.$organization->getName());
 
         $mapping = $this->resourceService->getMapping($this->configuration['openCatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
         if ($mapping === null) {
-            return;
+            return $organization;
         }
 
         $organizationArray = $this->mappingService->mapping($mapping, $openCatalogi);
@@ -324,11 +326,21 @@ class FindGithubRepositoryThroughOrganizationService
         if (key_exists('softwareUsed', $openCatalogi) === true) {
             foreach ($openCatalogi['softwareUsed'] as $use) {
                 // Get organisation repos and set the property.
-                $uses[] = $this->getOrganisationRepo($use, $organization, 'use', $source);
+                $uses[] = $this->getOrganisationRepo($use, $organization, 'use', $source)->getId()->toString();
             }
         }
 
-        $organization->setValue('uses', $uses);
+        $organization->hydrate(['uses' => $uses]);
+
+        $owns = [];
+        if (key_exists('softwareOwned', $openCatalogi) === true) {
+            foreach ($openCatalogi['softwareOwned'] as $own) {
+                // Get organisation repos and set the property.
+                $owns[] = $this->getOrganisationRepo($own, $organization, 'own', $source)->getId()->toString();
+            }
+        }
+
+        $organization->hydrate(['owns' => $owns]);
 
         $supports = [];
         if (key_exists('softwareSupported', $openCatalogi) === true) {
@@ -338,25 +350,26 @@ class FindGithubRepositoryThroughOrganizationService
                 }
 
                 // Get organisation component and set the property.
-                $supports[] = $supportOrganisation = $this->getOrganisationRepo($support['software'], $organization, 'supports', $source);
+                $supportOrganisation = $this->getOrganisationRepo($support['software'], $organization, 'supports', $source);
+                $supports[] = $supportOrganisation->getId()->toString();
 
                 if (key_exists('contact', $support) === false) {
                     continue;
                 }
 
                 if (key_exists('email', $support['contact']) === true) {
-                    $supportOrganisation->setValue('email', $support['contact']['email']);
+                    $supportOrganisation->hydrate('email', $support['contact']['email']);
                 }
 
                 if (key_exists('phone', $support['contact']) === true) {
-                    $supportOrganisation->setValue('email', $support['contact']['phone']);
+                    $supportOrganisation->hydrate(['email' => $support['contact']['phone']]);
                 }
 
                 $this->entityManager->persist($supportOrganisation);
             }//end foreach
         }//end if
 
-        $organization->setValue('supports', $supports);
+        $organization->hydrate(['supports' => $supports]);
 
         $members = [];
         if (isset($openCatalogi['members']) === true) {
@@ -386,6 +399,8 @@ class FindGithubRepositoryThroughOrganizationService
         $this->entityManager->flush();
 
         $this->pluginLogger->debug($organization->getName().' succesfully updated with fetched openCatalogi info');
+
+        return $organization;
 
     }//end getOrganizationCatalogi()
 
@@ -468,12 +483,13 @@ class FindGithubRepositoryThroughOrganizationService
         $mapping            = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
 
         $synchronization = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['id']);
+
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $organizationArray);
 
         $organizationObject = $synchronization->getObject();
 
-        $this->getOrganizationCatalogi($organizationObject);
+        $organizationObject = $this->getOrganizationCatalogi($organizationObject);
 
         return $organizationObject;
 

@@ -159,6 +159,7 @@ class GithubEventService
         $this->pluginLogger->debug('Checking organization '.$ownerName.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $orgSync->setMapping($orgMapping);
+
         $orgSync = $this->syncService->synchronize($orgSync, $repositoryArray['owner']);
         $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
@@ -244,11 +245,13 @@ class GithubEventService
         $repository = $synchronization->getObject();
 
         $repository   = $this->importComponentsThroughRepo($repository, $repositoryUrl);
+
         $organization = $this->importOrganizationThroughRepo($source, $repositoryArray, $repositoryUrl);
 
         $repository->hydrate(['organisation' => $organization]);
 
         $this->entityManager->persist($repository);
+        $this->entityManager->flush();
 
         return $organization;
 
@@ -298,9 +301,14 @@ class GithubEventService
 
             $organizationObject = $this->organizationService->createOrganization($organizationName, $source);
 
+            $this->entityManager->persist($organizationObject);
+            $this->entityManager->flush();
+
+            $organizationObject = $this->entityManager->find(get_class($organizationObject), $organizationObject->getId());
+
             $organizatioResponse['organization'] = $organizationObject->toArray();
 
-            $this->data['response'] = new Response(json_encode($organizatioResponse), 200);
+            $this->data['response'] = new Response(json_encode($organizatioResponse), 200, ['Content-Type' => 'application/json']);
 
             return $this->data;
         }
