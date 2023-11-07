@@ -180,6 +180,8 @@ class EnrichPubliccodeFromGithubUrlService
             // Get the publiccode through the raw.githubusercontent source
             $publiccode = $this->getPubliccodeFromRawUserContent($publiccodeUrl);
 
+            $this->pluginLogger->notice('Got publiccode from GitHub', $publiccode);
+
             if ($publiccode !== null) {
                 $repository = $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration, $publiccodeUrl);
             }
