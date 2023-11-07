@@ -244,7 +244,7 @@ class GithubEventService
 
         $repository = $synchronization->getObject();
 
-        $repository   = $this->importComponentsThroughRepo($repository, $repositoryUrl);
+        $repository = $this->importComponentsThroughRepo($repository, $repositoryUrl);
 
         $organization = $this->importOrganizationThroughRepo($source, $repositoryArray, $repositoryUrl);
 

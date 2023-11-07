@@ -351,7 +351,7 @@ class FindGithubRepositoryThroughOrganizationService
 
                 // Get organisation component and set the property.
                 $supportOrganisation = $this->getOrganisationRepo($support['software'], $organization, 'supports', $source);
-                $supports[] = $supportOrganisation->getId()->toString();
+                $supports[]          = $supportOrganisation->getId()->toString();
 
                 if (key_exists('contact', $support) === false) {
                     continue;
