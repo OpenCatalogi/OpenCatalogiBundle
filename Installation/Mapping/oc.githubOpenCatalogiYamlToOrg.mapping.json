@@ -2,10 +2,11 @@
   "title": "GithubOpenCatalogiYamlToOrganisation",
   "$id": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "name",
+    "description": "description",
     "logo": "logo",
     "website": "website",
     "phone": "contact.phone",
@@ -15,6 +16,7 @@
   },
   "cast": {
     "name": "unsetIfValue==name",
+    "description": "unsetIfValue==description",
     "logo": "unsetIfValue==logo",
     "website": "unsetIfValue==website",
     "phone": "unsetIfValue==contact.phone",
