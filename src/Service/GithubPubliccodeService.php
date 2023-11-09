@@ -229,6 +229,7 @@ class GithubPubliccodeService
 
     }//end getRepository()
 
+
     /**
      * Maps a repository object and creates/updates a Synchronization.
      *
@@ -270,7 +271,8 @@ class GithubPubliccodeService
         }
 
         return null;
-    }
+
+    }//end mappPubliccodesFromRepo()
 
 
     /**

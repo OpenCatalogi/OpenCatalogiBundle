@@ -38,7 +38,6 @@ class GithubApiService
      */
     private MappingService $mappingService;
 
-
     /**
      * @var array
      */
@@ -108,6 +107,7 @@ class GithubApiService
 
     }//end checkGithubAuth()
 
+
     /**
      * This function gets the publiccode file from the github user content.
      *
@@ -171,11 +171,12 @@ class GithubApiService
 
     }//end getRepository()
 
+
     /**
      * Get a repository through the repositories of the given source
      *
-     * @param string $repositoryUrl   The url of the repository.
-     * @param Source $source The source to sync from.
+     * @param string $repositoryUrl The url of the repository.
+     * @param Source $source        The source to sync from.
      *
      * @return array|null The imported repository as array.
      */
@@ -203,7 +204,8 @@ class GithubApiService
 
         return $repositories;
 
-    }//end getRepository()
+    }//end getPubliccodesFromRepo()
+
 
     /**
      * Get a repository through the repositories of the given source
@@ -237,7 +239,8 @@ class GithubApiService
 
         return $repository;
 
-    }//end getRepository()
+    }//end getOrganisation()
+
 
     /**
      * Get a repository through the repositories of the given source
@@ -271,7 +274,7 @@ class GithubApiService
 
         return $repository;
 
-    }//end getRepository()
+    }//end getOrganisationRepos()
 
 
     /**

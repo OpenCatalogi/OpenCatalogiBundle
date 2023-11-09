@@ -106,18 +106,18 @@ class GithubEventService
 
 
     /**
-     * @param EntityManagerInterface                         $entityManager       The Entity Manager Interface.
-     * @param SynchronizationService                         $syncService         The Synchronization Service.
-     * @param CallService                                    $callService         The Call Service.
-     * @param CacheService                                   $cacheService        The Cache Service.
-     * @param GithubApiService                               $githubApiService    The Github Api Service.
-     * @param GithubPubliccodeService $publiccodeService The Github Publiccode Service.
-     * @param ImportResourcesService $importResourcesService The Import Resources Service.
-     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode    The Enrich Publiccode From Github Url Service.
-     * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
-     * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
-     * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
-     * @param FindOrganizationThroughRepositoriesService     $findOrganization    The find organization through repositories service.
+     * @param EntityManagerInterface                         $entityManager          The Entity Manager Interface.
+     * @param SynchronizationService                         $syncService            The Synchronization Service.
+     * @param CallService                                    $callService            The Call Service.
+     * @param CacheService                                   $cacheService           The Cache Service.
+     * @param GithubApiService                               $githubApiService       The Github Api Service.
+     * @param GithubPubliccodeService                        $publiccodeService      The Github Publiccode Service.
+     * @param ImportResourcesService                         $importResourcesService The Import Resources Service.
+     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode       The Enrich Publiccode From Github Url Service.
+     * @param FindGithubRepositoryThroughOrganizationService $organizationService    The find github repository through organization service.
+     * @param GatewayResourceService                         $resourceService        The Gateway Resource Service.
+     * @param LoggerInterface                                $pluginLogger           The plugin version of the logger interface
+     * @param FindOrganizationThroughRepositoriesService     $findOrganization       The find organization through repositories service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -133,22 +133,23 @@ class GithubEventService
         LoggerInterface $pluginLogger,
         FindOrganizationThroughRepositoriesService $findOrganization
     ) {
-        $this->entityManager       = $entityManager;
-        $this->syncService         = $syncService;
-        $this->callService         = $callService;
-        $this->cacheService        = $cacheService;
-        $this->githubApiService    = $githubApiService;
-        $this->publiccodeService = $publiccodeService;
+        $this->entityManager          = $entityManager;
+        $this->syncService            = $syncService;
+        $this->callService            = $callService;
+        $this->cacheService           = $cacheService;
+        $this->githubApiService       = $githubApiService;
+        $this->publiccodeService      = $publiccodeService;
         $this->importResourcesService = $importResourcesService;
-        $this->enrichPubliccode    = $enrichPubliccode;
-        $this->organizationService = $organizationService;
-        $this->resourceService     = $resourceService;
-        $this->pluginLogger        = $pluginLogger;
-        $this->findOrganization    = $findOrganization;
-        $this->configuration       = [];
-        $this->data                = [];
+        $this->enrichPubliccode       = $enrichPubliccode;
+        $this->organizationService    = $organizationService;
+        $this->resourceService        = $resourceService;
+        $this->pluginLogger           = $pluginLogger;
+        $this->findOrganization       = $findOrganization;
+        $this->configuration          = [];
+        $this->data                   = [];
 
     }//end __construct()
+
 
     /**
      * This function creates/updates the repository with the github event response.
@@ -163,16 +164,16 @@ class GithubEventService
      */
     public function createRepository(Source $source, string $name, string $repositoryUrl): ?ObjectEntity
     {
-        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $this->configuration['organisationSchema'] = $this->configuration['organizationSchema'];
+        $this->configuration['organisationSchema']  = $this->configuration['organizationSchema'];
         $this->configuration['organisationMapping'] = $this->configuration['organizationMapping'];
 
         // Get the repository from the github api and import it.
         $repositoryArray = $this->githubApiService->getRepository($name, $source);
-        $repository = $this->importResourcesService->importGithubRepository($repositoryArray, $this->configuration);
+        $repository      = $this->importResourcesService->importGithubRepository($repositoryArray, $this->configuration);
 
         // If there is no component create one.
         if ($repository->getValue('components')->count() === 0) {

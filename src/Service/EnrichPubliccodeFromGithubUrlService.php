@@ -119,7 +119,7 @@ class EnrichPubliccodeFromGithubUrlService
         if ($this->githubApiService->checkGithubAuth($source) === false) {
             return null;
         }//end if
-        
+
         $repositories = $this->githubApiService->getPubliccodesFromRepo($repositoryUrl, $source);
 
         return $this->githubService->mappPubliccodesFromRepo($repositories, $repository);

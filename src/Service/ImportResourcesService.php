@@ -314,7 +314,7 @@ class ImportResourcesService
 
         return $componentObject;
 
-    }//end importComponent()
+    }//end importCatalogusComponent()
 
 
     /**
@@ -462,8 +462,9 @@ class ImportResourcesService
 
     }//end importApplication()
 
+
     /**
-     * @param array $component  The component that is being imported
+     * @param array $component     The component that is being imported
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
@@ -471,7 +472,7 @@ class ImportResourcesService
     public function importComponent(array $component, array $configuration): ?ObjectEntity
     {
         // Do we have a source?
-        $source              = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $source           = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $componentSchema  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
 
@@ -494,7 +495,7 @@ class ImportResourcesService
 
         return $synchronization->getObject();
 
-    }//end importOrganisation()
+    }//end importComponent()
 
 
     /**
