@@ -234,30 +234,25 @@ class FindGithubRepositoryThroughOrganizationService
 
         $name = trim(\Safe\parse_url($url, PHP_URL_PATH), '/');
 
-        $this->pluginLogger->debug('Getting repo from organisation '.$name);
-        $response = $this->callService->call($source, '/repos/'.$name);
+        // Get the repository from the github api.
+        $repository = $this->githubApiService->getRepository($name, $source);
 
-        $repository = json_decode($response->getBody()->getContents(), true);
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repos from organisation with name: '.$name.' and with source: '.$source->getName());
-
-            return null;
-        }//end if
-
+        // import the repository and set the organisation.
         $repositoryObject = $this->importResourcesService->importGithubRepository($repository, $this->configuration);
-
+        $repositoryObject->setValue('organisation', $organization);
+        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->flush();
+        
         $sync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryObject->getValue('url'));
-        $this->syncService->synchronize($sync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject]);
+        $sync = $this->syncService->synchronize($sync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject]);
 
         $this->pluginLogger->debug('Found repo from organisation with name: '.$name);
 
         if ($type === 'use') {
-            $component = $repositoryObject->getValue('component');
-            $component && $component->setValue('usedBy', [$organization]);
+            $sync->getObject()->setValue('usedBy', [$organization]);
         }
 
-        $repositoryObject->setValue('organisation', $organization);
-        $this->entityManager->persist($repositoryObject);
+        $this->entityManager->persist($sync->getObject());
         $this->entityManager->flush();
 
         return $repositoryObject;
