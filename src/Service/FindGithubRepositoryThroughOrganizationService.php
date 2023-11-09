@@ -242,7 +242,7 @@ class FindGithubRepositoryThroughOrganizationService
         $repositoryObject->setValue('organisation', $organization);
         $this->entityManager->persist($repositoryObject);
         $this->entityManager->flush();
-        
+
         $sync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryObject->getValue('url'));
         $sync = $this->syncService->synchronize($sync, ['name' => $repositoryObject->getValue('name'), 'url' => $repositoryObject]);
 
