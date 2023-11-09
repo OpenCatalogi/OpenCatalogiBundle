@@ -256,7 +256,9 @@ class FindGithubRepositoryThroughOrganizationService
             $component && $component->setValue('usedBy', [$organization]);
         }
 
+        $repositoryObject->setValue('organisation', $organization);
         $this->entityManager->persist($repositoryObject);
+        $this->entityManager->flush();
 
         return $repositoryObject;
 
