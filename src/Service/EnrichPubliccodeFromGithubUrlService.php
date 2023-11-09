@@ -103,35 +103,6 @@ class EnrichPubliccodeFromGithubUrlService
 
 
     /**
-     * This function gets the publiccode file from the github user content.
-     *
-     * @param string $repositoryUrl The url of the repository
-     *
-     * @throws GuzzleException
-     *
-     * @return array|null
-     */
-    public function getPubliccodeFromRawUserContent(string $repositoryUrl): ?array
-    {
-        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
-        if ($source === null) {
-            return $this->data;
-        }
-
-        // Get the path from the url to make the call.
-        $endpoint = \Safe\parse_url($repositoryUrl)['path'];
-        try {
-            $response = $this->callService->call($source, $endpoint);
-        } catch (Exception $e) {
-            $this->pluginLogger->error('Error found trying to fetch '.$repositoryUrl.' '.$e->getMessage());
-        }
-
-        return $this->callService->decodeResponse($source, $response, 'text/yaml');
-
-    }//end getPubliccodeFromRawUserContent()
-
-
-    /**
      * This function gets and maps the publiccode file
      *
      * @param ObjectEntity $repository    The repository object.
@@ -148,50 +119,10 @@ class EnrichPubliccodeFromGithubUrlService
         if ($this->githubApiService->checkGithubAuth($source) === false) {
             return null;
         }//end if
+        
+        $repositories = $this->githubApiService->getPubliccodesFromRepo($repositoryUrl, $source);
 
-        $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
-
-        // Call the search/code endpoint for publiccode files in this repository.
-        $queryConfig['query'] = ['q' => "filename:publiccode extension:yaml extension:yml repo:{$url}"];
-
-        // Find the publiccode.yaml file(s).
-        try {
-            $response = $this->callService->call($source, '/search/code', 'GET', $queryConfig);
-        } catch (Exception $exception) {
-            $this->pluginLogger->error('Error found trying to fetch '.$source->getLocation().'/search/code'.' '.$exception->getMessage());
-        }
-
-        if (isset($response) === false) {
-            return null;
-        }
-
-        $repositories = $this->callService->decodeResponse($source, $response);
-
-        $this->pluginLogger->debug('Found '.count($repositories).' publiccode file(s).', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $publiccodeUrls = [];
-        foreach ($repositories['items'] as $githubRepository) {
-            // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent
-            $publiccodeUrlQuery = \Safe\parse_url($githubRepository['url'])['query'];
-            $urlReference       = explode('ref=', $publiccodeUrlQuery)[1];
-
-            $publiccodeUrls[] = $publiccodeUrl = "https://raw.githubusercontent.com/{$githubRepository['repository']['full_name']}/{$urlReference}/{$githubRepository['path']}";
-
-            // Get the publiccode through the raw.githubusercontent source
-            $publiccode = $this->getPubliccodeFromRawUserContent($publiccodeUrl);
-
-            $this->pluginLogger->notice('Got publiccode from GitHub', $publiccode);
-
-            if ($publiccode !== null) {
-                $repository = $this->githubService->mapPubliccode($repository, $publiccode, $this->configuration, $publiccodeUrl);
-            }
-        }
-
-        $repository->setValue('publiccode_urls', $publiccodeUrls);
-        $this->entityManager->persist($repository);
-        $this->entityManager->flush();
-
-        return $repository;
+        return $this->githubService->mappPubliccodesFromRepo($repositories, $repository);
 
     }//end enrichRepositoryWithPubliccode()
 

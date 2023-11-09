@@ -254,7 +254,7 @@ class ImportResourcesService
      *
      * @return ObjectEntity|null
      */
-    public function importComponent(array $component, array $configuration): ?ObjectEntity
+    public function importCatalogusComponent(array $component, array $configuration): ?ObjectEntity
     {
         // Get the source, schema and mapping from the configuration array.
         $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
@@ -448,7 +448,7 @@ class ImportResourcesService
         if ($application['components'] !== null) {
             $components = [];
             foreach ($application['components'] as $component) {
-                $componentObject = $this->importComponent($component, $configuration);
+                $componentObject = $this->importCatalogusComponent($component, $configuration);
                 $components[]    = $componentObject;
             }//end foreach
 
@@ -461,6 +461,40 @@ class ImportResourcesService
         return $applicationObject;
 
     }//end importApplication()
+
+    /**
+     * @param array $component  The component that is being imported
+     * @param array $configuration The configuration array
+     *
+     * @return ObjectEntity|null
+     */
+    public function importComponent(array $component, array $configuration): ?ObjectEntity
+    {
+        // Do we have a source?
+        $source              = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        if ($source === null
+            || $componentSchema === null
+            || $componentMapping === null
+        ) {
+            return null;
+        }
+
+        $synchronization = $this->syncService->findSyncBySource($source, $componentSchema, $component['id']);
+
+        $this->pluginLogger->debug('Mapping object'.$component['login'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        $this->pluginLogger->debug('Checking organisation '.$component['login'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $synchronization->setMapping($componentMapping);
+        $synchronization = $this->syncService->synchronize($synchronization, $component);
+        $this->pluginLogger->debug('Organisation synchronization created with id: '.$synchronization->getId()->toString(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $synchronization->getObject();
+
+    }//end importOrganisation()
 
 
     /**
