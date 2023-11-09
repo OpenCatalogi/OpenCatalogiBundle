@@ -109,6 +109,35 @@ class GithubApiService
 
 
     /**
+     * This function gets the publiccode file from the github user content.
+     *
+     * @param string $repositoryUrl The url of the repository
+     *
+     * @throws GuzzleException
+     *
+     * @return array|null
+     */
+    public function getPubliccodeFromRawUserContent(string $repositoryUrl): ?array
+    {
+        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
+        if ($source === null) {
+            return $this->data;
+        }
+
+        // Get the path from the url to make the call.
+        $endpoint = \Safe\parse_url($repositoryUrl)['path'];
+        try {
+            $response = $this->callService->call($source, $endpoint);
+        } catch (Exception $e) {
+            $this->pluginLogger->error('Error found trying to fetch '.$repositoryUrl.' '.$e->getMessage());
+        }
+
+        return $this->callService->decodeResponse($source, $response, 'text/yaml');
+
+    }//end getPubliccodeFromRawUserContent()
+
+
+    /**
      * Get a repository through the repositories of the given source
      *
      * @param string $name   The name of the repository.
@@ -144,42 +173,108 @@ class GithubApiService
 
 
     /**
-     * This function create or get the component of the repository.
+     * Get a repository through the repositories of the given source
      *
-     * @param ObjectEntity $repository    The repository object.
-     * @param string|null  $publiccodeUrl The publiccode url.
+     * @param string $repositoryUrl The url of the repository.
+     * @param Source $source        The source to sync from.
      *
-     * @return ObjectEntity|null
+     * @return array|null The imported repository as array.
      */
-    public function connectComponent(ObjectEntity $repository, ?string $publiccodeUrl=null): ?ObjectEntity
+    public function getPubliccodesFromRepo(string $repositoryUrl, Source $source): ?array
     {
-        $componentEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $cacheComponents = $this->cacheService->searchObjects(null, ['url' => $repository->getSelf()], [$componentEntity->getId()->toString()])['results'];
+        $url = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
 
-        if ($cacheComponents === []) {
-            $component = new ObjectEntity($componentEntity);
-            $component->hydrate(
-                [
-                    'name'          => $repository->getValue('name'),
-                    'url'           => $repository,
-                    'publiccodeUrl' => $publiccodeUrl,
-                ]
-            );
-            $this->entityManager->persist($component);
-            $this->entityManager->flush();
+        // Call the search/code endpoint for publiccode files in this repository.
+        $queryConfig['query'] = ['q' => "filename:publiccode extension:yaml extension:yml repo:{$url}"];
+
+        // Find the publiccode.yaml file(s).
+        try {
+            $response = $this->callService->call($source, '/search/code', 'GET', $queryConfig);
+        } catch (Exception $exception) {
+            $this->pluginLogger->error('Error found trying to fetch '.$source->getLocation().'/search/code'.' '.$exception->getMessage());
+        }
+
+        if (isset($response) === false) {
+            return null;
+        }
+
+        $repositories = $this->callService->decodeResponse($source, $response);
+
+        $this->pluginLogger->debug('Found '.count($repositories).' publiccode file(s).', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $repositories;
+
+    }//end getPubliccodesFromRepo()
+
+
+    /**
+     * Get a repository through the repositories of the given source
+     *
+     * @param string $name   The name of the repository.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported repository as array.
+     */
+    public function getOrganisation(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        try {
+            $response = $this->callService->call($source, '/repos/'.$name);
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === false) {
+            return null;
+        }
+
+        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
+
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
         }//end if
 
-        if (count($cacheComponents) === 1) {
-            $component = $this->entityManager->find('App:ObjectEntity', $cacheComponents[0]['_self']['id']);
+        return $repository;
+
+    }//end getOrganisation()
+
+
+    /**
+     * Get a repository through the repositories of the given source
+     *
+     * @param string $name   The name of the repository.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported repository as array.
+     */
+    public function getOrganisationRepos(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        try {
+            $response = $this->callService->call($source, '/repos/'.$name);
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === false) {
+            return null;
+        }
+
+        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
+
+        if ($repository === null) {
+            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
         }//end if
 
-        if (isset($component) === true) {
-            return $component;
-        }//end if
+        return $repository;
 
-        return null;
-
-    }//end connectComponent()
+    }//end getOrganisationRepos()
 
 
     /**

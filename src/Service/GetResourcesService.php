@@ -94,7 +94,7 @@ class GetResourcesService
 
         $result = [];
         foreach ($components as $component) {
-            $result[] = $this->importResourceService->importComponent($component, $configuration);
+            $result[] = $this->importResourceService->importCatalogusComponent($component, $configuration);
         }
 
         $this->entityManager->flush();
@@ -125,7 +125,7 @@ class GetResourcesService
             return null;
         }
 
-        $component = $this->importResourceService->importComponent($component, $configuration);
+        $component = $this->importResourceService->importCatalogusComponent($component, $configuration);
         if ($component === null) {
             return null;
         }
