@@ -10,6 +10,7 @@ use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
+use CommonGateway\CoreBundle\Service\HydrationService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -71,6 +72,11 @@ class GithubPubliccodeService
     private LoggerInterface $pluginLogger;
 
     /**
+     * @var HydrationService
+     */
+    private HydrationService $hydrationService;
+
+    /**
      * @var Yaml
      */
     private Yaml $yaml;
@@ -102,7 +108,8 @@ class GithubPubliccodeService
         MappingService $mappingService,
         GithubApiService $githubApiService,
         GatewayResourceService $resourceService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
+        HydrationService $hydrationService
     ) {
         $this->entityManager    = $entityManager;
         $this->callService      = $callService;
@@ -111,6 +118,7 @@ class GithubPubliccodeService
         $this->githubApiService = $githubApiService;
         $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
+        $this->hydrationService = $hydrationService;
         $this->yaml             = new Yaml();
 
         $this->data          = [];
@@ -320,7 +328,7 @@ class GithubPubliccodeService
             return $component;
         }//end if
 
-        return null;
+        return $component;
 
     }//end createApplicationSuite()
 
@@ -625,19 +633,16 @@ class GithubPubliccodeService
     {
         $githubSource     = $this->resourceService->getSource($configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($configuration['componentMapping'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
 
         $sync = $this->findPubliccodeSync($repository, $configuration, $publiccodeUrl);
-
-        if (isset($sync) === false) {
-            return $repository;
-        }
-
-        $component = $sync->getObject();
 
         $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $forkedFrom = $repository->getValue('forked_from');
+
+
         if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
             $publiccode['isBasedOn'] = $forkedFrom;
         }
@@ -649,18 +654,21 @@ class GithubPubliccodeService
 
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
 
-        $component->hydrate($componentArray);
+        $componentArray['_sourceId'] = $publiccodeUrl;
+
+        $component = $this->hydrationService->searchAndReplaceSynchronizations($componentArray, $githubSource, $componentSchema);
+
         // set the name
         $component->hydrate(['name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'), 'url' => $repository]);
 
-        $this->createApplicationSuite($publiccode, $component);
-        $this->createMainCopyrightOwner($publiccode, $component);
-        $this->createRepoOwner($publiccode, $component);
+//        $this->createApplicationSuite($publiccode, $component);
+//        $this->createMainCopyrightOwner($publiccode, $component);
+//        $this->createRepoOwner($publiccode, $component);
 
         // @TODO These to functions aren't working.
         // contracts and contacts are not set to the component
-        // $component = $this->createContractors($publiccode, $component);
-        // $component = $this->createContacts($publiccode, $component);
+//         $component = $this->createContractors($publiccode, $component);
+//         $component = $this->createContacts($publiccode, $component);
         $this->entityManager->persist($component);
         $this->entityManager->flush();
 
