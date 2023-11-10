@@ -255,7 +255,7 @@ class FindGithubRepositoryThroughOrganizationService
         $this->entityManager->persist($sync->getObject());
         $this->entityManager->flush();
 
-        return $repositoryObject;
+        return $sync->getObject();
 
     }//end getOrganisationRepo()
 
