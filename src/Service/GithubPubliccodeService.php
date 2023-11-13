@@ -607,6 +607,9 @@ class GithubPubliccodeService
             ) {
                 $sync = $this->syncService->findSyncBySource($usercontentSource, $componentEntity, $publiccodeUrl);
 
+                $this->entityManager->persist($sync);
+                $this->entityManager->flush();
+
                 return $this->syncService->synchronize($sync, ['name' => $repository->getValue('name'), 'url' => $repository]);
             }
         }//end foreach
@@ -655,18 +658,12 @@ class GithubPubliccodeService
 
         $componentArray['_sourceId'] = $publiccodeUrl;
 
+
         $component = $this->hydrationService->searchAndReplaceSynchronizations($componentArray, $userContentSource, $componentSchema);
 
         // set the name
         $component->hydrate(['name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'), 'url' => $repository]);
 
-        // $this->createApplicationSuite($publiccode, $component);
-        // $this->createMainCopyrightOwner($publiccode, $component);
-        // $this->createRepoOwner($publiccode, $component);
-        // @TODO These to functions aren't working.
-        // contracts and contacts are not set to the component
-        // $component = $this->createContractors($publiccode, $component);
-        // $component = $this->createContacts($publiccode, $component);
         $this->entityManager->persist($component);
         $this->entityManager->flush();
 
