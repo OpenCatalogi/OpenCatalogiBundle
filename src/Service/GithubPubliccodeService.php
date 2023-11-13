@@ -299,7 +299,8 @@ class GithubPubliccodeService
         return $repositoryObject;
 
     }//end importRepository()
-    
+
+
     /**
      * This function maps the publiccode to a component.
      *
