@@ -60,6 +60,16 @@ class GithubEventService
     private GithubApiService $githubApiService;
 
     /**
+     * @var GithubPubliccodeService
+     */
+    private GithubPubliccodeService $publiccodeService;
+
+    /**
+     * @var ImportResourcesService
+     */
+    private ImportResourcesService $importResourcesService;
+
+    /**
      * @var EnrichPubliccodeFromGithubUrlService
      */
     private EnrichPubliccodeFromGithubUrlService $enrichPubliccode;
@@ -96,16 +106,18 @@ class GithubEventService
 
 
     /**
-     * @param EntityManagerInterface                         $entityManager       The Entity Manager Interface.
-     * @param SynchronizationService                         $syncService         The Synchronization Service.
-     * @param CallService                                    $callService         The Call Service.
-     * @param CacheService                                   $cacheService        The Cache Service.
-     * @param GithubApiService                               $githubApiService    The Github Api Service.
-     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode    The Enrich Publiccode From Github Url Service.
-     * @param FindGithubRepositoryThroughOrganizationService $organizationService The find github repository through organization service.
-     * @param GatewayResourceService                         $resourceService     The Gateway Resource Service.
-     * @param LoggerInterface                                $pluginLogger        The plugin version of the logger interface
-     * @param FindOrganizationThroughRepositoriesService     $findOrganization    The find organization through repositories service.
+     * @param EntityManagerInterface                         $entityManager          The Entity Manager Interface.
+     * @param SynchronizationService                         $syncService            The Synchronization Service.
+     * @param CallService                                    $callService            The Call Service.
+     * @param CacheService                                   $cacheService           The Cache Service.
+     * @param GithubApiService                               $githubApiService       The Github Api Service.
+     * @param GithubPubliccodeService                        $publiccodeService      The Github Publiccode Service.
+     * @param ImportResourcesService                         $importResourcesService The Import Resources Service.
+     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode       The Enrich Publiccode From Github Url Service.
+     * @param FindGithubRepositoryThroughOrganizationService $organizationService    The find github repository through organization service.
+     * @param GatewayResourceService                         $resourceService        The Gateway Resource Service.
+     * @param LoggerInterface                                $pluginLogger           The plugin version of the logger interface
+     * @param FindOrganizationThroughRepositoriesService     $findOrganization       The find organization through repositories service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -113,96 +125,30 @@ class GithubEventService
         CallService $callService,
         CacheService $cacheService,
         GithubApiService $githubApiService,
+        GithubPubliccodeService $publiccodeService,
+        ImportResourcesService $importResourcesService,
         EnrichPubliccodeFromGithubUrlService $enrichPubliccode,
         FindGithubRepositoryThroughOrganizationService $organizationService,
         GatewayResourceService $resourceService,
         LoggerInterface $pluginLogger,
         FindOrganizationThroughRepositoriesService $findOrganization
     ) {
-        $this->entityManager       = $entityManager;
-        $this->syncService         = $syncService;
-        $this->callService         = $callService;
-        $this->cacheService        = $cacheService;
-        $this->githubApiService    = $githubApiService;
-        $this->enrichPubliccode    = $enrichPubliccode;
-        $this->organizationService = $organizationService;
-        $this->resourceService     = $resourceService;
-        $this->pluginLogger        = $pluginLogger;
-        $this->findOrganization    = $findOrganization;
-        $this->configuration       = [];
-        $this->data                = [];
+        $this->entityManager          = $entityManager;
+        $this->syncService            = $syncService;
+        $this->callService            = $callService;
+        $this->cacheService           = $cacheService;
+        $this->githubApiService       = $githubApiService;
+        $this->publiccodeService      = $publiccodeService;
+        $this->importResourcesService = $importResourcesService;
+        $this->enrichPubliccode       = $enrichPubliccode;
+        $this->organizationService    = $organizationService;
+        $this->resourceService        = $resourceService;
+        $this->pluginLogger           = $pluginLogger;
+        $this->findOrganization       = $findOrganization;
+        $this->configuration          = [];
+        $this->data                   = [];
 
     }//end __construct()
-
-
-    /**
-     * This function creates/updates the organization through the repository.
-     *
-     * @param Source $source          The github api source
-     * @param array  $repositoryArray The repository from github api
-     * @param string $repositoryUrl   The url of the repository
-     *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
-     *
-     * @return ObjectEntity|null The organization of the repository.
-     */
-    public function importOrganizationThroughRepo(Source $source, array $repositoryArray, string $repositoryUrl): ?ObjectEntity
-    {
-        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $orgMapping         = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
-
-        $ownerName = $repositoryArray['owner']['html_url'];
-
-        $orgSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['id']);
-
-        $this->pluginLogger->debug('The mapping object '.$orgMapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('Checking organization '.$ownerName.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $orgSync->setMapping($orgMapping);
-
-        $orgSync = $this->syncService->synchronize($orgSync, $repositoryArray['owner']);
-        $this->pluginLogger->debug('Organization synchronization created with id: '.$orgSync->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        return $orgSync->getObject();
-
-    }//end importOrganizationThroughRepo()
-
-
-    /**
-     * This function gets the publiccode(s) of the repository.
-     *
-     * @param ObjectEntity $repository    The repository
-     * @param string       $repositoryUrl The url of the repository
-     *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
-     *
-     * @return ObjectEntity The repository
-     */
-    public function importComponentsThroughRepo(ObjectEntity $repository, string $repositoryUrl): ObjectEntity
-    {
-        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-
-        // Get publiccode.
-        $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.EnrichPubliccodeFromGithubUrlAction.action.json', 'open-catalogi/open-catalogi-bundle');
-        $this->enrichPubliccode->setConfiguration($action->getConfiguration());
-        $repository = $this->enrichPubliccode->enrichRepositoryWithPubliccode($repository, $repositoryUrl);
-
-        // If there is no component create one.
-        if ($repository->getValue('components')->count() === 0) {
-            $component = new ObjectEntity($componentSchema);
-            $component->hydrate(
-                [
-                    'name' => $repository->getValue('name'),
-                    'url'  => $repository,
-                ]
-            );
-            $this->entityManager->persist($component);
-            $this->entityManager->flush();
-        }
-
-        return $repository;
-
-    }//end importComponentsThroughRepo()
 
 
     /**
@@ -218,38 +164,31 @@ class GithubEventService
      */
     public function createRepository(Source $source, string $name, string $repositoryUrl): ?ObjectEntity
     {
+        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        // Get repository from github.
+        $this->configuration['organisationSchema']  = $this->configuration['organizationSchema'];
+        $this->configuration['organisationMapping'] = $this->configuration['organizationMapping'];
+
+        // Get the repository from the github api and import it.
         $repositoryArray = $this->githubApiService->getRepository($name, $source);
-        if ($repositoryArray === null) {
-            // Return error if repository is not found.
-            $this->data['response'] = new Response('Cannot find repository with url: '.$repositoryUrl, 404);
+        $repository      = $this->importResourcesService->importGithubRepository($repositoryArray, $this->configuration);
 
-            return $this->data;
-        }//end if
+        // If there is no component create one.
+        if ($repository->getValue('components')->count() === 0) {
+            $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryUrl);
+            $componentSync = $this->syncService->synchronize($componentSync, ['name' => $repository->getValue('name'), 'url' => $repository]);
+        }
 
-        $repositoryArray['name'] = str_replace('-', ' ', $repositoryArray['name']);
+        // Get the publiccodes of the repository and mapp the components.
+        $repositories = $this->githubApiService->getPubliccodesFromRepo($name, $source);
+        if ($repositories['total_count'] !== 0) {
+            $repository = $this->publiccodeService->mappPubliccodesFromRepo($repositories, $repository);
+        }
 
-        $synchronization = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['id']);
-
-        $this->pluginLogger->debug('Mapping object '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('The mapping object '.$mapping.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        $this->pluginLogger->debug('Checking repository '.$repositoryUrl.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $synchronization->setMapping($mapping);
-        $synchronization = $this->syncService->synchronize($synchronization, $repositoryArray);
-        $this->pluginLogger->debug('Repository synchronization created with id: '.$synchronization->getId()->toString().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        $repository = $synchronization->getObject();
-
-        $repository = $this->importComponentsThroughRepo($repository, $repositoryUrl);
-
-        $organization = $this->importOrganizationThroughRepo($source, $repositoryArray, $repositoryUrl);
-
+        $organization = $this->importResourcesService->importOrganisation($repositoryArray['owner'], $this->configuration);
         $repository->hydrate(['organisation' => $organization]);
-
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 

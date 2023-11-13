@@ -254,7 +254,7 @@ class ImportResourcesService
      *
      * @return ObjectEntity|null
      */
-    public function importComponent(array $component, array $configuration): ?ObjectEntity
+    public function importCatalogusComponent(array $component, array $configuration): ?ObjectEntity
     {
         // Get the source, schema and mapping from the configuration array.
         $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
@@ -314,7 +314,7 @@ class ImportResourcesService
 
         return $componentObject;
 
-    }//end importComponent()
+    }//end importCatalogusComponent()
 
 
     /**
@@ -448,7 +448,7 @@ class ImportResourcesService
         if ($application['components'] !== null) {
             $components = [];
             foreach ($application['components'] as $component) {
-                $componentObject = $this->importComponent($component, $configuration);
+                $componentObject = $this->importCatalogusComponent($component, $configuration);
                 $components[]    = $componentObject;
             }//end foreach
 
