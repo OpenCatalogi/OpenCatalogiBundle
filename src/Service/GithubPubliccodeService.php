@@ -658,7 +658,6 @@ class GithubPubliccodeService
 
         $componentArray['_sourceId'] = $publiccodeUrl;
 
-
         $component = $this->hydrationService->searchAndReplaceSynchronizations($componentArray, $userContentSource, $componentSchema);
 
         // set the name
