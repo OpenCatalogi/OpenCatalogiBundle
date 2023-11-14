@@ -184,11 +184,14 @@ class GithubApiService
         $this->entityManager->persist($repositorySync);
         $this->entityManager->flush();
 
+        $repository = $repositorySync->getObject();
+
         // Get the publiccode/opencatalogi files of the given repository.
         $dataArray = $this->getFilesFromRepo($repositoryUrl, $source);
-
-        // Import the publiccode/opencatalogi files and connect it to the repository.
-        $repository = $this->importRepoFiles($dataArray, $source, $repositorySync->getObject());
+        if ($dataArray !== null) {
+            // Import the publiccode/opencatalogi files and connect it to the repository.
+            $repository = $this->importRepoFiles($dataArray, $source, $repository);
+        }
 
         // Cleanup the repository.
         $repository = $this->cleanupRepository($repository);
@@ -464,7 +467,7 @@ class GithubApiService
         if ($opencatalogiMapping instanceof Mapping === false
             || $organizationSchema instanceof Entity === false
         ) {
-            return null;
+            return $repository;
         }
 
         // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent.
@@ -479,7 +482,7 @@ class GithubApiService
 
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
         if (key_exists('publiccodeYmlVersion', $opencatalogi) === false) {
-            return null;
+            return $repository;
         }
 
         $opencatalogi['github'] = $opencatalogiArray['repository']['owner']['html_url'];
@@ -534,7 +537,7 @@ class GithubApiService
         if ($publiccodeMapping instanceof Mapping === false
             || $componentSchema instanceof Entity === false
         ) {
-            return null;
+            return $repository;
         }
 
         // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent.
@@ -551,7 +554,7 @@ class GithubApiService
 
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
         if (key_exists('publiccodeYmlVersion', $publiccode) === false) {
-            return null;
+            return $repository;
         }
 
         // Get the forked_from from the repository.
