@@ -1,0 +1,17 @@
+{
+  "title": "FormInput",
+  "$id": "https://opencatalogi.nl/oc.formInput.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "description": "",
+  "properties": {
+    "source": {
+      "type": "string",
+      "enum": [
+        "github",
+        "gitlab"
+      ]
+    }
+  }
+}

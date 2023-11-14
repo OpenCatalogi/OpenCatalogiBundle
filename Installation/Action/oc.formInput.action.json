@@ -1,0 +1,24 @@
+{
+  "title": "Form Input Action",
+  "$id": "https://opencatalogi.nl/action/oc.formInput.action.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
+  "version": "0.0.1",
+  "listens": [
+    "opencatalogi.form.trigger"
+  ],
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FormInputHandler",
+  "conditions": {
+    "==": [
+      1,
+      1
+    ]
+  },
+  "configuration": {
+    "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
+    "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
+    "organizationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
+    "organizationMapping": "https://api.github.com/oc.githubOrganisation.mapping.json",
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json"
+  }
+}

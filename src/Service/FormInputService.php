@@ -21,9 +21,9 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- * This class handles the github events.
+ * This class handles the form input.
  *
- * This service handles the incoming github event and creates a repository.
+ * This service handles the incoming form input and creates a repository.
  *
  * @Author Sarai Misidjan <sarai@conduction.nl>
  *
@@ -31,7 +31,7 @@ use Twig\Error\SyntaxError;
  *
  * @category Service
  */
-class GithubEventService
+class FormInputService
 {
 
     /**
@@ -161,7 +161,7 @@ class GithubEventService
      *
      * @return array|null The data with the repository in the response array.
      */
-    public function updateRepositoryWithEventResponse(?array $data=[], ?array $configuration=[]): ?array
+    public function updateRepositoryWithFormInput(?array $data=[], ?array $configuration=[]): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
@@ -186,7 +186,7 @@ class GithubEventService
 
         return $this->data;
 
-    }//end updateRepositoryWithEventResponse()
+    }//end updateRepositoryWithFormInput()
 
 
 }//end class

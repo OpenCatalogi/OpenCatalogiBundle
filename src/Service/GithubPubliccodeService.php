@@ -18,6 +18,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use phpDocumentor\Reflection\DocBlock\Tags\Throws;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -144,10 +145,30 @@ class GithubPubliccodeService
 
         // If we are testing for one repository.
         if ($repositoryId !== null) {
-            return $this->getRepository($repositoryId);
         }
 
-        return $this->getRepositories();
+        if ($repositoryId === null) {
+            $repositories = $this->githubApiService->getGithubFiles();
+
+            $response = [];
+            foreach ($repositories as $repositoryArray) {
+                if (key_exists('repository', $repositoryArray) === false
+                    || key_exists('html_url', $repositoryArray['repository']) === false
+                ) {
+                    continue;
+                }
+
+                $repository = $this->githubApiService->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
+
+                $response[] = $repository->toArray();
+            }
+
+            if (isset($response) === true) {
+                $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
+            }
+        }//end if
+
+        return $this->data;
 
     }//end findGithubRepositories()
 
