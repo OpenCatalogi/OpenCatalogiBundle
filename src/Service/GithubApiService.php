@@ -138,13 +138,13 @@ class GithubApiService
     }//end checkGithubAuth()
 
     /**
-     * This function gets the publiccode file from the github user content.
+     * This function gets repository and enriches it.
      *
      * @param string $repositoryUrl The url of the repository
-     *
-     * @throws GuzzleException
+     * @param array|null $repositoryArray The repository array from the github api.
      *
      * @return ObjectEntity|null
+     * @throws Exception
      */
     public function getGithubRepository(string $repositoryUrl, ?array $repositoryArray = null): ?ObjectEntity
     {
@@ -200,26 +200,19 @@ class GithubApiService
         $repository = $this->cleanupRepository($repository);
 
         // Enrich the repository with component and/or organization.
-        $repository = $this->enrichRepository($repositorySync->getObject(), $repositoryArray, $source);
+        $repository = $this->enrichRepository($repository, $repositoryArray, $source);
 
         // Rate the component(s) of the repository.
-        $repository = $this->ratingService->rateRepoComponents($repository, $source, $repositoryArray);
-
         // Return the repository object.
-        return $repository;
+        return $this->ratingService->rateRepoComponents($repository, $source, $repositoryArray);
     }
 
     /**
      * This function does a cleanup for the repository.
      *
      * @param ObjectEntity $repository The repository object.
-     * @param array $repositoryArray The repository array from the github api call.
-     * @param Source $source The github api source.
-     *
-     * @throws GuzzleException
      *
      * @return ObjectEntity|null Return the repository
-     *
      */
     public function cleanupRepository(ObjectEntity $repository): ?ObjectEntity
     {
@@ -322,13 +315,14 @@ class GithubApiService
      * This function enriches the repository with a organization and/or component.
      *
      * @param ObjectEntity $organization The organization object.
-     * @param array $repositoryArray The repository array from the github api call.
+     * @param array $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source The github api source.
      *
-     * @throws GuzzleException
+     * @throws Exception
      *
      * @return ObjectEntity The repository object
      */
-    public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source, array $opencatalogiArray): ObjectEntity
+    public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
         $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
@@ -453,9 +447,11 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $dataArray An array with publiccode/opencatalogi files
+     * @param array $opencatalogiArray The opencatalogi array from the github api.
+     * @param Source $source The github api source.
+     * @param ObjectEntity $repository The repository object.
      *
-     * @throws GuzzleException
+     * @throws Exception
      *
      * @return ObjectEntity|null
      */
@@ -521,9 +517,9 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $dataArray An array with publiccode/opencatalogi files
-     *
-     * @throws GuzzleException
+     * @param array $publiccodeArray The publiccode array from the github api.
+     * @param Source $source The github api source.
+     * @param ObjectEntity $repository The repository object.
      *
      * @return ObjectEntity|null
      */
@@ -588,9 +584,11 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $dataArray An array with publiccode/opencatalogi files
+     * @param array $dataArray An array with publiccode/opencatalogi files.
+     * @param Source $source The github api source.
+     * @param ObjectEntity $repository The repository object.
      *
-     * @throws GuzzleException
+     * @throws Exception
      *
      * @return ObjectEntity|null
      */
@@ -632,10 +630,7 @@ class GithubApiService
     /**
      * This function gets the publiccode/opencatalogi file from the github gitub api.
      *
-     * @param string $repositoryUrl The url of the repository
      * @param string $gitUrl The git url of the repository
-     *
-     * @throws GuzzleException
      *
      * @return array|null
      */
@@ -889,35 +884,5 @@ class GithubApiService
         return $repository;
 
     }//end getOrganisationRepos()
-
-
-    /**
-     * This function checks if a github repository is public.
-     *
-     * @param string $slug The slug of the repository
-     *
-     * @return bool Boolean for if the repository is public.
-     */
-    public function checkPublicRepository(string $slug): bool
-    {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-
-        $slug = preg_replace('/^https:\/\/github.com\//', '', $slug);
-        $slug = rtrim($slug, '/');
-
-        try {
-            $response   = $this->callService->call($source, '/repos/'.$slug);
-            $repository = $this->callService->decodeResponse($source, $response);
-        } catch (Exception $exception) {
-            // @TODO Monolog ?
-            $this->pluginLogger->error("Exception while checking if public repository: {$exception->getMessage()}");
-
-            return false;
-        }
-
-        return $repository['private'] === false;
-
-    }//end checkPublicRepository()
-
 
 }//end class
