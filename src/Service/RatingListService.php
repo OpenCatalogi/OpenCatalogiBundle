@@ -30,14 +30,14 @@ class RatingListService
 
 
     /**
-     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface.
+     * @param LoggerInterface $pluginLogger The plugin version of the logger interface.
      */
     public function __construct(
         LoggerInterface $pluginLogger
     ) {
-        $this->pluginLogger     = $pluginLogger;
-        $this->configuration    = [];
-        $this->data             = [];
+        $this->pluginLogger  = $pluginLogger;
+        $this->configuration = [];
+        $this->data          = [];
 
     }//end __construct()
 
@@ -82,33 +82,33 @@ class RatingListService
         if (($repository = $component->getValue('url')) === false) {
             $ratingArray['results'][] = 'Cannot rate the repository because it is not set.';
         }
-        
+
         if ($repository !== false && ($url = $repository->getValue('url')) !== false) {
             $ratingArray['results'][] = 'The url: '.$url.' rated';
             $ratingArray['rating']++;
 
             $domain = \Safe\parse_url($url, PHP_URL_HOST);
 
-            switch ($domain){
-                case 'github.com':
-                    if ($repositoryArray['private'] === false) {
-                        $ratingArray['results'][] = 'Rated the repository because it is public';
-                        $ratingArray['rating']++;
-                    }
+            switch ($domain) {
+            case 'github.com':
+                if ($repositoryArray['private'] === false) {
+                    $ratingArray['results'][] = 'Rated the repository because it is public';
+                    $ratingArray['rating']++;
+                }
 
-                    if ($repositoryArray['private'] === true) {
-                        $ratingArray['results'][] = 'Cannot rate the repository because it is private.';
-                    }
-                    break;
-                case 'gitlab.com':
-                    $ratingArray['results'][] = 'Cannot rate the repository because we don\'t support '.$domain. ' yet.';
+                if ($repositoryArray['private'] === true) {
+                    $ratingArray['results'][] = 'Cannot rate the repository because it is private.';
+                }
+                break;
+            case 'gitlab.com':
+                $ratingArray['results'][] = 'Cannot rate the repository because we don\'t support '.$domain.' yet.';
 
-                    break;
-                default:
-                    $ratingArray['results'][] = 'Cannot rate the repository because it is not a valid repository';
-                    break;
+                break;
+            default:
+                $ratingArray['results'][] = 'Cannot rate the repository because it is not a valid repository';
+                break;
             }
-        }
+        }//end if
 
         $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 2);
 
@@ -261,6 +261,7 @@ class RatingListService
             $ratingArray['results'][] = 'The developmentStatus: '.$component->getValue('developmentStatus').' rated';
             $ratingArray['rating']++;
         }
+
         if ($component->getValue('developmentStatus') === false) {
             $ratingArray['results'][] = 'Cannot rate the developmentStatus because it is not set';
         }
@@ -703,7 +704,6 @@ class RatingListService
             $ratingArray['results'][] = 'The contacts are rated';
             $ratingArray['rating']++;
         }
-
 
         if (count($maintenanceObject->getValue('contacts')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the contacts because it is not set';

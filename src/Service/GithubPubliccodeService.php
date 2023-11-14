@@ -137,7 +137,6 @@ class GithubPubliccodeService
 
         // If we are testing for one repository.
         if ($repositoryId !== null) {
-
         }
 
         if ($repositoryId === null) {
@@ -145,7 +144,6 @@ class GithubPubliccodeService
 
             $response = [];
             foreach ($repositories as $repositoryArray) {
-
                 if (key_exists('repository', $repositoryArray) === false
                     || key_exists('html_url', $repositoryArray['repository']) === false
                 ) {
@@ -160,9 +158,10 @@ class GithubPubliccodeService
             if (isset($response) === true) {
                 $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
             }
-        }
+        }//end if
 
         return $this->data;
+
     }//end findGithubRepositories()
 
 

@@ -186,7 +186,7 @@ class FormInputService
 
         return $this->data;
 
-    }//end updateRepositoryWithEventResponse()
+    }//end updateRepositoryWithFormInput()
 
 
 }//end class
