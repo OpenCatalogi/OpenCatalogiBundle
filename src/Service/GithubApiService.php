@@ -187,14 +187,8 @@ class GithubApiService
         // Get the publiccode/opencatalogi files of the given repository.
         $dataArray = $this->getFilesFromRepo($repositoryUrl, $source);
 
-        if ($dataArray !== null) {
-            // Import the publiccode/opencatalogi files and connect it to the repository.
-            $repository = $this->importRepoFiles($dataArray, $source, $repositorySync->getObject());
-        }
-
-        if (isset($repository) === false) {
-            $repository = $repositorySync->getObject();
-        }
+        // Import the publiccode/opencatalogi files and connect it to the repository.
+        $repository = $this->importRepoFiles($dataArray, $source, $repositorySync->getObject());
 
         // Cleanup the repository.
         $repository = $this->cleanupRepository($repository);
@@ -220,7 +214,7 @@ class GithubApiService
     {
         // If the repository has one or less components return.
         if ($repository->getValue('components')->count() <= 1) {
-            return null;
+            return $repository;
         }
 
         // Loop through the components and remove the component we created.
@@ -247,8 +241,10 @@ class GithubApiService
      * @param Source       $source          The github api source.
      *
      * @throws GuzzleException
+     *
+     * @return ObjectEntity
      */
-    public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): void
+    public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
         $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
@@ -266,6 +262,8 @@ class GithubApiService
         $this->entityManager->persist($repository);
         $this->entityManager->flush();
 
+        return $repository;
+
     }//end enrichWithOrganization()
 
 
@@ -277,8 +275,10 @@ class GithubApiService
      * @param Source       $source          The github api source.
      *
      * @throws GuzzleException
+     *
+     * @return ObjectEntity
      */
-    public function enrichWithComponent(ObjectEntity $repository, array $repositoryArray, Source $source): void
+    public function enrichWithComponent(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
         $componentSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
 
@@ -286,6 +286,8 @@ class GithubApiService
         $componentSync = $this->syncService->synchronize($componentSync, ['url' => $repository, 'name' => $repository->getValue('name')]);
         $this->entityManager->persist($componentSync);
         $this->entityManager->flush();
+
+        return $repository;
 
     }//end enrichWithComponent()
 
@@ -303,12 +305,12 @@ class GithubApiService
     {
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
-            $this->enrichWithOrganization($repository, $repositoryArray, $source);
+            $repository = $this->enrichWithOrganization($repository, $repositoryArray, $source);
         }
 
         // If there is no component create one.
         if ($repository->getValue('components')->count() === 0) {
-            $this->enrichWithComponent($repository, $repositoryArray, $source);
+            $repository = $this->enrichWithComponent($repository, $repositoryArray, $source);
         }
 
         // @TODO: enrich the null values with what we have.
