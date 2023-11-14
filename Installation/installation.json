@@ -81,6 +81,14 @@
         "throws": [
           "opencatalogi.githubevents.trigger"
         ]
+      },
+      {
+        "reference": "https://opencatalogi.nl/oc.formInput.schema.json",
+        "path": "form_input",
+        "methods": ["POST"],
+        "throws": [
+          "opencatalogi.form.trigger"
+        ]
       }
     ]
   }
