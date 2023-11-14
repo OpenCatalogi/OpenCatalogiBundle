@@ -18,7 +18,12 @@ categories:
   - collaboration
   - it-development
   
-developmentStatus: beta
+developmentStatus: stable
+nl:
+  vng:
+    commonground:
+      layerType: service
+    gemma: []
 description:
   nl:
     shortDescription: "OpenCatalogiBundle"
