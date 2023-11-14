@@ -2,8 +2,10 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Service;
 
-use App\Entity\Entity;
+use App\Entity\Entity as Schema;
+use App\Entity\Gateway as Source;
 use App\Entity\ObjectEntity;
+use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -29,6 +31,11 @@ class RatingService
     private GatewayResourceService $resourceService;
 
     /**
+     * @var SynchronizationService
+     */
+    private SynchronizationService $syncService;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -48,17 +55,20 @@ class RatingService
      * @param EntityManagerInterface $entityManager     The Entity Manager.
      * @param RatingListService      $ratingListService The Rating List Service.
      * @param GatewayResourceService $resourceService   The Gateway Resource Service.
+     * @param SynchronizationService $syncService The Synchronization Service.
      * @param LoggerInterface        $pluginLogger      The plugin version of the logger interface.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         RatingListService $ratingListService,
         GatewayResourceService $resourceService,
+        SynchronizationService $syncService,
         LoggerInterface $pluginLogger
     ) {
         $this->entityManager     = $entityManager;
         $this->ratingListService = $ratingListService;
         $this->resourceService   = $resourceService;
+        $this->syncService = $syncService;
         $this->pluginLogger      = $pluginLogger;
         $this->configuration     = [];
         $this->data              = [];
@@ -121,6 +131,47 @@ class RatingService
 
     }//end enrichComponentsWithRating()
 
+    /**
+     * Rate the components of the repository
+     *
+     * @param ObjectEntity $repository The repository object.
+     * @param Source $source The source of the repository.
+     * @param array The repository array from the source.
+     *
+     * @throws Exception
+     *
+     * @return ObjectEntity Dataset at the end of the handler.
+     */
+    public function rateRepoComponents(ObjectEntity $repository, Source $source, array $repositoryArray): ObjectEntity
+    {
+        $ratingSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingMapping = $this->resourceService->getMapping('https://opencatalogi.nl/api/oc.rateComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
+
+        foreach ($repository->getValue('components') as $component) {
+            // Get the source id of the component.
+            $sourcId = $component->getSynchronizations()->first()->getSourceId();
+
+            // Find the sync with the component source id.
+            $ratingSync = $this->syncService->findSyncBySource($source, $ratingSchema, $sourcId);
+            $ratingSync->setMapping($ratingMapping);
+
+            // Get the rating array.
+            $ratingArray = $this->ratingList($component, $repositoryArray);
+
+            // Sync the rating array.
+            $ratingSync = $this->syncService->synchronize($ratingSync, $ratingArray);
+
+            // Set the rating object to the component.
+            $component->setValue('rating', $ratingSync->getObject());
+            $this->entityManager->persist($component);
+            $this->entityManager->flush();
+
+            $this->pluginLogger->debug("Created rating ({$ratingSync->getObject()->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
+        }
+
+        return $repository;
+    }
+
 
     /**
      * Rate a component.
@@ -133,7 +184,7 @@ class RatingService
      */
     public function rateComponent(ObjectEntity $component): ObjectEntity
     {
-        $ratingSchema = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
+        $ratingSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
 
         $ratingComponent = $this->ratingList($component);
 
@@ -162,12 +213,13 @@ class RatingService
      * Rates a component.
      *
      * @param ObjectEntity $component The component to rate.
+     * @param array $repositoryArray The repository array from the source.
      *
      * @throws Exception|GuzzleException
      *
      * @return ObjectEntity|null Dataset at the end of the handler.
      */
-    public function ratingList(ObjectEntity $component): ?array
+    public function ratingList(ObjectEntity $component, array $repositoryArray): ?array
     {
         $ratingArray = [
             'rating'    => 0,
@@ -176,7 +228,7 @@ class RatingService
         ];
 
         $ratingArray = $this->ratingListService->rateName($component, $ratingArray);
-        $ratingArray = $this->ratingListService->rateUrl($component, $ratingArray);
+        $ratingArray = $this->ratingListService->rateUrl($component, $ratingArray, $repositoryArray);
         $ratingArray = $this->ratingListService->rateLandingUrl($component, $ratingArray);
         $ratingArray = $this->ratingListService->rateSoftwareVersion($component, $ratingArray);
         $ratingArray = $this->ratingListService->rateReleaseDate($component, $ratingArray);
@@ -195,7 +247,9 @@ class RatingService
             $ratingArray = $this->ratingListService->rateFeatures($descriptionObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateScreenshots($descriptionObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateVideos($descriptionObject, $ratingArray);
-        } else {
+        }
+
+        if (($descriptionObject = $component->getValue('description')) === false) {
             $ratingArray['results'][] = 'Cannot rate the description object because it is not set';
             $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 7);
         }
@@ -212,7 +266,9 @@ class RatingService
             }//end if
 
             $ratingArray = $this->ratingListService->rateAuthorsFile($legalObject, $ratingArray);
-        } else {
+        }
+
+        if (($legalObject = $component->getValue('legal')) === false) {
             $ratingArray['results'][] = 'Cannot rate the legal object because it is not set';
             $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 2);
         }
@@ -221,7 +277,9 @@ class RatingService
             $ratingArray = $this->ratingListService->rateType($maintenanceObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateContractors($maintenanceObject, $ratingArray);
             $ratingArray = $this->ratingListService->rateContacts($maintenanceObject, $ratingArray);
-        } else {
+        }
+
+        if (($maintenanceObject = $component->getValue('maintenance')) === false) {
             $ratingArray['results'][] = 'Cannot rate the maintenance object because it is not set';
             $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 3);
         }

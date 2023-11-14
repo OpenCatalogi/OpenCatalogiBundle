@@ -14,11 +14,6 @@ class RatingListService
 {
 
     /**
-     * @var GithubApiService
-     */
-    private GithubApiService $githubApiService;
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -35,14 +30,11 @@ class RatingListService
 
 
     /**
-     * @param GithubApiService $githubApiService The github Api Service.
      * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface.
      */
     public function __construct(
-        GithubApiService $githubApiService,
         LoggerInterface $pluginLogger
     ) {
-        $this->githubApiService = $githubApiService;
         $this->pluginLogger     = $pluginLogger;
         $this->configuration    = [];
         $this->data             = [];
@@ -60,10 +52,12 @@ class RatingListService
      */
     public function rateName(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('name') !== null) {
+        if ($component->getValue('name') !== false) {
             $ratingArray['results'][] = 'The name: '.$component->getValue('name').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('name') === false) {
             $ratingArray['results'][] = 'Cannot rate the name because it is not set';
         }
 
@@ -82,33 +76,39 @@ class RatingListService
      *
      * @return array Dataset at the end of the handler.
      */
-    public function rateUrl(ObjectEntity $component, array $ratingArray): array
+    public function rateUrl(ObjectEntity $component, array $ratingArray, array $repositoryArray): array
     {
-        if (($repository = $component->getValue('url')) !== false) {
-            $url = $repository->getValue('url');
-            if (empty($url) === false) {
-                $ratingArray['results'][] = 'The url: '.$url.' rated';
-                $ratingArray['rating']++;
 
-                $domain = \Safe\parse_url($url, PHP_URL_HOST);
-                if ($domain !== 'github.com') {
-                    $ratingArray['results'][] = 'Cannot rate the repository because it is not a valid github repository';
-                } else if ($this->githubApiService->checkPublicRepository($url) !== null) {
-                    $ratingArray['results'][] = 'Rated the repository because it is public';
-                    $ratingArray['rating']++;
-                } else {
-                    $ratingArray['results'][] = 'Cannot rate the repository because it is private (or url is invalid)';
-                }
+        if (($repository = $component->getValue('url')) === false) {
+            $ratingArray['results'][] = 'Cannot rate the repository because it is not set.';
+        }
+        
+        if ($repository !== false && ($url = $repository->getValue('url')) !== false) {
+            $ratingArray['results'][] = 'The url: '.$url.' rated';
+            $ratingArray['rating']++;
 
-                $ratingArray['maxRating']++;
-            } else if ($url === null) {
-                $ratingArray['results'][] = 'Cannot rate the url because it is not set';
-            } else {
-                $ratingArray['results'][] = 'Cannot rate the repository because url is empty';
+            $domain = \Safe\parse_url($url, PHP_URL_HOST);
+
+            switch ($domain){
+                case 'github.com':
+                    if ($repositoryArray['private'] === false) {
+                        $ratingArray['results'][] = 'Rated the repository because it is public';
+                        $ratingArray['rating']++;
+                    }
+
+                    if ($repositoryArray['private'] === true) {
+                        $ratingArray['results'][] = 'Cannot rate the repository because it is private.';
+                    }
+                    break;
+                case 'gitlab.com':
+                    $ratingArray['results'][] = 'Cannot rate the repository because we don\'t support '.$domain. ' yet.';
+
+                    break;
+                default:
+                    $ratingArray['results'][] = 'Cannot rate the repository because it is not a valid repository';
+                    break;
             }
-
-            $ratingArray['maxRating']++;
-        }//end if
+        }
 
         $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 2);
 
@@ -127,10 +127,12 @@ class RatingListService
      */
     public function rateLandingUrl(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('landingURL') !== null) {
+        if ($component->getValue('landingURL') !== false) {
             $ratingArray['results'][] = 'The landingURL: '.$component->getValue('landingURL').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('landingURL') === false) {
             $ratingArray['results'][] = 'Cannot rate the landingURL because it is not set';
         }
 
@@ -151,10 +153,12 @@ class RatingListService
      */
     public function rateSoftwareVersion(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('softwareVersion') !== null) {
+        if ($component->getValue('softwareVersion') !== false) {
             $ratingArray['results'][] = 'The softwareVersion: '.$component->getValue('softwareVersion').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('softwareVersion') === false) {
             $ratingArray['results'][] = 'Cannot rate the softwareVersion because it is not set';
         }
 
@@ -175,10 +179,12 @@ class RatingListService
      */
     public function rateReleaseDate(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('releaseDate') !== null) {
+        if ($component->getValue('releaseDate') !== false) {
             $ratingArray['results'][] = 'The releaseDate: '.$component->getValue('releaseDate').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('releaseDate') === false) {
             $ratingArray['results'][] = 'Cannot rate the releaseDate because it is not set';
         }
 
@@ -199,10 +205,12 @@ class RatingListService
      */
     public function rateLogo(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('logo') !== null) {
+        if ($component->getValue('logo') !== false) {
             $ratingArray['results'][] = 'The logo: '.$component->getValue('logo').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('logo') === false) {
             $ratingArray['results'][] = 'Cannot rate the logo because it is not set';
         }
 
@@ -223,10 +231,12 @@ class RatingListService
      */
     public function rateRoadmap(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('roadmap') !== null) {
+        if ($component->getValue('roadmap') !== false) {
             $ratingArray['results'][] = 'The roadmap: '.$component->getValue('roadmap').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('roadmap') === false) {
             $ratingArray['results'][] = 'Cannot rate the roadmap because it is not set';
         }
 
@@ -247,10 +257,11 @@ class RatingListService
      */
     public function rateDevelopmentStatus(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('developmentStatus') !== null) {
+        if ($component->getValue('developmentStatus') !== false) {
             $ratingArray['results'][] = 'The developmentStatus: '.$component->getValue('developmentStatus').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+        if ($component->getValue('developmentStatus') === false) {
             $ratingArray['results'][] = 'Cannot rate the developmentStatus because it is not set';
         }
 
@@ -271,10 +282,12 @@ class RatingListService
      */
     public function rateSoftwareType(ObjectEntity $component, array $ratingArray): array
     {
-        if ($component->getValue('softwareType') !== null) {
+        if ($component->getValue('softwareType') !== false) {
             $ratingArray['results'][] = 'The softwareType: '.$component->getValue('softwareType').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($component->getValue('softwareType') === false) {
             $ratingArray['results'][] = 'Cannot rate the softwareType because it is not set';
         }
 
@@ -295,10 +308,13 @@ class RatingListService
      */
     public function ratePlatforms(ObjectEntity $component, array $ratingArray): array
     {
+
         if (count($component->getValue('platforms')) > 0) {
             $ratingArray['results'][] = 'The platforms are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($component->getValue('platforms')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the platforms because it is not set';
         }
 
@@ -322,7 +338,9 @@ class RatingListService
         if (count($component->getValue('categories')) > 0) {
             $ratingArray['results'][] = 'The categories are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($component->getValue('categories')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the categories because it is not set';
         }
 
@@ -343,10 +361,12 @@ class RatingListService
      */
     public function rateLocalisedName(ObjectEntity $descriptionObject, array $ratingArray): array
     {
-        if ($descriptionObject->getValue('localisedName') !== null) {
+        if ($descriptionObject->getValue('localisedName') !== false) {
             $ratingArray['results'][] = 'The localisedName: '.$descriptionObject->getValue('localisedName').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($descriptionObject->getValue('localisedName') === false) {
             $ratingArray['results'][] = 'Cannot rate the localisedName because it is not set';
         }
 
@@ -367,10 +387,12 @@ class RatingListService
      */
     public function rateShortDescription(ObjectEntity $descriptionObject, array $ratingArray): array
     {
-        if ($descriptionObject->getValue('shortDescription') !== null) {
+        if ($descriptionObject->getValue('shortDescription') !== false) {
             $ratingArray['results'][] = 'The shortDescription: '.$descriptionObject->getValue('shortDescription').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($descriptionObject->getValue('shortDescription') === false) {
             $ratingArray['results'][] = 'Cannot rate the shortDescription because it is not set';
         }
 
@@ -391,10 +413,12 @@ class RatingListService
      */
     public function rateLongDescription(ObjectEntity $descriptionObject, array $ratingArray): array
     {
-        if ($descriptionObject->getValue('longDescription') !== null) {
+        if ($descriptionObject->getValue('longDescription') === false) {
             $ratingArray['results'][] = 'The longDescription: '.$descriptionObject->getValue('longDescription').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($descriptionObject->getValue('longDescription') !== false) {
             $ratingArray['results'][] = 'Cannot rate the longDescription because it is not set';
         }
 
@@ -415,10 +439,12 @@ class RatingListService
      */
     public function rateApiDocumentation(ObjectEntity $descriptionObject, array $ratingArray): array
     {
-        if ($descriptionObject->getValue('apiDocumentation') !== null) {
+        if ($descriptionObject->getValue('apiDocumentation') !== false) {
             $ratingArray['results'][] = 'The apiDocumentation: '.$descriptionObject->getValue('apiDocumentation').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($descriptionObject->getValue('apiDocumentation') === false) {
             $ratingArray['results'][] = 'Cannot rate the apiDocumentation because it is not set';
         }
 
@@ -442,7 +468,9 @@ class RatingListService
         if (count($descriptionObject->getValue('features')) > 0) {
             $ratingArray['results'][] = 'The features are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($descriptionObject->getValue('features')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the features because it is not set';
         }
 
@@ -466,7 +494,9 @@ class RatingListService
         if (count($descriptionObject->getValue('screenshots')) > 0) {
             $ratingArray['results'][] = 'The screenshots are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($descriptionObject->getValue('screenshots')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the screenshots because it is not set';
         }
 
@@ -490,7 +520,9 @@ class RatingListService
         if (count($descriptionObject->getValue('videos')) > 0) {
             $ratingArray['results'][] = 'The videos are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($descriptionObject->getValue('videos')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the videos because it is not set';
         }
 
@@ -511,10 +543,12 @@ class RatingListService
      */
     public function rateLicense(ObjectEntity $legalObject, array $ratingArray): array
     {
-        if ($legalObject->getValue('license') !== null) {
+        if ($legalObject->getValue('license') !== false) {
             $ratingArray['results'][] = 'The license: '.$legalObject->getValue('license').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($legalObject->getValue('license') === false) {
             $ratingArray['results'][] = 'Cannot rate the license because it is not set';
         }
 
@@ -535,10 +569,12 @@ class RatingListService
      */
     public function rateCopyOwner(ObjectEntity $mainOwnerObject, array $ratingArray): array
     {
-        if ($mainOwnerObject->getValue('mainCopyrightOwner') !== null) {
+        if ($mainOwnerObject->getValue('mainCopyrightOwner') !== false) {
             $ratingArray['results'][] = 'The mainCopyrightOwner: '.$mainOwnerObject->getValue('name').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($mainOwnerObject->getValue('mainCopyrightOwner') === false) {
             $ratingArray['results'][] = 'Cannot rate the mainCopyrightOwner because it is not set';
         }
 
@@ -559,10 +595,12 @@ class RatingListService
      */
     public function rateRepoOwner(ObjectEntity $repoOwnerObject, array $ratingArray): array
     {
-        if ($repoOwnerObject->getValue('repoOwner') !== null) {
+        if ($repoOwnerObject->getValue('repoOwner') !== false) {
             $ratingArray['results'][] = 'The repoOwner is rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($repoOwnerObject->getValue('repoOwner') === false) {
             $ratingArray['results'][] = 'Cannot rate the repoOwner because it is not set';
         }
 
@@ -583,10 +621,12 @@ class RatingListService
      */
     public function rateAuthorsFile(ObjectEntity $legalObject, array $ratingArray): array
     {
-        if ($legalObject->getValue('authorsFile') !== null) {
+        if ($legalObject->getValue('authorsFile') !== false) {
             $ratingArray['results'][] = 'The authorsFile: '.$legalObject->getValue('authorsFile').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($legalObject->getValue('authorsFile') === false) {
             $ratingArray['results'][] = 'Cannot rate the authorsFile because it is not set';
         }
 
@@ -607,10 +647,12 @@ class RatingListService
      */
     public function rateType(ObjectEntity $maintenanceObject, array $ratingArray): array
     {
-        if ($maintenanceObject->getValue('type') !== null) {
+        if ($maintenanceObject->getValue('type') !== false) {
             $ratingArray['results'][] = 'The type: '.$maintenanceObject->getValue('type').' rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if ($maintenanceObject->getValue('type') === false) {
             $ratingArray['results'][] = 'Cannot rate the type because it is not set';
         }
 
@@ -634,7 +676,9 @@ class RatingListService
         if (count($maintenanceObject->getValue('contractors')) > 0) {
             $ratingArray['results'][] = 'The contractors are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+        if (count($maintenanceObject->getValue('contractors')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the contractors because it is not set';
         }
 
@@ -658,7 +702,10 @@ class RatingListService
         if (count($maintenanceObject->getValue('contacts')) > 0) {
             $ratingArray['results'][] = 'The contacts are rated';
             $ratingArray['rating']++;
-        } else {
+        }
+
+
+        if (count($maintenanceObject->getValue('contacts')) === 0) {
             $ratingArray['results'][] = 'Cannot rate the contacts because it is not set';
         }
 

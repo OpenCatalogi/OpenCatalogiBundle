@@ -1,0 +1,12 @@
+{
+  "title": "Rate Component",
+  "$id": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "rating": "rating",
+    "maxRating": "maxRating",
+    "results": "results"
+  }
+}
