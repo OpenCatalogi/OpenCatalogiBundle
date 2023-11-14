@@ -150,6 +150,7 @@ class GithubEventService
 
     }//end __construct()
 
+
     /**
      * This function creates/updates the repository with the github event response.
      *
@@ -180,10 +181,11 @@ class GithubEventService
 
             return $this->data;
         }
-        
+
         $this->data['response'] = new Response(json_encode($repository->getValue('organisation')->toArray()), 200, ['Content-Type' => 'application/json']);
 
         return $this->data;
+
     }//end updateRepositoryWithEventResponse()
 
 

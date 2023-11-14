@@ -55,7 +55,7 @@ class RatingService
      * @param EntityManagerInterface $entityManager     The Entity Manager.
      * @param RatingListService      $ratingListService The Rating List Service.
      * @param GatewayResourceService $resourceService   The Gateway Resource Service.
-     * @param SynchronizationService $syncService The Synchronization Service.
+     * @param SynchronizationService $syncService       The Synchronization Service.
      * @param LoggerInterface        $pluginLogger      The plugin version of the logger interface.
      */
     public function __construct(
@@ -68,7 +68,7 @@ class RatingService
         $this->entityManager     = $entityManager;
         $this->ratingListService = $ratingListService;
         $this->resourceService   = $resourceService;
-        $this->syncService = $syncService;
+        $this->syncService       = $syncService;
         $this->pluginLogger      = $pluginLogger;
         $this->configuration     = [];
         $this->data              = [];
@@ -131,11 +131,12 @@ class RatingService
 
     }//end enrichComponentsWithRating()
 
+
     /**
      * Rate the components of the repository
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param Source $source The source of the repository.
+     * @param ObjectEntity                               $repository The repository object.
+     * @param Source                                     $source     The source of the repository.
      * @param array The repository array from the source.
      *
      * @throws Exception
@@ -144,7 +145,7 @@ class RatingService
      */
     public function rateRepoComponents(ObjectEntity $repository, Source $source, array $repositoryArray): ObjectEntity
     {
-        $ratingSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
         $ratingMapping = $this->resourceService->getMapping('https://opencatalogi.nl/api/oc.rateComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         foreach ($repository->getValue('components') as $component) {
@@ -167,10 +168,11 @@ class RatingService
             $this->entityManager->flush();
 
             $this->pluginLogger->debug("Created rating ({$ratingSync->getObject()->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
-        }
+        }//end foreach
 
         return $repository;
-    }
+
+    }//end rateRepoComponents()
 
 
     /**
@@ -212,8 +214,8 @@ class RatingService
     /**
      * Rates a component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $repositoryArray The repository array from the source.
+     * @param ObjectEntity $component       The component to rate.
+     * @param array        $repositoryArray The repository array from the source.
      *
      * @throws Exception|GuzzleException
      *
