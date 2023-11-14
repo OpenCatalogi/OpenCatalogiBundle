@@ -2,7 +2,7 @@
   "title": "Organisation",
   "$id": "https://opencatalogi.nl/oc.organisation.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "object",
   "description": "extension of the publiccode standard ",
   "properties": {
@@ -22,7 +22,7 @@
       "uniqueItems": true,
       "description": "A list of components supported by this organisation",
       "items": {
-        "$ref": "https://opencatalogi.nl/oc.repository.schema.json"
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
     },
     "owns": {
@@ -30,7 +30,7 @@
       "uniqueItems": true,
       "description": "A list of components owned by this organisation",
       "items": {
-        "$ref": "https://opencatalogi.nl/oc.repository.schema.json"
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       }
     },
     "uses": {
@@ -38,7 +38,7 @@
       "uniqueItems": true,
       "description": "A list of components used by this organisation",
       "items": {
-        "$ref": "https://opencatalogi.nl/oc.repository.schema.json"
+        "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       },
       "inversedBy": "usedBy"
     },

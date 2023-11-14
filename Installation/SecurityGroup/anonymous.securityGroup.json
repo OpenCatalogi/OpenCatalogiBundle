@@ -1,7 +1,7 @@
 {
   "$id": "https://docs.commongateway.nl/securityGroup/default.anonymous.securityGroup.json",
   "$schema": "https://docs.commongateway.nl/schemas/SecurityGroup.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "title": "Anonymous SecurityGroup",
   "scopes": [
     "schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET",
@@ -9,6 +9,7 @@
     "schemas.https://opencatalogi.nl/oc.component.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.repository.schema.json.GET",
-    "schemas.https://opencatalogi.nl/oc.githubEvent.schema.json.POST"
+    "schemas.https://opencatalogi.nl/oc.githubEvent.schema.json.POST",
+    "schemas.https://opencatalogi.nl/oc.formInput.schema.json.POST"
   ]
 }
