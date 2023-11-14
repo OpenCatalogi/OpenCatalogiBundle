@@ -492,7 +492,7 @@ class GithubApiService
 
         // Check the sha of the sync with the sha in the array.
         if ($this->syncService->doesShaMatch($organizationSync, $opencatalogiArray['sha']) === true) {
-            $repository->setValue('organisation', $organizationSync->getObject());
+            $repository->hydrate(['organisation' => $organizationSync->getObject()]);
 
             $this->entityManager->persist($repository);
             $this->entityManager->flush();
@@ -519,6 +519,54 @@ class GithubApiService
         return $repository;
 
     }//end handleOpencatalogiFile()
+
+    /**
+     * This function loops through the array with publiccode/opencatalogi files.
+     *
+     * @param array        $publiccodeArray The publiccode array from the github api.
+     * @param Source       $source          The github api source.
+     * @param ObjectEntity $repository      The repository object.
+     *
+     * @return ObjectEntity
+     */
+    public function handlePubliccodeSubObjects(array $publiccodeArray, Source $source, ObjectEntity $component): ObjectEntity
+    {
+        if (key_exists('legal', $publiccodeArray) === true) {
+            $organizationSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+
+            if (key_exists('repoOwner', $publiccodeArray) === true
+                && key_exists('name', $publiccodeArray['repoOwner']) === true
+            ) {
+                $repoOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['repoOwner']['name']);
+                $repoOwnerSync = $this->syncService->synchronize($repoOwnerSync, $publiccodeArray['repoOwner']);
+
+                $component->hydrate(['repoOwner' => $repoOwnerSync->getObject()]);
+            }
+
+            if (key_exists('mainCopyrightOwner', $publiccodeArray) === true
+                && key_exists('name', $publiccodeArray['mainCopyrightOwner']) === true
+            ) {
+                $mainCopyrightOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['mainCopyrightOwner']['name']);
+                $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, $publiccodeArray['mainCopyrightOwner']);
+
+                $component->hydrate(['mainCopyrightOwner' => $mainCopyrightOwnerSync->getObject()]);
+
+            }
+        }
+
+        if (key_exists('applicationSuite', $publiccodeArray) === true
+            && key_exists('name', $publiccodeArray['applicationSuite']) === true
+        ) {
+            $applicationSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
+
+            $applicationSuiteSync = $this->syncService->findSyncBySource($source, $applicationSchema, $publiccodeArray['applicationSuite']['name']);
+            $applicationSuiteSync = $this->syncService->synchronize($applicationSuiteSync, $publiccodeArray['applicationSuite']);
+
+            $component->hydrate(['applicationSuite' => $applicationSuiteSync->getObject()]);
+        }
+
+        return $component;
+    }
 
 
     /**
@@ -569,18 +617,33 @@ class GithubApiService
             $publiccode['developmentStatus'] = 'obsolete';
         }
 
-        // @TODO: Check the sha of the sync with the sha in the array
-        // Map the publiccode file.
-        $componentArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
+        $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $publiccodeUrl);
 
-        // Set the publiccode url as _sourceId.
-        $componentArray['_sourceId'] = $publiccodeUrl;
+        // Check the sha of the sync with the sha in the array.
+        if ($this->syncService->doesShaMatch($componentSync, $publiccodeArray['sha']) === true) {
+            $component->hydrate(['url' => $repository]);
+
+            $this->entityManager->persist($component);
+            $this->entityManager->flush();
+
+            return $repository;
+        }
+
+        // Map the publiccode file.
+        $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
+
+        unset($componentArray['legal']['repoOwner']);
+        unset($componentArray['legal']['mainCopyrightOwner']);
+        unset($componentArray['applicationSuite']);
 
         // Find the sync with the source and publiccode url.
-        $component = $this->hydrationService->searchAndReplaceSynchronizations($componentArray, $source, $componentSchema, true, true);
+        $componentSync = $this->syncService->synchronize($componentSync, $componentArray, true);
+
+        // Handle the sub objects of the array.
+        $component = $this->handlePubliccodeSubObjects($dataArray, $source, $componentSync->getObject());
 
         $component->hydrate(['url' => $repository]);
-        $this->entityManager->persist($component);
+        $this->entityManager->persist($componentSync->getObject());
         $this->entityManager->flush();
 
         return $repository;
