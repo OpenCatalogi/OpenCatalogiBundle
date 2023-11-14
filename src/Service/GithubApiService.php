@@ -520,6 +520,7 @@ class GithubApiService
 
     }//end handleOpencatalogiFile()
 
+
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
@@ -532,7 +533,7 @@ class GithubApiService
     public function handlePubliccodeSubObjects(array $publiccodeArray, Source $source, ObjectEntity $component): ObjectEntity
     {
         if (key_exists('legal', $publiccodeArray) === true) {
-            $organizationSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+            $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             if (key_exists('repoOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['repoOwner']) === true
@@ -550,14 +551,13 @@ class GithubApiService
                 $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, $publiccodeArray['mainCopyrightOwner']);
 
                 $component->hydrate(['mainCopyrightOwner' => $mainCopyrightOwnerSync->getObject()]);
-
             }
-        }
+        }//end if
 
         if (key_exists('applicationSuite', $publiccodeArray) === true
             && key_exists('name', $publiccodeArray['applicationSuite']) === true
         ) {
-            $applicationSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
+            $applicationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
 
             $applicationSuiteSync = $this->syncService->findSyncBySource($source, $applicationSchema, $publiccodeArray['applicationSuite']['name']);
             $applicationSuiteSync = $this->syncService->synchronize($applicationSuiteSync, $publiccodeArray['applicationSuite']);
@@ -566,7 +566,8 @@ class GithubApiService
         }
 
         return $component;
-    }
+
+    }//end handlePubliccodeSubObjects()
 
 
     /**
