@@ -10,6 +10,7 @@ use App\Entity\Synchronization;
 use App\Service\SynchronizationService;
 use CommonGateway\CoreBundle\Service\CallService;
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
+use CommonGateway\CoreBundle\Service\HydrationService;
 use CommonGateway\CoreBundle\Service\MappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -72,6 +73,11 @@ class GithubPubliccodeService
     private LoggerInterface $pluginLogger;
 
     /**
+     * @var HydrationService
+     */
+    private HydrationService $hydrationService;
+
+    /**
      * @var Yaml
      */
     private Yaml $yaml;
@@ -103,7 +109,8 @@ class GithubPubliccodeService
         MappingService $mappingService,
         GithubApiService $githubApiService,
         GatewayResourceService $resourceService,
-        LoggerInterface $pluginLogger
+        LoggerInterface $pluginLogger,
+        HydrationService $hydrationService
     ) {
         $this->entityManager    = $entityManager;
         $this->callService      = $callService;
@@ -112,6 +119,7 @@ class GithubPubliccodeService
         $this->githubApiService = $githubApiService;
         $this->resourceService  = $resourceService;
         $this->pluginLogger     = $pluginLogger;
+        $this->hydrationService = $hydrationService;
         $this->yaml             = new Yaml();
 
         $this->data          = [];
@@ -360,272 +368,6 @@ class GithubPubliccodeService
 
 
     /**
-     * @param array        $publiccode The publiccode array for updating the component object.
-     * @param ObjectEntity $component  The component object that is being updated.
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null The updated component object
-     */
-    public function createApplicationSuite(array $publiccode, ObjectEntity $component): ?ObjectEntity
-    {
-        $applicationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        if (key_exists('applicationSuite', $publiccode) === true) {
-            $application = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $applicationEntity, 'name' => $publiccode['applicationSuite']]);
-            if ($application === null) {
-                $application = new ObjectEntity($applicationEntity);
-                $application->hydrate(['name' => $publiccode['applicationSuite']]);
-            }//end if
-
-            $this->entityManager->persist($application);
-            $component->setValue('applicationSuite', $application);
-            $this->entityManager->persist($component);
-            $this->entityManager->flush();
-
-            return $component;
-        }//end if
-
-        return null;
-
-    }//end createApplicationSuite()
-
-
-    /**
-     * @param array        $publiccode      The publiccode array for updating the component object.
-     * @param ObjectEntity $componentObject The component object that is being updated.
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null The updated component object.
-     */
-    public function createMainCopyrightOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
-    {
-        $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
-        if (key_exists('legal', $publiccode) === true
-            && key_exists('mainCopyrightOwner', $publiccode['legal']) === true
-            && is_array($publiccode['legal']['mainCopyrightOwner']) === false
-        ) {
-            $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['mainCopyrightOwner']]);
-            if ($organisation === null) {
-                $organisation = new ObjectEntity($organisationEntity);
-                $organisation->hydrate(['name' => $publiccode['legal']['mainCopyrightOwner']]);
-            }//end if
-
-            $this->entityManager->persist($organisation);
-
-            if (($legal = $componentObject->getValue('legal')) !== null) {
-                if ($legal->getValue('mainCopyrightOwner') !== null) {
-                    // If the component is already set to a repoOwner return the component object.
-                    return $componentObject;
-                }//end if
-
-                $legal->setValue('mainCopyrightOwner', $organisation);
-                $this->entityManager->persist($legal);
-
-                $componentObject->setValue('legal', $legal);
-                $this->entityManager->persist($componentObject);
-                $this->entityManager->flush();
-
-                return $componentObject;
-            }//end if
-
-            $legal = new ObjectEntity($legalEntity);
-            $legal->hydrate(['mainCopyrightOwner' => $organisation]);
-            $this->entityManager->persist($legal);
-            $componentObject->setValue('legal', $legal);
-            $this->entityManager->persist($componentObject);
-            $this->entityManager->flush();
-
-            return $componentObject;
-        }//end if
-
-        return null;
-
-    }//end createMainCopyrightOwner()
-
-
-    /**
-     * @param array        $publiccode      The publiccode array for updating the component object.
-     * @param ObjectEntity $componentObject The component object that is being updated.
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null The updated component object.
-     */
-    public function createRepoOwner(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
-    {
-        $organisationEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $legalEntity        = $this->resourceService->getSchema('https://opencatalogi.nl/oc.legal.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        // If the component isn't already set to a organisation (legal.repoOwner) create or get the org and set it to the component legal repoOwner.
-        if (key_exists('legal', $publiccode) === true
-            && key_exists('repoOwner', $publiccode['legal']) === true
-            && is_array($publiccode['legal']['repoOwner']) === false
-        ) {
-            $organisation = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $organisationEntity, 'name' => $publiccode['legal']['repoOwner']]);
-            if ($organisation === null) {
-                $organisation = new ObjectEntity($organisationEntity);
-                $organisation->hydrate(['name' => $publiccode['legal']['repoOwner']]);
-            }//end if
-
-            $this->entityManager->persist($organisation);
-
-            if (($legal = $componentObject->getValue('legal')) !== null) {
-                if ($legal->getValue('repoOwner') !== null) {
-                    // If the component is already set to a repoOwner return the component object.
-                    return $componentObject;
-                }//end if
-
-                $legal->setValue('repoOwner', $organisation);
-                $this->entityManager->persist($legal);
-
-                $componentObject->setValue('legal', $legal);
-                $this->entityManager->persist($componentObject);
-                $this->entityManager->flush();
-
-                return $componentObject;
-            }//end if
-
-            $legal = new ObjectEntity($legalEntity);
-            $legal->hydrate(['repoOwner' => $organisation]);
-            $this->entityManager->persist($legal);
-            $componentObject->setValue('legal', $legal);
-            $this->entityManager->persist($componentObject);
-            $this->entityManager->flush();
-
-            return $componentObject;
-        }//end if
-
-        return null;
-
-    }//end createRepoOwner()
-
-
-    /**
-     * @param array        $publiccode      The publiccode array for updating the component object.
-     * @param ObjectEntity $componentObject The component object that is being updated.
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null The updated component object.
-     */
-    public function createContractors(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
-    {
-        $maintenanceEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.maintenance.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $contractorsEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contractor.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        if (key_exists('maintenance', $publiccode) === true
-            && key_exists('contractors', $publiccode['maintenance']) === true
-        ) {
-            $contractors = [];
-            foreach ($publiccode['maintenance']['contractors'] as $contractor) {
-                if (key_exists('name', $contractor) === true) {
-                    if (($contractor = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $contractorsEntity, 'name' => $contractor['name']])) === false) {
-                        $contractor = new ObjectEntity($contractorsEntity);
-                        $contractor->hydrate(['name' => $contractor['name']]);
-                    }//end if
-
-                    $this->entityManager->persist($contractor);
-                    $contractors[] = $contractor;
-                }//end if
-            }
-
-            if (($maintenance = $componentObject->getValue('maintenance')) === true) {
-                if ($maintenance->getValue('contractors') !== false) {
-                    // If the component is already set to a contractors return the component object.
-                    return $componentObject;
-                }//end if
-
-                $maintenance->setValue('contractors', $contractors);
-                $this->entityManager->persist($maintenance);
-
-                $componentObject->setValue('maintenance', $maintenance);
-                $this->entityManager->persist($componentObject);
-                $this->entityManager->flush();
-
-                return $componentObject;
-            }//end if
-
-            $maintenance = new ObjectEntity($maintenanceEntity);
-            $maintenance->hydrate(['contractors' => $contractors]);
-            $this->entityManager->persist($maintenance);
-            $componentObject->setValue('maintenance', $maintenance);
-            $this->entityManager->persist($componentObject);
-            $this->entityManager->flush();
-
-            return $componentObject;
-        }//end if
-
-        return null;
-
-    }//end createContractors()
-
-
-    /**
-     * @param array        $publiccode      The publiccode array for updating the component object.
-     * @param ObjectEntity $componentObject The component object that is being updated.
-     *
-     * @throws Exception
-     *
-     * @return ObjectEntity|null The updated component object.
-     */
-    public function createContacts(array $publiccode, ObjectEntity $componentObject): ?ObjectEntity
-    {
-        $maintenanceEntity = $this->resourceService->getSchema('https://opencatalogi.nl/oc.maintenance.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $contactEntity     = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        if (key_exists('maintenance', $publiccode) === true
-            && key_exists('contacts', $publiccode['maintenance']) === true
-        ) {
-            $contacts = [];
-            foreach ($publiccode['maintenance']['contacts'] as $contact) {
-                if (key_exists('name', $contact) === true) {
-                    if (($contact = $this->entityManager->getRepository('App:ObjectEntity')->findOneBy(['entity' => $contactEntity, 'name' => $contact['name']])) === false) {
-                        $contact = new ObjectEntity($contactEntity);
-                        $contact->hydrate(['name' => $contact['name']]);
-                    }//end if
-
-                    $this->entityManager->persist($contact);
-                    $contacts[] = $contact;
-                }//end if
-            }
-
-            if (($maintenance = $componentObject->getValue('maintenance')) === true) {
-                if ($maintenance->getValue('contacts') !== false) {
-                    // If the component is already set to a contractors return the component object.
-                    return $componentObject;
-                }//end if
-
-                $maintenance->setValue('contacts', $contacts);
-                $this->entityManager->persist($maintenance);
-
-                $componentObject->setValue('maintenance', $maintenance);
-                $this->entityManager->persist($componentObject);
-                $this->entityManager->flush();
-
-                return $componentObject;
-            }//end if
-
-            $maintenance = new ObjectEntity($maintenanceEntity);
-            $maintenance->hydrate(['contacts' => $contacts]);
-            $this->entityManager->persist($maintenance);
-            $componentObject->setValue('maintenance', $maintenance);
-            $this->entityManager->persist($componentObject);
-            $this->entityManager->flush();
-
-            return $componentObject;
-        }//end if
-
-        return null;
-
-    }//end createContacts()
-
-
-    /**
      * This function maps the publiccode to a component.
      *
      * @param ObjectEntity $repository    The repository object.
@@ -666,6 +408,9 @@ class GithubPubliccodeService
             ) {
                 $sync = $this->syncService->findSyncBySource($usercontentSource, $componentEntity, $publiccodeUrl);
 
+                $this->entityManager->persist($sync);
+                $this->entityManager->flush();
+
                 return $this->syncService->synchronize($sync, ['name' => $repository->getValue('name'), 'url' => $repository]);
             }
         }//end foreach
@@ -689,21 +434,18 @@ class GithubPubliccodeService
      */
     public function mapPubliccode(ObjectEntity $repository, array $publiccode, array $configuration, string $publiccodeUrl): ?ObjectEntity
     {
-        $githubSource     = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
-        $componentMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $githubSource      = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $userContentSource = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
+        $componentSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentMapping  = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         $sync = $this->findPubliccodeSync($repository, $configuration, $publiccodeUrl);
-
-        if (isset($sync) === false) {
-            return $repository;
-        }
-
-        $component = $sync->getObject();
 
         $this->pluginLogger->debug('Mapping object'.$repository->getValue('name'), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         $this->pluginLogger->debug('The mapping object '.$componentMapping, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         $forkedFrom = $repository->getValue('forked_from');
+
         if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
             $publiccode['isBasedOn'] = $forkedFrom;
         }
@@ -715,18 +457,13 @@ class GithubPubliccodeService
 
         $componentArray = $this->mappingService->mapping($componentMapping, $publiccode);
 
-        $component->hydrate($componentArray);
+        $componentArray['_sourceId'] = $publiccodeUrl;
+
+        $component = $this->hydrationService->searchAndReplaceSynchronizations($componentArray, $userContentSource, $componentSchema);
+
         // set the name
         $component->hydrate(['name' => key_exists('name', $publiccode) ? $publiccode['name'] : $repository->getValue('name'), 'url' => $repository]);
 
-        $this->createApplicationSuite($publiccode, $component);
-        $this->createMainCopyrightOwner($publiccode, $component);
-        $this->createRepoOwner($publiccode, $component);
-
-        // @TODO These to functions aren't working.
-        // contracts and contacts are not set to the component
-        // $component = $this->createContractors($publiccode, $component);
-        // $component = $this->createContacts($publiccode, $component);
         $this->entityManager->persist($component);
         $this->entityManager->flush();
 
