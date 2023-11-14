@@ -150,117 +150,6 @@ class GithubEventService
 
     }//end __construct()
 
-
-    /**
-     * This function creates/updates the repository with the github event response.
-     *
-     * @param Source $source        The github api source
-     * @param string $name          The name of the repository
-     * @param string $repositoryUrl The url of the repository
-     *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
-     *
-     * @return ObjectEntity|null The organization of the repository.
-     */
-    public function createRepository(Source $source, string $name, string $repositoryUrl): ?ObjectEntity
-    {
-        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $mapping          = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
-
-        $this->configuration['organisationSchema']  = $this->configuration['organizationSchema'];
-        $this->configuration['organisationMapping'] = $this->configuration['organizationMapping'];
-
-        // Get the repository from the github api and import it.
-        $repositoryArray = $this->githubApiService->getRepository($name, $source);
-        $repository      = $this->importResourcesService->importGithubRepository($repositoryArray, $this->configuration);
-
-        // If there is no component create one.
-        if ($repository->getValue('components')->count() === 0) {
-            $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $repositoryUrl);
-            $componentSync = $this->syncService->synchronize($componentSync, ['name' => $repository->getValue('name'), 'url' => $repository]);
-        }
-
-        // Get the publiccodes of the repository and mapp the components.
-        $repositories = $this->githubApiService->getPubliccodesFromRepo($name, $source);
-        if ($repositories['total_count'] !== 0) {
-            $repository = $this->publiccodeService->mappPubliccodesFromRepo($repositories, $repository);
-        }
-
-        $organization = $this->importResourcesService->importOrganisation($repositoryArray['owner'], $this->configuration);
-        $repository->hydrate(['organisation' => $organization]);
-        $this->entityManager->persist($repository);
-        $this->entityManager->flush();
-
-        return $organization;
-
-    }//end createRepository()
-
-
-    /**
-     * This function creates/updates the repository with the github event response.
-     *
-     * @param array $githubEvent The github event data from the request.
-     *
-     * @throws GuzzleException|GatewayException|CacheException|InvalidArgumentException|ComponentException|LoaderError|SyntaxError|\Exception
-     *
-     * @return array|null The data with the repository in the response array.
-     */
-    public function githubEvent(array $githubEvent): ?array
-    {
-        $repositoryUrl = $githubEvent['repository']['html_url'];
-
-        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        // Do we have the api key set of the source.
-        if ($this->githubApiService->checkGithubAuth($source) === false) {
-            $this->data['response'] = new Response('Auth is not set for the source with location: '.$source->getLocation(), 404);
-
-            return $this->data;
-        }//end if
-
-        $name         = trim(\Safe\parse_url($repositoryUrl, PHP_URL_PATH), '/');
-        $explodedName = explode('/', $name);
-
-        // Check if the array has 1 item. If so this is an organisation.
-        if (count($explodedName) === 1) {
-            $organizationName = $name;
-        }
-
-        // Check if this is a .github repository
-        foreach ($explodedName as $item) {
-            if ($item === '.github') {
-                $organizationName = $explodedName[0];
-            }
-        }
-
-        // Check if the organizationName is set.
-        if (isset($organizationName) === true) {
-            $action = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
-            $this->organizationService->setConfiguration($action->getConfiguration());
-
-            $organizationObject = $this->organizationService->createOrganization($organizationName, $source);
-
-            $this->entityManager->persist($organizationObject);
-            $this->entityManager->flush();
-
-            $organizationObject = $this->entityManager->find(get_class($organizationObject), $organizationObject->getId());
-
-            $organizatioResponse['organization'] = $organizationObject->toArray();
-
-            $this->data['response'] = new Response(json_encode($organizatioResponse), 200, ['Content-Type' => 'application/json']);
-
-            return $this->data;
-        }
-
-        $organization = $this->createRepository($source, $name, $repositoryUrl);
-
-        $this->data['response'] = new Response(json_encode($organization->toArray()), 200, ['Content-Type' => 'application/json']);
-
-        return $this->data;
-
-    }//end githubEvent()
-
-
     /**
      * This function creates/updates the repository with the github event response.
      *
@@ -276,18 +165,25 @@ class GithubEventService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        if (key_exists('payload', $this->data) === true) {
-            $githubEvent = $this->data['payload'];
+        $formInput = $this->data['body'];
 
-            // Create repository with the payload of the request.
-            return $this->githubEvent($githubEvent);
-        }//end if
+        if (key_exists('repository', $formInput) === false
+            || key_exists('html_url', $formInput['repository']) === false
+        ) {
+            $this->pluginLogger->error('The repository html_url is not given.');
+        }
 
-        $githubEvent = $this->data['body'];
+        $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
 
-        // Create repository with the body of the request.
-        return $this->githubEvent($githubEvent);
+        if ($repository === null) {
+            $this->data['response'] = new Response('Repository is not created.', 404, ['Content-Type' => 'application/json']);
 
+            return $this->data;
+        }
+        
+        $this->data['response'] = new Response(json_encode($repository->getValue('organisation')->toArray()), 200, ['Content-Type' => 'application/json']);
+
+        return $this->data;
     }//end updateRepositoryWithEventResponse()
 
 
