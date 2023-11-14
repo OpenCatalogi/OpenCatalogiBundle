@@ -91,10 +91,10 @@
     "nl.apm": "keyCantBeValue",
     "nl.upl": "keyCantBeValue",
     "applicationSuite.name": "unsetIfValue==applicationSuite",
-    "applicationSuite._id": "unsetIfValue==applicationSuite",
-    "legal.mainCopyrightOwner._id": "unsetIfValue==legal.mainCopyrightOwner",
+    "applicationSuite._sourceId": "unsetIfValue==applicationSuite",
+    "legal.mainCopyrightOwner._sourceId": "unsetIfValue==legal.mainCopyrightOwner",
     "legal.mainCopyrightOwner.name": "unsetIfValue==legal.mainCopyrightOwner",
-    "legal.repoOwner._id": "unsetIfValue==legal.repoOwner",
+    "legal.repoOwner._sourceId": "unsetIfValue==legal.repoOwner",
     "legal.repoOwner.name": "unsetIfValue==legal.repoOwner"
   }
 }
