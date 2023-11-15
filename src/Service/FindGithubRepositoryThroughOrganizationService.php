@@ -132,7 +132,6 @@ class FindGithubRepositoryThroughOrganizationService
                 }
             }
 
-
             if ($repositorySync->getObject() === null) {
                 // Remove the sync so that we dont create multiple syncs.
                 $this->entityManager->remove($repositorySync);
