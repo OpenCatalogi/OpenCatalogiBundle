@@ -46,7 +46,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         $this
             ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update create owned repositories from organisation')
-            ->addOption('organisationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
+            ->addOption('organizationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
 
     }//end configure()
 
@@ -70,15 +70,15 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         ];
 
         // Handle the command options
-        $organisationId = $input->getOption('organisationId', false);
+        $organizationId = $input->getOption('organizationId', false);
 
-        if ($organisationId === null) {
+        if ($organizationId === null) {
             if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
-        if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration, $organisationId)) === true) {
+        if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration, $organizationId)) === true) {
             return Command::FAILURE;
         }
 
