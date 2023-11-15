@@ -381,6 +381,7 @@ class GithubApiService
 
                 // Get the github repository from the given url if the object is null.
                 if ($repositorySync->getObject() === null) {
+                    $this->entityManager->remove($repositorySync);
                     $repository = $this->getGithubRepository($supports['software']);
                 }
 
