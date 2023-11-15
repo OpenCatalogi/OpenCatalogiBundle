@@ -55,7 +55,6 @@ class FindGithubRepositoryThroughOrganizationService
      */
     private SynchronizationService $syncService;
 
-
     /**
      * @var array
      */
@@ -68,11 +67,11 @@ class FindGithubRepositoryThroughOrganizationService
 
 
     /**
-     * @param EntityManagerInterface  $entityManager          The Entity Manager Interface
-     * @param LoggerInterface         $pluginLogger           The plugin version of the logger interface
-     * @param GatewayResourceService  $resourceService        The Gateway Resource Service.
-     * @param GithubApiService        $githubApiService       The Github API Service
-     * @param ImportResourcesService  $importResourcesService The Import Resources Service
+     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
+     * @param LoggerInterface        $pluginLogger           The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService        The Gateway Resource Service.
+     * @param GithubApiService       $githubApiService       The Github API Service
+     * @param ImportResourcesService $importResourcesService The Import Resources Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -108,11 +107,12 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end setConfiguration()
 
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param array $repositoriesArray The repositories from the github api
-     * @param Source $source The github api source
+     * @param array  $repositoriesArray The repositories from the github api
+     * @param Source $source            The github api source
      *
      * @throws GuzzleException|Exception
      *
@@ -120,26 +120,28 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getOrganizationRepository(array $repositoriesArray, Source $source): array
     {
-        $repositorySchema    = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        
+        $repositorySchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+
         $ownedRepositories = [];
         // Loop through the repositories array.
         foreach ($repositoriesArray as $repositoryArray) {
-
             $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['html_url']);
             if ($repositorySync->getObject() !== null) {
                 foreach ($repositorySync->getObject()->getValue('components') as $component) {
                     $ownedRepositories[] = $component;
                 }
             }
-//
-//            if ($repositorySync->getObject() === null) {
-//                $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
-//            }
+
+            //
+            // if ($repositorySync->getObject() === null) {
+            // $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
+            // }
         }
-        
+
         return $ownedRepositories;
-    }
+
+    }//end getOrganizationRepository()
+
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
@@ -153,7 +155,7 @@ class FindGithubRepositoryThroughOrganizationService
     public function getOrganizationCatalogi(ObjectEntity $organization): ObjectEntity
     {
         // Get the github api source.
-        $source            = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null
             || $this->githubApiService->checkGithubAuth($source) === false
         ) {
@@ -168,7 +170,7 @@ class FindGithubRepositoryThroughOrganizationService
 
         // Get the owned repositories.
         $ownedRepositories = $this->getOrganizationRepository($repositoriesArray, $source);
-        
+
         // Set the repositories to the owns array.
         $organization->hydrate(['owns' => $ownedRepositories]);
         $this->entityManager->persist($organization);
@@ -195,7 +197,6 @@ class FindGithubRepositoryThroughOrganizationService
     {
         $this->configuration = $configuration;
         $this->data          = $data;
-
 
         if ($organizationId !== null) {
             // If we are testing for one repository.
@@ -230,5 +231,6 @@ class FindGithubRepositoryThroughOrganizationService
         return $this->data;
 
     }//end findGithubRepositoryThroughOrganizationHandler()
+
 
 }//end class
