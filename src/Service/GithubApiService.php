@@ -309,14 +309,13 @@ class GithubApiService
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
             $organizationArray = $this->getOrganization($repositoryArray['owner']['login'], $source);
-            $repository = $this->enrichWithOrganization($repository, $organizationArray, $source);
+            $repository        = $this->enrichWithOrganization($repository, $organizationArray, $source);
         }
 
         // If there is no component create one.
         if ($repository->getValue('components')->count() === 0) {
             $repository = $this->enrichWithComponent($repository, $repositoryArray, $source);
         }
-
 
         // @TODO: enrich the null values with what we have.
         return $repository;
@@ -451,12 +450,13 @@ class GithubApiService
 
     }//end getConnectedComponents()
 
+
     /**
      * This function enriches the opencatalogi file organization.
      *
      * @param array        $opencatalogiArray The opencatalogi array from the github api.
-     * @param array       $opencatalogi            The opencatalogi file as array.
-     * @param ObjectEntity $organization        The organization object.
+     * @param array        $opencatalogi      The opencatalogi file as array.
+     * @param ObjectEntity $organization      The organization object.
      *
      * @return ObjectEntity
      * @throws Exception
@@ -508,7 +508,8 @@ class GithubApiService
         }
 
         return $organization;
-    }
+
+    }//end enrichOpencatalogiOrg()
 
 
     /**
@@ -567,7 +568,6 @@ class GithubApiService
 
         $this->entityManager->persist($organizationSync);
         $this->entityManager->flush();
-
 
         // Get the softwareSupported/softwareOwned/softwareUsed repositories.
         $organization = $this->getConnectedComponents($organizationSync->getObject(), $opencatalogi, $source, $opencatalogiArray);
@@ -984,7 +984,7 @@ class GithubApiService
 
         return $organization;
 
-    }//end getOrganisation()
+    }//end getOrganization()
 
 
     /**
