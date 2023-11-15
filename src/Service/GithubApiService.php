@@ -381,6 +381,8 @@ class GithubApiService
 
                 // Get the github repository from the given url if the object is null.
                 if ($repositorySync->getObject() === null) {
+                    $this->entityManager->remove($repositorySync);
+                    $this->entityManager->flush();
                     $repository = $this->getGithubRepository($supports['software']);
                 }
 
@@ -988,19 +990,19 @@ class GithubApiService
 
 
     /**
-     * Get a repository through the repositories of the given source
+     * Get a repositories of the organization from the github api.
      *
      * @param string $name   The name of the repository.
      * @param Source $source The source to sync from.
      *
      * @return array|null The imported repository as array.
      */
-    public function getOrganisationRepos(string $name, Source $source): ?array
+    public function getOrganizationRepos(string $name, Source $source): ?array
     {
         $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         try {
-            $response = $this->callService->call($source, '/repos/'.$name);
+            $response = $this->callService->call($source, '/orgs'.$name.'/repos');
         } catch (ClientException $exception) {
             $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
@@ -1009,17 +1011,19 @@ class GithubApiService
             return null;
         }
 
-        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
+        $repositories = \Safe\json_decode($response->getBody()->getContents(), true);
 
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (empty($repositories) === true
+            || $repositories === null
+        ) {
+            $this->pluginLogger->error('Could not find the repositories of the organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
 
-        return $repository;
+        return $repositories;
 
-    }//end getOrganisationRepos()
+    }//end getOrganizationRepos()
 
 
 }//end class
