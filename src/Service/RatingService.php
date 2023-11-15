@@ -252,14 +252,8 @@ class RatingService
         }
 
         if (($descriptionObject = $component->getValue('description')) === false) {
-            $ratingArray['results'][] = 'Cannot rate the localisedName because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the shortDescription because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the longDescription because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the apiDocumentation because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the features because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the screenshots because the description object is not set';
-            $ratingArray['results'][] = 'Cannot rate the videos because the description object is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 7);
+            $ratingArray['results'][] = 'Cannot rate the description object because it is not set';
+            $ratingArray['maxRating']++;
         }
 
         if (($legalObject = $component->getValue('legal')) !== false) {
@@ -277,11 +271,8 @@ class RatingService
         }
 
         if (($legalObject = $component->getValue('legal')) === false) {
-            $ratingArray['results'][] = 'Cannot rate the license because the legal object is not set';
-            $ratingArray['results'][] = 'Cannot rate the mainCopyrightOwner because the legal obect is not set';
-            $ratingArray['results'][] = 'Cannot rate the repoOwner because the legal obect is not set';
-            $ratingArray['results'][] = 'Cannot rate the authorsFile because the legal object is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 4);
+            $ratingArray['results'][] = 'Cannot rate the legal object because it is not set';
+            $ratingArray['maxRating']++;
         }
 
         if (($maintenanceObject = $component->getValue('maintenance')) !== false) {
@@ -291,10 +282,8 @@ class RatingService
         }
 
         if (($maintenanceObject = $component->getValue('maintenance')) === false) {
-            $ratingArray['results'][] = 'Cannot rate the type because the maintenance object is not set';
-            $ratingArray['results'][] = 'Cannot rate the contractors because the maintenance object is not set';
-            $ratingArray['results'][] = 'Cannot rate the contacts because the maintenance object is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 3);
+            $ratingArray['results'][] = 'Cannot rate the maintenance object because it is not set';
+            $ratingArray['maxRating']++;
         }
 
         return $ratingArray;
