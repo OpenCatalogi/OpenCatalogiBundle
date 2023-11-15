@@ -551,8 +551,8 @@ class GithubApiService
 
         // Find the sync with the source and opencatalogi url.
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $opencatalogiArray['repository']['owner']['html_url']);
-        // Check the sha of the sync with the sha in the array.
-        if ($this->syncService->doesShaMatch($organizationSync, $opencatalogiArray['sha']) === true) {
+        // Check the sha of the sync with the url reference in the array.
+        if ($this->syncService->doesShaMatch($organizationSync, $urlReference) === true) {
             $repository->hydrate(['organisation' => $organizationSync->getObject()]);
 
             $this->entityManager->persist($repository);
@@ -683,11 +683,11 @@ class GithubApiService
             $publiccode['developmentStatus'] = 'obsolete';
         }
 
-        $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $publiccodeUrl);
+        $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $publiccodeArray['git_url']);
 
         // Check the sha of the sync with the sha in the array.
-        if ($this->syncService->doesShaMatch($componentSync, $publiccodeArray['sha']) === true) {
-            $component->hydrate(['url' => $repository]);
+        if ($this->syncService->doesShaMatch($componentSync, $urlReference) === true) {
+            $componentSync->getObject()->hydrate(['url' => $repository]);
 
             $this->entityManager->persist($component);
             $this->entityManager->flush();
