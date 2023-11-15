@@ -132,10 +132,13 @@ class FindGithubRepositoryThroughOrganizationService
                 }
             }
 
-            //
-            // if ($repositorySync->getObject() === null) {
-            // $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
-            // }
+
+            if ($repositorySync->getObject() === null) {
+                // Remove the sync so that we dont create multiple syncs.
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
+            }
         }
 
         return $ownedRepositories;
