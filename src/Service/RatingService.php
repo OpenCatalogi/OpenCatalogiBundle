@@ -253,7 +253,7 @@ class RatingService
 
         if (($descriptionObject = $component->getValue('description')) === false) {
             $ratingArray['results'][] = 'Cannot rate the description object because it is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 7);
+            $ratingArray['maxRating']++;
         }
 
         if (($legalObject = $component->getValue('legal')) !== false) {
@@ -272,7 +272,7 @@ class RatingService
 
         if (($legalObject = $component->getValue('legal')) === false) {
             $ratingArray['results'][] = 'Cannot rate the legal object because it is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 2);
+            $ratingArray['maxRating']++;
         }
 
         if (($maintenanceObject = $component->getValue('maintenance')) !== false) {
@@ -283,7 +283,7 @@ class RatingService
 
         if (($maintenanceObject = $component->getValue('maintenance')) === false) {
             $ratingArray['results'][] = 'Cannot rate the maintenance object because it is not set';
-            $ratingArray['maxRating'] = ($ratingArray['maxRating'] + 3);
+            $ratingArray['maxRating']++;
         }
 
         return $ratingArray;
