@@ -247,17 +247,17 @@ class GithubApiService
      *
      * @return ObjectEntity
      */
-    public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
+    public function enrichWithOrganization(ObjectEntity $repository, array $organizationArray, Source $source): ObjectEntity
     {
         $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['html_url']);
+        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
 
         if ($organizationSync->getObject() === null) {
             $organizationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
             $organizationSync->setMapping($organizationMapping);
-            $organizationSync = $this->syncService->synchronize($organizationSync, $repositoryArray['owner']);
+            $organizationSync = $this->syncService->synchronize($organizationSync, $organizationArray);
             $this->entityManager->persist($organizationSync);
         }
 
@@ -308,7 +308,8 @@ class GithubApiService
     {
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
-            $repository = $this->enrichWithOrganization($repository, $repositoryArray, $source);
+            $organizationArray = $this->getOrganization($repositoryArray['owner']['login'], $source);
+            $repository        = $this->enrichWithOrganization($repository, $organizationArray, $source);
         }
 
         // If there is no component create one.
@@ -451,6 +452,67 @@ class GithubApiService
 
 
     /**
+     * This function enriches the opencatalogi file organization.
+     *
+     * @param array        $opencatalogiArray The opencatalogi array from the github api.
+     * @param array        $opencatalogi      The opencatalogi file as array.
+     * @param ObjectEntity $organization      The organization object.
+     *
+     * @return ObjectEntity
+     * @throws Exception
+     */
+    public function enrichOpencatalogiOrg(array $opencatalogiArray, array $opencatalogi, ObjectEntity $organization, Source $source): ObjectEntity
+    {
+        // If the opencatalogi logo is set to null or false we set the organization logo to null.
+        if (key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === false
+            || key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === null
+        ) {
+            $organization->hydrate(['logo' => null]);
+        }
+
+        // If we get an empty string we set the logo from the github api.
+        if (key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === ''
+        ) {
+            $organization->hydrate(['logo' => $opencatalogiArray['repository']['owner']['avatar_url']]);
+        }
+
+        // If we don't get a opencatalogi logo we set the logo from the github api.
+        if (key_exists('logo', $opencatalogi) === false) {
+            $organization->hydrate(['logo' => $opencatalogiArray['repository']['owner']['avatar_url']]);
+        }
+
+        // If the opencatalogi description is set to null or false we set the organization description to null.
+        if (key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === false
+            || key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === null
+        ) {
+            $organization->hydrate(['description' => null]);
+        }
+
+        // If we get an empty string we set the description from the github api.
+        if (key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === ''
+        ) {
+            $organizationArray = $this->getOrganization($opencatalogiArray['repository']['owner']['login'], $source);
+            $organization->hydrate(['description' => $organizationArray['description']]);
+        }
+
+        // If we don't get a opencatalogi description we set the description from the github api.
+        if (key_exists('description', $opencatalogi) === false) {
+            $organizationArray = $this->getOrganization($opencatalogiArray['repository']['owner']['login'], $source);
+            $organization->hydrate(['description' => $organizationArray['description']]);
+        }
+
+        return $organization;
+
+    }//end enrichOpencatalogiOrg()
+
+
+    /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
      * @param array        $opencatalogiArray The opencatalogi array from the github api.
@@ -489,7 +551,6 @@ class GithubApiService
 
         // Find the sync with the source and opencatalogi url.
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $opencatalogiArray['repository']['owner']['html_url']);
-
         // Check the sha of the sync with the sha in the array.
         if ($this->syncService->doesShaMatch($organizationSync, $opencatalogiArray['sha']) === true) {
             $repository->hydrate(['organisation' => $organizationSync->getObject()]);
@@ -504,11 +565,15 @@ class GithubApiService
 
         // Synchronize the organization with the opencatalogi file.
         $organizationSync = $this->syncService->synchronize($organizationSync, $opencatalogi, true);
+
         $this->entityManager->persist($organizationSync);
         $this->entityManager->flush();
 
         // Get the softwareSupported/softwareOwned/softwareUsed repositories.
         $organization = $this->getConnectedComponents($organizationSync->getObject(), $opencatalogi, $source, $opencatalogiArray);
+
+        // Enrich the opencatalogi organization with a logo and description.
+        $organization = $this->enrichOpencatalogiOrg($opencatalogiArray, $opencatalogi, $organization, $source);
 
         // Set the organization to the repository.
         $repository->hydrate(['organisation' => $organization]);
@@ -888,19 +953,19 @@ class GithubApiService
 
 
     /**
-     * Get a repository through the repositories of the given source
+     * Get a organization from the github api.
      *
-     * @param string $name   The name of the repository.
+     * @param string $name   The name of the organization.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported repository as array.
+     * @return array|null The imported organization as array.
      */
-    public function getOrganisation(string $name, Source $source): ?array
+    public function getOrganization(string $name, Source $source): ?array
     {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        $this->pluginLogger->debug('Getting organization '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
         try {
-            $response = $this->callService->call($source, '/repos/'.$name);
+            $response = $this->callService->call($source, '/orgs/'.$name);
         } catch (ClientException $exception) {
             $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
@@ -909,17 +974,17 @@ class GithubApiService
             return null;
         }
 
-        $repository = \Safe\json_decode($response->getBody()->getContents(), true);
+        $organization = \Safe\json_decode($response->getBody()->getContents(), true);
 
-        if ($repository === null) {
-            $this->pluginLogger->error('Could not find a repository with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if ($organization === null) {
+            $this->pluginLogger->error('Could not find a organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
 
-        return $repository;
+        return $organization;
 
-    }//end getOrganisation()
+    }//end getOrganization()
 
 
     /**
