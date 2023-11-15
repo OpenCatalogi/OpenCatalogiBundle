@@ -1021,7 +1021,7 @@ class GithubApiService
 
         return $repositories;
 
-    }//end getOrganisationRepos()
+    }//end getOrganizationRepos()
 
 
 }//end class
