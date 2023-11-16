@@ -2,9 +2,13 @@
   "title": "Github Event Action",
   "$id": "https://opencatalogi.nl/action/oc.GithubEventAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.3",
+  "version": "0.0.4",
+  "priority": 1,
   "listens": [
     "opencatalogi.githubevents.trigger"
+  ],
+  "throws": [
+    "opencatalogi.enrich.organization"
   ],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubEventHandler",
   "conditions": {

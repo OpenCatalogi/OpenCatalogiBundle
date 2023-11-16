@@ -22,7 +22,7 @@ use Twig\Error\SyntaxError;
  * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
-class FindGithubRepositoryThroughOrganizationService
+class EnrichOrganizationService
 {
 
     /**
@@ -93,58 +93,6 @@ class FindGithubRepositoryThroughOrganizationService
 
     }//end __construct()
 
-
-    /**
-     * Override configuration from other services.
-     *
-     * @param array $configuration The new configuration array.
-     *
-     * @return void
-     */
-    public function setConfiguration(array $configuration): void
-    {
-        $this->configuration = $configuration;
-
-    }//end setConfiguration()
-
-
-    /**
-     * This function gets all the repositories from the given organization and sets it to the owns of the organization.
-     *
-     * @param array  $repositoriesArray The repositories from the github api
-     * @param Source $source            The github api source
-     *
-     * @throws GuzzleException|Exception
-     *
-     * @return array
-     */
-    public function getOrganizationRepository(array $repositoriesArray, Source $source): array
-    {
-        $repositorySchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-
-        $ownedRepositories = [];
-        // Loop through the repositories array.
-        foreach ($repositoriesArray as $repositoryArray) {
-            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['html_url']);
-            if ($repositorySync->getObject() !== null) {
-                foreach ($repositorySync->getObject()->getValue('components') as $component) {
-                    $ownedRepositories[] = $component;
-                }
-            }
-
-            if ($repositorySync->getObject() === null) {
-                // Remove the sync so that we dont create multiple syncs.
-                $this->entityManager->remove($repositorySync);
-                $this->entityManager->flush();
-                $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
-            }
-        }
-
-        return $ownedRepositories;
-
-    }//end getOrganizationRepository()
-
-
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -154,7 +102,7 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return ObjectEntity
      */
-    public function getOrganizationCatalogi(ObjectEntity $organization): ObjectEntity
+    public function enrichOrganization(ObjectEntity $organization): ObjectEntity
     {
         // Get the github api source.
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
@@ -167,16 +115,17 @@ class FindGithubRepositoryThroughOrganizationService
         // Get the path of the github url.
         $githubPath = \Safe\parse_url($organization->getValue('github'))['path'];
 
-        // Get the repositories of the organization from the github api.
-        $repositoriesArray = $this->githubApiService->getOrganizationRepos($githubPath, $source);
+        // Get the organization from the github api.
+        $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
 
-        // Get the owned repositories.
-        $ownedRepositories = $this->getOrganizationRepository($repositoriesArray, $source);
-
-        // Set the repositories to the owns array.
-        $organization->hydrate(['owns' => $ownedRepositories]);
-        $this->entityManager->persist($organization);
-        $this->entityManager->flush();
+        // If we get an empty string we set the description from the github api.
+        if ($organization->getValue('description') !== false
+            && $organization->getValue('description') !== null
+        ) {
+            $organization->hydrate(['description' => $organizationArray['description']]);
+            $this->entityManager->persist($organization);
+            $this->entityManager->flush();
+        }
 
         $this->pluginLogger->debug($organization->getName().' succesfully updated with owned repositorie');
 
@@ -195,7 +144,7 @@ class FindGithubRepositoryThroughOrganizationService
      *
      * @return array|null dataset at the end of the handler              (not needed here)
      */
-    public function findGithubRepositoryThroughOrganizationHandler(?array $data=[], ?array $configuration=[], ?string $organizationId=null): ?array
+    public function enrichOrganizationHandler(?array $data=[], ?array $configuration=[], ?string $organizationId=null): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
@@ -207,7 +156,7 @@ class FindGithubRepositoryThroughOrganizationService
                 && $organization->getValue('name') !== null
                 && $organization->getValue('github') !== null
             ) {
-                $this->getOrganizationCatalogi($organization);
+                $this->enrichOrganization($organization);
             }//end if
 
             if ($organization instanceof ObjectEntity === false) {
@@ -217,7 +166,7 @@ class FindGithubRepositoryThroughOrganizationService
             }//end if
         }
 
-        $organisztionSchema = $this->resourceService->getSchema($this->configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $organisztionSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
         // If we want to do it for al repositories.
         $this->pluginLogger->info('Looping through organisations');
@@ -226,7 +175,7 @@ class FindGithubRepositoryThroughOrganizationService
             if ($organization->getValue('name') !== null
                 && $organization->getValue('github') !== null
             ) {
-                $this->getOrganizationCatalogi($organization);
+                $this->enrichOrganization($organization);
             }
         }
 
