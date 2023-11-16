@@ -103,7 +103,7 @@ class EnrichOrganizationService
         // Get the organization from the github api.
         $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
 
-        if ($organizationArray === null){
+        if ($organizationArray === null) {
             return $organization;
         }
 
