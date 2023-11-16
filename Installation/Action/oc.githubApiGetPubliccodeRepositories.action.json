@@ -18,5 +18,6 @@
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
     "repositoriesMapping": "https://api.github.com/oc.githubPubliccodeRepository.mapping.json"
-  }
+  },
+  "isEnabled": false
 }

@@ -14,5 +14,6 @@
   "configuration": {
     "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
     "componentSchema": "https://opencatalogi.nl/oc.component.schema.json"
-  }
+  },
+  "isEnabled": false
 }

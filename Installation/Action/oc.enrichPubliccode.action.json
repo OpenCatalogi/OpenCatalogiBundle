@@ -16,5 +16,6 @@
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
     "componentMapping": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
-  }
+  },
+  "isEnabled": false
 }

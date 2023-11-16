@@ -19,5 +19,6 @@
     "componentMapping": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
     "memoryLimit": "2G",
     "maxResults": 100
-  }
+  },
+  "isEnabled": false
 }

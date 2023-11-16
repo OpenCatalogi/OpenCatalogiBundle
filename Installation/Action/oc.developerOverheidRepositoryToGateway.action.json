@@ -17,5 +17,6 @@
     "source": "https://opencatalogi.nl/source/oc.developerOverheid.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "endpoint": "/repositories"
-  }
+  },
+  "isEnabled": false
 }

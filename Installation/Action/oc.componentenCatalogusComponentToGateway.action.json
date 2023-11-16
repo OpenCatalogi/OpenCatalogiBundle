@@ -22,5 +22,6 @@
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryEndpoint": "/repositories",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json"
-  }
+  },
+  "isEnabled": false
 }
