@@ -179,7 +179,10 @@ class FindGithubRepositoryThroughOrganizationService
             $repositoriesArray = $this->githubApiService->getOrganizationRepos($githubPath, $source);
         }
 
-        if ($repositoriesArray === null) {
+        if (isset($repositoriesArray) === false
+            || isset($repositoriesArray) === true
+            && $repositoriesArray === null
+        ) {
             return $organization;
         }
 
