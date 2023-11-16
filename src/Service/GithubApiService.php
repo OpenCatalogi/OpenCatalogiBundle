@@ -308,7 +308,7 @@ class GithubApiService
     {
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
-            $repository        = $this->enrichWithOrganization($repository, $repositoryArray, $source);
+            $repository = $this->enrichWithOrganization($repository, $repositoryArray, $source);
         }
 
         // If there is no component create one.

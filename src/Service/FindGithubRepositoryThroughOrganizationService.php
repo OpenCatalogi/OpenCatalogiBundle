@@ -173,7 +173,7 @@ class FindGithubRepositoryThroughOrganizationService
         // If we get an empty string we set the description from the github api.
         if ($organization->getValue('description') !== false
             && $organization->getValue('description') !== null
-        ){
+        ) {
             $organization->hydrate(['description' => $organizationArray['description']]);
         }
 
