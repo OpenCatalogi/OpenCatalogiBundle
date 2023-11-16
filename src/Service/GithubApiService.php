@@ -247,17 +247,17 @@ class GithubApiService
      *
      * @return ObjectEntity
      */
-    public function enrichWithOrganization(ObjectEntity $repository, array $organizationArray, Source $source): ObjectEntity
+    public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
         $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
+        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['html_url']);
 
         if ($organizationSync->getObject() === null) {
             $organizationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
             $organizationSync->setMapping($organizationMapping);
-            $organizationSync = $this->syncService->synchronize($organizationSync, $organizationArray);
+            $organizationSync = $this->syncService->synchronize($organizationSync, $repositoryArray['owner']);
             $this->entityManager->persist($organizationSync);
         }
 
@@ -308,8 +308,7 @@ class GithubApiService
     {
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
-            $organizationArray = $this->getOrganization($repositoryArray['owner']['login'], $source);
-            $repository        = $this->enrichWithOrganization($repository, $organizationArray, $source);
+            $repository = $this->enrichWithOrganization($repository, $repositoryArray, $source);
         }
 
         // If there is no component create one.
@@ -351,6 +350,8 @@ class GithubApiService
 
                 // Get the github repository from the given url if the object is null.
                 if ($repositorySync->getObject() === null) {
+                    $this->entityManager->remove($repositorySync);
+                    $this->entityManager->flush();
                     $repository = $this->getGithubRepository($repositoryUrl);
                 }
 
@@ -409,6 +410,8 @@ class GithubApiService
 
                 // Get the github repository from the given url if the object is null.
                 if ($repositorySync->getObject() === null) {
+                    $this->entityManager->remove($repositorySync);
+                    $this->entityManager->flush();
                     $repository = $this->getGithubRepository($repositoryUrl);
                 }
 
@@ -484,29 +487,6 @@ class GithubApiService
         // If we don't get a opencatalogi logo we set the logo from the github api.
         if (key_exists('logo', $opencatalogi) === false) {
             $organization->hydrate(['logo' => $opencatalogiArray['repository']['owner']['avatar_url']]);
-        }
-
-        // If the opencatalogi description is set to null or false we set the organization description to null.
-        if (key_exists('description', $opencatalogi) === true
-            && $opencatalogi['description'] === false
-            || key_exists('description', $opencatalogi) === true
-            && $opencatalogi['description'] === null
-        ) {
-            $organization->hydrate(['description' => null]);
-        }
-
-        // If we get an empty string we set the description from the github api.
-        if (key_exists('description', $opencatalogi) === true
-            && $opencatalogi['description'] === ''
-        ) {
-            $organizationArray = $this->getOrganization($opencatalogiArray['repository']['owner']['login'], $source);
-            $organization->hydrate(['description' => $organizationArray['description']]);
-        }
-
-        // If we don't get a opencatalogi description we set the description from the github api.
-        if (key_exists('description', $opencatalogi) === false) {
-            $organizationArray = $this->getOrganization($opencatalogiArray['repository']['owner']['login'], $source);
-            $organization->hydrate(['description' => $organizationArray['description']]);
         }
 
         return $organization;
@@ -691,7 +671,7 @@ class GithubApiService
         if ($this->syncService->doesShaMatch($componentSync, $urlReference) === true) {
             $componentSync->getObject()->hydrate(['url' => $repository]);
 
-            $this->entityManager->persist($component);
+            $this->entityManager->persist($componentSync->getObject());
             $this->entityManager->flush();
 
             return $repository;
@@ -742,8 +722,6 @@ class GithubApiService
         ];
 
         // Loop through the array of publiccode/opencatalogi files.
-        $opencatalogiUrls = [];
-        $publiccodeUrls   = [];
         foreach ($dataArray as $item) {
             // Check if the item name is the same as the openCatalogiNames array.
             // If so go the the function for the opencatalogi file.

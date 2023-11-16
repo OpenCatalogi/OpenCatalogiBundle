@@ -2,7 +2,7 @@
   "title": "DeveloperOverheidApisToComponent",
   "$id": "https://developer.overheid.nl/api/oc.developerOverheidComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "passTrough": false,
   "mapping": {
     "name": "service_name",
@@ -17,5 +17,19 @@
     "legal.repoOwner.phone": "contact.phone",
     "legal.repoOwner.website": "contact.url",
     "legal.repoOwner.type": "Organization"
+  },
+  "cast": {
+    "name": "unsetIfValue==service_name",
+    "softwareType": "unsetIfValue==api",
+    "description.localisedName": "unsetIfValue==service_name",
+    "description.shortDescription": "unsetIfValue==description",
+    "description.longDescription": "unsetIfValue==description",
+    "description.documentation": "unsetIfValue==environments.0.documentation_url",
+    "description.apiDocumentation": "unsetIfValue==environments.0.specification_url",
+    "legal.repoOwner.name": "unsetIfValue==organization.name",
+    "legal.repoOwner.email": "unsetIfValue==contact.email",
+    "legal.repoOwner.phone": "unsetIfValue==contact.phone",
+    "legal.repoOwner.website": "unsetIfValue==contact.url",
+    "legal.repoOwner.type": "unsetIfValue==Organization"
   }
 }
