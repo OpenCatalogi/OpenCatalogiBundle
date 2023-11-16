@@ -167,6 +167,16 @@ class FindGithubRepositoryThroughOrganizationService
         // Get the path of the github url.
         $githubPath = \Safe\parse_url($organization->getValue('github'))['path'];
 
+        // Get the organization from the github api.
+        $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
+
+        // If we get an empty string we set the description from the github api.
+        if ($organization->getValue('description') !== false
+            && $organization->getValue('description') !== null
+        ){
+            $organization->hydrate(['description' => $organizationArray['description']]);
+        }
+
         // Get the repositories of the organization from the github api.
         $repositoriesArray = $this->githubApiService->getOrganizationRepos($githubPath, $source);
 
