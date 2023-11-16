@@ -2,7 +2,7 @@
   "title": "Find Organization Through Repositories Action",
   "$id": "https://opencatalogi.nl/action/oc.FindOrganizationThroughRepositoriesAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "listens": ["opencatalogi.default.listens"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindOrganizationThroughRepositoriesHandler",
   "conditions": {
@@ -18,5 +18,6 @@
     "organisationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
     "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
     "organisationMapping": "https://api.github.com/oc.githubOrganisation.mapping.json"
-  }
+  },
+  "isEnabled": false
 }

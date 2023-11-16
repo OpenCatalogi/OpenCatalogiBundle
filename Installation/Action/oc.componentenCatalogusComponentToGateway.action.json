@@ -2,7 +2,7 @@
   "title": "Componenten Catalogus Component To Gateway",
   "$id": "https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "priority": 1,
   "isLockable": true,
   "listens": ["opencatalogi.bronnen.trigger"],
@@ -22,5 +22,6 @@
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryEndpoint": "/repositories",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json"
-  }
+  },
+  "isEnabled": false
 }
