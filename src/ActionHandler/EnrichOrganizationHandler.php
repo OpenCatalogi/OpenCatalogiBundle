@@ -44,12 +44,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
             'description' => 'This handler enriches the organizations',
             'required'    => [
                 'githubSource',
-                'usercontentSource',
-                'repositorySchema',
-                'repositoryMapping',
-                'organisationSchema',
-                'componentSchema',
-                'openCatalogiMapping',
+                'organizationSchema',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -59,46 +54,11 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'usercontentSource'   => [
-                    'type'        => 'string',
-                    'description' => 'The source of the developer overheid.',
-                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
-                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
-                    'required'    => true,
-                ],
-                'repositorySchema'    => [
-                    'type'        => 'string',
-                    'description' => 'The repository schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.repository.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.repository.schema.json',
-                    'required'    => true,
-                ],
-                'repositoryMapping'   => [
-                    'type'        => 'string',
-                    'description' => 'The mapping for github repository to oc repository.',
-                    'example'     => 'https://api.github.com/oc.githubRepository.mapping.json',
-                    'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
-                    'required'    => true,
-                ],
-                'organisationSchema'  => [
+                'organizationSchema'  => [
                     'type'        => 'string',
                     'description' => 'The organisation schema.',
                     'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                    'required'    => true,
-                ],
-                'componentSchema'     => [
-                    'type'        => 'string',
-                    'description' => 'The component schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
-                    'required'    => true,
-                ],
-                'openCatalogiMapping' => [
-                    'type'        => 'string',
-                    'description' => 'The mapping for github openCatalogi.yaml to oc organisation.',
-                    'example'     => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
-                    'reference'   => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'required'    => true,
                 ],
             ],
