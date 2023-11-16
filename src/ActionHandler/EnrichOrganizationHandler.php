@@ -47,14 +47,14 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                 'organizationSchema',
             ],
             'properties'  => [
-                'githubSource'        => [
+                'githubSource'       => [
                     'type'        => 'string',
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'organizationSchema'  => [
+                'organizationSchema' => [
                     'type'        => 'string',
                     'description' => 'The organisation schema.',
                     'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
