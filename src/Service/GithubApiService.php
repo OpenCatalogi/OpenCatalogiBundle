@@ -1006,6 +1006,7 @@ class GithubApiService
 
     }//end getOrganizationRepos()
 
+
     /**
      * Get a repositories of the organization with type user from the github api.
      *
@@ -1040,7 +1041,7 @@ class GithubApiService
 
         return $repositories;
 
-    }//end getOrganizationRepos()
+    }//end getUserRepos()
 
 
 }//end class
