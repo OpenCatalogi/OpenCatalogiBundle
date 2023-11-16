@@ -722,8 +722,6 @@ class GithubApiService
         ];
 
         // Loop through the array of publiccode/opencatalogi files.
-        $opencatalogiUrls = [];
-        $publiccodeUrls   = [];
         foreach ($dataArray as $item) {
             // Check if the item name is the same as the openCatalogiNames array.
             // If so go the the function for the opencatalogi file.
