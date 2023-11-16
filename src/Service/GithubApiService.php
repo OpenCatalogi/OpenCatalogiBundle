@@ -251,13 +251,13 @@ class GithubApiService
     {
         $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
 
-        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['repository']['owner']['html_url']);
+        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['html_url']);
 
         if ($organizationSync->getObject() === null) {
             $organizationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
             $organizationSync->setMapping($organizationMapping);
-            $organizationSync = $this->syncService->synchronize($organizationSync, $repositoryArray['repository']['owner']);
+            $organizationSync = $this->syncService->synchronize($organizationSync, $repositoryArray['owner']);
             $this->entityManager->persist($organizationSync);
         }
 
