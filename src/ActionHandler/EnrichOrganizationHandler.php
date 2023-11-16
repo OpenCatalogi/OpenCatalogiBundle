@@ -8,7 +8,7 @@ use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizat
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
- * Executes a the EnrichOrganizationHandler that loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
+ * Executes a the EnrichOrganizationHandler and gets an organization from the response of the githubEventAction and formInputAction
  * and enriches the organization.
  */
 class EnrichOrganizationHandler implements ActionHandlerInterface
@@ -108,7 +108,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the enrich organization service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action

@@ -19,8 +19,8 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
- * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
+ * Gets an organization from the response of the githubEventAction and formInputAction
+ * and enriches the organization.
  */
 class EnrichOrganizationService
 {
@@ -121,14 +121,14 @@ class EnrichOrganizationService
 
         // If we get an empty string we set the description from the github api.
         if ($organization->getValue('description') !== false
-            && $organization->getValue('description') !== null
+            || $organization->getValue('description') !== null
         ) {
             $organization->hydrate(['description' => $organizationArray['description']]);
             $this->entityManager->persist($organization);
             $this->entityManager->flush();
         }
 
-        $this->pluginLogger->debug($organization->getName().' succesfully updated with owned repositorie');
+        $this->pluginLogger->debug($organization->getName().' succesfully updated the organization with a description.');
 
         return $organization;
 
@@ -150,35 +150,34 @@ class EnrichOrganizationService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        if ($organizationId !== null) {
-            // If we are testing for one repository.
-            $organization = $this->entityManager->find('App:ObjectEntity', $organizationId);
-            if ($organization instanceof ObjectEntity === true
-                && $organization->getValue('name') !== null
-                && $organization->getValue('github') !== null
-            ) {
-                $this->enrichOrganization($organization);
-            }//end if
-
-            if ($organization instanceof ObjectEntity === false) {
-                $this->pluginLogger->error('Could not find given organisation');
-
-                return null;
-            }//end if
+        // Get the response.
+        try {
+            $response = json_decode($this->data['response']->getContent(), true);
+        } catch (Exception $exception) {
+            $this->pluginLogger->error('Cannot get the response.');
         }
 
-        $organisztionSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-
-        // If we want to do it for al repositories.
-        $this->pluginLogger->info('Looping through organisations');
-        foreach ($organisztionSchema->getObjectEntities() as $organization) {
-            // Check if the name of the organization is set and it is a github organization.
-            if ($organization->getValue('name') !== null
-                && $organization->getValue('github') !== null
-            ) {
-                $this->enrichOrganization($organization);
-            }
+        if (isset($response) === false) {
+            return $this->data;
         }
+
+        // Get the organization object.
+        $organization = $this->entityManager->find('App:ObjectEntity', $response['_self']['id']);
+
+        // Check if the name and github is not null.
+        if ($organization instanceof ObjectEntity === true
+            && $organization->getValue('name') !== null
+            && $organization->getValue('github') !== null
+        ) {
+            // Enrich the organization object.
+            $this->enrichOrganization($organization);
+        }//end if
+
+        if ($organization instanceof ObjectEntity === false) {
+            $this->pluginLogger->error('Could not find given organization');
+
+            return $this->data;
+        }//end if
 
         return $this->data;
 
