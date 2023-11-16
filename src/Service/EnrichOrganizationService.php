@@ -106,7 +106,7 @@ class EnrichOrganizationService
         }
 
         if (isset($organizationArray) === false
-            || isset($organizationArray) === true 
+            || isset($organizationArray) === true
             && $organizationArray === null
         ) {
             return $organization;
