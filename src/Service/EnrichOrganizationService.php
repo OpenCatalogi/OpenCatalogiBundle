@@ -46,16 +46,6 @@ class EnrichOrganizationService
     private GithubApiService $githubApiService;
 
     /**
-     * @var ImportResourcesService
-     */
-    private ImportResourcesService $importResourcesService;
-
-    /**
-     * @var SynchronizationService $syncService
-     */
-    private SynchronizationService $syncService;
-
-    /**
      * @var array
      */
     private array $data;
@@ -70,23 +60,17 @@ class EnrichOrganizationService
      * @param EntityManagerInterface $entityManager          The Entity Manager Interface
      * @param LoggerInterface        $pluginLogger           The plugin version of the logger interface
      * @param GatewayResourceService $resourceService        The Gateway Resource Service.
-     * @param GithubApiService       $githubApiService       The Github API Service
-     * @param ImportResourcesService $importResourcesService The Import Resources Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService,
-        ImportResourcesService $importResourcesService,
-        SynchronizationService $syncService
     ) {
         $this->entityManager          = $entityManager;
         $this->pluginLogger           = $pluginLogger;
         $this->resourceService        = $resourceService;
         $this->githubApiService       = $githubApiService;
-        $this->importResourcesService = $importResourcesService;
-        $this->syncService            = $syncService;
 
         $this->configuration = [];
         $this->data          = [];
