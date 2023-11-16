@@ -100,10 +100,15 @@ class EnrichOrganizationService
         // Get the path of the github url.
         $githubPath = \Safe\parse_url($organization->getValue('github'))['path'];
 
-        // Get the organization from the github api.
-        $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
+        if ($organization->getValue('type') === 'Organization') {
+            // Get the organization from the github api.
+            $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
+        }
 
-        if ($organizationArray === null) {
+        if (isset($organizationArray) === false
+            || isset($organizationArray) === true
+            && $organizationArray === null
+        ) {
             return $organization;
         }
 
