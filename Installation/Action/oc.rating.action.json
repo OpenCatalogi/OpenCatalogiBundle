@@ -2,7 +2,7 @@
   "title": "Rating Action",
   "$id": "https://opencatalogi.nl/action/oc.RatingAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "listens": ["opencatalogi.rating.handler"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\RatingHandler",
   "conditions": {
