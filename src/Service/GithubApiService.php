@@ -691,7 +691,7 @@ class GithubApiService
         if ($this->syncService->doesShaMatch($componentSync, $urlReference) === true) {
             $componentSync->getObject()->hydrate(['url' => $repository]);
 
-            $this->entityManager->persist($component);
+            $this->entityManager->persist($componentSync->getObject());
             $this->entityManager->flush();
 
             return $repository;
