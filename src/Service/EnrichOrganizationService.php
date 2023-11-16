@@ -57,9 +57,9 @@ class EnrichOrganizationService
 
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
-     * @param LoggerInterface        $pluginLogger           The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService        The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager   The Entity Manager Interface
+     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -67,10 +67,10 @@ class EnrichOrganizationService
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService,
     ) {
-        $this->entityManager          = $entityManager;
-        $this->pluginLogger           = $pluginLogger;
-        $this->resourceService        = $resourceService;
-        $this->githubApiService       = $githubApiService;
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
+        $this->githubApiService = $githubApiService;
 
         $this->configuration = [];
         $this->data          = [];
