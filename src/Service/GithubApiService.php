@@ -585,7 +585,7 @@ class GithubApiService
 
             if (key_exists('repoOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['repoOwner']) === true
-                && is_string($publiccodeArray['repoOwner']['nane']) === true
+                && is_string($publiccodeArray['repoOwner']['name']) === true
             ) {
                 $repoOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['repoOwner']['name']);
                 $repoOwnerSync = $this->syncService->synchronize($repoOwnerSync, $publiccodeArray['repoOwner']);
@@ -595,7 +595,7 @@ class GithubApiService
 
             if (key_exists('mainCopyrightOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['mainCopyrightOwner']) === true
-                && is_string($publiccodeArray['mainCopyrightOwner']['nane']) === true
+                && is_string($publiccodeArray['mainCopyrightOwner']['name']) === true
             ) {
                 $mainCopyrightOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['mainCopyrightOwner']['name']);
                 $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, $publiccodeArray['mainCopyrightOwner']);
@@ -1007,7 +1007,6 @@ class GithubApiService
 
     }//end getOrganizationRepos()
 
-
     /**
      * Get a repositories of the organization with type user from the github api.
      *
@@ -1042,7 +1041,7 @@ class GithubApiService
 
         return $repositories;
 
-    }//end getUserRepos()
+    }//end getOrganizationRepos()
 
 
 }//end class
