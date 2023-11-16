@@ -170,6 +170,10 @@ class FindGithubRepositoryThroughOrganizationService
         // Get the repositories of the organization from the github api.
         $repositoriesArray = $this->githubApiService->getOrganizationRepos($githubPath, $source);
 
+        if ($repositoriesArray === null) {
+            return $organization;
+        }
+
         // Get the owned repositories.
         $ownedRepositories = $this->getOrganizationRepository($repositoriesArray, $source);
 
