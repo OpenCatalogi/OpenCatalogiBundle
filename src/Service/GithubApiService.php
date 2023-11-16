@@ -584,6 +584,7 @@ class GithubApiService
 
             if (key_exists('repoOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['repoOwner']) === true
+                && is_string($publiccodeArray['repoOwner']['name']) === true
             ) {
                 $repoOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['repoOwner']['name']);
                 $repoOwnerSync = $this->syncService->synchronize($repoOwnerSync, $publiccodeArray['repoOwner']);
@@ -593,6 +594,7 @@ class GithubApiService
 
             if (key_exists('mainCopyrightOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['mainCopyrightOwner']) === true
+                && is_string($publiccodeArray['mainCopyrightOwner']['name']) === true
             ) {
                 $mainCopyrightOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['mainCopyrightOwner']['name']);
                 $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, $publiccodeArray['mainCopyrightOwner']);
@@ -603,6 +605,7 @@ class GithubApiService
 
         if (key_exists('applicationSuite', $publiccodeArray) === true
             && key_exists('name', $publiccodeArray['applicationSuite']) === true
+            && is_string($publiccodeArray['applicationSuite']['name']) === true
         ) {
             $applicationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
 
@@ -933,7 +936,7 @@ class GithubApiService
 
 
     /**
-     * Get a organization from the github api.
+     * Get a organization with type Organization from the github api.
      *
      * @param string $name   The name of the organization.
      * @param Source $source The source to sync from.
@@ -995,6 +998,42 @@ class GithubApiService
             || $repositories === null
         ) {
             $this->pluginLogger->error('Could not find the repositories of the organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }//end if
+
+        return $repositories;
+
+    }//end getOrganizationRepos()
+
+    /**
+     * Get a repositories of the organization with type user from the github api.
+     *
+     * @param string $name   The name of the repository.
+     * @param Source $source The source to sync from.
+     *
+     * @return array|null The imported repository as array.
+     */
+    public function getUserRepos(string $name, Source $source): ?array
+    {
+        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+
+        try {
+            $response = $this->callService->call($source, '/users'.$name.'/repos');
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        if (isset($response) === false) {
+            return null;
+        }
+
+        $repositories = \Safe\json_decode($response->getBody()->getContents(), true);
+
+        if (empty($repositories) === true
+            || $repositories === null
+        ) {
+            $this->pluginLogger->error('Could not find the repositories of the user with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if

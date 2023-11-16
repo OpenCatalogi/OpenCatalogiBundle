@@ -2,7 +2,7 @@
   "title": "Organisation",
   "$id": "https://opencatalogi.nl/oc.organisation.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "object",
   "description": "extension of the publiccode standard ",
   "properties": {
@@ -15,12 +15,12 @@
     "logo": {
       "type": "string",
       "format": "uri",
-      "description": "The logo of this organisation"
+      "description": "The logo of this organization"
     },
     "supports": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of components supported by this organisation",
+      "description": "A list of components supported by this organization",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       },
@@ -37,7 +37,7 @@
     "uses": {
       "type": "array",
       "uniqueItems": true,
-      "description": "A list of components used by this organisation",
+      "description": "A list of components used by this organization",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.component.schema.json"
       },
@@ -53,17 +53,17 @@
     },
     "token": {
       "type": "string",
-      "description": "An optional NL-Design token that contains the organisations style"
+      "description": "An optional NL-Design token that contains the organizations style"
     },
     "github": {
       "type": "string",
       "format": "url",
-      "description": "A link the the organisations github "
+      "description": "A link the the organizations github "
     },
     "gitlab": {
       "type": "string",
       "format": "url",
-      "description": "A link to the organisations gitlab"
+      "description": "A link to the organizations gitlab"
     },
     "website": {
       "type": "string"
@@ -77,12 +77,11 @@
     "type": {
       "type": "string",
       "enum": [
-        "public",
-        "private",
-        "unkown"
+        "User",
+        "Organization"
       ],
       "example": "public",
-      "description": "The type of this organisation"
+      "description": "The type of this organization"
     },
     "catalogus": {
       "$ref": "https://opencatalogi.nl/oc.catalogus.schema.json"
