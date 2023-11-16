@@ -93,6 +93,7 @@ class EnrichOrganizationService
 
     }//end __construct()
 
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -131,7 +132,7 @@ class EnrichOrganizationService
 
         return $organization;
 
-    }//end getOrganizationCatalogi()
+    }//end enrichOrganization()
 
 
     /**
@@ -181,7 +182,7 @@ class EnrichOrganizationService
 
         return $this->data;
 
-    }//end findGithubRepositoryThroughOrganizationHandler()
+    }//end enrichOrganizationHandler()
 
 
 }//end class
