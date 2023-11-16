@@ -530,6 +530,7 @@ class GithubApiService
         }
 
         $opencatalogi['github'] = $opencatalogiArray['repository']['owner']['html_url'];
+        $opencatalogi['type']   = $opencatalogiArray['repository']['owner']['type'];
 
         // Find the sync with the source and opencatalogi url.
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $opencatalogiArray['repository']['owner']['html_url']);
