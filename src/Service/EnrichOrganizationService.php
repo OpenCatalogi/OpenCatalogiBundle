@@ -65,7 +65,7 @@ class EnrichOrganizationService
         EntityManagerInterface $entityManager,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService,
-        GithubApiService $githubApiService,
+        GithubApiService $githubApiService
     ) {
         $this->entityManager    = $entityManager;
         $this->pluginLogger     = $pluginLogger;
