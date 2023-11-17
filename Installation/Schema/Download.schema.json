@@ -1,0 +1,23 @@
+{
+  "title": "Download",
+  "$id": "https://opencatalogi.nl/oc.download.schema.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
+  "version": "0.1.0",
+  "type": "object",
+  "properties": {
+    "naam": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "grootte": {
+      "type": "int"
+    },
+    "url": {
+      "type": "string",
+      "description": "De Url naar de download",
+      "format": "url"
+    }
+  }
+}
