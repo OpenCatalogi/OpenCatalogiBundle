@@ -777,11 +777,11 @@ class GithubApiService
 
                 // Only set these values if the object is null.
                 if ($organizationSync->getObject() === null) {
-                    $data = [
-                        'name' => $item['repository']['full_name'],
-                        'type' => $item['repository']['owner']['type'],
-                        'github' => $item['repository']['owner']['html_url'],
-                        'opencatalogiRepo' => $item['repository']['html_url']
+                    $data             = [
+                        'name'             => $item['repository']['full_name'],
+                        'type'             => $item['repository']['owner']['type'],
+                        'github'           => $item['repository']['owner']['html_url'],
+                        'opencatalogiRepo' => $item['repository']['html_url'],
                     ];
                     $organizationSync = $this->syncService->synchronize($organizationSync, $data);
                     $this->entityManager->persist($organizationSync->getObject());
