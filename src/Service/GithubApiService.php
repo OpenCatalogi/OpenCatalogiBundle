@@ -157,7 +157,6 @@ class GithubApiService
             return $this->data;
         }//end if
 
-
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
         if ($this->checkGithubAuth($source) === false
@@ -191,7 +190,7 @@ class GithubApiService
         $path = trim(\Safe\parse_url($repositoryUrl)['path'], '/');
         // Call the search/code endpoint for publiccode files in this repository.
         $queryConfig['query'] = ['q' => "filename:publiccode filename:opencatalogi extension:yaml extension:yml repo:{$path}"];
-        $dataArray = $this->getFilesFromRepo($source, $queryConfig);
+        $dataArray            = $this->getFilesFromRepo($source, $queryConfig);
         if ($dataArray !== null) {
             // Import the publiccode/opencatalogi files and connect it to the repository.
             $repository = $this->importRepoFiles($dataArray, $source, $repository);
@@ -559,12 +558,11 @@ class GithubApiService
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
         // Check the sha of the sync with the url reference in the array.
         if ($this->syncService->doesShaMatch($organizationSync, $urlReference) === true) {
-
             return null;
         }
 
-        $opencatalogi['github'] = $organizationArray['html_url'];
-        $opencatalogi['type']   = $organizationArray['type'];
+        $opencatalogi['github']           = $organizationArray['html_url'];
+        $opencatalogi['type']             = $organizationArray['type'];
         $opencatalogi['opencatalogiRepo'] = $organizationSync->getObject()->getValue('opencatalogiRepo');
 
         $organizationSync->setMapping($opencatalogiMapping);
@@ -671,7 +669,7 @@ class GithubApiService
         // The urlReference and the git_url changes when the file changes.
         $sourceId = "https://raw.githubusercontent.com/{$publiccodeArray['repository']['full_name']}/{$publiccodeArray['path']}";
 
-        $this->pluginLogger->info('Map the publiccode file with url: '.$publiccodeUrl .' and source id: '.$sourceId);
+        $this->pluginLogger->info('Map the publiccode file with url: '.$publiccodeUrl.' and source id: '.$sourceId);
 
         // Get the file from the usercontent or github api source
         $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $publiccodeArray['git_url']);
@@ -754,15 +752,15 @@ class GithubApiService
             // Check if the item name is the same as the openCatalogiNames array.
             // If so go the the function for the opencatalogi file.
             if (in_array($item['name'], $opencatalogiNames) === true) {
-                $organizationSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+                $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
                 $this->pluginLogger->info('The item is a opencatalogi file.');
 
                 $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $item['repository']['owner']['html_url']);
-                $data = [
-                    'name' => $item['repository']['full_name'],
-                    'type' => $item['repository']['owner']['type'],
-                    'github' => $item['repository']['owner']['html_url'],
-                    'opencatalogiRepo' => $item['repository']['html_url']
+                $data             = [
+                    'name'             => $item['repository']['full_name'],
+                    'type'             => $item['repository']['owner']['type'],
+                    'github'           => $item['repository']['owner']['html_url'],
+                    'opencatalogiRepo' => $item['repository']['html_url'],
                 ];
                 $organizationSync = $this->syncService->synchronize($organizationSync, $data);
                 $this->entityManager->persist($organizationSync->getObject());
@@ -772,8 +770,7 @@ class GithubApiService
                 $repository->hydrate(['organisation' => $organizationSync->getObject()]);
                 $this->entityManager->persist($repository);
                 $this->entityManager->flush();
-
-            }
+            }//end if
 
             // Check if the item name is the same as the publiccodeNames array.
             // If so go the the function for the publiccode file.
@@ -781,7 +778,7 @@ class GithubApiService
                 $this->pluginLogger->info('The item is a publiccode file.');
                 $repository = $this->handlePubliccodeFile($item, $source, $repository);
             }
-        }
+        }//end foreach
 
         return $repository;
 
@@ -795,7 +792,7 @@ class GithubApiService
      *
      * @return array|null
      */
-    public function getFileFromGithubApi(string $gitUrl, ?string $query = null): ?array
+    public function getFileFromGithubApi(string $gitUrl, ?string $query=null): ?array
     {
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
@@ -837,13 +834,13 @@ class GithubApiService
     /**
      * This function gets the publiccode/opencatalogi file from the github user content.
      *
-     * @param string $repositoryUrl The url of the repository
+     * @param string      $repositoryUrl The url of the repository
      * @param string|null $gitUrl        The git url of the repository
      *
      * @return array|null
      * @throws GuzzleException
      */
-    public function getFileFromRawUserContent(string $repositoryUrl, ?string $gitUrl = null): ?array
+    public function getFileFromRawUserContent(string $repositoryUrl, ?string $gitUrl=null): ?array
     {
         $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
@@ -870,6 +867,7 @@ class GithubApiService
         }
 
         return null;
+
     }//end getFileFromRawUserContent()
 
 
@@ -917,8 +915,8 @@ class GithubApiService
     /**
      * Get the publiccode/opencatalogi files of the given repository
      *
-     * @param Source $source        The source to sync from.
-     * @param array $queryConfig The query config of the call.
+     * @param Source $source      The source to sync from.
+     * @param array  $queryConfig The query config of the call.
      *
      * @return array|null The publiccode/opencatalogi files as array.
      */
@@ -1049,6 +1047,7 @@ class GithubApiService
 
     }//end getOrganizationRepos()
 
+
     /**
      * Get a organization with type Organization from the github api.
      *
@@ -1081,8 +1080,7 @@ class GithubApiService
 
         return $organization;
 
-    }//end getOrganization()
-
+    }//end getUser()
 
 
     /**

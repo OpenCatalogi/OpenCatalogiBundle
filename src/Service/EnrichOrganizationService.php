@@ -111,11 +111,11 @@ class EnrichOrganizationService
         }
 
         $opencatalogiUrl = $organization->getValue('opencatalogiRepo');
-        $path = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
+        $path            = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
 
         // Call the search/code endpoint for publiccode files in this repository.
         $queryConfig['query'] = ['q' => "filename:opencatalogi extension:yaml extension:yml repo:{$path}"];
-        $opencatalogiFiles = $this->githubApiService->getFilesFromRepo($source, $queryConfig);
+        $opencatalogiFiles    = $this->githubApiService->getFilesFromRepo($source, $queryConfig);
 
         $opencatalogiNames = [
             'opencatalogi.yaml',
