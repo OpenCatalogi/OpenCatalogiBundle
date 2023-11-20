@@ -771,22 +771,23 @@ class GithubApiService
                 $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
                 $this->pluginLogger->info('The item is a opencatalogi file.');
 
-                // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent.
-                // $opencatalogiUrlQuery = \Safe\parse_url($item['url'])['query'];
-                // Remove the ref= part of the query.
-                // $urlReference = explode('ref=', $opencatalogiUrlQuery)[1];
                 $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $item['repository']['owner']['html_url']);
-                // $this->syncService->doesShaMatch($organizationSync, $urlReference);
-                $data             = [
-                    'name'             => $item['repository']['full_name'],
-                    'type'             => $item['repository']['owner']['type'],
-                    'github'           => $item['repository']['owner']['html_url'],
-                    'opencatalogiRepo' => $item['repository']['html_url'],
-                ];
-                $organizationSync = $this->syncService->synchronize($organizationSync, $data);
-                $this->entityManager->persist($organizationSync->getObject());
                 $this->entityManager->persist($organizationSync);
                 $this->entityManager->flush();
+
+                // Only set these values if the object is null.
+                if ($organizationSync->getObject() === null) {
+                    $data             = [
+                        'name'             => $item['repository']['full_name'],
+                        'type'             => $item['repository']['owner']['type'],
+                        'github'           => $item['repository']['owner']['html_url'],
+                        'opencatalogiRepo' => $item['repository']['html_url'],
+                    ];
+                    $organizationSync = $this->syncService->synchronize($organizationSync, $data);
+                    $this->entityManager->persist($organizationSync->getObject());
+                    $this->entityManager->persist($organizationSync);
+                    $this->entityManager->flush();
+                }
 
                 $repository->hydrate(['organisation' => $organizationSync->getObject()]);
                 $this->entityManager->persist($repository);
