@@ -26,14 +26,14 @@ class DeveloperOverheidService
     private LoggerInterface $pluginLogger;
 
     /**
+     * @var CallService
+     */
+    private CallService $callService;
+
+    /**
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
-
-    /**
-     * @var GetResourcesService
-     */
-    private GetResourcesService $getResourcesService;
 
     /**
      * @var array
@@ -48,17 +48,17 @@ class DeveloperOverheidService
 
     /**
      * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
+     * @param CallService $callService The Call Service.
      * @param GatewayResourceService $resourceService The Gateway Resource Service.
-     * @pqram GetResourcesService    $getResourcesService   The Get Resources. Service.
      */
     public function __construct(
         LoggerInterface $pluginLogger,
-        GatewayResourceService $resourceService,
-        GetResourcesService $getResourcesService
+        CallService $callService,
+        GatewayResourceService $resourceService
     ) {
         $this->pluginLogger        = $pluginLogger;
+        $this->callService = $callService;
         $this->resourceService     = $resourceService;
-        $this->getResourcesService = $getResourcesService;
         $this->data                = [];
         $this->configuration       = [];
 
@@ -66,46 +66,14 @@ class DeveloperOverheidService
 
 
     /**
-     * Get all components or one component through the products of developer.overheid.nl/apis/{id}.
-     *
-     * @param array|null  $data          The data array from the request
-     * @param array|null  $configuration The configuration array from the request
-     * @param string|null $componentId   The given component id
-     *
-     * @return array|null
-     */
-    public function getComponents(?array $data=[], ?array $configuration=[], ?string $componentId=null): ?array
-    {
-        $this->data          = $data;
-        $this->configuration = $configuration;
-
-        // Get the source from the configuration array.
-        $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
-        $endpoint = $this->configuration['endpoint'];
-
-        if ($source === null
-            && $endpoint === null
-        ) {
-            return $this->data;
-        }
-
-        if ($componentId === null) {
-            return $this->getResourcesService->getComponents($source, $endpoint, $this->configuration);
-        }
-
-        return $this->getResourcesService->getComponent($source, $endpoint, $componentId, $this->configuration);
-
-    }//end getComponents()
-
-
-    /**
      * Get all repositories or one repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param array|null  $data          The data array from the request
-     * @param array|null  $configuration The configuration array from the request
-     * @param string|null $repositoryId  The given repository id
+     * @param array|null $data The data array from the request
+     * @param array|null $configuration The configuration array from the request
+     * @param string|null $repositoryId The given repository id
      *
      * @return array|null
+     * @throws \Exception
      */
     public function getRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
@@ -123,12 +91,121 @@ class DeveloperOverheidService
         }
 
         if ($repositoryId === null) {
-            return $this->getResourcesService->getRepositories($source, $endpoint, $this->configuration);
+            return $this->getRepositoriesFromSource($source, $endpoint);
         }
 
-        return $this->getResourcesService->getRepository($source, $endpoint, $repositoryId, $this->configuration);
+        return $this->getRepositoryFromSource($source, $endpoint, $repositoryId);
 
     }//end getRepositories()
+
+    /**
+     * Get all repositories of the given source.
+     *
+     * @param Source $source The given source
+     * @param array $repositoryArray
+     * @return array|null
+     */
+    public function handleRepository(Source $source, array $repositoryArray): ?array
+    {
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+
+        $parsedUrl = \Safe\parse_url($repositoryArray['url']);
+        if (key_exists('host', $parsedUrl) === false){
+            return null;
+        }
+
+        $domain = $parsedUrl['host'];
+        switch ($domain) {
+            case 'github.com':
+
+                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
+
+                if ($repositorySync->getObject() !== null) {
+                    $repository = $repositorySync->getObject();
+                }
+
+                if ($repositorySync->getObject() === null) {
+                    $this->entityManager->remove($repositorySync);
+                    $this->entityManager->flush();
+                    // Get the github repository
+                    $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
+                }
+
+                return $repository->getObject()->toArray();
+                break;
+            case 'gitlab.com':
+                break;
+            default:
+                break;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all repositories of the given source.
+     *
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
+     *
+     * @return array|null
+     * @throws \Exception
+     */
+    public function getRepositoriesFromSource(Source $source, string $endpoint): ?array
+    {
+        $repositoriesArray = $this->callService->getAllResults($source, $endpoint);
+        $this->pluginLogger->info('Found '.count($repositoriesArray).' repositories from '.$source->getName());
+
+        $result = [];
+        foreach ($repositoriesArray as $repositoryArray) {
+            $result[] = $this->handleRepository($source, $repositoryArray);
+//            $result[] = $this->importResourceService->importDevRepository($repository, $configuration);
+        }
+
+        $this->entityManager->flush();
+
+        return $result;
+
+    }//end getRepositories()
+
+    /**
+     * Get a repository of the given source with the given id.
+     *
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param string $repositoryId  The given repository id
+     * @param array  $configuration The configuration array
+     *
+     * @return array|null
+     * @throws \Exception
+     */
+    public function getRepositoryFromSource(Source $source, string $endpoint, string $repositoryId): ?array
+    {
+        $response   = $this->callService->call($source, $endpoint.'/'.$repositoryId);
+        $repositoryArray = json_decode($response->getBody()->getContents(), true);
+
+        if ($repositoryArray === null) {
+            $this->pluginLogger->error('Could not find an repository with id: '.$repositoryId.' and with source: '.$source->getName(), ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+            return null;
+        }
+
+
+        $repository = $this->handleRepository($source, $repositoryArray);
+
+        if ($repository === null) {
+            return null;
+        }
+
+        $this->entityManager->flush();
+
+        $this->pluginLogger->info('Found repository with id: '.$repositoryId, ['package' => 'open-catalogi/open-catalogi-bundle']);
+
+        return $repository->toArray();
+
+    }//end getRepository()
+
 
 
 }//end class

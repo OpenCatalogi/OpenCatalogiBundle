@@ -2,26 +2,25 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
-use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
- * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organization.schema.json)
- * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
+ * Haalt alle repositories op die een opencatalogi en/of publiccode file hebben.
  */
-class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
+class GithubApiHandler implements ActionHandlerInterface
 {
 
     /**
-     * @var FindGithubRepositoryThroughOrganizationService
+     * @var GithubApiService
      */
-    private FindGithubRepositoryThroughOrganizationService $service;
+    private GithubApiService $service;
 
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $service The findGithubRepositoryThroughOrganizationService
+     * @param GithubApiService $service The  GithubApiService
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $service)
+    public function __construct(GithubApiService $service)
     {
         $this->service = $service;
 
@@ -33,13 +32,13 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
      *
      * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://opencatalogi.nl/ActionHandler/FindGithubRepositoryThroughOrganizationHandler.ActionHandler.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubApiHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'FindGithubRepositoryThroughOrganizationHandler',
-            'description' => 'This handler finds the .github repository through organizations',
+            'title'       => 'GithubApiHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'    => [
                 'githubSource',
                 'usercontentSource',
@@ -132,14 +131,15 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     /**
      * This function runs the application to gateway service plugin.
      *
-     * @param array $data          The data from the call
+     * @param array $data The data from the call
      * @param array $configuration The configuration of the action
      *
      * @return array
+     * @throws \Exception
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
+        return $this->service->findGithubRepositories();
 
     }//end run()
 

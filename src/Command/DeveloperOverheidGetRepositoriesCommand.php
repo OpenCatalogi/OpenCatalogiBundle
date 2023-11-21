@@ -2,6 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\DeveloperOverheidService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,13 +27,21 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
      */
     private DeveloperOverheidService $devOverheidService;
 
-
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+    
     /**
      * @param DeveloperOverheidService $devOverheidService developer Overheid Service
+     * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
-    public function __construct(DeveloperOverheidService $devOverheidService)
-    {
+    public function __construct(
+        DeveloperOverheidService $devOverheidService,
+        GatewayResourceService $resourceService
+    ){
         $this->devOverheidService = $devOverheidService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -52,18 +61,17 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
 
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      * @param OutputInterface $output The output
      *
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'source'           => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
-            'repositorySchema' => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'endpoint'         => '/repositories',
-        ];
+        $developerAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration = $developerAction->getConfiguration();
+
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);
 

@@ -55,7 +55,7 @@ class RatingService
      * @param EntityManagerInterface $entityManager     The Entity Manager.
      * @param RatingListService      $ratingListService The Rating List Service.
      * @param GatewayResourceService $resourceService   The Gateway Resource Service.
-     * @param SynchronizationService $syncService       The Synchronization Service.
+     * @param SynchronizationService $syncService The Synchronization Service.
      * @param LoggerInterface        $pluginLogger      The plugin version of the logger interface.
      */
     public function __construct(
@@ -68,12 +68,25 @@ class RatingService
         $this->entityManager     = $entityManager;
         $this->ratingListService = $ratingListService;
         $this->resourceService   = $resourceService;
-        $this->syncService       = $syncService;
+        $this->syncService = $syncService;
         $this->pluginLogger      = $pluginLogger;
         $this->configuration     = [];
         $this->data              = [];
 
     }//end __construct()
+
+    /**
+     * Override configuration from other services.
+     *
+     * @param array $configuration The new configuration array.
+     *
+     * @return void
+     */
+    public function setConfiguration(array $configuration): void
+    {
+        $this->configuration = $configuration;
+
+    }//end setConfiguration()
 
 
     /**
@@ -131,12 +144,11 @@ class RatingService
 
     }//end enrichComponentsWithRating()
 
-
     /**
      * Rate the components of the repository
      *
-     * @param ObjectEntity                               $repository The repository object.
-     * @param Source                                     $source     The source of the repository.
+     * @param ObjectEntity $repository The repository object.
+     * @param Source $source The source of the repository.
      * @param array The repository array from the source.
      *
      * @throws Exception
@@ -145,66 +157,50 @@ class RatingService
      */
     public function rateRepoComponents(ObjectEntity $repository, Source $source, array $repositoryArray): ObjectEntity
     {
-        $ratingSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $ratingMapping = $this->resourceService->getMapping('https://opencatalogi.nl/api/oc.rateComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
 
         foreach ($repository->getValue('components') as $component) {
-            // Get the source id of the component.
-            $sourcId = $component->getSynchronizations()->first()->getSourceId();
-
-            // Find the sync with the component source id.
-            $ratingSync = $this->syncService->findSyncBySource($source, $ratingSchema, $sourcId);
-            $ratingSync->setMapping($ratingMapping);
-
-            // Get the rating array.
-            $ratingArray = $this->ratingList($component, $repositoryArray);
-
-            // Sync the rating array.
-            $ratingSync = $this->syncService->synchronize($ratingSync, $ratingArray);
-
-            // Set the rating object to the component.
-            $component->setValue('rating', $ratingSync->getObject());
-            $this->entityManager->persist($component);
-            $this->entityManager->flush();
-
-            $this->pluginLogger->debug("Created rating ({$ratingSync->getObject()->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
-        }//end foreach
+            $this->rateComponent($component, $source, $repositoryArray);
+        }
 
         return $repository;
-
-    }//end rateRepoComponents()
+    }
 
 
     /**
-     * Rate a component.
+     * Rate the components of the repository
      *
-     * @param ObjectEntity $component The component to rate.
+     * @param ObjectEntity $component The component object.
+     * @param Source $source The source of the repository.
+     * @param array The repository array from the source.
      *
      * @throws Exception
      *
      * @return ObjectEntity Dataset at the end of the handler.
      */
-    public function rateComponent(ObjectEntity $component): ObjectEntity
+    public function rateComponent(ObjectEntity $component, Source $source, array $repositoryArray): ObjectEntity
     {
-        $ratingSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.rating.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingSchema = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
+        $ratingMapping = $this->resourceService->getMapping($this->configuration['ratingMapping'], 'open-catalogi/open-catalogi-bundle');
 
-        $ratingComponent = $this->ratingList($component);
+        // Get the source id of the component.
+        $sourcId = $component->getSynchronizations()->first()->getSourceId();
 
-        if (($rating = $component->getValue('rating')) === false) {
-            $rating = new ObjectEntity();
-            $rating->setEntity($ratingSchema);
-        }//end if
+        // Find the sync with the component source id.
+        $ratingSync = $this->syncService->findSyncBySource($source, $ratingSchema, $sourcId);
+        $ratingSync->setMapping($ratingMapping);
 
-        $rating->setValue('rating', $ratingComponent['rating']);
-        $rating->setValue('maxRating', $ratingComponent['maxRating']);
-        $rating->setValue('results', $ratingComponent['results']);
-        $this->entityManager->persist($rating);
+        // Get the rating array.
+        $ratingArray = $this->ratingList($component, $repositoryArray);
 
-        $component->setValue('rating', $rating);
+        // Sync the rating array.
+        $ratingSync = $this->syncService->synchronize($ratingSync, $ratingArray);
+
+        // Set the rating object to the component.
+        $component->setValue('rating', $ratingSync->getObject());
         $this->entityManager->persist($component);
         $this->entityManager->flush();
 
-        $this->pluginLogger->debug("Created rating ({$rating->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
+        $this->pluginLogger->debug("Created rating ({$ratingSync->getObject()->getId()->toString()}) for component ObjectEntity with id: {$component->getId()->toString()}");
 
         return $component;
 
@@ -214,8 +210,8 @@ class RatingService
     /**
      * Rates a component.
      *
-     * @param ObjectEntity $component       The component to rate.
-     * @param array        $repositoryArray The repository array from the source.
+     * @param ObjectEntity $component The component to rate.
+     * @param array $repositoryArray The repository array from the source.
      *
      * @throws Exception|GuzzleException
      *
@@ -228,6 +224,8 @@ class RatingService
             'maxRating' => 0,
             'results'   => [],
         ];
+
+        $this->ratingListService->setConfiguration($this->configuration);
 
         $ratingArray = $this->ratingListService->rateName($component, $ratingArray);
         $ratingArray = $this->ratingListService->rateUrl($component, $ratingArray, $repositoryArray);
@@ -259,11 +257,13 @@ class RatingService
         if (($legalObject = $component->getValue('legal')) !== false) {
             $ratingArray = $this->ratingListService->rateLicense($legalObject, $ratingArray);
 
-            if (($mainOwnerObject = $legalObject->getValue('mainCopyrightOwner')) !== false) {
+            if (($mainOwnerObject = $legalObject->getValue('mainCopyrightOwner')) !== false
+            ) {
                 $ratingArray = $this->ratingListService->rateCopyOwner($mainOwnerObject, $ratingArray);
             }//end if
 
-            if (($repoOwnerObject = $legalObject->getValue('repoOwner')) !== false) {
+            if (($repoOwnerObject = $legalObject->getValue('repoOwner')) !== false
+            ) {
                 $ratingArray = $this->ratingListService->rateRepoOwner($repoOwnerObject, $ratingArray);
             }//end if
 

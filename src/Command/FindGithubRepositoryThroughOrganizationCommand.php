@@ -2,6 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,13 +27,22 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     private FindGithubRepositoryThroughOrganizationService $findGitService;
 
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+    
 
     /**
      * @param FindGithubRepositoryThroughOrganizationService $findGitService find Github Repository Through Organization Service
+     * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $findGitService)
-    {
+    public function __construct(
+        FindGithubRepositoryThroughOrganizationService $findGitService,
+        GatewayResourceService $resourceService
+    ){
         $this->findGitService = $findGitService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -59,15 +69,8 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'usercontentSource'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
-            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
-            'organisationSchema'  => 'https://opencatalogi.nl/oc.organisation.schema.json',
-            'componentSchema'     => 'https://opencatalogi.nl/oc.component.schema.json',
-            'openCatalogiMapping' => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
-        ];
+        $githubRepoAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration = $githubRepoAction->getConfiguration();
 
         // Handle the command options
         $organizationId = $input->getOption('organizationId', false);

@@ -25,7 +25,7 @@
         "description": "Generic Search Endpoint",
         "schemas": [
           "https://opencatalogi.nl/oc.application.schema.json",
-          "https://opencatalogi.nl/oc.organisation.schema.json",
+          "https://opencatalogi.nl/oc.organization.schema.json",
           "https://opencatalogi.nl/oc.component.schema.json"
         ],
         "path": ["search"],
@@ -39,7 +39,7 @@
         "description": "Generic Federalization Search Endpoint",
         "schemas": [
           "https://opencatalogi.nl/oc.application.schema.json",
-          "https://opencatalogi.nl/oc.organisation.schema.json",
+          "https://opencatalogi.nl/oc.organization.schema.json",
           "https://opencatalogi.nl/oc.component.schema.json",
           "https://opencatalogi.nl/oc.catalogi.schema.json"
         ],
@@ -55,7 +55,7 @@
         "methods": []
       },
       {
-        "reference": "https://opencatalogi.nl/oc.organisation.schema.json",
+        "reference": "https://opencatalogi.nl/oc.organization.schema.json",
         "path": "organizations",
         "methods": []
       },

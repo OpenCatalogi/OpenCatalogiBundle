@@ -2,7 +2,8 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubPubliccodeService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Command to execute the GithubService.
  */
-class GithubApiGetPubliccodeRepositoriesCommand extends Command
+class GithubApiCommand extends Command
 {
     // the name of the command (the part after "bin/console")
 
@@ -22,17 +23,26 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     protected static $defaultName = 'opencatalogi:githubapi:repositories';
 
     /**
-     * @var GithubPubliccodeService
+     * @var GithubApiService
      */
-    private GithubPubliccodeService $githubService;
+    private GithubApiService $githubService;
+
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
 
 
     /**
-     * @param GithubPubliccodeService $githubService The Github Publiccode Service
+     * @param GithubApiService $githubService The GithubApiService
+     * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
-    public function __construct(GithubPubliccodeService $githubService)
-    {
+    public function __construct(
+        GithubApiService $githubService,
+        GatewayResourceService $resourceService
+    ) {
         $this->githubService = $githubService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -44,27 +54,23 @@ class GithubApiGetPubliccodeRepositoriesCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('This command triggers OpenCatalogi GithubPubliccodeService')
-            ->setHelp('This command allows you to get all repositories or one repository from https://api.github.com/search/code')
+            ->setDescription('This command triggers OpenCatalogi GithubApiService')
+            ->setHelp('This command allows you to get all repositories or one repository with an opencatalogi and/or publiccode file from https://api.github.com/search/code')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'Get a single repository by id');
 
     }//end configure()
 
 
     /**
-     * @param InputInterface  $input  The input
+     * @param InputInterface $input The input
      * @param OutputInterface $output The output
      *
      * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'githubSource'        => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'repositorySchema'    => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'repositoryMapping'   => 'https://api.github.com/oc.githubRepository.mapping.json',
-            'repositoriesMapping' => 'https://api.github.com/oc.githubPubliccodeRepository.mapping.json',
-        ];
+        $githubApiAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.githubApi.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration = $githubApiAction->getConfiguration();
 
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);

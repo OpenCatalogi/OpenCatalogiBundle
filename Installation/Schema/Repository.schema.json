@@ -2,12 +2,12 @@
   "title": "Repository",
   "$id": "https://opencatalogi.nl/oc.repository.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "type": "object",
   "description": "",
   "properties": {
     "organisation": {
-      "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
+      "$ref": "https://opencatalogi.nl/oc.organization.schema.json"
     },
     "components": {
       "type": "array",

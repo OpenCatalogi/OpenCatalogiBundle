@@ -2,6 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\RatingService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,13 +27,22 @@ class PublicCodeRatingCommand extends Command
      */
     private RatingService $ratingService;
 
+    /**
+     * @var GatewayResourceService 
+     */
+    private GatewayResourceService $resourceService;
+
 
     /**
      * @param RatingService $ratingService The rating service
+     * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
-    public function __construct(RatingService $ratingService)
-    {
+    public function __construct(
+        RatingService $ratingService,
+        GatewayResourceService $resourceService
+    ){
         $this->ratingService = $ratingService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -61,10 +71,8 @@ class PublicCodeRatingCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'ratingSchema'    => 'https://opencatalogi.nl/oc.rating.schema.json',
-            'componentSchema' => 'https://opencatalogi.nl/oc.component.schema.json',
-        ];
+        $ratingAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.RatingAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration = $ratingAction->getConfiguration();
 
         // Handle the command options
         $componentId = $input->getOption('component', false);

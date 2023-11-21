@@ -2,10 +2,10 @@
   "title": "Componenten Catalogus Application To Gateway",
   "$id": "https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "priority": 1,
   "isLockable": true,
-  "listens": ["opencatalogi.bronnen.trigger"],
+  "listens": ["opencatalogi.componentencatalogus.trigger"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\ComponentenCatalogusApplicationToGatewayHandler",
   "conditions": {
     "==": [
@@ -15,15 +15,21 @@
   },
   "configuration": {
     "source": "https://opencatalogi.nl/source/oc.componentencatalogus.source.json",
-    "applicationMapping": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json",
     "applicationSchema": "https://opencatalogi.nl/oc.application.schema.json",
+    "applicationMapping": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json",
     "endpoint": "/products",
-    "componentMapping": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json",
-    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
+    "componentencatalogusMapping": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json",
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
-    "repositoryEndpoint": "/repositories",
-    "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json"
+    "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
+    "organizationSchema": "https://opencatalogi.nl/oc.organization.schema.json",
+    "organizationMapping": "https://api.github.com/oc.githubOrganization.mapping.json",
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
+    "publiccodeMapping": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
+    "opencatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
+    "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
+    "ratingMapping": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json"
   },
   "isEnabled": false
 }

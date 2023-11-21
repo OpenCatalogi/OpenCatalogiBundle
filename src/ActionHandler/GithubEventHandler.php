@@ -41,11 +41,15 @@ class GithubEventHandler implements ActionHandlerInterface
             'description' => 'This handler gets the github event and creates or updates the repository',
             'required'    => [
                 'githubSource',
+                'usercontentSource',
                 'repositorySchema',
                 'repositoryMapping',
                 'organizationSchema',
                 'organizationMapping',
                 'componentSchema',
+                'publiccodeMapping',
+                'opencatalogiMapping',
+                'applicationSchema',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -53,6 +57,13 @@ class GithubEventHandler implements ActionHandlerInterface
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'usercontentSource'        => [
+                    'type'        => 'string',
+                    'description' => 'The source of the raw user content.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
                     'required'    => true,
                 ],
                 'repositorySchema'    => [
@@ -69,25 +80,46 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
-                'organizationSchema'  => [
+                'organizationSchema'    => [
                     'type'        => 'string',
                     'description' => 'The organization schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'required'    => true,
                 ],
-                'organizationMapping' => [
+                'organizationMapping'   => [
                     'type'        => 'string',
-                    'description' => 'The mapping for github organization to oc organisation.',
-                    'example'     => 'https://api.github.com/oc.githubOrganisation.mapping.json',
-                    'reference'   => 'https://api.github.com/oc.githubOrganisation.mapping.json',
+                    'description' => 'The mapping for github organization to oc organization.',
+                    'example'     => 'https://api.github.com/oc.githubOrganization.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'required'    => true,
                 ],
-                'componentSchema'     => [
+                'componentSchema'    => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
+                    'required'    => true,
+                ],
+                'publiccodeMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for publiccode file to oc component.',
+                    'example'     => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'required'    => true,
+                ],
+                'opencatalogiMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for opencatalogi file to oc organization.',
+                    'example'     => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
+                    'required'    => true,
+                ],
+                'applicationSchema'    => [
+                    'type'        => 'string',
+                    'description' => 'The application schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
             ],

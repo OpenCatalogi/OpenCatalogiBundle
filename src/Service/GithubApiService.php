@@ -40,11 +40,6 @@ class GithubApiService
     private SynchronizationService $syncService;
 
     /**
-     * @var CacheService
-     */
-    private CacheService $cacheService;
-
-    /**
      * @var MappingService
      */
     private MappingService $mappingService;
@@ -53,16 +48,6 @@ class GithubApiService
      * @var RatingService
      */
     private RatingService $ratingService;
-
-    /**
-     * @var array
-     */
-    private array $configuration;
-
-    /**
-     * @var array
-     */
-    private array $data;
 
     /**
      * @var LoggerInterface
@@ -75,42 +60,41 @@ class GithubApiService
     private GatewayResourceService $resourceService;
 
     /**
-     * @var HydrationService
+     * @var array
      */
-    private HydrationService $hydrationService;
+    private array $configuration;
+
+    /**
+     * @var array
+     */
+    private array $data;
 
 
     /**
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface
      * @param CallService            $callService      The Call Service
      * @param SynchronizationService $syncService      The Synchronisation Service
-     * @param CacheService           $cacheService     The Cache Service
      * @param MappingService         $mappingService   The Mapping Service
      * @param RatingService          $ratingService    The Rating Service.
      * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
-     * @param HydrationService       $hydrationService The Hydration Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         CallService $callService,
         SynchronizationService $syncService,
-        CacheService $cacheService,
         MappingService $mappingService,
         RatingService $ratingService,
         LoggerInterface $pluginLogger,
-        GatewayResourceService $resourceService,
-        HydrationService $hydrationService
+        GatewayResourceService $resourceService
     ) {
         $this->entityManager    = $entityManager;
         $this->callService      = $callService;
         $this->syncService      = $syncService;
-        $this->cacheService     = $cacheService;
         $this->mappingService   = $mappingService;
         $this->ratingService    = $ratingService;
         $this->pluginLogger     = $pluginLogger;
         $this->resourceService  = $resourceService;
-        $this->hydrationService = $hydrationService;
 
         $this->configuration = [];
         $this->data          = [];
@@ -137,6 +121,19 @@ class GithubApiService
 
     }//end checkGithubAuth()
 
+    /**
+     * Override configuration from other services.
+     *
+     * @param array $configuration The new configuration array.
+     *
+     * @return void
+     */
+    public function setConfiguration(array $configuration): void
+    {
+        $this->configuration = $configuration;
+
+    }//end setConfiguration()
+
 
     /**
      * This function gets repository and enriches it.
@@ -149,15 +146,15 @@ class GithubApiService
      */
     public function getGithubRepository(string $repositoryUrl, ?array $repositoryArray=null): ?ObjectEntity
     {
-        $repositorySchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema  = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $repositoryMapping = $this->resourceService->getMapping($this->configuration['repositoryMapping'], 'open-catalogi/open-catalogi-bundle');
         if ($repositorySchema instanceof Entity === false
             || $repositoryMapping instanceof Mapping === false
         ) {
             return $this->data;
         }//end if
 
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
         if ($this->checkGithubAuth($source) === false
         ) {
@@ -204,6 +201,7 @@ class GithubApiService
 
         // Rate the component(s) of the repository.
         // Return the repository object.
+        $this->ratingService->setConfiguration($this->configuration);
         return $this->ratingService->rateRepoComponents($repository, $source, $repositoryArray);
 
     }//end getGithubRepository()
@@ -242,22 +240,20 @@ class GithubApiService
     /**
      * This function enriches the repository with a organization.
      *
-     * @param ObjectEntity $repository      The repository object.
-     * @param array        $repositoryArray The repository array from the github api call.
-     * @param Source       $source          The github api source.
-     *
-     * @throws GuzzleException
+     * @param ObjectEntity $repository The repository object.
+     * @param array $organizationArray The organization array from the github api.
+     * @param Source $source The github api source.
      *
      * @return ObjectEntity
      */
     public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
-        $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['html_url']);
 
         if ($organizationSync->getObject() === null) {
-            $organizationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
+            $organizationMapping = $this->resourceService->getMapping($this->configuration['organizationMapping'], 'open-catalogi/open-catalogi-bundle');
 
             $organizationSync->setMapping($organizationMapping);
             $organizationSync = $this->syncService->synchronize($organizationSync, $repositoryArray['owner']);
@@ -286,7 +282,7 @@ class GithubApiService
      */
     public function enrichWithComponent(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
-        $componentSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
 
         $forkedFrom = $repository->getValue('forked_from');
         // Set the isBasedOn.
@@ -353,9 +349,8 @@ class GithubApiService
      */
     public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ObjectEntity
     {
-        $repositorySchema    = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $organizationSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
-        $organizationMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOrganisation.mapping.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema    = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('softwareOwned', $opencatalogi) === true) {
             $ownedComponents = [];
@@ -478,12 +473,11 @@ class GithubApiService
     /**
      * This function enriches the opencatalogi file organization.
      *
-     * @param array        $opencatalogiArray The opencatalogi array from the github api.
-     * @param array        $opencatalogi      The opencatalogi file as array.
-     * @param ObjectEntity $organization      The organization object.
-     *
+     * @param array $opencatalogiArray The opencatalogi array from the github api.
+     * @param array $opencatalogi The opencatalogi file as array.
+     * @param ObjectEntity $organization The organization object.
+     * @param Source $source The github api source.
      * @return ObjectEntity
-     * @throws Exception
      */
     public function enrichOpencatalogiOrg(array $organizationArray, array $opencatalogi, ObjectEntity $organization, Source $source): ObjectEntity
     {
@@ -547,8 +541,8 @@ class GithubApiService
      */
     public function handleOpencatalogiFile(array $organizationArray, Source $source, array $opencatalogiArray): ?ObjectEntity
     {
-        $opencatalogiMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json', 'open-catalogi/open-catalogi-bundle');
-        $organizationSchema  = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $opencatalogiMapping = $this->resourceService->getMapping($this->configuration['opencatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         if ($opencatalogiMapping instanceof Mapping === false
             || $organizationSchema instanceof Entity === false
         ) {
@@ -566,15 +560,18 @@ class GithubApiService
         $opencatalogi = $this->getFileFromRawUserContent($opencatalogiUrl, $opencatalogiArray['git_url']);
 
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
-        if (key_exists('publiccodeYmlVersion', $opencatalogi) === false) {
-            return null;
+        if ($opencatalogi === null
+            || $opencatalogi !== null
+            && key_exists('publiccodeYmlVersion', $opencatalogi) === false
+        ) {
+            return $organization;
         }
 
         // Find the sync with the source and organization html_url.
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
         // Check the sha of the sync with the url reference in the array.
         if ($this->syncService->doesShaMatch($organizationSync, $urlReference) === true) {
-            return null;
+            return $organizationSync->getObject();
         }
 
         $opencatalogi['github']           = $organizationArray['html_url'];
@@ -615,7 +612,7 @@ class GithubApiService
     public function handlePubliccodeSubObjects(array $publiccodeArray, Source $source, ObjectEntity $component): ObjectEntity
     {
         if (key_exists('legal', $publiccodeArray) === true) {
-            $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+            $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
             if (key_exists('repoOwner', $publiccodeArray) === true
                 && key_exists('name', $publiccodeArray['repoOwner']) === true
@@ -642,7 +639,7 @@ class GithubApiService
             && key_exists('name', $publiccodeArray['applicationSuite']) === true
             && is_string($publiccodeArray['applicationSuite']['name']) === true
         ) {
-            $applicationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.application.schema.json', 'open-catalogi/open-catalogi-bundle');
+            $applicationSchema = $this->resourceService->getSchema($this->configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
 
             $applicationSuiteSync = $this->syncService->findSyncBySource($source, $applicationSchema, $publiccodeArray['applicationSuite']['name']);
             $applicationSuiteSync = $this->syncService->synchronize($applicationSuiteSync, $publiccodeArray['applicationSuite']);
@@ -666,8 +663,8 @@ class GithubApiService
      */
     public function handlePubliccodeFile(array $publiccodeArray, Source $source, ObjectEntity $repository): ?ObjectEntity
     {
-        $publiccodeMapping = $this->resourceService->getMapping('https://api.github.com/oc.githubPubliccodeComponent.mapping.json', 'open-catalogi/open-catalogi-bundle');
-        $componentSchema   = $this->resourceService->getSchema('https://opencatalogi.nl/oc.component.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $publiccodeMapping = $this->resourceService->getMapping($this->configuration['publiccodeMapping'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema   = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         if ($publiccodeMapping instanceof Mapping === false
             || $componentSchema instanceof Entity === false
         ) {
@@ -691,7 +688,10 @@ class GithubApiService
         $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $publiccodeArray['git_url']);
 
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
-        if (key_exists('publiccodeYmlVersion', $publiccode) === false) {
+        if ($publiccode === null
+            || $publiccode !== null
+            && key_exists('publiccodeYmlVersion', $publiccode) === false
+        ) {
             return $repository;
         }
 
@@ -768,7 +768,7 @@ class GithubApiService
             // Check if the item name is the same as the openCatalogiNames array.
             // If so go the the function for the opencatalogi file.
             if (in_array($item['name'], $opencatalogiNames) === true) {
-                $organizationSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.organisation.schema.json', 'open-catalogi/open-catalogi-bundle');
+                $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
                 $this->pluginLogger->info('The item is a opencatalogi file.');
 
                 $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $item['repository']['owner']['html_url']);
@@ -817,7 +817,7 @@ class GithubApiService
      */
     public function getFileFromGithubApi(string $gitUrl, ?string $query=null): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
             return null;
         }
@@ -836,10 +836,16 @@ class GithubApiService
         }
 
         // Decode the response from the call.
-        $response = $this->callService->decodeResponse($source, $response, 'application/json');
+        try {
+            $decodedResponse = $this->callService->decodeResponse($source, $response, 'application/json');
+        } catch (Exception $e) {
+            $this->pluginLogger->error($e->getMessage());
+        }
 
         // Check if there is a key content. This is the base64 of the file.
-        if (key_exists('content', $response) === false) {
+        if (isset($decodedResponse) === false
+            && key_exists('content', $response) === false
+        ) {
             return null;
         }
 
@@ -865,7 +871,7 @@ class GithubApiService
      */
     public function getFileFromRawUserContent(string $repositoryUrl, ?string $gitUrl=null): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubusercontent.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
             return null;
         }
@@ -886,7 +892,17 @@ class GithubApiService
         }
 
         if (isset($response) === true) {
-            return $this->callService->decodeResponse($source, $response, 'text/yaml');
+            try {
+                $decodedResponse = $this->callService->decodeResponse($source, $response, 'text/yaml');
+            } catch (Exception $e) {
+                $this->pluginLogger->error('Error decoding response of repo: '.$repositoryUrl.' '.$e->getMessage());
+            }
+
+            if (isset($decodedResponse) === true
+                && is_array($decodedResponse) === true
+            ){
+                return $decodedResponse;
+            }
         }
 
         return null;
@@ -921,10 +937,16 @@ class GithubApiService
         }
 
         // Decode the response with the source.
-        $repository = $this->callService->decodeResponse($source, $response, 'application/json');
+        try {
+            $repository = $this->callService->decodeResponse($source, $response, 'application/json');
+        } catch (ClientException $exception) {
+            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
 
         // If we cannot decode the response then return null.
-        if ($repository === null) {
+        if (isset($repository) === true
+            && $repository === null
+        ) {
             $this->pluginLogger->error('Could not find a repository with url: '.$repositoryUrl.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
@@ -956,7 +978,15 @@ class GithubApiService
             return null;
         }
 
-        $dataArray = $this->callService->decodeResponse($source, $response);
+        try {
+            $dataArray = $this->callService->decodeResponse($source, $response);
+        } catch (Exception $exception) {
+            $this->pluginLogger->error($exception->getMessage());
+        }
+
+        if (isset($dataArray) === false){
+            return null;
+        }
 
         $this->pluginLogger->debug('Found '.$dataArray['total_count'].' publiccode/opencatalogi file(s).', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
@@ -968,14 +998,11 @@ class GithubApiService
     /**
      * Get the publiccode/opencatalogi files of the given repository
      *
-     * @param string $repositoryUrl The url of the repository.
-     * @param Source $source        The source to sync from.
-     *
      * @return array|null The publiccode/opencatalogi files as array.
      */
     public function getGithubFiles(): ?array
     {
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitHubAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
 
         // Call the search/code endpoint for publiccode files in this repository.
         $queryConfig['query'] = ['q' => "filename:publiccode filename:opencatalogi extension:yaml extension:yml"];
@@ -1141,5 +1168,63 @@ class GithubApiService
 
     }//end getUserRepos()
 
+     /** This function searches for all repositories with a publiccode or one repository
+     *
+     * @param array|null  $data          data set at the start of the handler
+     * @param array|null  $configuration configuration of the action
+     * @param string|null $repositoryId  The given repository id
+     *
+     * @return array|null dataset at the end of the handler
+     * @throws Exception
+     */
+    public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
+    {
+        $this->configuration = $configuration;
+        $this->data          = $data;
 
+        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+
+
+        // If we have one repository.
+        if ($repositoryId !== null) {
+
+        }
+
+        // If we have all repositories.
+        if ($repositoryId === null) {
+            // Get all the repositories with a publiccode/opencatalogi file.
+            $repositories = $this->getGithubFiles();
+
+            $response = [];
+            foreach ($repositories as $repositoryArray) {
+
+                if (key_exists('repository', $repositoryArray) === false
+                    || key_exists('html_url', $repositoryArray['repository']) === false
+                ) {
+                    continue;
+                }
+
+                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
+
+                if ($repositorySync->getObject() !== null){
+                    $repository = $repositorySync->getObject();
+                }
+
+                if ($repositorySync->getObject() === null){
+                    $this->entityManager->remove($repositorySync);
+                    $this->entityManager->flush();
+                    $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
+                }
+
+                $response[] = $repository->toArray();
+            }
+
+            if (isset($response) === true) {
+                $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
+            }
+        }
+
+        return $this->data;
+    }//end findGithubRepositories()
 }//end class

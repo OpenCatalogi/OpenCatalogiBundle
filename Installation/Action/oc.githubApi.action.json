@@ -1,12 +1,12 @@
 {
-  "title": "Developer Overheid Repository To Gateway Action",
-  "$id": "https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json",
+  "title": "Github Api Action",
+  "$id": "https://opencatalogi.nl/action/oc.githubApi.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.6",
-  "priority": 1,
+  "version": "0.0.1",
+  "priority": 2,
   "isLockable": true,
-  "listens": ["opencatalogi.developeroverheid.trigger"],
-  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\DeveloperOverheidRepositoryToGatewayHandler",
+  "listens": ["opencatalogi.githubapi.trigger"],
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\GithubApiHandler",
   "conditions": {
     "==": [
       1,
@@ -14,8 +14,6 @@
     ]
   },
   "configuration": {
-    "source": "https://opencatalogi.nl/source/oc.developerOverheid.source.json",
-    "endpoint": "/repositories",
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
     "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
@@ -25,8 +23,8 @@
     "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
     "publiccodeMapping": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
     "opencatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
+    "applicationSchema": "https://opencatalogi.nl/oc.application.schema.json",
     "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
     "ratingMapping": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json"
-  },
-  "isEnabled": false
+  }
 }

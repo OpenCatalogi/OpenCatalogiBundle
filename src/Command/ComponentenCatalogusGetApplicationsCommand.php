@@ -26,13 +26,22 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
      */
     private ComponentenCatalogusService $compCatService;
 
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+
 
     /**
      * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
+     * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
-    public function __construct(ComponentenCatalogusService $compCatService)
-    {
+    public function __construct(
+        ComponentenCatalogusService $compCatService,
+        GatewayResourceService $resourceService
+    ){
         $this->compCatService = $compCatService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -59,19 +68,15 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'source'             => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-            'applicationMapping' => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusApplication.mapping.json',
-            'applicationSchema'  => 'https://opencatalogi.nl/oc.application.schema.json',
-            'endpoint'           => '/products',
-            'componentMapping'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'componentSchema'    => 'https://opencatalogi.nl/oc.component.schema.json',
-        ];
+        $componentenAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration = $componentenAction->getConfiguration();
+
 
         // Handle the command options.
         $applicationId = $input->getOption('application', false);
 
         if ($applicationId === null) {
+
             if ($this->compCatService->getApplications([], $configuration) === null) {
                 return Command::FAILURE;
             }

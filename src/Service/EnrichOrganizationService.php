@@ -81,7 +81,7 @@ class EnrichOrganizationService
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organization.schema.json
      *
      * @throws GuzzleException|Exception
      *
@@ -125,14 +125,57 @@ class EnrichOrganizationService
         foreach ($opencatalogiFiles as $item) {
             if (in_array($item['name'], $opencatalogiNames) === true) {
                 $organization = $this->githubApiService->handleOpencatalogiFile($organizationArray, $source, $item);
+
+                break;
             }
         }
 
-        $this->pluginLogger->debug($organization->getName().' succesfully updated the organization with the opencatalogi file.');
+        $this->pluginLogger->debug($organization->getValue('name').' succesfully updated the organization with the opencatalogi file.');
 
         return $organization;
 
     }//end enrichOrganization()
+
+    /**
+     * This function gets all the repositories from the given organization and sets it to the owns of the organization.
+     *
+     * @param string $organizationId The id of the organization in the response.
+     *
+     * @throws GuzzleException|Exception
+     *
+     * @return ObjectEntity
+     */
+    public function getOrganization(string $organizationId): ObjectEntity
+    {
+        // Get the response.
+        try {
+            $response = json_decode($this->data['response']->getContent(), true);
+        } catch (Exception $exception) {
+            $this->pluginLogger->error('Cannot get the response.');
+        }
+
+        if (isset($response) === false) {
+            return $this->data;
+        }
+
+        // Get the organization object.
+        $organization = $this->entityManager->find('App:ObjectEntity', $organizationId);
+
+        // Check if the name and github is not null.
+        if ($organization instanceof ObjectEntity === true
+            && $organization->getValue('name') !== null
+            && $organization->getValue('github') !== null
+        ) {
+            // Enrich the organization object.
+            $this->enrichOrganization($organization);
+        }//end if
+
+        if ($organization instanceof ObjectEntity === false) {
+            $this->pluginLogger->error('Could not find given organization');
+
+            return $this->data;
+        }//end if
+    }
 
 
     /**
@@ -150,34 +193,28 @@ class EnrichOrganizationService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        // Get the response.
-        try {
-            $response = json_decode($this->data['response']->getContent(), true);
-        } catch (Exception $exception) {
-            $this->pluginLogger->error('Cannot get the response.');
+        // If there is an organization in the response.
+        if ($organizationId !== null) {
+           $this->getOrganization();
         }
 
-        if (isset($response) === false) {
-            return $this->data;
+        // If there is no organization we get all the organizations and enrich it.
+        if ($organizationId === null) {
+            $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findAll();
+
+            foreach ($organizations as $organization) {
+
+                // Check if the name and github is not null.
+                if ($organization instanceof ObjectEntity === true
+                    && $organization->getValue('name') !== null
+                    && $organization->getValue('github') !== null
+                ) {
+                    // Enrich the organization object.
+                    $this->enrichOrganization($organization);
+                }//end if
+            }
         }
 
-        // Get the organization object.
-        $organization = $this->entityManager->find('App:ObjectEntity', $response['_self']['id']);
-
-        // Check if the name and github is not null.
-        if ($organization instanceof ObjectEntity === true
-            && $organization->getValue('name') !== null
-            && $organization->getValue('github') !== null
-        ) {
-            // Enrich the organization object.
-            $this->enrichOrganization($organization);
-        }//end if
-
-        if ($organization instanceof ObjectEntity === false) {
-            $this->pluginLogger->error('Could not find given organization');
-
-            return $this->data;
-        }//end if
 
         return $this->data;
 

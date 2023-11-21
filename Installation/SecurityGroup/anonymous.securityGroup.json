@@ -7,7 +7,7 @@
     "schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.application.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.component.schema.json.GET",
-    "schemas.https://opencatalogi.nl/oc.organisation.schema.json.GET",
+    "schemas.https://opencatalogi.nl/oc.organization.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.repository.schema.json.GET",
     "schemas.https://opencatalogi.nl/oc.githubEvent.schema.json.POST",
     "schemas.https://opencatalogi.nl/oc.formInput.schema.json.POST"

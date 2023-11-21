@@ -2,7 +2,7 @@
   "title": "Find Github Repository Through Organization Action",
   "$id": "https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "listens": ["opencatalogi.default.listens"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindGithubRepositoryThroughOrganizationHandler",
   "conditions": {
@@ -16,10 +16,11 @@
     "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
-    "organisationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
-    "organizationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
+    "organizationSchema": "https://opencatalogi.nl/oc.organization.schema.json",
     "organizationMapping": "https://opencatalogi.nl/oc.githubOrganisation.mapping.json",
     "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
-    "openCatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json"
+    "openCatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
+    "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
+    "ratingMapping": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json"
   }
 }

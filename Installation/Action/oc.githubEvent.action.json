@@ -2,7 +2,7 @@
   "title": "Github Event Action",
   "$id": "https://opencatalogi.nl/action/oc.GithubEventAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "priority": 1,
   "listens": [
     "opencatalogi.githubevents.trigger"
@@ -19,10 +19,16 @@
   },
   "configuration": {
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
-    "organizationSchema": "https://opencatalogi.nl/oc.organisation.schema.json",
-    "organizationMapping": "https://api.github.com/oc.githubOrganisation.mapping.json",
-    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json"
+    "organizationSchema": "https://opencatalogi.nl/oc.organization.schema.json",
+    "organizationMapping": "https://api.github.com/oc.githubOrganization.mapping.json",
+    "componentSchema": "https://opencatalogi.nl/oc.component.schema.json",
+    "publiccodeMapping": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
+    "opencatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
+    "applicationSchema": "https://opencatalogi.nl/oc.application.schema.json",
+    "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
+    "ratingMapping": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json"
   }
 }

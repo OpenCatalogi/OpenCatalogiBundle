@@ -2,7 +2,7 @@
   "title": "ComponentenCatalogusComponentToOpenCatalogiComponent",
   "$id": "https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "passTrough": false,
   "mapping": {
     "name": "name",
@@ -14,8 +14,7 @@
     "nl.commonground.layerType": "{{layerType|trans({'proces': 'process', 'interactie': 'interface', 'services': 'service', 'integratie': 'integration'}, '','en')}}",
     "landingURL": "repositoryUrl",
     "developmentStatus": "status",
-    "url.url": "repositoryUrl",
-    "url.name": "name"
+    "url": "repositoryUrl"
   },
   "cast": {
     "name": "keyCantBeValue",
@@ -27,7 +26,6 @@
     "nl.commonground.layerType": "unsetIfValue==",
     "landingURL": "unsetIfValue==repositoryUrl",
     "developmentStatus": "unsetIfValue==status",
-    "url.url": "unsetIfValue==repositoryUrl",
-    "url.name": "unsetIfValue==name"
+    "url": "unsetIfValue==repositoryUrl"
   }
 }
