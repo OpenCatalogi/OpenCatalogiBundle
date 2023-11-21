@@ -59,7 +59,7 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'usercontentSource'        => [
+                'usercontentSource'   => [
                     'type'        => 'string',
                     'description' => 'The source of the raw user content.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
@@ -80,21 +80,21 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
-                'organizationSchema'    => [
+                'organizationSchema'  => [
                     'type'        => 'string',
                     'description' => 'The organization schema.',
                     'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'required'    => true,
                 ],
-                'organizationMapping'   => [
+                'organizationMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for github organization to oc organization.',
                     'example'     => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'required'    => true,
                 ],
-                'componentSchema'    => [
+                'componentSchema'     => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
@@ -108,14 +108,14 @@ class GithubEventHandler implements ActionHandlerInterface
                     'reference'   => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
                     'required'    => true,
                 ],
-                'opencatalogiMapping'   => [
+                'opencatalogiMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for opencatalogi file to oc organization.',
                     'example'     => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'required'    => true,
                 ],
-                'applicationSchema'    => [
+                'applicationSchema'   => [
                     'type'        => 'string',
                     'description' => 'The application schema.',
                     'example'     => 'https://opencatalogi.nl/oc.application.schema.json',

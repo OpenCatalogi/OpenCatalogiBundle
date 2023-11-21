@@ -62,10 +62,10 @@ class FindGithubRepositoryThroughOrganizationService
 
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
-     * @param LoggerInterface        $pluginLogger           The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService        The Gateway Resource Service.
-     * @param GithubApiService       $githubApiService       The Github API Service
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param GithubApiService       $githubApiService The Github API Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -74,11 +74,11 @@ class FindGithubRepositoryThroughOrganizationService
         GithubApiService $githubApiService,
         SynchronizationService $syncService
     ) {
-        $this->entityManager          = $entityManager;
-        $this->pluginLogger           = $pluginLogger;
-        $this->resourceService        = $resourceService;
-        $this->githubApiService       = $githubApiService;
-        $this->syncService            = $syncService;
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
+        $this->githubApiService = $githubApiService;
+        $this->syncService      = $syncService;
 
         $this->configuration = [];
         $this->data          = [];

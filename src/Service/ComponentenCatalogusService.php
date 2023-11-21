@@ -62,12 +62,12 @@ class ComponentenCatalogusService
 
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface
-     * @param GatewayResourceService $resourceService     The Gateway Resource Service.
-     * @param CallService $callService The call Service.
-     * @param LoggerInterface        $pluginLogger        The Plugin logger.
-     * @param SynchronizationService $syncService The Synchronization Service.
-     * @param GithubApiService $githubApiService The Github API Service.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param CallService            $callService      The call Service.
+     * @param LoggerInterface        $pluginLogger     The Plugin logger.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param GithubApiService       $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -77,14 +77,14 @@ class ComponentenCatalogusService
         SynchronizationService $syncService,
         GithubApiService $githubApiService
     ) {
-        $this->entityManager = $entityManager;
-        $this->pluginLogger        = $pluginLogger;
-        $this->callService = $callService;
-        $this->resourceService     = $resourceService;
-        $this->syncService = $syncService;
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->callService      = $callService;
+        $this->resourceService  = $resourceService;
+        $this->syncService      = $syncService;
         $this->githubApiService = $githubApiService;
-        $this->data                = [];
-        $this->configuration       = [];
+        $this->data             = [];
+        $this->configuration    = [];
 
     }//end __construct()
 
@@ -121,6 +121,7 @@ class ComponentenCatalogusService
 
     }//end getApplications()
 
+
     /**
      * Get all applications of the given source.
      *
@@ -144,7 +145,7 @@ class ComponentenCatalogusService
 
         return $result;
 
-    }//end getApplications()
+    }//end handleApplications()
 
 
     /**
@@ -179,7 +180,8 @@ class ComponentenCatalogusService
 
         return $application->toArray();
 
-    }//end getApplication()
+    }//end handleApplication()
+
 
     /**
      * Import the application into the data layer.
@@ -235,9 +237,9 @@ class ComponentenCatalogusService
     /**
      * Get all the components or one component through the components of https://componentencatalogus.commonground.nl/api/components.
      *
-     * @param array|null $data The data array from the request
-     * @param array|null $configuration The configuration array from the request
-     * @param string|null $componentId The given component id
+     * @param array|null  $data          The data array from the request
+     * @param array|null  $configuration The configuration array from the request
+     * @param string|null $componentId   The given component id
      *
      * @return array|null
      * @throws \Exception
@@ -265,75 +267,78 @@ class ComponentenCatalogusService
 
     }//end getComponents()
 
+
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
      */
     public function handleComponent(Source $source, array $componentArray): ?array
     {
-        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
         $parsedUrl = \Safe\parse_url($componentArray['repositoryUrl']);
-        if (key_exists('host', $parsedUrl) === false){
+        if (key_exists('host', $parsedUrl) === false) {
             return null;
         }
 
         $domain = $parsedUrl['host'];
         switch ($domain) {
-            case 'github.com':
+        case 'github.com':
 
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $componentArray['repositoryUrl']);
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $componentArray['repositoryUrl']);
 
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
 
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-                    // Get the github repository
-                    $this->githubApiService->setConfiguration($this->configuration);
-                    $repository = $this->githubApiService->getGithubRepository($componentArray['repositoryUrl']);
-                }
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                // Get the github repository
+                $this->githubApiService->setConfiguration($this->configuration);
+                $repository = $this->githubApiService->getGithubRepository($componentArray['repositoryUrl']);
+            }
 
-                if ($repository === null){
-                    return null;
-                }
+            if ($repository === null) {
+                return null;
+            }
 
-                $componentArray['repositoryUrl'] = $repository;
+            $componentArray['repositoryUrl'] = $repository;
 
-                // Add values from the componenten catalogus array.
-                $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $componentArray['repositoryUrl']);
-                $componentSync->setMapping($componentMapping);
+            // Add values from the componenten catalogus array.
+            $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $componentArray['repositoryUrl']);
+            $componentSync->setMapping($componentMapping);
 
-                $componentSync = $this->syncService->synchronize($componentSync, $componentArray);
+            $componentSync = $this->syncService->synchronize($componentSync, $componentArray);
 
-                return $componentSync->getObject()->toArray();
+            return $componentSync->getObject()->toArray();
                 break;
-            case 'gitlab.com':
-                break;
-            default:
-                break;
-        }
+        case 'gitlab.com':
+            break;
+        default:
+            break;
+        }//end switch
 
         return null;
-    }
+
+    }//end handleComponent()
+
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
      * @param string $componentId
-     * @param array $configuration The configuration array
+     * @param array  $configuration The configuration array
      *
      * @return ObjectEntity|null
      */
@@ -341,11 +346,11 @@ class ComponentenCatalogusService
     {
         try {
             $response = $this->callService->call($source, $endpoint.'/'.$componentId);
-        } catch (\Exception $exception){
+        } catch (\Exception $exception) {
             $this->pluginLogger->error($exception->getMessage());
         }
 
-        if (isset($response) === true){
+        if (isset($response) === true) {
             $componentArray = $this->callService->decodeResponse($source, $response, 'application/json');
 
             $component = $this->handleComponent($source, $componentArray);
@@ -356,14 +361,16 @@ class ComponentenCatalogusService
         }
 
         return null;
-    }
+
+    }//end getComponentFromSource()
+
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -375,21 +382,18 @@ class ComponentenCatalogusService
 
         $result = [];
         foreach ($components as $componentArray) {
+            $component = $this->handleComponent($source, $componentArray);
 
-           $component = $this->handleComponent($source, $componentArray);
-
-           if ($component !== null){
-               $result[] = $component->toArray();
-           }
+            if ($component !== null) {
+                $result[] = $component->toArray();
+            }
         }
 
         $this->entityManager->flush();
 
         return $result;
 
-    }//end getComponents()
-
-
+    }//end getComponentsFromSource()
 
 
 }//end class

@@ -33,6 +33,7 @@ use Twig\Error\SyntaxError;
  */
 class FormInputService
 {
+
     /**
      * @var GithubApiService
      */
@@ -55,17 +56,17 @@ class FormInputService
 
 
     /**
-     * @param GithubApiService                               $githubApiService       The Github Api Service.
-     * @param LoggerInterface                                $pluginLogger           The plugin version of the logger interface
+     * @param GithubApiService $githubApiService The Github Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface
      */
     public function __construct(
         GithubApiService $githubApiService,
         LoggerInterface $pluginLogger
     ) {
-        $this->githubApiService       = $githubApiService;
-        $this->pluginLogger           = $pluginLogger;
-        $this->configuration          = [];
-        $this->data                   = [];
+        $this->githubApiService = $githubApiService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->configuration    = [];
+        $this->data             = [];
 
     }//end __construct()
 
@@ -94,21 +95,20 @@ class FormInputService
         }
 
         $parsedUrl = \Safe\parse_url($formInput['repository']['html_url']);
-        if (key_exists('host', $parsedUrl) === false){
+        if (key_exists('host', $parsedUrl) === false) {
             return null;
         }
 
         $domain = $parsedUrl['host'];
         switch ($domain) {
-            case 'github.com':
-                $this->githubApiService->setConfiguration($this->configuration);
-                $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
-                break;
-            case 'gitlab.com':
-            default:
-                break;
+        case 'github.com':
+            $this->githubApiService->setConfiguration($this->configuration);
+            $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
+            break;
+        case 'gitlab.com':
+        default:
+            break;
         }
-
 
         if (isset($repository) === false
             || $repository === null
@@ -122,7 +122,7 @@ class FormInputService
 
         return $this->data;
 
-    }//end updateRepositoryWithEventResponse()
+    }//end updateRepositoryWithFormInput()
 
 
 }//end class

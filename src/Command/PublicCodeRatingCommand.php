@@ -28,20 +28,20 @@ class PublicCodeRatingCommand extends Command
     private RatingService $ratingService;
 
     /**
-     * @var GatewayResourceService 
+     * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
 
 
     /**
-     * @param RatingService $ratingService The rating service
+     * @param RatingService          $ratingService   The rating service
      * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
     public function __construct(
         RatingService $ratingService,
         GatewayResourceService $resourceService
-    ){
-        $this->ratingService = $ratingService;
+    ) {
+        $this->ratingService   = $ratingService;
         $this->resourceService = $resourceService;
         parent::__construct();
 
@@ -71,7 +71,7 @@ class PublicCodeRatingCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ratingAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.RatingAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $ratingAction  = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.RatingAction.action.json', 'open-catalogi/open-catalogi-bundle');
         $configuration = $ratingAction->getConfiguration();
 
         // Handle the command options

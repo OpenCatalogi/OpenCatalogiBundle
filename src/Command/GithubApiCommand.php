@@ -34,14 +34,14 @@ class GithubApiCommand extends Command
 
 
     /**
-     * @param GithubApiService $githubService The GithubApiService
+     * @param GithubApiService       $githubService   The GithubApiService
      * @param GatewayResourceService $resourceService The Gateway Resource Service
      */
     public function __construct(
         GithubApiService $githubService,
         GatewayResourceService $resourceService
     ) {
-        $this->githubService = $githubService;
+        $this->githubService   = $githubService;
         $this->resourceService = $resourceService;
         parent::__construct();
 
@@ -62,7 +62,7 @@ class GithubApiCommand extends Command
 
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
      *
      * @return int
@@ -70,7 +70,7 @@ class GithubApiCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $githubApiAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.githubApi.action.json', 'open-catalogi/open-catalogi-bundle');
-        $configuration = $githubApiAction->getConfiguration();
+        $configuration   = $githubApiAction->getConfiguration();
 
         // Handle the command optiosn
         $repositoryId = $input->getOption('repository', false);

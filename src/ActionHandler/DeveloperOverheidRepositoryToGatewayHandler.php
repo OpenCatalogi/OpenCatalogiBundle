@@ -54,14 +54,14 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                 'applicationSchema',
             ],
             'properties'  => [
-                'source'           => [
+                'source'              => [
                     'type'        => 'string',
                     'description' => 'The source of the developer overheid.',
                     'example'     => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.developerOverheid.source.json',
                     'required'    => true,
                 ],
-                'endpoint'         => [
+                'endpoint'            => [
                     'type'        => 'string',
                     'description' => 'The endpoint of the source.',
                     'example'     => '/repositories',
@@ -74,7 +74,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'required'    => true,
                 ],
-                'usercontentSource'        => [
+                'usercontentSource'   => [
                     'type'        => 'string',
                     'description' => 'The source of the raw user content.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
@@ -95,21 +95,21 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                     'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
-                'organizationSchema'    => [
+                'organizationSchema'  => [
                     'type'        => 'string',
                     'description' => 'The organization schema.',
                     'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'required'    => true,
                 ],
-                'organizationMapping'   => [
+                'organizationMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for github organization to oc organization.',
                     'example'     => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'required'    => true,
                 ],
-                'componentSchema'    => [
+                'componentSchema'     => [
                     'type'        => 'string',
                     'description' => 'The component schema.',
                     'example'     => 'https://opencatalogi.nl/oc.component.schema.json',
@@ -123,14 +123,14 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
                     'reference'   => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
                     'required'    => true,
                 ],
-                'opencatalogiMapping'   => [
+                'opencatalogiMapping' => [
                     'type'        => 'string',
                     'description' => 'The mapping for opencatalogi file to oc organization.',
                     'example'     => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'required'    => true,
                 ],
-                'applicationSchema'    => [
+                'applicationSchema'   => [
                     'type'        => 'string',
                     'description' => 'The application schema.',
                     'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
@@ -146,7 +146,7 @@ class DeveloperOverheidRepositoryToGatewayHandler implements ActionHandlerInterf
     /**
      * This function runs the developer overheid repositories to gateway service plugin.
      *
-     * @param array $data The data from the call
+     * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
      *
      * @return array

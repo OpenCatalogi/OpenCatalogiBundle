@@ -71,13 +71,13 @@ class GithubApiService
 
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager Interface
-     * @param CallService            $callService      The Call Service
-     * @param SynchronizationService $syncService      The Synchronisation Service
-     * @param MappingService         $mappingService   The Mapping Service
-     * @param RatingService          $ratingService    The Rating Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager   The Entity Manager Interface
+     * @param CallService            $callService     The Call Service
+     * @param SynchronizationService $syncService     The Synchronisation Service
+     * @param MappingService         $mappingService  The Mapping Service
+     * @param RatingService          $ratingService   The Rating Service.
+     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService The Gateway Resource Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -88,13 +88,13 @@ class GithubApiService
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService
     ) {
-        $this->entityManager    = $entityManager;
-        $this->callService      = $callService;
-        $this->syncService      = $syncService;
-        $this->mappingService   = $mappingService;
-        $this->ratingService    = $ratingService;
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
+        $this->entityManager   = $entityManager;
+        $this->callService     = $callService;
+        $this->syncService     = $syncService;
+        $this->mappingService  = $mappingService;
+        $this->ratingService   = $ratingService;
+        $this->pluginLogger    = $pluginLogger;
+        $this->resourceService = $resourceService;
 
         $this->configuration = [];
         $this->data          = [];
@@ -120,6 +120,7 @@ class GithubApiService
         return true;
 
     }//end checkGithubAuth()
+
 
     /**
      * Override configuration from other services.
@@ -240,9 +241,9 @@ class GithubApiService
     /**
      * This function enriches the repository with a organization.
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param array $organizationArray The organization array from the github api.
-     * @param Source $source The github api source.
+     * @param ObjectEntity $repository        The repository object.
+     * @param array        $organizationArray The organization array from the github api.
+     * @param Source       $source            The github api source.
      *
      * @return ObjectEntity
      */
@@ -349,8 +350,8 @@ class GithubApiService
      */
     public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ObjectEntity
     {
-        $repositorySchema    = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
         if (key_exists('softwareOwned', $opencatalogi) === true) {
             $ownedComponents = [];
@@ -473,10 +474,10 @@ class GithubApiService
     /**
      * This function enriches the opencatalogi file organization.
      *
-     * @param array $opencatalogiArray The opencatalogi array from the github api.
-     * @param array $opencatalogi The opencatalogi file as array.
-     * @param ObjectEntity $organization The organization object.
-     * @param Source $source The github api source.
+     * @param  array        $opencatalogiArray The opencatalogi array from the github api.
+     * @param  array        $opencatalogi      The opencatalogi file as array.
+     * @param  ObjectEntity $organization      The organization object.
+     * @param  Source       $source            The github api source.
      * @return ObjectEntity
      */
     public function enrichOpencatalogiOrg(array $organizationArray, array $opencatalogi, ObjectEntity $organization, Source $source): ObjectEntity
@@ -900,7 +901,7 @@ class GithubApiService
 
             if (isset($decodedResponse) === true
                 && is_array($decodedResponse) === true
-            ){
+            ) {
                 return $decodedResponse;
             }
         }
@@ -984,7 +985,7 @@ class GithubApiService
             $this->pluginLogger->error($exception->getMessage());
         }
 
-        if (isset($dataArray) === false){
+        if (isset($dataArray) === false) {
             return null;
         }
 
@@ -1168,27 +1169,27 @@ class GithubApiService
 
     }//end getUserRepos()
 
-     /** This function searches for all repositories with a publiccode or one repository
-     *
-     * @param array|null  $data          data set at the start of the handler
-     * @param array|null  $configuration configuration of the action
-     * @param string|null $repositoryId  The given repository id
-     *
-     * @return array|null dataset at the end of the handler
-     * @throws Exception
-     */
+
+     /**
+      * This function searches for all repositories with a publiccode or one repository
+      *
+      * @param array|null  $data          data set at the start of the handler
+      * @param array|null  $configuration configuration of the action
+      * @param string|null $repositoryId  The given repository id
+      *
+      * @return array|null dataset at the end of the handler
+      * @throws Exception
+      */
     public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-
 
         // If we have one repository.
         if ($repositoryId !== null) {
-
         }
 
         // If we have all repositories.
@@ -1198,7 +1199,6 @@ class GithubApiService
 
             $response = [];
             foreach ($repositories as $repositoryArray) {
-
                 if (key_exists('repository', $repositoryArray) === false
                     || key_exists('html_url', $repositoryArray['repository']) === false
                 ) {
@@ -1207,24 +1207,27 @@ class GithubApiService
 
                 $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
 
-                if ($repositorySync->getObject() !== null){
+                if ($repositorySync->getObject() !== null) {
                     $repository = $repositorySync->getObject();
                 }
 
-                if ($repositorySync->getObject() === null){
+                if ($repositorySync->getObject() === null) {
                     $this->entityManager->remove($repositorySync);
                     $this->entityManager->flush();
                     $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
                 }
 
                 $response[] = $repository->toArray();
-            }
+            }//end foreach
 
             if (isset($response) === true) {
                 $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
             }
-        }
+        }//end if
 
         return $this->data;
+
     }//end findGithubRepositories()
+
+
 }//end class

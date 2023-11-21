@@ -31,17 +31,17 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
-    
+
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $findGitService find Github Repository Through Organization Service
-     * @param GatewayResourceService $resourceService The Gateway Resource Service
+     * @param FindGithubRepositoryThroughOrganizationService $findGitService  find Github Repository Through Organization Service
+     * @param GatewayResourceService                         $resourceService The Gateway Resource Service
      */
     public function __construct(
         FindGithubRepositoryThroughOrganizationService $findGitService,
         GatewayResourceService $resourceService
-    ){
-        $this->findGitService = $findGitService;
+    ) {
+        $this->findGitService  = $findGitService;
         $this->resourceService = $resourceService;
         parent::__construct();
 
@@ -70,7 +70,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $githubRepoAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
-        $configuration = $githubRepoAction->getConfiguration();
+        $configuration    = $githubRepoAction->getConfiguration();
 
         // Handle the command options
         $organizationId = $input->getOption('organizationId', false);

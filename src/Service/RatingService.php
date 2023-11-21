@@ -55,7 +55,7 @@ class RatingService
      * @param EntityManagerInterface $entityManager     The Entity Manager.
      * @param RatingListService      $ratingListService The Rating List Service.
      * @param GatewayResourceService $resourceService   The Gateway Resource Service.
-     * @param SynchronizationService $syncService The Synchronization Service.
+     * @param SynchronizationService $syncService       The Synchronization Service.
      * @param LoggerInterface        $pluginLogger      The plugin version of the logger interface.
      */
     public function __construct(
@@ -68,12 +68,13 @@ class RatingService
         $this->entityManager     = $entityManager;
         $this->ratingListService = $ratingListService;
         $this->resourceService   = $resourceService;
-        $this->syncService = $syncService;
+        $this->syncService       = $syncService;
         $this->pluginLogger      = $pluginLogger;
         $this->configuration     = [];
         $this->data              = [];
 
     }//end __construct()
+
 
     /**
      * Override configuration from other services.
@@ -144,11 +145,12 @@ class RatingService
 
     }//end enrichComponentsWithRating()
 
+
     /**
      * Rate the components of the repository
      *
-     * @param ObjectEntity $repository The repository object.
-     * @param Source $source The source of the repository.
+     * @param ObjectEntity                               $repository The repository object.
+     * @param Source                                     $source     The source of the repository.
      * @param array The repository array from the source.
      *
      * @throws Exception
@@ -163,14 +165,15 @@ class RatingService
         }
 
         return $repository;
-    }
+
+    }//end rateRepoComponents()
 
 
     /**
      * Rate the components of the repository
      *
-     * @param ObjectEntity $component The component object.
-     * @param Source $source The source of the repository.
+     * @param ObjectEntity                               $component The component object.
+     * @param Source                                     $source    The source of the repository.
      * @param array The repository array from the source.
      *
      * @throws Exception
@@ -179,7 +182,7 @@ class RatingService
      */
     public function rateComponent(ObjectEntity $component, Source $source, array $repositoryArray): ObjectEntity
     {
-        $ratingSchema = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
+        $ratingSchema  = $this->resourceService->getSchema($this->configuration['ratingSchema'], 'open-catalogi/open-catalogi-bundle');
         $ratingMapping = $this->resourceService->getMapping($this->configuration['ratingMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Get the source id of the component.
@@ -210,8 +213,8 @@ class RatingService
     /**
      * Rates a component.
      *
-     * @param ObjectEntity $component The component to rate.
-     * @param array $repositoryArray The repository array from the source.
+     * @param ObjectEntity $component       The component to rate.
+     * @param array        $repositoryArray The repository array from the source.
      *
      * @throws Exception|GuzzleException
      *

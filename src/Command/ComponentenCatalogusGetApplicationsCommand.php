@@ -33,14 +33,14 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
 
 
     /**
-     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
-     * @param GatewayResourceService $resourceService The Gateway Resource Service
+     * @param ComponentenCatalogusService $compCatService  componenten Catalogus Service
+     * @param GatewayResourceService      $resourceService The Gateway Resource Service
      */
     public function __construct(
         ComponentenCatalogusService $compCatService,
         GatewayResourceService $resourceService
-    ){
-        $this->compCatService = $compCatService;
+    ) {
+        $this->compCatService  = $compCatService;
         $this->resourceService = $resourceService;
         parent::__construct();
 
@@ -69,14 +69,12 @@ class ComponentenCatalogusGetApplicationsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $componentenAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
-        $configuration = $componentenAction->getConfiguration();
-
+        $configuration     = $componentenAction->getConfiguration();
 
         // Handle the command options.
         $applicationId = $input->getOption('application', false);
 
         if ($applicationId === null) {
-
             if ($this->compCatService->getApplications([], $configuration) === null) {
                 return Command::FAILURE;
             }

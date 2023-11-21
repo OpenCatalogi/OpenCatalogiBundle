@@ -31,17 +31,18 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
-    
+
+
     /**
      * @param DeveloperOverheidService $devOverheidService developer Overheid Service
-     * @param GatewayResourceService $resourceService The Gateway Resource Service
+     * @param GatewayResourceService   $resourceService    The Gateway Resource Service
      */
     public function __construct(
         DeveloperOverheidService $devOverheidService,
         GatewayResourceService $resourceService
-    ){
+    ) {
         $this->devOverheidService = $devOverheidService;
-        $this->resourceService = $resourceService;
+        $this->resourceService    = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -61,7 +62,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
 
 
     /**
-     * @param InputInterface $input The input
+     * @param InputInterface  $input  The input
      * @param OutputInterface $output The output
      *
      * @return int
@@ -70,7 +71,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $developerAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
-        $configuration = $developerAction->getConfiguration();
+        $configuration   = $developerAction->getConfiguration();
 
         // Handle the command options
         $repositoryId = $input->getOption('repository', false);

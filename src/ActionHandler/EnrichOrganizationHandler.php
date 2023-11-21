@@ -87,7 +87,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
         ) {
             $organizationId = $data['response']['_self']['id'];
         }//end if
-        
+
         return $this->service->enrichOrganizationHandler($data, $configuration, $organizationId);
 
     }//end run()

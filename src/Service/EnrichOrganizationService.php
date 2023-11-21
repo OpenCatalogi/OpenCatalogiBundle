@@ -136,6 +136,7 @@ class EnrichOrganizationService
 
     }//end enrichOrganization()
 
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -175,7 +176,8 @@ class EnrichOrganizationService
 
             return $this->data;
         }//end if
-    }
+
+    }//end getOrganization()
 
 
     /**
@@ -195,7 +197,7 @@ class EnrichOrganizationService
 
         // If there is an organization in the response.
         if ($organizationId !== null) {
-           $this->getOrganization();
+            $this->getOrganization();
         }
 
         // If there is no organization we get all the organizations and enrich it.
@@ -203,7 +205,6 @@ class EnrichOrganizationService
             $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findAll();
 
             foreach ($organizations as $organization) {
-
                 // Check if the name and github is not null.
                 if ($organization instanceof ObjectEntity === true
                     && $organization->getValue('name') !== null
@@ -214,7 +215,6 @@ class EnrichOrganizationService
                 }//end if
             }
         }
-
 
         return $this->data;
 

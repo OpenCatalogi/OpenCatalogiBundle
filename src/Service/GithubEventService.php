@@ -56,17 +56,17 @@ class GithubEventService
 
 
     /**
-     * @param GithubApiService                               $githubApiService       The Github Api Service.
-     * @param LoggerInterface                                $pluginLogger           The plugin version of the logger interface
+     * @param GithubApiService $githubApiService The Github Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface
      */
     public function __construct(
         GithubApiService $githubApiService,
         LoggerInterface $pluginLogger
     ) {
-        $this->githubApiService       = $githubApiService;
-        $this->pluginLogger           = $pluginLogger;
-        $this->configuration          = [];
-        $this->data                   = [];
+        $this->githubApiService = $githubApiService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->configuration    = [];
+        $this->data             = [];
 
     }//end __construct()
 

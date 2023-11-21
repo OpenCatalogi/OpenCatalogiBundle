@@ -48,7 +48,7 @@ class DeveloperOverheidService
 
     /**
      * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
-     * @param CallService $callService The Call Service.
+     * @param CallService            $callService     The Call Service.
      * @param GatewayResourceService $resourceService The Gateway Resource Service.
      */
     public function __construct(
@@ -56,11 +56,11 @@ class DeveloperOverheidService
         CallService $callService,
         GatewayResourceService $resourceService
     ) {
-        $this->pluginLogger        = $pluginLogger;
-        $this->callService = $callService;
-        $this->resourceService     = $resourceService;
-        $this->data                = [];
-        $this->configuration       = [];
+        $this->pluginLogger    = $pluginLogger;
+        $this->callService     = $callService;
+        $this->resourceService = $resourceService;
+        $this->data            = [];
+        $this->configuration   = [];
 
     }//end __construct()
 
@@ -68,9 +68,9 @@ class DeveloperOverheidService
     /**
      * Get all repositories or one repository through the repositories of developer.overheid.nl/repositories/{id}.
      *
-     * @param array|null $data The data array from the request
-     * @param array|null $configuration The configuration array from the request
-     * @param string|null $repositoryId The given repository id
+     * @param array|null  $data          The data array from the request
+     * @param array|null  $configuration The configuration array from the request
+     * @param string|null $repositoryId  The given repository id
      *
      * @return array|null
      * @throws \Exception
@@ -98,11 +98,12 @@ class DeveloperOverheidService
 
     }//end getRepositories()
 
+
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source The given source
-     * @param array $repositoryArray
+     * @param  Source $source          The given source
+     * @param  array  $repositoryArray
      * @return array|null
      */
     public function handleRepository(Source $source, array $repositoryArray): ?array
@@ -110,37 +111,38 @@ class DeveloperOverheidService
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
         $parsedUrl = \Safe\parse_url($repositoryArray['url']);
-        if (key_exists('host', $parsedUrl) === false){
+        if (key_exists('host', $parsedUrl) === false) {
             return null;
         }
 
         $domain = $parsedUrl['host'];
         switch ($domain) {
-            case 'github.com':
+        case 'github.com':
 
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
 
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
 
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-                    // Get the github repository
-                    $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
-                }
-
-                return $repository->getObject()->toArray();
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                // Get the github repository
+                $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
+            }
+            return $repository->getObject()->toArray();
                 break;
-            case 'gitlab.com':
-                break;
-            default:
-                break;
-        }
+        case 'gitlab.com':
+            break;
+        default:
+            break;
+        }//end switch
 
         return null;
-    }
+
+    }//end handleRepository()
+
 
     /**
      * Get all repositories of the given source.
@@ -160,14 +162,15 @@ class DeveloperOverheidService
         $result = [];
         foreach ($repositoriesArray as $repositoryArray) {
             $result[] = $this->handleRepository($source, $repositoryArray);
-//            $result[] = $this->importResourceService->importDevRepository($repository, $configuration);
+            // $result[] = $this->importResourceService->importDevRepository($repository, $configuration);
         }
 
         $this->entityManager->flush();
 
         return $result;
 
-    }//end getRepositories()
+    }//end getRepositoriesFromSource()
+
 
     /**
      * Get a repository of the given source with the given id.
@@ -182,7 +185,7 @@ class DeveloperOverheidService
      */
     public function getRepositoryFromSource(Source $source, string $endpoint, string $repositoryId): ?array
     {
-        $response   = $this->callService->call($source, $endpoint.'/'.$repositoryId);
+        $response        = $this->callService->call($source, $endpoint.'/'.$repositoryId);
         $repositoryArray = json_decode($response->getBody()->getContents(), true);
 
         if ($repositoryArray === null) {
@@ -190,7 +193,6 @@ class DeveloperOverheidService
 
             return null;
         }
-
 
         $repository = $this->handleRepository($source, $repositoryArray);
 
@@ -204,8 +206,7 @@ class DeveloperOverheidService
 
         return $repository->toArray();
 
-    }//end getRepository()
-
+    }//end getRepositoryFromSource()
 
 
 }//end class
