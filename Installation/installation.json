@@ -20,7 +20,7 @@
     "multipleSchemas": [
       {
         "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.search.endpoint.json",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "name": "Search",
         "description": "Generic Search Endpoint",
         "schemas": [
@@ -34,7 +34,7 @@
       },
       {
         "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.federalization.endpoint.json",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "name": "Federalization Search",
         "description": "Generic Federalization Search Endpoint",
         "schemas": [
@@ -55,6 +55,7 @@
         "methods": []
       },
       {
+        "version": "0.0.2",
         "reference": "https://opencatalogi.nl/oc.organization.schema.json",
         "path": "organizations",
         "methods": []

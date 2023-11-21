@@ -1,7 +1,7 @@
 {
   "$id": "https://docs.commongateway.nl/securityGroup/default.anonymous.securityGroup.json",
   "$schema": "https://docs.commongateway.nl/schemas/SecurityGroup.schema.json",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "title": "Anonymous SecurityGroup",
   "scopes": [
     "schemas.https://opencatalogi.nl/oc.catalogi.schema.json.GET",
