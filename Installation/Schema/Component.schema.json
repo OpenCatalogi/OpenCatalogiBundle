@@ -184,6 +184,12 @@
       "type": "boolean",
       "description": "If the component should be hidden",
       "default": "false"
+    },
+    "downloads": {
+      "type": "array",
+      "items": {
+        "$ref": "https://opencatalogi.nl/oc.download.schema.json"
+      }
     }
   },
   "required": [
