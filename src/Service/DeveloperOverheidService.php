@@ -102,8 +102,9 @@ class DeveloperOverheidService
     /**
      * Get all repositories of the given source.
      *
-     * @param  Source $source          The given source
-     * @param  array  $repositoryArray
+     * @param Source $source          The given source
+     * @param array  $repositoryArray The repository array.
+     *
      * @return array|null
      */
     public function handleRepository(Source $source, array $repositoryArray): ?array
@@ -147,9 +148,8 @@ class DeveloperOverheidService
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param array  $configuration The configuration array
+     * @param Source $source   The given source
+     * @param string $endpoint The endpoint of the source
      *
      * @return array|null
      * @throws \Exception
@@ -175,10 +175,9 @@ class DeveloperOverheidService
     /**
      * Get a repository of the given source with the given id.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param string $repositoryId  The given repository id
-     * @param array  $configuration The configuration array
+     * @param Source $source       The given source
+     * @param string $endpoint     The endpoint of the source
+     * @param string $repositoryId The given repository id
      *
      * @return array|null
      * @throws \Exception

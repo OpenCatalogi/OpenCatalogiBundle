@@ -2,14 +2,14 @@
   "title": "Catalogi",
   "$id": "https://opencatalogi.nl/oc.catalogi.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "object",
   "properties": {
     "source": {
       "$ref": "https://opencatalogi.nl/oc.source.schema.json"
     },
     "organisation": {
-      "$ref": "https://opencatalogi.nl/oc.organization.schema.json"
+      "$ref": "https://opencatalogi.nl/oc.organisation.schema.json"
     },
     "rsin": {
       "type": "string"

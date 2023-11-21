@@ -81,7 +81,7 @@ class EnrichOrganizationService
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organization.schema.json
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      *
      * @throws GuzzleException|Exception
      *

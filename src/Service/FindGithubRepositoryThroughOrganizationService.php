@@ -19,7 +19,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- * Loops through organizations (https://opencatalogi.nl/oc.organization.schema.json)
+ * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
 class FindGithubRepositoryThroughOrganizationService
@@ -141,7 +141,7 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organization.schema.json
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      *
      * @throws GuzzleException|Exception
      *

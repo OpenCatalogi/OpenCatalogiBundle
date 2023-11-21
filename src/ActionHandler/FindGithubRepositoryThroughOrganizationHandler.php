@@ -6,7 +6,7 @@ use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
 
 /**
- * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organization.schema.json)
+ * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
 class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
@@ -84,8 +84,8 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                 'organizationSchema'  => [
                     'type'        => 'string',
                     'description' => 'The organization schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'required'    => true,
                 ],
                 'organizationMapping' => [

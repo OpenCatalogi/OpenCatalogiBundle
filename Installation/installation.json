@@ -20,12 +20,12 @@
     "multipleSchemas": [
       {
         "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.search.endpoint.json",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "name": "Search",
         "description": "Generic Search Endpoint",
         "schemas": [
           "https://opencatalogi.nl/oc.application.schema.json",
-          "https://opencatalogi.nl/oc.organization.schema.json",
+          "https://opencatalogi.nl/oc.organisation.schema.json",
           "https://opencatalogi.nl/oc.component.schema.json"
         ],
         "path": ["search"],
@@ -34,12 +34,12 @@
       },
       {
         "$id": "https://opencatalogi.nl/EntitiesEndpoint/oc.federalization.endpoint.json",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "name": "Federalization Search",
         "description": "Generic Federalization Search Endpoint",
         "schemas": [
           "https://opencatalogi.nl/oc.application.schema.json",
-          "https://opencatalogi.nl/oc.organization.schema.json",
+          "https://opencatalogi.nl/oc.organisation.schema.json",
           "https://opencatalogi.nl/oc.component.schema.json",
           "https://opencatalogi.nl/oc.catalogi.schema.json"
         ],
@@ -55,8 +55,8 @@
         "methods": []
       },
       {
-        "version": "0.0.2",
-        "reference": "https://opencatalogi.nl/oc.organization.schema.json",
+        "version": "0.0.3",
+        "reference": "https://opencatalogi.nl/oc.organisation.schema.json",
         "path": "organizations",
         "methods": []
       },

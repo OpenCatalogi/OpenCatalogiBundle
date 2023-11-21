@@ -241,9 +241,9 @@ class GithubApiService
     /**
      * This function enriches the repository with a organization.
      *
-     * @param ObjectEntity $repository        The repository object.
-     * @param array        $organizationArray The organization array from the github api.
-     * @param Source       $source            The github api source.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $repositoryArray The repository array from the github api.
+     * @param Source       $source          The github api source.
      *
      * @return ObjectEntity
      */

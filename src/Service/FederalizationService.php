@@ -101,7 +101,7 @@ class FederalizationService
 
     private const SCHEMAS_TO_SYNC = [
         'https://opencatalogi.nl/oc.catalogi.schema.json',
-        'https://opencatalogi.nl/oc.organization.schema.json',
+        'https://opencatalogi.nl/oc.organisation.schema.json',
         'https://opencatalogi.nl/oc.component.schema.json',
         'https://opencatalogi.nl/oc.application.schema.json',
     ];
@@ -473,7 +473,7 @@ class FederalizationService
             $entity   = $this->catalogusEntity;
             $endpoint = '/api/catalogi';
             break;
-        case 'https://opencatalogi.nl/oc.organization.schema.json':
+        case 'https://opencatalogi.nl/oc.organisation.schema.json':
             $entity   = $this->organisationEntity;
             $endpoint = '/api/organisations';
             break;
@@ -635,9 +635,9 @@ class FederalizationService
         }
 
         if (isset($this->organisationEntity) === false) {
-            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organization.schema.json']);
+            $this->organisationEntity = $this->entityManager->getRepository('App:Entity')->findOneBy(['reference' => 'https://opencatalogi.nl/oc.organisation.schema.json']);
             if ($this->organisationEntity === null) {
-                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.organization.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+                $this->logger->error('Could not find an entity for https://opencatalogi.nl/oc.organisation.schema.json', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             }
         }
 

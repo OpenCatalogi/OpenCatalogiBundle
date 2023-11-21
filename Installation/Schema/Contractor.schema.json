@@ -2,11 +2,11 @@
   "title": "Contractor",
   "$id": "https://opencatalogi.nl/oc.contractor.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "object",
   "properties": {
     "organisation": {
-      "$ref": "https://opencatalogi.nl/oc.organization.schema.json",
+      "$ref": "https://opencatalogi.nl/oc.organisation.schema.json",
       "required": true
     },
     "until": {
