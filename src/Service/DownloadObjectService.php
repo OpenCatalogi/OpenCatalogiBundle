@@ -93,8 +93,8 @@ class DownloadObjectService
     /**
      * Adds a name, size, content type to the download object if an url is set.
      *
-     * @param array $data           The data from the
-     * @param array $configuration
+     * @param  array $data          The data from the
+     * @param  array $configuration
      * @return array
      */
     public function enrichDownloadObject(array $data, array $configuration): array
