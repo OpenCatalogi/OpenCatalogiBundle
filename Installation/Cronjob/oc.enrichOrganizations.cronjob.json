@@ -2,7 +2,7 @@
     "title": "Enrich Organization trigger",
     "$id": "https://opencatalogi.nl/cronjob/oc.enrichOrganization.cronjob.json",
     "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "description": "This cronjob enriches all the organizations.",
     "crontab": "*/5 * * * *",
     "throws": [
