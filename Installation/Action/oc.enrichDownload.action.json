@@ -1,15 +1,15 @@
 {
-  "title": "Enrich Organization Action",
+  "title": "Enrich Download Action",
   "$id": "https://opencatalogi.nl/action/oc.enrichDownload.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
   "version": "0.0.1",
   "async": true,
-  "priority": 2,
-  "listens": ["commongateway.action.pre.create", "commongateway.action.pre.update"],
+  "priority": 1,
+  "listens": ["commongateway.object.post.create"],
   "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\EnrichDownloadHandler",
   "conditions": {
     "==": [
-      "schema.reference",
+      {"var": "entity.reference"},
       "https://opencatalogi.nl/oc.download.schema.json"
     ]
   }

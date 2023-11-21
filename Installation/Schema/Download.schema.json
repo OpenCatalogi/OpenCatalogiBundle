@@ -12,7 +12,7 @@
       "type": "string"
     },
     "grootte": {
-      "type": "int"
+      "type": "integer"
     },
     "url": {
       "type": "string",
