@@ -62,7 +62,7 @@ class DeveloperOverheidService
         $this->data            = [];
         $this->configuration   = [];
 
-    }// end __construct()
+    }//end __construct()
 
 
     /**
@@ -96,14 +96,14 @@ class DeveloperOverheidService
 
         return $this->getRepositoryFromSource($source, $endpoint, $repositoryId);
 
-    }// end getRepositories()
+    }//end getRepositories()
 
 
     /**
      * Get all repositories of the given source.
      *
-     * @param  Source $source          The given source
-     * @param  array  $repositoryArray The repository array.
+     * @param Source $source          The given source
+     * @param array  $repositoryArray The repository array.
      *
      * @return array|null
      */
@@ -142,14 +142,14 @@ class DeveloperOverheidService
 
         return null;
 
-    }// end handleRepository()
+    }//end handleRepository()
 
 
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
+     * @param Source $source   The given source
+     * @param string $endpoint The endpoint of the source
      *
      * @return array|null
      * @throws \Exception
@@ -169,15 +169,15 @@ class DeveloperOverheidService
 
         return $result;
 
-    }// end getRepositoriesFromSource()
+    }//end getRepositoriesFromSource()
 
 
     /**
      * Get a repository of the given source with the given id.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param string $repositoryId  The given repository id
+     * @param Source $source       The given source
+     * @param string $endpoint     The endpoint of the source
+     * @param string $repositoryId The given repository id
      *
      * @return array|null
      * @throws \Exception
@@ -205,7 +205,7 @@ class DeveloperOverheidService
 
         return $repository->toArray();
 
-    }// end getRepositoryFromSource()
+    }//end getRepositoryFromSource()
 
 
 }//end class

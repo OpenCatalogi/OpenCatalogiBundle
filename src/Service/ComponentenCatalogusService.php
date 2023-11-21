@@ -151,10 +151,10 @@ class ComponentenCatalogusService
     /**
      * Get an applications of the given source with the given id.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
      * @param string $applicationId The given application id
-     * @param array $configuration The configuration array
+     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -187,7 +187,7 @@ class ComponentenCatalogusService
     /**
      * Import the application into the data layer.
      *
-     * @param array $application The application to import.
+     * @param array $application   The application to import.
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
@@ -267,13 +267,13 @@ class ComponentenCatalogusService
 
         return $this->getComponentFromSource($source, $endpoint, $componentId);
 
-    }// end getComponents()
+    }//end getComponents()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source        The given source
+     * @param Source $source         The given source
      * @param array  $componentArray The component array
      *
      * @return array|null
@@ -326,20 +326,20 @@ class ComponentenCatalogusService
             break;
         default:
             break;
-        }// end switch
+        }//end switch
 
         return null;
 
-    }// end handleComponent()
+    }//end handleComponent()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
      * @param string $componentId
-     * @param array $configuration The configuration array
+     * @param array  $configuration The configuration array
      *
      * @return ObjectEntity|null
      * @throws \Exception
@@ -364,14 +364,14 @@ class ComponentenCatalogusService
 
         return null;
 
-    }// end getComponentFromSource()
+    }//end getComponentFromSource()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
+     * @param Source $source   The given source
+     * @param string $endpoint The endpoint of the source
      *
      * @return array|null
      * @throws \Exception
@@ -394,7 +394,7 @@ class ComponentenCatalogusService
 
         return $result;
 
-    }// end getComponentsFromSource()
+    }//end getComponentsFromSource()
 
 
-}// end class
+}//end class

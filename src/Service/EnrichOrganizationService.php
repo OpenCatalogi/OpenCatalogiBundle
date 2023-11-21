@@ -95,7 +95,7 @@ class EnrichOrganizationService
             || $this->githubApiService->checkGithubAuth($source) === false
         ) {
             return $organization;
-        }// end if
+        }//end if
 
         // Get the path of the github url.
         $githubPath = \Safe\parse_url($organization->getValue('github'))['path'];
