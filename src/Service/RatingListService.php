@@ -43,6 +43,20 @@ class RatingListService
 
 
     /**
+     * Override configuration from other services.
+     *
+     * @param array $configuration The new configuration array.
+     *
+     * @return void
+     */
+    public function setConfiguration(array $configuration): void
+    {
+        $this->configuration = $configuration;
+
+    }//end setConfiguration()
+
+
+    /**
      * Rates the name of the component.
      *
      * @param ObjectEntity $component   The component to rate.

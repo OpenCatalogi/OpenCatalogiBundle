@@ -3,24 +3,24 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
- * ...
+ * Haalt alle repositories op die een opencatalogi en/of publiccode file hebben.
  */
-class GithubEventHandler implements ActionHandlerInterface
+class GithubApiHandler implements ActionHandlerInterface
 {
 
     /**
-     * @var GithubEventService
+     * @var GithubApiService
      */
-    private GithubEventService $service;
+    private GithubApiService $service;
 
 
     /**
-     * @param GithubEventService $service The $githubEventService
+     * @param GithubApiService $service The  GithubApiService
      */
-    public function __construct(GithubEventService $service)
+    public function __construct(GithubApiService $service)
     {
         $this->service = $service;
 
@@ -32,13 +32,13 @@ class GithubEventHandler implements ActionHandlerInterface
      *
      * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubEventHandler.ActionHandler.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubApiHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'GithubEventHandler',
-            'description' => 'This handler gets the github event and creates or updates the repository',
+            'title'       => 'GithubApiHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'    => [
                 'githubSource',
                 'usercontentSource',
@@ -129,16 +129,17 @@ class GithubEventHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the email service plugin.
+     * This function runs the application to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
      *
      * @return array
+     * @throws \Exception
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->updateRepositoryWithEventResponse($data, $configuration);
+        return $this->service->findGithubRepositories();
 
     }//end run()
 

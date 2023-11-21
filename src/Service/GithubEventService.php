@@ -35,59 +35,9 @@ class GithubEventService
 {
 
     /**
-     * @var EntityManagerInterface
-     */
-    private EntityManagerInterface $entityManager;
-
-    /**
-     * @var SynchronizationService
-     */
-    private SynchronizationService $syncService;
-
-    /**
-     * @var CallService
-     */
-    private CallService $callService;
-
-    /**
-     * @var CacheService
-     */
-    private CacheService $cacheService;
-
-    /**
      * @var GithubApiService
      */
     private GithubApiService $githubApiService;
-
-    /**
-     * @var GithubPubliccodeService
-     */
-    private GithubPubliccodeService $publiccodeService;
-
-    /**
-     * @var ImportResourcesService
-     */
-    private ImportResourcesService $importResourcesService;
-
-    /**
-     * @var EnrichPubliccodeFromGithubUrlService
-     */
-    private EnrichPubliccodeFromGithubUrlService $enrichPubliccode;
-
-    /**
-     * @var FindGithubRepositoryThroughOrganizationService
-     */
-    private FindGithubRepositoryThroughOrganizationService $organizationService;
-
-    /**
-     * @var FindOrganizationThroughRepositoriesService
-     */
-    private FindOrganizationThroughRepositoriesService $findOrganization;
-
-    /**
-     * @var GatewayResourceService
-     */
-    private GatewayResourceService $resourceService;
 
     /**
      * @var LoggerInterface
@@ -106,47 +56,17 @@ class GithubEventService
 
 
     /**
-     * @param EntityManagerInterface                         $entityManager          The Entity Manager Interface.
-     * @param SynchronizationService                         $syncService            The Synchronization Service.
-     * @param CallService                                    $callService            The Call Service.
-     * @param CacheService                                   $cacheService           The Cache Service.
-     * @param GithubApiService                               $githubApiService       The Github Api Service.
-     * @param GithubPubliccodeService                        $publiccodeService      The Github Publiccode Service.
-     * @param ImportResourcesService                         $importResourcesService The Import Resources Service.
-     * @param EnrichPubliccodeFromGithubUrlService           $enrichPubliccode       The Enrich Publiccode From Github Url Service.
-     * @param FindGithubRepositoryThroughOrganizationService $organizationService    The find github repository through organization service.
-     * @param GatewayResourceService                         $resourceService        The Gateway Resource Service.
-     * @param LoggerInterface                                $pluginLogger           The plugin version of the logger interface
-     * @param FindOrganizationThroughRepositoriesService     $findOrganization       The find organization through repositories service.
+     * @param GithubApiService $githubApiService The Github Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
-        SynchronizationService $syncService,
-        CallService $callService,
-        CacheService $cacheService,
         GithubApiService $githubApiService,
-        GithubPubliccodeService $publiccodeService,
-        ImportResourcesService $importResourcesService,
-        EnrichPubliccodeFromGithubUrlService $enrichPubliccode,
-        FindGithubRepositoryThroughOrganizationService $organizationService,
-        GatewayResourceService $resourceService,
-        LoggerInterface $pluginLogger,
-        FindOrganizationThroughRepositoriesService $findOrganization
+        LoggerInterface $pluginLogger
     ) {
-        $this->entityManager          = $entityManager;
-        $this->syncService            = $syncService;
-        $this->callService            = $callService;
-        $this->cacheService           = $cacheService;
-        $this->githubApiService       = $githubApiService;
-        $this->publiccodeService      = $publiccodeService;
-        $this->importResourcesService = $importResourcesService;
-        $this->enrichPubliccode       = $enrichPubliccode;
-        $this->organizationService    = $organizationService;
-        $this->resourceService        = $resourceService;
-        $this->pluginLogger           = $pluginLogger;
-        $this->findOrganization       = $findOrganization;
-        $this->configuration          = [];
-        $this->data                   = [];
+        $this->githubApiService = $githubApiService;
+        $this->pluginLogger     = $pluginLogger;
+        $this->configuration    = [];
+        $this->data             = [];
 
     }//end __construct()
 
@@ -174,6 +94,7 @@ class GithubEventService
             $this->pluginLogger->error('The repository html_url is not given.');
         }
 
+        $this->githubApiService->setConfiguration($this->configuration);
         $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
 
         if ($repository === null) {

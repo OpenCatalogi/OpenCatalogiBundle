@@ -1,6 +1,6 @@
 {
-  "title": "GithubApiOrganisationToOrganisation",
-  "$id": "https://api.github.com/oc.githubOrganisation.mapping.json",
+  "title": "GithubApiOrganizationToOrganization",
+  "$id": "https://api.github.com/oc.githubOrganization.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
   "version": "0.0.3",
   "passTrough": false,

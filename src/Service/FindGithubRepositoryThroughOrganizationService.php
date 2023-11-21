@@ -19,7 +19,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
 /**
- * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
+ * Loops through organizations (https://opencatalogi.nl/oc.organization.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
 class FindGithubRepositoryThroughOrganizationService
@@ -46,11 +46,6 @@ class FindGithubRepositoryThroughOrganizationService
     private GithubApiService $githubApiService;
 
     /**
-     * @var ImportResourcesService
-     */
-    private ImportResourcesService $importResourcesService;
-
-    /**
      * @var SynchronizationService $syncService
      */
     private SynchronizationService $syncService;
@@ -67,26 +62,23 @@ class FindGithubRepositoryThroughOrganizationService
 
 
     /**
-     * @param EntityManagerInterface $entityManager          The Entity Manager Interface
-     * @param LoggerInterface        $pluginLogger           The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService        The Gateway Resource Service.
-     * @param GithubApiService       $githubApiService       The Github API Service
-     * @param ImportResourcesService $importResourcesService The Import Resources Service
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param GithubApiService       $githubApiService The Github API Service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
         LoggerInterface $pluginLogger,
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService,
-        ImportResourcesService $importResourcesService,
         SynchronizationService $syncService
     ) {
-        $this->entityManager          = $entityManager;
-        $this->pluginLogger           = $pluginLogger;
-        $this->resourceService        = $resourceService;
-        $this->githubApiService       = $githubApiService;
-        $this->importResourcesService = $importResourcesService;
-        $this->syncService            = $syncService;
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->resourceService  = $resourceService;
+        $this->githubApiService = $githubApiService;
+        $this->syncService      = $syncService;
 
         $this->configuration = [];
         $this->data          = [];
@@ -120,7 +112,7 @@ class FindGithubRepositoryThroughOrganizationService
      */
     public function getOrganizationRepository(array $repositoriesArray, Source $source): array
     {
-        $repositorySchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.repository.schema.json', 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
         $ownedRepositories = [];
         // Loop through the repositories array.
@@ -136,6 +128,7 @@ class FindGithubRepositoryThroughOrganizationService
                 // Remove the sync so that we dont create multiple syncs.
                 $this->entityManager->remove($repositorySync);
                 $this->entityManager->flush();
+                $this->githubApiService->setConfiguration($this->configuration);
                 $ownedRepositories[] = $this->githubApiService->getGithubRepository($repositoryArray['html_url'], $repositoryArray);
             }
         }
@@ -148,7 +141,7 @@ class FindGithubRepositoryThroughOrganizationService
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organization.schema.json
      *
      * @throws GuzzleException|Exception
      *
@@ -233,11 +226,11 @@ class FindGithubRepositoryThroughOrganizationService
             }//end if
         }
 
-        $organisztionSchema = $this->resourceService->getSchema($this->configuration['organisationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
         // If we want to do it for al repositories.
         $this->pluginLogger->info('Looping through organisations');
-        foreach ($organisztionSchema->getObjectEntities() as $organization) {
+        foreach ($organizationSchema->getObjectEntities() as $organization) {
             // Check if the name of the organization is set and it is a github organization.
             if ($organization->getValue('name') !== null
                 && $organization->getValue('github') !== null

@@ -1,0 +1,11 @@
+{
+    "title": "Componenten Catalogus Trigger",
+    "$id": "https://opencatalogi.nl/cronjob/oc.componentencatalogus.cronjob.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
+    "version": "0.0.1",
+    "description": "This cronjob gets the objects from the componenten catalogus source.",
+    "crontab": "*/5 * * * *",
+    "throws": [
+        "opencatalogi.componentencatalogus.trigger"
+    ]
+}

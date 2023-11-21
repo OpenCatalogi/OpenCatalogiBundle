@@ -1,0 +1,11 @@
+{
+    "title": "Github API trigger",
+    "$id": "https://opencatalogi.nl/cronjob/oc.githubapi.cronjob.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Cronjob.schema.json",
+    "version": "0.0.1",
+    "description": "This cronjob gets the objects from the github api source.",
+    "crontab": "*/5 * * * *",
+    "throws": [
+        "opencatalogi.githubapi.trigger"
+    ]
+}

@@ -6,7 +6,7 @@ use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
 
 /**
- * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
+ * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organization.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
 class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
@@ -45,9 +45,12 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                 'usercontentSource',
                 'repositorySchema',
                 'repositoryMapping',
-                'organisationSchema',
+                'organizationSchema',
+                'organizationMapping',
                 'componentSchema',
-                'openCatalogiMapping',
+                'publiccodeMapping',
+                'opencatalogiMapping',
+                'applicationSchema',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -59,7 +62,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                 ],
                 'usercontentSource'   => [
                     'type'        => 'string',
-                    'description' => 'The source of the developer overheid.',
+                    'description' => 'The source of the raw user content.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubusercontent.source.json',
                     'required'    => true,
@@ -78,11 +81,18 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                     'reference'   => 'https://api.github.com/oc.githubRepository.mapping.json',
                     'required'    => true,
                 ],
-                'organisationSchema'  => [
+                'organizationSchema'  => [
                     'type'        => 'string',
-                    'description' => 'The organisation schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'description' => 'The organization schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'required'    => true,
+                ],
+                'organizationMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for github organization to oc organization.',
+                    'example'     => 'https://api.github.com/oc.githubOrganization.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubOrganization.mapping.json',
                     'required'    => true,
                 ],
                 'componentSchema'     => [
@@ -92,11 +102,25 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                     'reference'   => 'https://opencatalogi.nl/oc.component.schema.json',
                     'required'    => true,
                 ],
-                'openCatalogiMapping' => [
+                'publiccodeMapping'   => [
                     'type'        => 'string',
-                    'description' => 'The mapping for github openCatalogi.yaml to oc organisation.',
+                    'description' => 'The mapping for publiccode file to oc component.',
+                    'example'     => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'reference'   => 'https://api.github.com/oc.githubPubliccodeComponent.mapping.json',
+                    'required'    => true,
+                ],
+                'opencatalogiMapping' => [
+                    'type'        => 'string',
+                    'description' => 'The mapping for opencatalogi file to oc organization.',
                     'example'     => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
                     'reference'   => 'https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json',
+                    'required'    => true,
+                ],
+                'applicationSchema'   => [
+                    'type'        => 'string',
+                    'description' => 'The application schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
             ],

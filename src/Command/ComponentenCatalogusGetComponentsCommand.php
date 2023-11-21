@@ -2,6 +2,7 @@
 
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
+use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\ComponentenCatalogusService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,13 +26,22 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     private ComponentenCatalogusService $compCatService;
 
+    /**
+     * @var GatewayResourceService
+     */
+    private GatewayResourceService $resourceService;
+
 
     /**
-     * @param ComponentenCatalogusService $compCatService componenten Catalogus Service
+     * @param ComponentenCatalogusService $compCatService  componenten Catalogus Service
+     * @param GatewayResourceService      $resourceService The Gateway Resource Service
      */
-    public function __construct(ComponentenCatalogusService $compCatService)
-    {
-        $this->compCatService = $compCatService;
+    public function __construct(
+        ComponentenCatalogusService $compCatService,
+        GatewayResourceService $resourceService
+    ) {
+        $this->compCatService  = $compCatService;
+        $this->resourceService = $resourceService;
         parent::__construct();
 
     }//end __construct()
@@ -58,16 +68,8 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = [
-            'source'             => 'https://opencatalogi.nl/source/oc.componentencatalogus.source.json',
-            'componentMapping'   => 'https://componentencatalogus.commonground.nl/api/oc.componentenCatalogusComponent.mapping.json',
-            'componentSchema'    => 'https://opencatalogi.nl/oc.component.schema.json',
-            'endpoint'           => '/components',
-            'githubSource'       => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-            'repositorySchema'   => 'https://opencatalogi.nl/oc.repository.schema.json',
-            'repositoryEndpoint' => '/repositories',
-            'repositoryMapping'  => 'https://api.github.com/oc.githubRepository.mapping.json',
-        ];
+        $componentenAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $configuration     = $componentenAction->getConfiguration();
 
         // Handle the command options.
         $componentId = $input->getOption('component', false);

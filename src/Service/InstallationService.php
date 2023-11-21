@@ -18,7 +18,7 @@ class InstallationService implements InstallerInterface
      */
     private const MAX_DEPTH_2 = [
         "https://opencatalogi.nl/oc.application.schema.json",
-        "https://opencatalogi.nl/oc.organisation.schema.json",
+        "https://opencatalogi.nl/oc.organization.schema.json",
     ];
 
 

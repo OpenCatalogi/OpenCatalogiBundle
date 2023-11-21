@@ -51,6 +51,13 @@ class RatingHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
                     'required'    => true,
                 ],
+                'ratingMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The rating mapping.',
+                    'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'reference'   => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'required'    => true,
+                ],
                 'componentSchema' => [
                     'type'        => 'string',
                     'description' => 'The component schema.',

@@ -57,8 +57,8 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                 'organizationSchema' => [
                     'type'        => 'string',
                     'description' => 'The organisation schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
                     'required'    => true,
                 ],
             ],
@@ -77,7 +77,18 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->enrichOrganizationHandler($data, $configuration);
+
+        // This comes from the GithubEvent or FormInput action.
+        // We hava an organization in the response.
+        $organizationId = null;
+        if (key_exists('response', $data) === true
+            && key_exists('_self', $data['response']) === true
+            && key_exists('id', $data['response']['_self']) === true
+        ) {
+            $organizationId = $data['response']['_self']['id'];
+        }//end if
+
+        return $this->service->enrichOrganizationHandler($data, $configuration, $organizationId);
 
     }//end run()
 
