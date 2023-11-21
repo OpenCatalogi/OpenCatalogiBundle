@@ -24,26 +24,26 @@ class DownloadObjectService
     public function getContentType(string $extension): string
     {
         switch ($extension) {
-            case 'pdf':
-                return 'application/pdf';
-            case 'json':
-                return 'application/json';
-            case 'yaml':
-                return 'application/yaml';
-            case 'xml':
-                return 'text/xml';
-            case 'csv':
-                return 'text/csv';
-            case 'html':
-                return 'text/html';
-            case 'xlsx':
-                return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-            case 'docx':
-                return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-            case 'zip':
-                return 'application/zip';
-            default:
-                return $extension;
+        case 'pdf':
+            return 'application/pdf';
+        case 'json':
+            return 'application/json';
+        case 'yaml':
+            return 'application/yaml';
+        case 'xml':
+            return 'text/xml';
+        case 'csv':
+            return 'text/csv';
+        case 'html':
+            return 'text/html';
+        case 'xlsx':
+            return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        case 'docx':
+            return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        case 'zip':
+            return 'application/zip';
+        default:
+            return $extension;
         }//end switch
 
     }//end getContentType()
