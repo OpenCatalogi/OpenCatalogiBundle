@@ -5,6 +5,17 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\ObjectEntity;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * Service to enrich download objects with name, content type and size.
+ *
+ * This service provides the functionality to derive a file name, content type and file size from an url and store it in an object.
+ *
+ * @Author Ruben van der Linde <ruben@conduction.nl>, Robert Zondervan <robert@conduction.nl>, Sarai Misidjan <sarai@conduction.nl>, Wilco Louwerse <wilco@conduction.nl>, Barry Brands <barry@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/common-gateway/blob/master/LICENSE.md>
+ *
+ * @category Service
+ */
 class DownloadObjectService
 {
 
