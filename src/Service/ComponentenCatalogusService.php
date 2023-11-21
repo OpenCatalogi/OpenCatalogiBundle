@@ -151,12 +151,13 @@ class ComponentenCatalogusService
     /**
      * Get an applications of the given source with the given id.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
      * @param string $applicationId The given application id
-     * @param array  $configuration The configuration array
+     * @param array $configuration The configuration array
      *
      * @return array|null
+     * @throws \Exception
      */
     public function handleApplication(Source $source, string $endpoint, string $applicationId, array $configuration): ?array
     {
@@ -186,10 +187,11 @@ class ComponentenCatalogusService
     /**
      * Import the application into the data layer.
      *
-     * @param array $application   The application to import.
+     * @param array $application The application to import.
      * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
+     * @throws \Exception
      */
     public function importApplication(array $application, array $configuration): ?ObjectEntity
     {
@@ -260,20 +262,19 @@ class ComponentenCatalogusService
         }
 
         if ($componentId === null) {
-            return $this->getComponentsFromSource($source, $endpoint, $this->configuration);
+            return $this->getComponentsFromSource($source, $endpoint);
         }
 
-        return $this->getComponentFromSource($source, $endpoint, $componentId, $this->configuration);
+        return $this->getComponentFromSource($source, $endpoint, $componentId);
 
-    }//end getComponents()
+    }// end getComponents()
 
 
     /**
      * Get all components of the given source.
      *
      * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
-     * @param array  $configuration The configuration array
+     * @param array  $componentArray The component array
      *
      * @return array|null
      * @throws \Exception
@@ -325,24 +326,25 @@ class ComponentenCatalogusService
             break;
         default:
             break;
-        }//end switch
+        }// end switch
 
         return null;
 
-    }//end handleComponent()
+    }// end handleComponent()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source        The given source
-     * @param string $endpoint      The endpoint of the source
+     * @param Source $source The given source
+     * @param string $endpoint The endpoint of the source
      * @param string $componentId
-     * @param array  $configuration The configuration array
+     * @param array $configuration The configuration array
      *
      * @return ObjectEntity|null
+     * @throws \Exception
      */
-    public function getComponentFromSource(Source $source, string $endpoint, string $componentId, array $configuration): ?ObjectEntity
+    public function getComponentFromSource(Source $source, string $endpoint, string $componentId): ?ObjectEntity
     {
         try {
             $response = $this->callService->call($source, $endpoint.'/'.$componentId);
@@ -362,7 +364,7 @@ class ComponentenCatalogusService
 
         return null;
 
-    }//end getComponentFromSource()
+    }// end getComponentFromSource()
 
 
     /**
@@ -370,12 +372,11 @@ class ComponentenCatalogusService
      *
      * @param Source $source        The given source
      * @param string $endpoint      The endpoint of the source
-     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
      */
-    public function getComponentsFromSource(Source $source, string $endpoint, array $configuration): ?array
+    public function getComponentsFromSource(Source $source, string $endpoint): ?array
     {
         $components = $this->callService->getAllResults($source, $endpoint);
         $this->pluginLogger->info('Found '.count($components).' components from '.$source->getName());
@@ -393,7 +394,7 @@ class ComponentenCatalogusService
 
         return $result;
 
-    }//end getComponentsFromSource()
+    }// end getComponentsFromSource()
 
 
-}//end class
+}// end class

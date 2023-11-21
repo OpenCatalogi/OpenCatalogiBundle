@@ -62,7 +62,7 @@ class DeveloperOverheidService
         $this->data            = [];
         $this->configuration   = [];
 
-    }//end __construct()
+    }// end __construct()
 
 
     /**
@@ -96,14 +96,15 @@ class DeveloperOverheidService
 
         return $this->getRepositoryFromSource($source, $endpoint, $repositoryId);
 
-    }//end getRepositories()
+    }// end getRepositories()
 
 
     /**
      * Get all repositories of the given source.
      *
      * @param  Source $source          The given source
-     * @param  array  $repositoryArray
+     * @param  array  $repositoryArray The repository array.
+     *
      * @return array|null
      */
     public function handleRepository(Source $source, array $repositoryArray): ?array
@@ -141,7 +142,7 @@ class DeveloperOverheidService
 
         return null;
 
-    }//end handleRepository()
+    }// end handleRepository()
 
 
     /**
@@ -149,7 +150,6 @@ class DeveloperOverheidService
      *
      * @param Source $source        The given source
      * @param string $endpoint      The endpoint of the source
-     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -169,7 +169,7 @@ class DeveloperOverheidService
 
         return $result;
 
-    }//end getRepositoriesFromSource()
+    }// end getRepositoriesFromSource()
 
 
     /**
@@ -178,7 +178,6 @@ class DeveloperOverheidService
      * @param Source $source        The given source
      * @param string $endpoint      The endpoint of the source
      * @param string $repositoryId  The given repository id
-     * @param array  $configuration The configuration array
      *
      * @return array|null
      * @throws \Exception
@@ -206,7 +205,7 @@ class DeveloperOverheidService
 
         return $repository->toArray();
 
-    }//end getRepositoryFromSource()
+    }// end getRepositoryFromSource()
 
 
 }//end class

@@ -99,8 +99,8 @@ class ComponentenCatalogusComponentToGatewayHandler implements ActionHandlerInte
                 'organizationSchema'          => [
                     'type'        => 'string',
                     'description' => 'The organization schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'required'    => true,
                 ],
                 'organizationMapping'         => [

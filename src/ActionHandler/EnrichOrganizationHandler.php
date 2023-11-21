@@ -57,8 +57,8 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                 'organizationSchema' => [
                     'type'        => 'string',
                     'description' => 'The organisation schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.organization.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.organization.schema.json',
+                    'example'     => 'https://opencatalogi.nl/oc.organisation.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.organisation.schema.json',
                     'required'    => true,
                 ],
             ],

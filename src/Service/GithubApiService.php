@@ -242,7 +242,7 @@ class GithubApiService
      * This function enriches the repository with a organization.
      *
      * @param ObjectEntity $repository        The repository object.
-     * @param array        $organizationArray The organization array from the github api.
+     * @param array        $repositoryArray The repository array from the github api.
      * @param Source       $source            The github api source.
      *
      * @return ObjectEntity
@@ -1180,7 +1180,7 @@ class GithubApiService
       * @return array|null dataset at the end of the handler
       * @throws Exception
       */
-    public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
+    public function findGithubRepositories(?array $data = [], ?array $configuration = [], ?string $repositoryId = null): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
