@@ -14,7 +14,6 @@ use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 class EnrichDownloadHandler implements ActionHandlerInterface
 {
 
-
     private DownloadObjectService $service;
 
 
