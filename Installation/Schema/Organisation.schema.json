@@ -2,7 +2,7 @@
   "title": "Organisation",
   "$id": "https://opencatalogi.nl/oc.organisation.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "object",
   "description": "extension of the publiccode standard ",
   "properties": {
@@ -85,6 +85,10 @@
     },
     "catalogus": {
       "$ref": "https://opencatalogi.nl/oc.catalogus.schema.json"
+    },
+    "opencatalogiRepo": {
+      "type": "string",
+      "description": "The url of the opencatalogi file."
     }
   }
 }

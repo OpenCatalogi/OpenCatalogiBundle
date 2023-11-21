@@ -105,23 +105,30 @@ class EnrichOrganizationService
             $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
         }
 
-        if (isset($organizationArray) === false
-            || isset($organizationArray) === true
-            && $organizationArray === null
-        ) {
-            return $organization;
+        if ($organization->getValue('type') === 'User') {
+            // Get the organization from the github api.
+            $organizationArray = $this->githubApiService->getUser(trim($githubPath, '/'), $source);
         }
 
-        // If we get an empty string we set the description from the github api.
-        if ($organization->getValue('description') !== false
-            || $organization->getValue('description') !== null
-        ) {
-            $organization->hydrate(['description' => $organizationArray['description']]);
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
+        $opencatalogiUrl = $organization->getValue('opencatalogiRepo');
+        $path            = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
+
+        // Call the search/code endpoint for publiccode files in this repository.
+        $queryConfig['query'] = ['q' => "filename:opencatalogi extension:yaml extension:yml repo:{$path}"];
+        $opencatalogiFiles    = $this->githubApiService->getFilesFromRepo($source, $queryConfig);
+
+        $opencatalogiNames = [
+            'opencatalogi.yaml',
+            'opencatalogi.yml',
+        ];
+
+        foreach ($opencatalogiFiles as $item) {
+            if (in_array($item['name'], $opencatalogiNames) === true) {
+                $organization = $this->githubApiService->handleOpencatalogiFile($organizationArray, $source, $item);
+            }
         }
 
-        $this->pluginLogger->debug($organization->getName().' succesfully updated the organization with a description.');
+        $this->pluginLogger->debug($organization->getName().' succesfully updated the organization with the opencatalogi file.');
 
         return $organization;
 
