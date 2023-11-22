@@ -1220,11 +1220,10 @@ class GithubApiService
                     $this->entityManager->flush();
                     $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
                 }
-                
+
                 if ($repository !== null) {
                     $response[] = $repository->toArray();
                 }
-
             }//end foreach
 
             if (isset($response) === true) {
