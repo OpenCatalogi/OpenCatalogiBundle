@@ -1209,8 +1209,6 @@ class GithubApiService
                     continue;
                 }
 
-                var_dump($repositoryArray['repository']['html_url']);
-
                 $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
 
                 if ($repositorySync->getObject() !== null) {
