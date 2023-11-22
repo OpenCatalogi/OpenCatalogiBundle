@@ -111,7 +111,11 @@ class EnrichOrganizationService
         }
 
         $opencatalogiUrl = $organization->getValue('opencatalogiRepo');
-        $path            = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
+        if ($opencatalogiUrl === null) {
+            return $organization;
+        }
+
+        $path = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
 
         // Call the search/code endpoint for publiccode files in this repository.
         $queryConfig['query'] = ['q' => "filename:opencatalogi extension:yaml extension:yml repo:{$path}"];
@@ -144,9 +148,9 @@ class EnrichOrganizationService
      *
      * @throws GuzzleException|Exception
      *
-     * @return ObjectEntity
+     * @return array
      */
-    public function getOrganization(string $organizationId): ObjectEntity
+    public function getOrganization(string $organizationId): array
     {
         // Get the response.
         try {
@@ -177,6 +181,8 @@ class EnrichOrganizationService
             return $this->data;
         }//end if
 
+        return $this->data;
+
     }//end getOrganization()
 
 
@@ -197,12 +203,13 @@ class EnrichOrganizationService
 
         // If there is an organization in the response.
         if ($organizationId !== null) {
-            $this->getOrganization();
+            $this->getOrganization($organizationId);
         }
 
         // If there is no organization we get all the organizations and enrich it.
         if ($organizationId === null) {
-            $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findAll();
+            $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+            $organizations      = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
 
             foreach ($organizations as $organization) {
                 // Check if the name and github is not null.

@@ -177,6 +177,10 @@ class GithubApiService
             $repositoryArray = $this->getRepository($repositoryUrl, $source);
         }
 
+        if ($repositoryArray === null) {
+            return null;
+        }
+
         // Synchronize the github repository.
         $repositorySync = $this->syncService->synchronize($repositorySync, $repositoryArray);
         $this->entityManager->persist($repositorySync);
