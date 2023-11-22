@@ -569,7 +569,7 @@ class GithubApiService
             || $opencatalogi !== null
             && key_exists('publiccodeYmlVersion', $opencatalogi) === false
         ) {
-            return $organization;
+            return null;
         }
 
         // Find the sync with the source and organization html_url.
@@ -1220,8 +1220,11 @@ class GithubApiService
                     $this->entityManager->flush();
                     $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
                 }
+                
+                if ($repository !== null) {
+                    $response[] = $repository->toArray();
+                }
 
-                $response[] = $repository->toArray();
             }//end foreach
 
             if (isset($response) === true) {
