@@ -115,7 +115,7 @@ class EnrichOrganizationService
             return $organization;
         }
 
-        $path            = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
+        $path = trim(\Safe\parse_url($opencatalogiUrl)['path'], '/');
 
         // Call the search/code endpoint for publiccode files in this repository.
         $queryConfig['query'] = ['q' => "filename:opencatalogi extension:yaml extension:yml repo:{$path}"];
@@ -209,7 +209,7 @@ class EnrichOrganizationService
         // If there is no organization we get all the organizations and enrich it.
         if ($organizationId === null) {
             $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-            $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
+            $organizations      = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
 
             foreach ($organizations as $organization) {
                 // Check if the name and github is not null.
