@@ -139,7 +139,7 @@ class GithubApiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->findGithubRepositories();
+        return $this->service->findGithubRepositories($data, $configuration);
 
     }//end run()
 
