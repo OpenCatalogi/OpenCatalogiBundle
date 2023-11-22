@@ -128,6 +128,7 @@ class EnrichOrganizationService
 
         foreach ($opencatalogiFiles as $item) {
             if (in_array($item['name'], $opencatalogiNames) === true) {
+                $this->githubApiService->setConfiguration($this->configuration);
                 $organization = $this->githubApiService->handleOpencatalogiFile($organizationArray, $source, $item);
 
                 break;
