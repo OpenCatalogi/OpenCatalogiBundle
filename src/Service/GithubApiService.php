@@ -564,18 +564,18 @@ class GithubApiService
         // Get the file from the usercontent or github api source.
         $opencatalogi = $this->getFileFromRawUserContent($opencatalogiUrl, $opencatalogiArray['git_url']);
 
+        // Find the sync with the source and organization html_url.
+        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
+        // Check the sha of the sync with the url reference in the array.
+        if ($this->syncService->doesShaMatch($organizationSync, $urlReference) === true) {
+            return $organizationSync->getObject();
+        }
+
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
         if ($opencatalogi === null
             || $opencatalogi !== null
             && key_exists('publiccodeYmlVersion', $opencatalogi) === false
         ) {
-            return null;
-        }
-
-        // Find the sync with the source and organization html_url.
-        $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
-        // Check the sha of the sync with the url reference in the array.
-        if ($this->syncService->doesShaMatch($organizationSync, $urlReference) === true) {
             return $organizationSync->getObject();
         }
 
@@ -1208,6 +1208,8 @@ class GithubApiService
                 ) {
                     continue;
                 }
+
+                var_dump($repositoryArray['repository']['html_url']);
 
                 $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
 
