@@ -21,6 +21,11 @@ class DeveloperOverheidService
 {
 
     /**
+     * @var EntityManagerInterface
+     */
+    private EntityManagerInterface $entityManager;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -31,9 +36,19 @@ class DeveloperOverheidService
     private CallService $callService;
 
     /**
+     * @var SynchronizationService
+     */
+    private SynchronizationService $syncService;
+
+    /**
      * @var GatewayResourceService
      */
     private GatewayResourceService $resourceService;
+
+    /**
+     * @var GithubApiService
+     */
+    private GithubApiService $githubApiService;
 
     /**
      * @var array
@@ -47,20 +62,29 @@ class DeveloperOverheidService
 
 
     /**
-     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
-     * @param CallService            $callService     The Call Service.
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
+     * @param CallService            $callService      The Call Service.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param GithubApiService       $githubApiService The Github API Service.
      */
     public function __construct(
+        EntityManagerInterface $entityManager,
         LoggerInterface $pluginLogger,
         CallService $callService,
-        GatewayResourceService $resourceService
+        SynchronizationService $syncService,
+        GatewayResourceService $resourceService,
+        GithubApiService $githubApiService
     ) {
-        $this->pluginLogger    = $pluginLogger;
-        $this->callService     = $callService;
-        $this->resourceService = $resourceService;
-        $this->data            = [];
-        $this->configuration   = [];
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->callService      = $callService;
+        $this->syncService      = $syncService;
+        $this->resourceService  = $resourceService;
+        $this->githubApiService = $githubApiService;
+        $this->data             = [];
+        $this->configuration    = [];
 
     }//end __construct()
 
@@ -107,7 +131,7 @@ class DeveloperOverheidService
      *
      * @return array|null
      */
-    public function handleRepository(Source $source, array $repositoryArray): ?array
+    public function handleRepository(Source $source, array $repositoryArray): ?ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
@@ -130,9 +154,10 @@ class DeveloperOverheidService
                 $this->entityManager->remove($repositorySync);
                 $this->entityManager->flush();
                 // Get the github repository
+                $this->githubApiService->setConfiguration($this->configuration);
                 $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
             }
-            return $repository->getObject()->toArray();
+            return $repository;
                 break;
         case 'gitlab.com':
             break;
@@ -162,7 +187,6 @@ class DeveloperOverheidService
         $result = [];
         foreach ($repositoriesArray as $repositoryArray) {
             $result[] = $this->handleRepository($source, $repositoryArray);
-            // $result[] = $this->importResourceService->importDevRepository($repository, $configuration);
         }
 
         $this->entityManager->flush();
