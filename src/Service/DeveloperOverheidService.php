@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
  */
 class DeveloperOverheidService
 {
+
     /**
      * @var EntityManagerInterface
      */
@@ -61,12 +62,12 @@ class DeveloperOverheidService
 
 
     /**
-     * @param EntityManagerInterface $entityManager The Entity Manager Interface.
-     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface.
-     * @param CallService            $callService     The Call Service.
-     * @param SynchronizationService $syncService The Synchronization Service.
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
-     * @param GithubApiService $githubApiService The Github API Service.
+     * @param EntityManagerInterface $entityManager    The Entity Manager Interface.
+     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface.
+     * @param CallService            $callService      The Call Service.
+     * @param SynchronizationService $syncService      The Synchronization Service.
+     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
+     * @param GithubApiService       $githubApiService The Github API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -76,14 +77,14 @@ class DeveloperOverheidService
         GatewayResourceService $resourceService,
         GithubApiService $githubApiService
     ) {
-        $this->entityManager = $entityManager;
-        $this->pluginLogger    = $pluginLogger;
-        $this->callService     = $callService;
-        $this->syncService = $syncService;
-        $this->resourceService = $resourceService;
+        $this->entityManager    = $entityManager;
+        $this->pluginLogger     = $pluginLogger;
+        $this->callService      = $callService;
+        $this->syncService      = $syncService;
+        $this->resourceService  = $resourceService;
         $this->githubApiService = $githubApiService;
-        $this->data            = [];
-        $this->configuration   = [];
+        $this->data             = [];
+        $this->configuration    = [];
 
     }//end __construct()
 
@@ -156,7 +157,6 @@ class DeveloperOverheidService
                 $this->githubApiService->setConfiguration($this->configuration);
                 $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
             }
-
             return $repository;
                 break;
         case 'gitlab.com':
