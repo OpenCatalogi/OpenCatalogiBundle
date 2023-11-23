@@ -819,7 +819,7 @@ class GithubApiService
      *
      * @return array|null
      */
-    public function getFileFromGithubApi(string $gitUrl, ?string $query=null): ?array
+    public function getFileFromGithubApi(string $gitUrl): ?array
     {
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         if ($source === null) {
@@ -830,7 +830,7 @@ class GithubApiService
         $endpoint = \Safe\parse_url($gitUrl)['path'];
 
         try {
-            $response = $this->callService->call($source, $endpoint, 'GET', $query);
+            $response = $this->callService->call($source, $endpoint);
         } catch (Exception $e) {
             $this->pluginLogger->error('Error found trying to fetch '.$gitUrl.' '.$e->getMessage());
         }
