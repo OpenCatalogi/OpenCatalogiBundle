@@ -136,6 +136,9 @@ class DownloadObjectService
         ];
         $object->hydrate($objectArray);
 
+        $this->entityManager->persist($object);
+        $this->entityManager->flush();
+
         return $data;
 
     }//end enrichDownloadObject()
