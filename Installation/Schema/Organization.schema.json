@@ -2,7 +2,7 @@
   "title": "Organization",
   "$id": "https://opencatalogi.nl/oc.organisation.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "type": "object",
   "description": "extension of the publiccode standard ",
   "properties": {
@@ -78,9 +78,10 @@
       "type": "string",
       "enum": [
         "User",
-        "Organization"
+        "Organization",
+        "Owner"
       ],
-      "example": "public",
+      "example": "Organization",
       "description": "The type of this organization"
     },
     "catalogus": {

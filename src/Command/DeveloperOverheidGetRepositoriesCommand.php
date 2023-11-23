@@ -70,7 +70,7 @@ class DeveloperOverheidGetRepositoriesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $developerAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $developerAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
         $configuration   = $developerAction->getConfiguration();
 
         // Handle the command options

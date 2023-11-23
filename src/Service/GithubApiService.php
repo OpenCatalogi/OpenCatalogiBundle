@@ -624,7 +624,7 @@ class GithubApiService
                 && is_string($publiccodeArray['repoOwner']['name']) === true
             ) {
                 $repoOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['repoOwner']['name']);
-                $repoOwnerSync = $this->syncService->synchronize($repoOwnerSync, $publiccodeArray['repoOwner']);
+                $repoOwnerSync = $this->syncService->synchronize($repoOwnerSync, ['name' => $publiccodeArray['repoOwner']['name'], 'type' => 'Owner']);
 
                 $component->hydrate(['repoOwner' => $repoOwnerSync->getObject()]);
             }
@@ -634,20 +634,19 @@ class GithubApiService
                 && is_string($publiccodeArray['mainCopyrightOwner']['name']) === true
             ) {
                 $mainCopyrightOwnerSync = $this->syncService->findSyncBySource($source, $organizationSchema, $publiccodeArray['mainCopyrightOwner']['name']);
-                $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, $publiccodeArray['mainCopyrightOwner']);
+                $mainCopyrightOwnerSync = $this->syncService->synchronize($mainCopyrightOwnerSync, ['name' => $publiccodeArray['mainCopyrightOwner']['name'], 'type' => 'Owner']);
 
                 $component->hydrate(['mainCopyrightOwner' => $mainCopyrightOwnerSync->getObject()]);
             }
         }//end if
 
         if (key_exists('applicationSuite', $publiccodeArray) === true
-            && key_exists('name', $publiccodeArray['applicationSuite']) === true
-            && is_string($publiccodeArray['applicationSuite']['name']) === true
+            && is_string($publiccodeArray['applicationSuite']) === true
         ) {
             $applicationSchema = $this->resourceService->getSchema($this->configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
 
-            $applicationSuiteSync = $this->syncService->findSyncBySource($source, $applicationSchema, $publiccodeArray['applicationSuite']['name']);
-            $applicationSuiteSync = $this->syncService->synchronize($applicationSuiteSync, $publiccodeArray['applicationSuite']);
+            $applicationSuiteSync = $this->syncService->findSyncBySource($source, $applicationSchema, $publiccodeArray['applicationSuite']);
+            $applicationSuiteSync = $this->syncService->synchronize($applicationSuiteSync, ['name' => $publiccodeArray['applicationSuite']]);
 
             $component->hydrate(['applicationSuite' => $applicationSuiteSync->getObject()]);
         }
@@ -737,7 +736,7 @@ class GithubApiService
         // Handle the sub objects of the array.
         $component = $this->handlePubliccodeSubObjects($dataArray, $source, $componentSync->getObject());
 
-        $component->hydrate(['url' => $repository]);
+        $component->hydrate(['url' => $repository, 'publiccodeUrl' => $publiccodeUrl]);
         $this->entityManager->persist($componentSync->getObject());
         $this->entityManager->flush();
 

@@ -2,7 +2,7 @@
   "title": "Componenten Catalogus Application To Gateway",
   "$id": "https://opencatalogi.nl/action/oc.ComponentenCatalogusApplicationToGatewayAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "priority": 1,
   "isLockable": true,
   "listens": ["opencatalogi.componentencatalogus.trigger"],
@@ -30,6 +30,5 @@
     "opencatalogiMapping": "https://api.github.com/oc.githubOpenCatalogiYamlToOrg.mapping.json",
     "ratingSchema": "https://opencatalogi.nl/oc.rating.schema.json",
     "ratingMapping": "https://opencatalogi.nl/api/oc.rateComponent.mapping.json"
-  },
-  "isEnabled": false
+  }
 }
