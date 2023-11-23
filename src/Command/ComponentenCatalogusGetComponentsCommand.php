@@ -68,7 +68,7 @@ class ComponentenCatalogusGetComponentsCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $componentenAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.DeveloperOverheidRepositoryToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $componentenAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.ComponentenCatalogusComponentToGatewayAction.action.json', 'open-catalogi/open-catalogi-bundle');
         $configuration     = $componentenAction->getConfiguration();
 
         // Handle the command options.

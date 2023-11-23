@@ -36,6 +36,11 @@ class ComponentenCatalogusService
     private CallService $callService;
 
     /**
+     * @var MappingService
+     */
+    private MappingService $mappingService;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -65,6 +70,7 @@ class ComponentenCatalogusService
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      * @param CallService            $callService      The call Service.
+     * @param MappingService $mappingService The mapping service.
      * @param LoggerInterface        $pluginLogger     The Plugin logger.
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param GithubApiService       $githubApiService The Github API Service.
@@ -73,6 +79,7 @@ class ComponentenCatalogusService
         EntityManagerInterface $entityManager,
         GatewayResourceService $resourceService,
         CallService $callService,
+        MappingService $mappingService,
         LoggerInterface $pluginLogger,
         SynchronizationService $syncService,
         GithubApiService $githubApiService
@@ -80,6 +87,7 @@ class ComponentenCatalogusService
         $this->entityManager    = $entityManager;
         $this->pluginLogger     = $pluginLogger;
         $this->callService      = $callService;
+        $this->mappingService = $mappingService;
         $this->resourceService  = $resourceService;
         $this->syncService      = $syncService;
         $this->githubApiService = $githubApiService;
@@ -196,6 +204,8 @@ class ComponentenCatalogusService
     public function importApplication(array $application, array $configuration): ?ObjectEntity
     {
         // Get the source, entity and mapping
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $githubSource  = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $schema  = $this->resourceService->getSchema($configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping = $this->resourceService->getMapping($configuration['applicationMapping'], 'open-catalogi/open-catalogi-bundle');
@@ -211,18 +221,40 @@ class ComponentenCatalogusService
 
         $this->pluginLogger->debug('Mapping object '.$application['name'].' with mapping: '.$mapping->getReference(), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
+        // Unset the owner of the application so we don't make duplicates.
+        $owner = $application['owner'];
+        unset($application['owner']);
+
         $synchronization->setMapping($mapping);
         $synchronization = $this->syncService->synchronize($synchronization, $application);
-
         $applicationObject = $synchronization->getObject();
+
+        // Sync the owner and add it to the application.
+        if ($owner !== null) {
+            $ownerSync = $this->syncService->findSyncBySource($githubSource, $organizationSchema, $owner['fullName']);
+            $ownerSync = $this->syncService->synchronize($ownerSync, ['name' => $owner['fullName'], 'email' => $owner['email'], 'logo' => $owner['pictureUrl'], 'type' => 'Owner']);
+
+            $applicationObject->setValue('owner', $ownerSync->getObject());
+            $this->entityManager->persist($applicationObject);
+        }
 
         $this->pluginLogger->debug('Synced application: '.$applicationObject->getValue('name'), ['package' => 'open-catalogi/open-catalogi-bundle']);
 
         if ($application['components'] !== null) {
             $components = [];
-            foreach ($application['components'] as $component) {
-                $componentObject = $this->handleComponent($source, $component);
-                $components[]    = $componentObject;
+            foreach ($application['components'] as $componentArray) {
+                $repositoryObject = $this->handleComponent($source, $componentArray);
+
+                // If there is no component continue.
+                if ($repositoryObject === null) {
+                    continue;
+                }
+
+                // Set the components of the repository to the components array.
+                foreach ($repositoryObject->getValue('components') as $component) {
+                    $components[]    = $component;
+                }
+
             }//end foreach
 
             $applicationObject->setValue('components', $components);
@@ -269,6 +301,44 @@ class ComponentenCatalogusService
 
     }//end getComponents()
 
+    /**
+     * Get all components of the given source.
+     *
+     * @param Source $source         The given source
+     * @param array  $componentArray The component array
+     *
+     * @return ObjectEntity|null
+     * @throws \Exception
+     */
+    public function createComponentWithData(ObjectEntity $repository, array $componentArray, Source $githubSource): ?ObjectEntity
+    {
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        // Add values from the componenten catalogus array.
+        $componentSync = $this->syncService->findSyncBySource($githubSource, $componentSchema, $componentArray['repositoryUrl']);
+        $componentSync->setMapping($componentMapping);
+
+        // Unset the repo owner so we don't make duplicates.
+        $owner = $componentArray['owner'];
+        unset($componentArray['owner']);
+
+        $componentSync = $this->syncService->synchronize($componentSync, $componentArray);
+        $componentSync->getObject()->hydrate(['url' => $repository]);
+        $this->entityManager->persist($componentSync->getObject());
+
+        // Sync the owner and add it to the component.
+        if ($owner !== null) {
+            $ownerSync = $this->syncService->findSyncBySource($githubSource, $organizationSchema, $owner['fullName']);
+            $ownerSync = $this->syncService->synchronize($ownerSync, ['name' => $owner['fullName'], 'email' => $owner['email'], 'logo' => $owner['pictureUrl'], 'type' => 'Owner']);
+
+            $componentSync->getObject()->getValue('legal')->hydrate(['repoOwner' => $ownerSync->getObject()]);
+            $this->entityManager->persist($componentSync->getObject());
+        }
+
+        return $componentSync->getObject();
+    }
 
     /**
      * Get all components of the given source.
@@ -276,14 +346,118 @@ class ComponentenCatalogusService
      * @param Source $source         The given source
      * @param array  $componentArray The component array
      *
-     * @return array|null
+     * @return ObjectEntity|null
      * @throws \Exception
      */
-    public function handleComponent(Source $source, array $componentArray): ?array
+    public function updateComponentWithData(ObjectEntity $component, array $componentArray, Source $githubSource): ?ObjectEntity
     {
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
+
+        // Map the componenten catalogus data.
+        $dataArray = $this->mappingService->mapping($componentMapping, $componentArray);
+
+        // Unset the repo owner so we don't make duplicates.
+        unset($dataArray['legal']['repoOwner']);
+
+        // Hydrate the component with the mapped componenten catalogus data.
+        $component->hydrate($dataArray);
+        $this->entityManager->persist($component);
+
+        // Sync the owner and add it to the component.
+        if ($componentArray['owner'] !== null) {
+            $ownerSync = $this->syncService->findSyncBySource($githubSource, $organizationSchema, $componentArray['owner']['fullName']);
+            $ownerSync = $this->syncService->synchronize($ownerSync, ['name' => $componentArray['owner']['fullName'], 'email' => $componentArray['owner']['email'], 'logo' => $componentArray['owner']['pictureUrl'], 'type' => 'Owner']);
+
+            $component->getValue('legal')->setValue('repoOwner', $ownerSync->getObject());
+            $this->entityManager->persist($component);
+        }
+        $this->entityManager->flush();
+
+        return $component;
+    }
+
+    /**
+     * Get all components of the given source.
+     *
+     * @param Source $source         The given source
+     * @param array  $componentArray The component array
+     *
+     * @return ObjectEntity|null
+     * @throws \Exception
+     */
+    public function handleGithubComponentRepo(Source $source, array $componentArray): ?ObjectEntity
+    {
+        // Get the github api source.
+        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $githubSource  = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySync = $this->syncService->findSyncBySource($githubSource, $repositorySchema, $componentArray['repositoryUrl']);
+
+        // If the repository has a object don't get the repository from github.
+        if ($repositorySync->getObject() !== null) {
+            $repository = $repositorySync->getObject();
+        }
+
+        // If there is no repository get the repository from github.
+        if ($repositorySync->getObject() === null) {
+            $this->entityManager->remove($repositorySync);
+            $this->entityManager->flush();
+            // Get the github repository
+            $this->githubApiService->setConfiguration($this->configuration);
+            $repository = $this->githubApiService->getGithubRepository($componentArray['repositoryUrl']);
+        }
+
+        // If we don't have a repository we return null. (probabbly the rate limit from github)
+        if ($repository === null) {
+            return null;
+        }
+
+        $components = $repository->getValue('components');
+
+        // If there are more then one components we know that there is a publiccode file, then we don't do anything.
+        // If there is no component we want to add a component with the componenten catalogus data.
+        if ($components->count() === 0) {
+            $component = $this->createComponentWithData($repository, $componentArray, $githubSource);
+        }
+
+        // If there is no publiccode file found enrich the component with the componenten catalogus data.
+        // Check if there is a publiccode file through the property publiccodeUrl.
+        if ($components->count() === 1
+            && $components[0] !== null
+            && $components[0]->getValue('publiccodeUrl') === null
+        ) {
+            $component = $this->updateComponentWithData($components[0], $componentArray, $githubSource);
+        }
+
+        // If the component is created/updated the componenten catalogus source is added to the sync.
+        if (isset($component) === true) {
+            // Create a sync object for the componenten catalogus source and add it to the object.
+            $sync = $this->syncService->findSyncBySource($source, $componentSchema, $componentArray['repositoryUrl']);
+            $component->addSynchronization($sync);
+            $this->entityManager->persist($sync);
+            $this->entityManager->persist($component);
+            $this->entityManager->flush();
+        }
+
+        return $repository;
+    }
+
+
+    /**
+     * Get all components of the given source.
+     *
+     * @param Source $source         The given source
+     * @param array  $componentArray The component array
+     *
+     * @return ObjectEntity|null
+     * @throws \Exception
+     */
+    public function handleComponent(Source $source, array $componentArray): ?ObjectEntity
+    {
 
         $parsedUrl = \Safe\parse_url($componentArray['repositoryUrl']);
         if (key_exists('host', $parsedUrl) === false) {
@@ -293,34 +467,7 @@ class ComponentenCatalogusService
         $domain = $parsedUrl['host'];
         switch ($domain) {
         case 'github.com':
-
-            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $componentArray['repositoryUrl']);
-
-            if ($repositorySync->getObject() !== null) {
-                $repository = $repositorySync->getObject();
-            }
-
-            if ($repositorySync->getObject() === null) {
-                $this->entityManager->remove($repositorySync);
-                $this->entityManager->flush();
-                // Get the github repository
-                $this->githubApiService->setConfiguration($this->configuration);
-                $repository = $this->githubApiService->getGithubRepository($componentArray['repositoryUrl']);
-            }
-
-            if ($repository === null) {
-                return null;
-            }
-
-            $componentArray['repositoryUrl'] = $repository;
-
-            // Add values from the componenten catalogus array.
-            $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $componentArray['repositoryUrl']);
-            $componentSync->setMapping($componentMapping);
-
-            $componentSync = $this->syncService->synchronize($componentSync, $componentArray);
-
-            return $componentSync->getObject()->toArray();
+            return $this->handleGithubComponentRepo($source, $componentArray);
                 break;
         case 'gitlab.com':
             break;
@@ -355,10 +502,10 @@ class ComponentenCatalogusService
         if (isset($response) === true) {
             $componentArray = $this->callService->decodeResponse($source, $response, 'application/json');
 
-            $component = $this->handleComponent($source, $componentArray);
+            $repository = $this->handleComponent($source, $componentArray);
 
-            if ($component !== null) {
-                return $component;
+            if ($repository !== null) {
+                return $repository;
             }
         }
 
@@ -383,10 +530,10 @@ class ComponentenCatalogusService
 
         $result = [];
         foreach ($components as $componentArray) {
-            $component = $this->handleComponent($source, $componentArray);
+            $repository = $this->handleComponent($source, $componentArray);
 
-            if ($component !== null) {
-                $result[] = $component->toArray();
+            if ($repository !== null) {
+                $result[] = $repository->toArray();
             }
         }
 
