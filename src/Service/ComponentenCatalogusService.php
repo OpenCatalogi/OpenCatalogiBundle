@@ -70,7 +70,7 @@ class ComponentenCatalogusService
      * @param EntityManagerInterface $entityManager    The Entity Manager Interface
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      * @param CallService            $callService      The call Service.
-     * @param MappingService $mappingService The mapping service.
+     * @param MappingService         $mappingService   The mapping service.
      * @param LoggerInterface        $pluginLogger     The Plugin logger.
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param GithubApiService       $githubApiService The Github API Service.
@@ -87,7 +87,7 @@ class ComponentenCatalogusService
         $this->entityManager    = $entityManager;
         $this->pluginLogger     = $pluginLogger;
         $this->callService      = $callService;
-        $this->mappingService = $mappingService;
+        $this->mappingService   = $mappingService;
         $this->resourceService  = $resourceService;
         $this->syncService      = $syncService;
         $this->githubApiService = $githubApiService;
@@ -204,11 +204,11 @@ class ComponentenCatalogusService
     public function importApplication(array $application, array $configuration): ?ObjectEntity
     {
         // Get the source, entity and mapping
-        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $githubSource  = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        $source  = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
-        $schema  = $this->resourceService->getSchema($configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $mapping = $this->resourceService->getMapping($configuration['applicationMapping'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $githubSource       = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $source             = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
+        $schema             = $this->resourceService->getSchema($configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $mapping            = $this->resourceService->getMapping($configuration['applicationMapping'], 'open-catalogi/open-catalogi-bundle');
 
         if ($source === null
             || $schema === null
@@ -226,7 +226,7 @@ class ComponentenCatalogusService
         unset($application['owner']);
 
         $synchronization->setMapping($mapping);
-        $synchronization = $this->syncService->synchronize($synchronization, $application);
+        $synchronization   = $this->syncService->synchronize($synchronization, $application);
         $applicationObject = $synchronization->getObject();
 
         // Sync the owner and add it to the application.
@@ -252,9 +252,8 @@ class ComponentenCatalogusService
 
                 // Set the components of the repository to the components array.
                 foreach ($repositoryObject->getValue('components') as $component) {
-                    $components[]    = $component;
+                    $components[] = $component;
                 }
-
             }//end foreach
 
             $applicationObject->setValue('components', $components);
@@ -301,6 +300,7 @@ class ComponentenCatalogusService
 
     }//end getComponents()
 
+
     /**
      * Get all components of the given source.
      *
@@ -312,9 +312,9 @@ class ComponentenCatalogusService
      */
     public function createComponentWithData(ObjectEntity $repository, array $componentArray, Source $githubSource): ?ObjectEntity
     {
-        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Add values from the componenten catalogus array.
         $componentSync = $this->syncService->findSyncBySource($githubSource, $componentSchema, $componentArray['repositoryUrl']);
@@ -338,7 +338,9 @@ class ComponentenCatalogusService
         }
 
         return $componentSync->getObject();
-    }
+
+    }//end createComponentWithData()
+
 
     /**
      * Get all components of the given source.
@@ -351,9 +353,9 @@ class ComponentenCatalogusService
      */
     public function updateComponentWithData(ObjectEntity $component, array $componentArray, Source $githubSource): ?ObjectEntity
     {
-        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
 
         // Map the componenten catalogus data.
         $dataArray = $this->mappingService->mapping($componentMapping, $componentArray);
@@ -373,10 +375,13 @@ class ComponentenCatalogusService
             $component->getValue('legal')->setValue('repoOwner', $ownerSync->getObject());
             $this->entityManager->persist($component);
         }
+
         $this->entityManager->flush();
 
         return $component;
-    }
+
+    }//end updateComponentWithData()
+
 
     /**
      * Get all components of the given source.
@@ -390,12 +395,12 @@ class ComponentenCatalogusService
     public function handleGithubComponentRepo(Source $source, array $componentArray): ?ObjectEntity
     {
         // Get the github api source.
-        $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentSchema  = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
-        $componentMapping = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
-        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $githubSource  = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        $repositorySync = $this->syncService->findSyncBySource($githubSource, $repositorySchema, $componentArray['repositoryUrl']);
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $githubSource       = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySync     = $this->syncService->findSyncBySource($githubSource, $repositorySchema, $componentArray['repositoryUrl']);
 
         // If the repository has a object don't get the repository from github.
         if ($repositorySync->getObject() !== null) {
@@ -444,7 +449,8 @@ class ComponentenCatalogusService
         }
 
         return $repository;
-    }
+
+    }//end handleGithubComponentRepo()
 
 
     /**
