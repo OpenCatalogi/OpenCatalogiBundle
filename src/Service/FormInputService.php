@@ -113,7 +113,7 @@ class FormInputService
         if (isset($repository) === false
             || $repository === null
         ) {
-            $this->data['response'] = new Response('Repository is not created.', 404, ['Content-Type' => 'application/json']);
+            $this->data['response'] = new Response('Repository is not created. See logs for more detail.', 404, ['Content-Type' => 'application/json']);
 
             return $this->data;
         }

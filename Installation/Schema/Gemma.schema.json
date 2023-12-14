@@ -2,7 +2,7 @@
   "title": "Gemma",
   "$id": "https://opencatalogi.nl/oc.gemma.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "object",
   "properties": {
     "bedrijfsfuncties": {
@@ -30,12 +30,6 @@
         "Fysiek"
       ],
       "example": "Semantisch"
-    },
-    "referentieComponenten": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
     }
   }
 }

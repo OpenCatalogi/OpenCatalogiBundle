@@ -2,7 +2,7 @@
   "title": "Maintenance",
   "$id": "https://opencatalogi.nl/oc.maintenance.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "object",
   "description": "This section provides information on the maintenance status of the software, useful to evaluate whether the software is actively developed or not.",
   "properties": {
@@ -20,13 +20,13 @@
     },
     "contractors": {
       "type": "array",
-      "description": "This key describes the entity or entities, if any, that are currently contracted for maintaining the software. They can be companies, organizations, or other collective names.",
+      "description": "This key describes the entity or entities, if any, that are currently contracted for maintaining the software. They can be companies, organizations, or other collective names. Presence: mandatory (if maintenance/type is contract)",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.contractor.schema.json"
       }
     },
     "contacts": {
-      "description": "One or more contacts maintaining this software.\n\nThis key describes the technical people currently responsible for maintaining the software. All contacts need to be a physical person, not a company or an organisation. If somebody is acting as a representative of an institution, it must be listed within the affiliation of the contact.\n\nIn case of a commercial agreement (or a chain of such agreements), specify the final entities actually contracted to deliver the maintenance. Do not specify the software owner unless it is technically involved with the maintenance of the product as well.",
+      "description": "One or more contacts maintaining this software.\n\nThis key describes the technical people currently responsible for maintaining the software. All contacts need to be a physical person, not a company or an organisation. If somebody is acting as a representative of an institution, it must be listed within the affiliation of the contact.\n\nIn case of a commercial agreement (or a chain of such agreements), specify the final entities actually contracted to deliver the maintenance. Do not specify the software owner unless it is technically involved with the maintenance of the product as well. Presence: mandatory (if maintenance/type is internal or community)",
       "type": "array",
       "items": {
         "$ref": "https://opencatalogi.nl/oc.contact.schema.json"

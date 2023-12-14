@@ -2,17 +2,30 @@
   "title": "Dependency",
   "$id": "https://opencatalogi.nl/oc.dependency.schema.json",
   "$schema": "https://docs.commongateway.nl/schemas/Entity.schema.json",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     },
     "name": {
+      "type": "string",
+      "required": true
+    },
+    "versionMin": {
+      "type": "string"
+    },
+    "versionMax": {
       "type": "string"
     },
     "version": {
       "type": "string"
+    },
+    "optional": {
+      "type": "boolean"
     }
-  }
+  },
+  "required": [
+    "name"
+  ]
 }
