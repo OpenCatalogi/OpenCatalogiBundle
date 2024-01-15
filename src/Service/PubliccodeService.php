@@ -661,7 +661,6 @@ class PubliccodeService
 
                 // Return the given avatar logo url.
                 return $componentArray['logo'];
-                    break;
                 // Check if the logo is as option 2, a logo from https://raw.githubusercontent.com.
                 // Check if the domain is https://raw.githubusercontent.com. If so, the user content source must be called with the path of the given logo URL as endpoint.
             case 'raw.githubusercontent.com':
@@ -672,12 +671,11 @@ class PubliccodeService
                     $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
 
                     // Cannot validate the raw usercontent url if the source cannot be found.
-                    return null;
+                    break;
                 }
 
                 // Handle the logo if the logo is as option 2, the raw github link for the logo.
                 return $this->handleRawLogo($componentArray, $usercontentSource, 'raw');
-                    break;
                 // Check if the domain is https://github.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
                 // If so we need to get an url that the frontend can use.
             case 'github.com':
@@ -696,7 +694,6 @@ class PubliccodeService
 
                 // Return the given gravatar logo url.
                 return $componentArray['logo'];
-                    break;
                 // Check if the domain is https://gitlab.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
                 // If so we need to get an url that the frontend can use.
             case 'gitlab.com':
@@ -762,8 +759,8 @@ class PubliccodeService
         }
 
         $publiccode = $data['publiccode'];
-        $sourceId   = $data['sourceId'];
-        $sha        = $data['sha'];
+        $sourceId = $data['sourceId'];
+        $sha = $data['sha'];
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
@@ -788,19 +785,20 @@ class PubliccodeService
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $sourceId);
 
         // Check the sha of the sync with the sha in the array.
-        if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
-            $componentSync->getObject()->hydrate(['url' => $repository]);
+         if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
+         $componentSync->getObject()->hydrate(['url' => $repository]);
 
-            $this->entityManager->persist($componentSync->getObject());
-            $this->entityManager->flush();
+         $this->entityManager->persist($componentSync->getObject());
+         $this->entityManager->flush();
 
-            $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
+         $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
 
-            return $repository;
-        }
+         return $repository;
+         }
 
         // Map the publiccode file.
         $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
+
 
         // Check if the logo property is set and is not null.
         if (key_exists('logo', $componentArray) === true
