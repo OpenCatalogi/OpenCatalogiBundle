@@ -821,7 +821,7 @@ class PubliccodeService
 
         // Set the repository and publiccodeUrl to the component object.
         $component->hydrate(['url' => $repository, 'publiccodeUrl' => $sourceId]);
-        $this->entityManager->persist($componentSync->getObject());
+        $this->entityManager->persist($component);
         $this->entityManager->flush();
 
         return $repository;
