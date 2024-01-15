@@ -1,11 +1,12 @@
 {
-  "title": "GithubPubliccodeToComponent",
+  "title": "PubliccodeToComponent",
   "$id": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "passTrough": false,
   "mapping": {
-    "softwareVersion": "publiccodeYmlVersion",
+    "publiccodeYmlVersion": "publiccodeYmlVersion",
+    "softwareVersion": "softwareVersion",
     "name": "name",
     "softwareType": "softwareType",
     "developmentStatus": "developmentStatus",
@@ -45,15 +46,18 @@
     "nl.gemma.bedrijfsservices": "nl.gemma.bedrijfsservices",
     "nl.gemma.applicatiefunctie": "nl.gemma.applicatiefunctie",
     "nl.gemma.model": "nl.gemma.model",
+    "nl.gemma.referentieComponenten": "nl.gemma.referentieComponenten",
+    "nl.apm": "nl.apm",
     "nl.upl": "nl.upl",
     "downloads": "[{% if downloadUrls|default %}{% for url in downloadUrls%}{% if not loop.first %},{% endif %}{\"url\": \"{{ url }}\"}{% endfor %}{% endif %}]"
   },
   "unset": [
     "description.nl",
-    "description.en",
-    "publiccodeYmlVersion"
+    "description.en"
   ],
   "cast": {
+    "publiccodeYmlVersion": "keyCantBeValue",
+    "softwareVersion": "keyCantBeValue",
     "name": "keyCantBeValue",
     "softwareType": "keyCantBeValue",
     "developmentStatus": "keyCantBeValue",
@@ -61,6 +65,7 @@
     "isBasedOn": "keyCantBeValue",
     "releaseDate": "keyCantBeValue",
     "logo": "keyCantBeValue",
+    "monochromeLogo": "keyCantBeValue",
     "roadmap": "keyCantBeValue",
     "inputTypes": "keyCantBeValue",
     "outputTypes": "keyCantBeValue",
@@ -96,7 +101,9 @@
     "nl.gemma.bedrijfsservices": "keyCantBeValue",
     "nl.gemma.applicatiefunctie": "keyCantBeValue",
     "nl.gemma.model": "keyCantBeValue",
+    "nl.gemma.referentieComponenten": "keyCantBeValue",
     "nl.gemma": "unsetIfValue==",
+    "nl.apm": "keyCantBeValue",
     "nl.upl": "keyCantBeValue",
     "nl": "unsetIfValue==",
     "applicationSuite.name": "unsetIfValue==applicationSuite",
