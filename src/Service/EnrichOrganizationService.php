@@ -363,6 +363,10 @@ class EnrichOrganizationService
             $organizationArray = $this->githubApiService->getUser(trim($githubPath, '/'), $source);
         }
 
+        if ($organizationArray === null) {
+            return $organization;
+        }
+
         $opencatalogiRepo = $organization->getValue('opencatalogiRepo');
 
         // If the opencatalogiRepo is not null get the file and update the organization.
@@ -382,27 +386,26 @@ class EnrichOrganizationService
         }
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
-        if ($opencatalogiRepo === null) {
-            // Set the logo and description if null.
-            if ($organization->getValue('logo') === null) {
-                $organization->setValue('logo', $organizationArray['avatar_url']);
-            }
-
-            if ($organization->getValue('description') === null) {
-                $organization->setValue('description', $organizationArray['description']);
-            }
-
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
-
-            $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with a logo and/or description.');
+        // Set the logo and description if null.
+        if ($organization->getValue('logo') === null) {
+            $organization->setValue('logo', $organizationArray['avatar_url']);
         }
+
+        if ($organization->getValue('description') === null) {
+            $organization->setValue('description', $organizationArray['description']);
+        }
+
+        $this->entityManager->persist($organization);
+        $this->entityManager->flush();
+
+        $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with a logo and/or description.');
+
 
         return $organization;
 
     }//end enrichGithubOrganization()
 
-
+    
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
