@@ -707,6 +707,7 @@ class PubliccodeService
                 break;
             default:
                 $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
+                break;
             }//end switch
         }//end if
 
