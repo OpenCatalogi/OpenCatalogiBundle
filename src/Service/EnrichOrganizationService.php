@@ -83,12 +83,12 @@ class EnrichOrganizationService
 
 
     /**
-     * @param EntityManagerInterface $entityManager   The Entity Manager Interface
-     * @param LoggerInterface        $pluginLogger    The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService The Gateway Resource Service.
-     * @param SynchronizationService $syncService The Synchronization Service
-     * @param PubliccodeService $publiccodeService The publiccode service
-     * @param OpenCatalogiService $openCatalogiService The opencatalogi service
+     * @param EntityManagerInterface $entityManager       The Entity Manager Interface
+     * @param LoggerInterface        $pluginLogger        The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService     The Gateway Resource Service.
+     * @param SynchronizationService $syncService         The Synchronization Service
+     * @param PubliccodeService      $publiccodeService   The publiccode service
+     * @param OpenCatalogiService    $openCatalogiService The opencatalogi service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -99,14 +99,14 @@ class EnrichOrganizationService
         GitlabApiService $gitlabApiService,
         PubliccodeService $publiccodeService,
         OpenCatalogiService $openCatalogiService
-   ) {
-        $this->entityManager    = $entityManager;
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
-        $this->syncService = $syncService;
-        $this->githubApiService = $githubApiService;
-        $this->gitlabApiService = $gitlabApiService;
-        $this->publiccodeService = $publiccodeService;
+    ) {
+        $this->entityManager       = $entityManager;
+        $this->pluginLogger        = $pluginLogger;
+        $this->resourceService     = $resourceService;
+        $this->syncService         = $syncService;
+        $this->githubApiService    = $githubApiService;
+        $this->gitlabApiService    = $gitlabApiService;
+        $this->publiccodeService   = $publiccodeService;
         $this->openCatalogiService = $openCatalogiService;
 
         $this->configuration = [];
@@ -152,7 +152,7 @@ class EnrichOrganizationService
                 foreach ($repository->getValue('components') as $component) {
                     $ownedComponents[] = $component;
                 }
-            }
+            }//end foreach
 
             $organization->hydrate(['owns' => $ownedComponents]);
             $this->entityManager->persist($organization);
@@ -215,7 +215,7 @@ class EnrichOrganizationService
                 foreach ($repository->getValue('components') as $component) {
                     $usedComponents[] = $component;
                 }
-            }
+            }//end foreach
 
             $organization->hydrate(['uses' => $usedComponents]);
             $this->entityManager->persist($organization);
@@ -288,9 +288,8 @@ class EnrichOrganizationService
 
         // If the opencatalogiRepo is not null get the file and update the organization.
         if ($opencatalogiRepo !== null) {
-
             // Get the opencatalogi file from the opencatalogiRepo property.
-            $opencatalogi    = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
+            $opencatalogi = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
 
             // Get the softwareSupported/softwareOwned/softwareUsed repositories.
             $organization = $this->getConnectedComponents($organization, $opencatalogi, $source);
@@ -305,7 +304,6 @@ class EnrichOrganizationService
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
         if ($opencatalogiRepo === null) {
-
             // Set the logo and description if null.
             if ($organization->getValue('logo') === null) {
                 $organization->setValue('logo', $organizationArray['avatar_url']);
@@ -323,7 +321,8 @@ class EnrichOrganizationService
 
         return $organization;
 
-    }//end enrichOrganization()
+    }//end enrichGithubOrganization()
+
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.

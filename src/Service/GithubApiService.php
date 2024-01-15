@@ -95,15 +95,15 @@ class GithubApiService
 
 
     /**
-     * @param EntityManagerInterface $entityManager    The Entity Manager Interface
-     * @param CallService            $callService      The Call Service
-     * @param SynchronizationService $syncService      The Synchronisation Service
-     * @param MappingService         $mappingService   The Mapping Service
-     * @param RatingService          $ratingService    The Rating Service.
-     * @param LoggerInterface        $pluginLogger     The plugin version of the logger interface
-     * @param GatewayResourceService $resourceService  The Gateway Resource Service.
-     * @param GitlabApiService       $gitlabApiService The Gitlab API Service
-     * @param PubliccodeService $publiccodeService The publiccode service
+     * @param EntityManagerInterface $entityManager     The Entity Manager Interface
+     * @param CallService            $callService       The Call Service
+     * @param SynchronizationService $syncService       The Synchronisation Service
+     * @param MappingService         $mappingService    The Mapping Service
+     * @param RatingService          $ratingService     The Rating Service.
+     * @param LoggerInterface        $pluginLogger      The plugin version of the logger interface
+     * @param GatewayResourceService $resourceService   The Gateway Resource Service.
+     * @param GitlabApiService       $gitlabApiService  The Gitlab API Service
+     * @param PubliccodeService      $publiccodeService The publiccode service
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -117,15 +117,15 @@ class GithubApiService
         PubliccodeService $publiccodeService,
         OpenCatalogiService $openCatalogiService
     ) {
-        $this->entityManager    = $entityManager;
-        $this->callService      = $callService;
-        $this->syncService      = $syncService;
-        $this->mappingService   = $mappingService;
-        $this->ratingService    = $ratingService;
-        $this->pluginLogger     = $pluginLogger;
-        $this->resourceService  = $resourceService;
-        $this->gitlabApiService = $gitlabApiService;
-        $this->publiccodeService = $publiccodeService;
+        $this->entityManager       = $entityManager;
+        $this->callService         = $callService;
+        $this->syncService         = $syncService;
+        $this->mappingService      = $mappingService;
+        $this->ratingService       = $ratingService;
+        $this->pluginLogger        = $pluginLogger;
+        $this->resourceService     = $resourceService;
+        $this->gitlabApiService    = $gitlabApiService;
+        $this->publiccodeService   = $publiccodeService;
         $this->openCatalogiService = $openCatalogiService;
 
         $this->configuration = [];
@@ -186,7 +186,6 @@ class GithubApiService
         ) {
             return $this->data;
         }//end if
-
 
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
@@ -369,7 +368,8 @@ class GithubApiService
         return $repository;
 
     }//end enrichRepository()
-    
+
+
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
@@ -400,8 +400,8 @@ class GithubApiService
         }
 
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
-        if ($opencatalogi === null ||
-            $opencatalogi !== null
+        if ($opencatalogi === null
+            || $opencatalogi !== null
             && key_exists('publiccodeYmlVersion', $opencatalogi) === false
         ) {
             return null;
@@ -412,10 +412,12 @@ class GithubApiService
 
         return [
             'opencatalogi' => $opencatalogi,
-            'sourceId' => $sourceId,
-            'sha' => $urlReference
+            'sourceId'     => $sourceId,
+            'sha'          => $urlReference,
         ];
-    }
+
+    }//end importOpenCatalogiFile()
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
@@ -430,7 +432,8 @@ class GithubApiService
     public function importPubliccodeFile(array $dataArray, Source $source, ObjectEntity $repository, array $repositoryArray): ?ObjectEntity
     {
 
-    }
+    }//end importPubliccodeFile()
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
@@ -502,7 +505,7 @@ class GithubApiService
                 // TODO: Set the $urlReference as the sha
                 $this->publiccodeService->setConfiguration($this->configuration);
                 $repository = $this->publiccodeService->handlePubliccodeFile($item, $source, $repository, $publiccode, $sourceId);
-            }
+            }//end if
         }//end foreach
 
         return $repository;
@@ -797,6 +800,7 @@ class GithubApiService
         return $repositories;
 
     }//end getOrganizationRepos()
+
 
     /**
      * Get a organization with type Organization from the github api.

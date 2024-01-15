@@ -101,6 +101,7 @@ class OpenCatalogiService
 
     }//end __construct()
 
+
     /**
      * Override configuration from other services.
      *
@@ -114,7 +115,7 @@ class OpenCatalogiService
 
     }//end setConfiguration()
 
-    
+
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
@@ -125,7 +126,7 @@ class OpenCatalogiService
      * @return ObjectEntity|null The repository with the updated organization object
      * @throws Exception
      */
-    public function handleOpencatalogiFile(array $opencatalogiArray, Source $source, ObjectEntity $repository, array $data, ?array $organizationArray = []): ?ObjectEntity
+    public function handleOpencatalogiFile(array $opencatalogiArray, Source $source, ObjectEntity $repository, array $data, ?array $organizationArray=[]): ?ObjectEntity
     {
         $opencatalogiMapping = $this->resourceService->getMapping($this->configuration['opencatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
         $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
@@ -136,28 +137,27 @@ class OpenCatalogiService
         }
 
         $opencatalogi = $data['opencatalogi'];
-        $sha = $data['sha'];
+        $sha          = $data['sha'];
 
         if ($repository->getValue('source') === 'gitlab') {
             // Find the sync with the source and organization web_url.
-            $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['web_url']);
-            $opencatalogi['gitlab']           = $organizationArray['web_url'];
+            $organizationSync       = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['web_url']);
+            $opencatalogi['gitlab'] = $organizationArray['web_url'];
 
             if ($organizationArray['kind'] === 'group') {
-                $opencatalogi['type']             = 'Organization';
+                $opencatalogi['type'] = 'Organization';
             }
 
             if ($organizationArray['kind'] === 'user') {
-                $opencatalogi['type']             = 'User';
+                $opencatalogi['type'] = 'User';
             }
         }
 
         if ($repository->getValue('source') === 'github') {
-
             // Find the sync with the source and organization html_url.
-            $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
-            $opencatalogi['github']           = $organizationArray['html_url'];
-            $opencatalogi['type']             = $organizationArray['type'];
+            $organizationSync       = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationArray['html_url']);
+            $opencatalogi['github'] = $organizationArray['html_url'];
+            $opencatalogi['type']   = $organizationArray['type'];
         }
 
         // Check the sha of the sync with the url reference in the array.

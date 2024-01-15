@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  *  This class handles the interaction with componentencatalogus.commonground.nl.
- * 
+ *
  * @Author Sarai Misidjan <sarai@conduction.nl>
  *
  * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
