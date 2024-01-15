@@ -115,64 +115,87 @@ class OpenCatalogiService
 
     }//end setConfiguration()
 
-
     /**
      * This function enriches the opencatalogi file organization.
      *
-     * @param  array        $opencatalogiArray The opencatalogi array from the github api.
-     * @param  array        $opencatalogi      The opencatalogi file as array.
-     * @param  ObjectEntity $organization      The organization object.
-     * @param  Source       $source            The github api source.
-     * @return ObjectEntity
+     * @param array $organizationArray The organization from the github api.
+     * @param array $opencatalogi The opencatalogi file as array.
+     * @param ObjectEntity $organization The organization object.
+     *
+     * @return ObjectEntity The organization object with updated logo.
      */
-    public function enrichOpencatalogiOrg(array $organizationArray, array $opencatalogi, ObjectEntity $organization, Source $source): ObjectEntity
+    public function enrichLogo(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ObjectEntity
     {
-
         // If the opencatalogi logo is set to null or false we set the organization logo to null.
         if (key_exists('logo', $opencatalogi) === true
             && $opencatalogi['logo'] === false
             || key_exists('logo', $opencatalogi) === true
             && $opencatalogi['logo'] === null
         ) {
-            $organization->hydrate(['logo' => null]);
+            $logo = null;
         }
 
         // If we get an empty string we set the logo from the github api.
         if (key_exists('logo', $opencatalogi) === true
             && $opencatalogi['logo'] === ''
         ) {
-            $organization->hydrate(['logo' => $organizationArray['avatar_url']]);
+            $logo = $organizationArray['avatar_url'];
         }
 
         // If we don't get a opencatalogi logo we set the logo from the github api.
         if (key_exists('logo', $opencatalogi) === false) {
-            $organization->hydrate(['logo' => $organizationArray['avatar_url']]);
+            $logo = $organizationArray['avatar_url'];
         }
 
+        // If the logo is set hydrate the logo.
+        if (isset($logo) === true) {
+            $organization->hydrate(['logo' => $logo]);
+            $this->entityManager->persist($organization);
+        }
+
+        return $organization;
+    }
+
+    /**
+     * This function enriches the opencatalogi file organization.
+     *
+     * @param array $organizationArray The organization from the github api.
+     * @param array $opencatalogi The opencatalogi file as array.
+     * @param ObjectEntity $organization The organization object.
+     *
+     * @return ObjectEntity The organization object with updated logo.
+     */
+    public function enrichDescription(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ObjectEntity
+    {
         // If the opencatalogi description is set to null or false we set the organization description to null.
         if (key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === false
             || key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === null
         ) {
-            $organization->hydrate(['description' => null]);
+            $description = null;
         }
 
         // If we get an empty string we set the description from the github api.
         if (key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === ''
         ) {
-            $organization->hydrate(['description' => $organizationArray['description']]);
+            $description = $organizationArray['description'];
         }
 
         // If we don't get a opencatalogi description we set the description from the github api.
         if (key_exists('description', $opencatalogi) === false) {
-            $organization->hydrate(['description' => $organizationArray['description']]);
+            $description = $organizationArray['description'];
+        }
+
+        // If the description is set hydrate the description.
+        if (isset($description) === true) {
+            $organization->hydrate(['description' => $description]);
+            $this->entityManager->persist($organization);
         }
 
         return $organization;
-
-    }//end enrichOpencatalogiOrg()
+    }
 
 
     /**
