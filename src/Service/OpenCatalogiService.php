@@ -115,12 +115,13 @@ class OpenCatalogiService
 
     }//end setConfiguration()
 
+
     /**
      * This function enriches the opencatalogi file organization.
      *
-     * @param array $organizationArray The organization from the github api.
-     * @param array $opencatalogi The opencatalogi file as array.
-     * @param ObjectEntity $organization The organization object.
+     * @param array        $organizationArray The organization from the github api.
+     * @param array        $opencatalogi      The opencatalogi file as array.
+     * @param ObjectEntity $organization      The organization object.
      *
      * @return ObjectEntity The organization object with updated logo.
      */
@@ -154,14 +155,16 @@ class OpenCatalogiService
         }
 
         return $organization;
-    }
+
+    }//end enrichLogo()
+
 
     /**
      * This function enriches the opencatalogi file organization.
      *
-     * @param array $organizationArray The organization from the github api.
-     * @param array $opencatalogi The opencatalogi file as array.
-     * @param ObjectEntity $organization The organization object.
+     * @param array        $organizationArray The organization from the github api.
+     * @param array        $opencatalogi      The opencatalogi file as array.
+     * @param ObjectEntity $organization      The organization object.
      *
      * @return ObjectEntity The organization object with updated logo.
      */
@@ -195,7 +198,8 @@ class OpenCatalogiService
         }
 
         return $organization;
-    }
+
+    }//end enrichDescription()
 
 
     /**
