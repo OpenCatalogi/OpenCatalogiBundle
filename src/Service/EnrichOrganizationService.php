@@ -114,12 +114,13 @@ class EnrichOrganizationService
 
     }//end __construct()
 
+
     /**
      * This function gets the softwareOwned repositories in the opencatalogi file.
      *
      * @param Entity $repositorySchema The repository schema.
-     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source       $source       The github api source.
+     * @param array  $opencatalogi     opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source           The github api source.
      *
      * @return ObjectEntity The repository object
      * @throws Exception
@@ -150,14 +151,16 @@ class EnrichOrganizationService
         }//end foreach
 
         return $ownedComponents;
-    }
+
+    }//end getSoftwareOwned()
+
 
     /**
      * This function gets the softwareSupported repositories in the opencatalogi file.
      *
      * @param Entity $repositorySchema The repository schema.
-     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source       $source       The github api source.
+     * @param array  $opencatalogi     opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source           The github api source.
      *
      * @return ObjectEntity The repository object
      * @throws Exception
@@ -192,14 +195,16 @@ class EnrichOrganizationService
         }//end foreach
 
         return $supportedComponents;
-    }
+
+    }//end getSoftwareSupported()
+
 
     /**
      * This function gets the softwareUsed repositories in the opencatalogi file.
      *
      * @param Entity $repositorySchema The repository schema.
-     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source       $source       The github api source.
+     * @param array  $opencatalogi     opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source           The github api source.
      *
      * @return ObjectEntity The repository object
      * @throws Exception
@@ -231,13 +236,15 @@ class EnrichOrganizationService
         }//end foreach
 
         return $usedComponents;
-    }
+
+    }//end getSoftwareUsed()
+
 
     /**
      * This function gets the members in the opencatalogi file.
      *
-     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source       $source       The github api source.
+     * @param array  $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source       The github api source.
      *
      * @return ObjectEntity The repository object
      * @throws Exception
@@ -264,7 +271,8 @@ class EnrichOrganizationService
         }
 
         return $members;
-    }
+
+    }//end getMembers()
 
 
     /**
@@ -279,7 +287,7 @@ class EnrichOrganizationService
      */
     public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ObjectEntity
     {
-        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
 
         // Get the softwareOwned repositories and set it to the array.
         $ownedComponents = [];
@@ -291,7 +299,6 @@ class EnrichOrganizationService
         $supportedComponents = [];
         if (key_exists('softwareSupported', $opencatalogi) === true) {
             $supportedComponents = $this->getSoftwareSupported($repositorySchema, $opencatalogi, $source);
-
         }
 
         // Get the softwareUsed repositories and set it to the array.
@@ -307,12 +314,14 @@ class EnrichOrganizationService
         }//end if
 
         // Hydrate the organization with the arrays.
-        $organization->hydrate([
-            'owns' => $ownedComponents,
-            'supports' => $supportedComponents,
-            'uses' => $usedComponents,
-            'members' => $members
-        ]);
+        $organization->hydrate(
+            [
+                'owns'     => $ownedComponents,
+                'supports' => $supportedComponents,
+                'uses'     => $usedComponents,
+                'members'  => $members,
+            ]
+        );
 
         $this->entityManager->persist($organization);
         $this->entityManager->flush();
@@ -392,6 +401,7 @@ class EnrichOrganizationService
         return $organization;
 
     }//end enrichGithubOrganization()
+
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
