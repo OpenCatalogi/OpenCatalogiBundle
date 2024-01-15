@@ -350,7 +350,6 @@ class PubliccodeService
         try {
             $response = $this->callService->call($source, $endpoint, 'GET', $queryParam);
         } catch (Exception $exception) {
-            var_dump($exception->getMessage());
             // Set the error code so there can be checked if the file cannot be found or that the rate limit is reached.
             $errorCode = $exception->getCode();
 
@@ -558,7 +557,6 @@ class PubliccodeService
                 // The {branch} will is needed for the ref query.
                 if ($i === 3) {
                     $branch = $explodedPath[$i];
-                    var_dump($branch);
                     continue;
                 }
 
