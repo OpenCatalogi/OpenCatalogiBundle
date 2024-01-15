@@ -115,6 +115,65 @@ class OpenCatalogiService
 
     }//end setConfiguration()
 
+    /**
+     * This function enriches the opencatalogi file organization.
+     *
+     * @param  array        $opencatalogiArray The opencatalogi array from the github api.
+     * @param  array        $opencatalogi      The opencatalogi file as array.
+     * @param  ObjectEntity $organization      The organization object.
+     * @param  Source       $source            The github api source.
+     * @return ObjectEntity
+     */
+    public function enrichOpencatalogiOrg(array $organizationArray, array $opencatalogi, ObjectEntity $organization, Source $source): ObjectEntity
+    {
+
+        // If the opencatalogi logo is set to null or false we set the organization logo to null.
+        if (key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === false
+            || key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === null
+        ) {
+            $organization->hydrate(['logo' => null]);
+        }
+
+        // If we get an empty string we set the logo from the github api.
+        if (key_exists('logo', $opencatalogi) === true
+            && $opencatalogi['logo'] === ''
+        ) {
+            $organization->hydrate(['logo' => $organizationArray['avatar_url']]);
+        }
+
+        // If we don't get a opencatalogi logo we set the logo from the github api.
+        if (key_exists('logo', $opencatalogi) === false) {
+            $organization->hydrate(['logo' => $organizationArray['avatar_url']]);
+        }
+
+        // If the opencatalogi description is set to null or false we set the organization description to null.
+        if (key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === false
+            || key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === null
+        ) {
+            $organization->hydrate(['description' => null]);
+        }
+
+        // If we get an empty string we set the description from the github api.
+        if (key_exists('description', $opencatalogi) === true
+            && $opencatalogi['description'] === ''
+        ) {
+            $organization->hydrate(['description' => $organizationArray['description']]);
+        }
+
+        // If we don't get a opencatalogi description we set the description from the github api.
+        if (key_exists('description', $opencatalogi) === false) {
+            $organization->hydrate(['description' => $organizationArray['description']]);
+        }
+
+        return $organization;
+
+    }//end enrichOpencatalogiOrg()
+
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
@@ -162,7 +221,7 @@ class OpenCatalogiService
 
         // Check the sha of the sync with the url reference in the array.
         if ($this->syncService->doesShaMatch($organizationSync, $sha) === true) {
-            return $organizationSync->getObject();
+            return $repository;
         }
 
         // Set the mapping to the sync object.

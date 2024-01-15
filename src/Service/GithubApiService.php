@@ -216,6 +216,7 @@ class GithubApiService
 
         $repository = $repositorySync->getObject();
 
+
         // Get the publiccode/opencatalogi files of the given repository.
         $path = trim(\Safe\parse_url($repositoryUrl)['path'], '/');
         // Call the search/code endpoint for publiccode files in this repository.
@@ -250,7 +251,8 @@ class GithubApiService
     public function cleanupRepository(ObjectEntity $repository): ?ObjectEntity
     {
         // If the repository has one or less components return.
-        if ($repository->getValue('components')->count() <= 1) {
+        if ($repository->getValue('components') === false
+            || $repository->getValue('components')->count() <= 1) {
             return $repository;
         }
 
@@ -360,7 +362,7 @@ class GithubApiService
         }
 
         // If there is no component create one.
-        if ($repository->getValue('components')->count() === 0) {
+        if ($repository->getValue('components') === false) {
             $repository = $this->enrichWithComponent($repository, $repositoryArray, $source);
         }
 
@@ -373,14 +375,12 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array        $dataArray  An array with publiccode/opencatalogi files.
-     * @param Source       $source     The github api source.
-     * @param ObjectEntity $repository The repository object.
+     * @param array        $item  An array with opencatalogi file.
      *
      * @return array|null An array with the opencatalogi => imported opencatalogi file /sourceId => The sourceId /sha => The sha (used as sourceId)
      * @throws Exception
      */
-    public function importOpenCatalogiFile(array $item, Source $source, ObjectEntity $repository, array $repositoryArray): ?array
+    public function importOpenCatalogiFile(array $item): ?array
     {
         // Get the ref query from the url. This way we can get the opencatalogi file with the raw.gitgubusercontent.
         $opencatalogiUrlQuery = \Safe\parse_url($item['url'])['query'];
@@ -424,14 +424,38 @@ class GithubApiService
      *
      * @param array        $dataArray  An array with publiccode/opencatalogi files.
      * @param Source       $source     The github api source.
-     * @param ObjectEntity $repository The repository object.
      *
-     * @return ObjectEntity|null
+     * @return array|null An array with the publiccode => imported publiccode file /sourceId => The sourceId /sha => The sha
      * @throws Exception
      */
-    public function importPubliccodeFile(array $dataArray, Source $source, ObjectEntity $repository, array $repositoryArray): ?ObjectEntity
+    public function importPubliccodeFile(array $item): ?array
     {
+        // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent.
+        $publiccodeUrlQuery = \Safe\parse_url($item['url'])['query'];
+        // Remove the ref= part of the query.
+        $urlReference = explode('ref=', $publiccodeUrlQuery)[1];
+        // Create the publiccode/opencatalogi url
+        $publiccodeUrl = "https://raw.githubusercontent.com/{$item['repository']['full_name']}/{$urlReference}/{$item['path']}";
 
+        // Create an unique sourceId for every publiccode that doesn't change.
+        // The urlReference and the git_url changes when the file changes.
+        $sourceId = "https://raw.githubusercontent.com/{$item['repository']['full_name']}/{$item['path']}";
+
+        $this->pluginLogger->info('Map the publiccode file with url: '.$publiccodeUrl.' and source id: '.$sourceId);
+
+        // Get the file from the usercontent or github api source
+        // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
+        $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $item['git_url']);
+        if ($publiccode === null) {
+
+            return null;
+        }
+
+        return [
+            'publiccode' => $publiccode,
+            'sourceId'     => $sourceId,
+            'sha'          => $urlReference,
+        ];
     }//end importPubliccodeFile()
 
 
@@ -464,8 +488,8 @@ class GithubApiService
             if (in_array($item['name'], $opencatalogiNames) === true) {
                 $this->pluginLogger->info('The item is a opencatalogi file.');
 
-                // Import the opencatalogi file and get the needed data. With the keys: opencatalogi/sourceId/urlReference.
-                $data = $this->importOpenCatalogiFile($item, $source, $repository, $repositoryArray);
+                // Import the opencatalogi file and get the needed data. With the keys: opencatalogi/sourceId/sha.
+                $data = $this->importOpenCatalogiFile($item);
                 if ($data === null) {
                     continue;
                 }
@@ -482,29 +506,12 @@ class GithubApiService
             if (in_array($item['name'], $publiccodeNames) === true) {
                 $this->pluginLogger->info('The item is a publiccode file.');
 
-                // Get the ref query from the url. This way we can get the publiccode file with the raw.gitgubusercontent.
-                $publiccodeUrlQuery = \Safe\parse_url($item['url'])['query'];
-                // Remove the ref= part of the query.
-                $urlReference = explode('ref=', $publiccodeUrlQuery)[1];
-                // Create the publiccode/opencatalogi url
-                $publiccodeUrl = "https://raw.githubusercontent.com/{$item['repository']['full_name']}/{$urlReference}/{$item['path']}";
+                // Import the publiccode file and get the needed data. With the keys: publiccode/sourceId/sha.
+                $data = $this->importPubliccodeFile($item);
 
-                // Create an unique sourceId for every publiccode that doesn't change.
-                // The urlReference and the git_url changes when the file changes.
-                $sourceId = "https://raw.githubusercontent.com/{$item['repository']['full_name']}/{$item['path']}";
-
-                $this->pluginLogger->info('Map the publiccode file with url: '.$publiccodeUrl.' and source id: '.$sourceId);
-
-                // Get the file from the usercontent or github api source
-                // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
-                $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $item['git_url']);
-                if ($publiccode === null) {
-                    continue;
-                }
-
-                // TODO: Set the $urlReference as the sha
+                // Handle the publiccode file.
                 $this->publiccodeService->setConfiguration($this->configuration);
-                $repository = $this->publiccodeService->handlePubliccodeFile($item, $source, $repository, $publiccode, $sourceId);
+                $repository = $this->publiccodeService->handlePubliccodeFile($item, $source, $repository, $data, $repositoryArray);
             }//end if
         }//end foreach
 

@@ -751,7 +751,7 @@ class PubliccodeService
      *
      * @return ObjectEntity|null
      */
-    public function handlePubliccodeFile(array $publiccodeArray, Source $source, ObjectEntity $repository, array $publiccode, string $sourceId, ?array $repositoryArray=[]): ?ObjectEntity
+    public function handlePubliccodeFile(array $publiccodeArray, Source $source, ObjectEntity $repository, array $data, ?array $repositoryArray=[]): ?ObjectEntity
     {
         $publiccodeMapping = $this->resourceService->getMapping($this->configuration['publiccodeMapping'], 'open-catalogi/open-catalogi-bundle');
         $componentSchema   = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
@@ -760,6 +760,10 @@ class PubliccodeService
         ) {
             return $repository;
         }
+
+        $publiccode = $data['publiccode'];
+        $sourceId = $data['sourceId'];
+        $sha = $data['sha'];
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
@@ -784,22 +788,21 @@ class PubliccodeService
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $sourceId);
 
         // Check the sha of the sync with the sha in the array.
-        // if ($this->syncService->doesShaMatch($componentSync, $urlReference) === true) {
-        // $componentSync->getObject()->hydrate(['url' => $repository]);
-        //
-        // $this->entityManager->persist($componentSync->getObject());
-        // $this->entityManager->flush();
-        //
-        // $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
-        //
-        // return $repository;
-        // }
+         if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
+         $componentSync->getObject()->hydrate(['url' => $repository]);
+
+         $this->entityManager->persist($componentSync->getObject());
+         $this->entityManager->flush();
+
+         $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
+
+         return $repository;
+         }
+
         // Map the publiccode file.
         $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
 
-        // $componentArray['logo'] = 'https://www.gravatar.com/avatar/e64c7d89f26bd1972efa854d13d7dd61';
-        // $componentArray['logo'] = 'https://gitlab.com/uploads/-/system/project/avatar/33855802/760205.png';
-        // $componentArray['logo'] = 'https://gitlab.com/discipl/RON/regels.overheid.nl/-/blob/master/images/WORK_PACKAGE_ISSUE.png';
+
         // Check if the logo property is set and is not null.
         if (key_exists('logo', $componentArray) === true
             && $componentArray['logo'] !== null
