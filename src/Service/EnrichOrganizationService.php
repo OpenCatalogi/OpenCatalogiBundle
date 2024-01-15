@@ -400,12 +400,11 @@ class EnrichOrganizationService
 
         $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with a logo and/or description.');
 
-
         return $organization;
 
     }//end enrichGithubOrganization()
 
-    
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
