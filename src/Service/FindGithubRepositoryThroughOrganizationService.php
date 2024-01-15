@@ -21,6 +21,12 @@ use Twig\Error\SyntaxError;
 /**
  * Loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
+ * 
+ * @Author Sarai Misidjan <sarai@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @category Service
  */
 class FindGithubRepositoryThroughOrganizationService
 {

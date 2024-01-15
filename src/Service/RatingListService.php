@@ -97,7 +97,7 @@ class RatingListService
             $ratingArray['results'][] = 'Cannot rate the repository because it is not set.';
         }
 
-        if ($repository !== false && ($url = $repository->getValue('url')) !== false) {
+        if ($repository !== false && ($url = $repository->getValue('url')) !== null) {
             $ratingArray['results'][] = 'The url: '.$url.' rated';
             $ratingArray['rating']++;
 
