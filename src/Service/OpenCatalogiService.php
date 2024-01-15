@@ -115,6 +115,7 @@ class OpenCatalogiService
 
     }//end setConfiguration()
 
+
     /**
      * This function enriches the opencatalogi file organization.
      *
@@ -172,7 +173,6 @@ class OpenCatalogiService
         return $organization;
 
     }//end enrichOpencatalogiOrg()
-
 
 
     /**

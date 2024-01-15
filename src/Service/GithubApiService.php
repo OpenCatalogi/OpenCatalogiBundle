@@ -216,7 +216,6 @@ class GithubApiService
 
         $repository = $repositorySync->getObject();
 
-
         // Get the publiccode/opencatalogi files of the given repository.
         $path = trim(\Safe\parse_url($repositoryUrl)['path'], '/');
         // Call the search/code endpoint for publiccode files in this repository.
@@ -252,7 +251,8 @@ class GithubApiService
     {
         // If the repository has one or less components return.
         if ($repository->getValue('components') === false
-            || $repository->getValue('components')->count() <= 1) {
+            || $repository->getValue('components')->count() <= 1
+        ) {
             return $repository;
         }
 
@@ -375,7 +375,7 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array        $item  An array with opencatalogi file.
+     * @param array $item An array with opencatalogi file.
      *
      * @return array|null An array with the opencatalogi => imported opencatalogi file /sourceId => The sourceId /sha => The sha (used as sourceId)
      * @throws Exception
@@ -422,8 +422,8 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array        $dataArray  An array with publiccode/opencatalogi files.
-     * @param Source       $source     The github api source.
+     * @param array  $dataArray An array with publiccode/opencatalogi files.
+     * @param Source $source    The github api source.
      *
      * @return array|null An array with the publiccode => imported publiccode file /sourceId => The sourceId /sha => The sha
      * @throws Exception
@@ -447,15 +447,15 @@ class GithubApiService
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
         $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $item['git_url']);
         if ($publiccode === null) {
-
             return null;
         }
 
         return [
             'publiccode' => $publiccode,
-            'sourceId'     => $sourceId,
-            'sha'          => $urlReference,
+            'sourceId'   => $sourceId,
+            'sha'        => $urlReference,
         ];
+
     }//end importPubliccodeFile()
 
 

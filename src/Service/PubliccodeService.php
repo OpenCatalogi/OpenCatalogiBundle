@@ -762,8 +762,8 @@ class PubliccodeService
         }
 
         $publiccode = $data['publiccode'];
-        $sourceId = $data['sourceId'];
-        $sha = $data['sha'];
+        $sourceId   = $data['sourceId'];
+        $sha        = $data['sha'];
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
@@ -788,20 +788,19 @@ class PubliccodeService
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $sourceId);
 
         // Check the sha of the sync with the sha in the array.
-         if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
-         $componentSync->getObject()->hydrate(['url' => $repository]);
+        if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
+            $componentSync->getObject()->hydrate(['url' => $repository]);
 
-         $this->entityManager->persist($componentSync->getObject());
-         $this->entityManager->flush();
+            $this->entityManager->persist($componentSync->getObject());
+            $this->entityManager->flush();
 
-         $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
+            $this->pluginLogger->info('The sha is the same as the sha from the component sync. The given sha (publiccode url from the github api)  is: '.$urlReference);
 
-         return $repository;
-         }
+            return $repository;
+        }
 
         // Map the publiccode file.
         $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
-
 
         // Check if the logo property is set and is not null.
         if (key_exists('logo', $componentArray) === true
