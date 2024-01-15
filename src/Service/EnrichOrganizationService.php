@@ -114,6 +114,158 @@ class EnrichOrganizationService
 
     }//end __construct()
 
+    /**
+     * This function gets the softwareOwned repositories in the opencatalogi file.
+     *
+     * @param Entity $repositorySchema The repository schema.
+     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source       $source       The github api source.
+     *
+     * @return ObjectEntity The repository object
+     * @throws Exception
+     */
+    public function getSoftwareOwned(Entity $repositorySchema, array $opencatalogi, Source $source): array
+    {
+        $ownedComponents = [];
+        foreach ($opencatalogi['softwareOwned'] as $repositoryUrl) {
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryUrl);
+
+            // Get the object of the sync if there is one.
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
+
+            // Get the github repository from the given url if the object is null.
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                $this->githubApiService->setConfiguration($this->configuration);
+                $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
+            }
+
+            // Set the components of the repository to the array.
+            foreach ($repository->getValue('components') as $component) {
+                $ownedComponents[] = $component;
+            }
+        }//end foreach
+
+        return $ownedComponents;
+    }
+
+    /**
+     * This function gets the softwareSupported repositories in the opencatalogi file.
+     *
+     * @param Entity $repositorySchema The repository schema.
+     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source       $source       The github api source.
+     *
+     * @return ObjectEntity The repository object
+     * @throws Exception
+     */
+    public function getSoftwareSupported(Entity $repositorySchema, array $opencatalogi, Source $source): array
+    {
+        $supportedComponents = [];
+        foreach ($opencatalogi['softwareSupported'] as $supports) {
+            if (key_exists('software', $supports) === false) {
+                continue;
+            }
+
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $supports['software']);
+
+            // Get the object of the sync if there is one.
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
+
+            // Get the github repository from the given url if the object is null.
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                $this->githubApiService->setConfiguration($this->configuration);
+                $repository = $this->githubApiService->getGithubRepository($supports['software']);
+            }
+
+            // Set the components of the repository
+            foreach ($repository->getValue('components') as $component) {
+                $supportedComponents[] = $component;
+            }
+        }//end foreach
+
+        return $supportedComponents;
+    }
+
+    /**
+     * This function gets the softwareUsed repositories in the opencatalogi file.
+     *
+     * @param Entity $repositorySchema The repository schema.
+     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source       $source       The github api source.
+     *
+     * @return ObjectEntity The repository object
+     * @throws Exception
+     */
+    public function getSoftwareUsed(Entity $repositorySchema, array $opencatalogi, Source $source): array
+    {
+        $usedComponents = [];
+        foreach ($opencatalogi['softwareUsed'] as $repositoryUrl) {
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryUrl);
+
+            // Get the object of the sync if there is one.
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
+
+            // Get the github repository from the given url if the object is null.
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+
+                $this->githubApiService->setConfiguration($this->configuration);
+                $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
+            }
+
+            // Set the components of the repository
+            foreach ($repository->getValue('components') as $component) {
+                $usedComponents[] = $component;
+            }
+        }//end foreach
+
+        return $usedComponents;
+    }
+
+    /**
+     * This function gets the members in the opencatalogi file.
+     *
+     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source       $source       The github api source.
+     *
+     * @return ObjectEntity The repository object
+     * @throws Exception
+     */
+    public function getMembers(array $opencatalogi, Source $source): array
+    {
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+
+        $members = [];
+        foreach ($opencatalogi['members'] as $organizationUrl) {
+            $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationUrl);
+
+            if ($organizationSync->getObject() === null) {
+                // Do we want to get the organization from the repository
+                // $organizationName = \Safe\parse_url($organizationUrl)['path'];
+                // $organizationSync = $this->syncService->synchronize($organizationSync, ['github' => $organizationUrl, 'name' => $organizationName]);
+                //
+                // $members[] = $organizationSync->getObject();
+            }
+
+            if ($organizationSync->getObject() !== null) {
+                $members[] = $organizationSync->getObject();
+            }
+        }
+
+        return $members;
+    }
+
 
     /**
      * This function enriches the repository with a organization and/or component.
@@ -128,123 +280,41 @@ class EnrichOrganizationService
     public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ObjectEntity
     {
         $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
 
+        // Get the softwareOwned repositories and set it to the array.
+        $ownedComponents = [];
         if (key_exists('softwareOwned', $opencatalogi) === true) {
-            $ownedComponents = [];
-            foreach ($opencatalogi['softwareOwned'] as $repositoryUrl) {
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryUrl);
-
-                // Get the object of the sync if there is one.
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
-
-                // Get the github repository from the given url if the object is null.
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-                    $this->githubApiService->setConfiguration($this->configuration);
-                    $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
-                }
-
-                // Set the components of the repository to the array.
-                foreach ($repository->getValue('components') as $component) {
-                    $ownedComponents[] = $component;
-                }
-            }//end foreach
-
-            $organization->hydrate(['owns' => $ownedComponents]);
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
+            $ownedComponents = $this->getSoftwareOwned($repositorySchema, $opencatalogi, $source);
         }//end if
 
+        // Get the softwareSupported repositories and set it to the array.
+        $supportedComponents = [];
         if (key_exists('softwareSupported', $opencatalogi) === true) {
-            $supportedComponents = [];
-            foreach ($opencatalogi['softwareSupported'] as $supports) {
-                if (key_exists('software', $supports) === false) {
-                    continue;
-                }
+            $supportedComponents = $this->getSoftwareSupported($repositorySchema, $opencatalogi, $source);
 
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $supports['software']);
+        }
 
-                // Get the object of the sync if there is one.
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
-
-                // Get the github repository from the given url if the object is null.
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-                    $this->githubApiService->setConfiguration($this->configuration);
-                    $repository = $this->githubApiService->getGithubRepository($supports['software']);
-                }
-
-                // Set the components of the repository
-                foreach ($repository->getValue('components') as $component) {
-                    $supportedComponents[] = $component;
-                }
-            }//end foreach
-
-            $organization->hydrate(['supports' => $supportedComponents]);
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
-        }//end if
-
+        // Get the softwareUsed repositories and set it to the array.
+        $usedComponents = [];
         if (key_exists('softwareUsed', $opencatalogi) === true) {
-            $usedComponents = [];
-            foreach ($opencatalogi['softwareUsed'] as $repositoryUrl) {
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryUrl);
+            $usedComponents = $this->getSoftwareUsed($repositorySchema, $opencatalogi, $source);
+        }
 
-                // Get the object of the sync if there is one.
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
-
-                // Get the github repository from the given url if the object is null.
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-
-                    $this->githubApiService->setConfiguration($this->configuration);
-                    $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
-                }
-
-                // Set the components of the repository
-                foreach ($repository->getValue('components') as $component) {
-                    $usedComponents[] = $component;
-                }
-            }//end foreach
-
-            $organization->hydrate(['uses' => $usedComponents]);
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
-        }//end if
-
+        // Get the members repositories and set it to the array.
+        $members = [];
         if (key_exists('members', $opencatalogi) === true) {
-            $members = [];
-            foreach ($opencatalogi['members'] as $organizationUrl) {
-                $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $organizationUrl);
-
-                if ($organizationSync->getObject() === null) {
-                    // Do we want to get the organization from the repository
-                    // $organizationName = \Safe\parse_url($organizationUrl)['path'];
-                    // $organizationSync = $this->syncService->synchronize($organizationSync, ['github' => $organizationUrl, 'name' => $organizationName]);
-                    //
-                    // $members[] = $organizationSync->getObject();
-                }
-
-                if ($organizationSync->getObject() !== null) {
-                    $members[] = $organizationSync->getObject();
-                }
-            }
-
-            $organization->hydrate(['members' => $members]);
-            $this->entityManager->persist($organization);
-            $this->entityManager->flush();
+            $members = $this->getMembers($opencatalogi, $source);
         }//end if
 
+        // Hydrate the organization with the arrays.
+        $organization->hydrate([
+            'owns' => $ownedComponents,
+            'supports' => $supportedComponents,
+            'uses' => $usedComponents,
+            'members' => $members
+        ]);
+
+        $this->entityManager->persist($organization);
         $this->entityManager->flush();
 
         return $organization;
@@ -322,7 +392,6 @@ class EnrichOrganizationService
         return $organization;
 
     }//end enrichGithubOrganization()
-
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
