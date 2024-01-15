@@ -765,9 +765,7 @@ class PubliccodeService
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
-        if ($publiccode !== null
-            && key_exists('publiccodeYmlVersion', $publiccode) === false
-        ) {
+        if ($publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
             return $repository;
         }
 
