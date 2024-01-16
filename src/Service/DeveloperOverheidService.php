@@ -27,42 +27,47 @@ class DeveloperOverheidService
 {
 
     /**
-     * @var EntityManagerInterface
+     * @var EntityManagerInterface $entityManager
      */
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface $pluginLogger
      */
     private LoggerInterface $pluginLogger;
 
     /**
-     * @var CallService
+     * @var CallService $callService
      */
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
+     * @var SynchronizationService $syncService
      */
     private SynchronizationService $syncService;
 
     /**
-     * @var GatewayResourceService
+     * @var GatewayResourceService $resourceService
      */
     private GatewayResourceService $resourceService;
 
     /**
-     * @var GithubApiService
+     * @var GithubApiService $githubApiService
      */
     private GithubApiService $githubApiService;
 
     /**
-     * @var array
+     * @var GitlabApiService $gitlabApiService
+     */
+    private GitlabApiService $gitlabApiService;
+
+    /**
+     * @var array $data
      */
     private array $data;
 
     /**
-     * @var array
+     * @var array $configuration
      */
     private array $configuration;
 
@@ -74,6 +79,7 @@ class DeveloperOverheidService
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param GatewayResourceService $resourceService  The Gateway Resource Service.
      * @param GithubApiService       $githubApiService The Github API Service.
+     * @param GitlabApiService $gitlabApiService The Gitlab API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -81,7 +87,8 @@ class DeveloperOverheidService
         CallService $callService,
         SynchronizationService $syncService,
         GatewayResourceService $resourceService,
-        GithubApiService $githubApiService
+        GithubApiService $githubApiService,
+        GitlabApiService $gitlabApiService
     ) {
         $this->entityManager    = $entityManager;
         $this->pluginLogger     = $pluginLogger;
@@ -89,6 +96,7 @@ class DeveloperOverheidService
         $this->syncService      = $syncService;
         $this->resourceService  = $resourceService;
         $this->githubApiService = $githubApiService;
+        $this->gitlabApiService = $gitlabApiService;
         $this->data             = [];
         $this->configuration    = [];
 
@@ -102,7 +110,7 @@ class DeveloperOverheidService
      * @param array|null  $configuration The configuration array from the request
      * @param string|null $repositoryId  The given repository id
      *
-     * @return array|null
+     * @return array|null An arry of repositories from the developer.overheid source.
      * @throws \Exception
      */
     public function getRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
@@ -128,14 +136,56 @@ class DeveloperOverheidService
 
     }//end getRepositories()
 
+    /**
+     * Get all components of the given source.
+     *
+     * @param Source $source The given source
+     * @param array $repositoryArray The repository array
+     * @param string $domain The domain of the repository url.
+     *
+     * @return ObjectEntity|null The repository object.
+     * @throws \Exception
+     */
+    public function getRepositoryFromSync(Source $source, array $repositoryArray, string $domain): ?ObjectEntity
+    {
+        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+
+        // Find the repository sync by source.
+        $repositorySync     = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
+
+        // If the repository has a object don't get the repository from the given source.
+        if ($repositorySync->getObject() !== null) {
+            return $repositorySync->getObject();
+        }
+
+        // If there is no repository get the repository from the given source.
+        $this->entityManager->remove($repositorySync);
+        $this->entityManager->flush();
+
+        if ($domain === 'github.com') {
+            // Get the github repository
+            $this->githubApiService->setConfiguration($this->configuration);
+            $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
+        }
+
+        if ($domain === 'gitlab.com') {
+            // Get the gitlab repository
+            $this->gitlabApiService->setConfiguration($this->configuration);
+            $repository = $this->gitlabApiService->getGitlabRepository($repositoryArray['url']);
+        }
+
+        return $repository;
+    }//end handleGithubComponentRepo()
+
 
     /**
      * Get all repositories of the given source.
      *
-     * @param Source $source          The given source
-     * @param array  $repositoryArray The repository array.
+     * @param Source $source The given source
+     * @param array $repositoryArray The repository array.
      *
-     * @return array|null
+     * @return ObjectEntity|null The repository object.
+     * @throws \Exception
      */
     public function handleRepository(Source $source, array $repositoryArray): ?ObjectEntity
     {
@@ -146,33 +196,28 @@ class DeveloperOverheidService
             return null;
         }
 
+        // Get the domain of the repository url.
         $domain = $parsedUrl['host'];
-        switch ($domain) {
-        case 'github.com':
 
-            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
+        // Get the repository from the find sync by source.
+        // If there is no object get it from the github source.
+        $repository = $this->getRepositoryFromSync($source, $repositoryArray, $domain);
 
-            if ($repositorySync->getObject() !== null) {
-                $repository = $repositorySync->getObject();
-            }
+        // Get the developer.overheid sync.
+        $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
+        
+        // If we don't have a repository we return null. (probabbly the rate limit from github)
+        if ($repository === null) {
+            return null;
+        }
 
-            if ($repositorySync->getObject() === null) {
-                $this->entityManager->remove($repositorySync);
-                $this->entityManager->flush();
-                // Get the github repository
-                $this->githubApiService->setConfiguration($this->configuration);
-                $repository = $this->githubApiService->getGithubRepository($repositoryArray['url']);
-            }
-            return $repository;
-                break;
-        case 'gitlab.com':
-            break;
-        default:
-            break;
-        }//end switch
+        // Set the developer.overheid sync to the repository object.
+        $repository->addSynchronization($repositorySync);
 
-        return null;
+        $this->entityManager->persist($repository);
+        $this->entityManager->flush();
 
+        return $repository;
     }//end handleRepository()
 
 
@@ -182,7 +227,7 @@ class DeveloperOverheidService
      * @param Source $source   The given source
      * @param string $endpoint The endpoint of the source
      *
-     * @return array|null
+     * @return array|null An array of repositories from the developer.overheid source.
      * @throws \Exception
      */
     public function getRepositoriesFromSource(Source $source, string $endpoint): ?array
@@ -209,7 +254,7 @@ class DeveloperOverheidService
      * @param string $endpoint     The endpoint of the source
      * @param string $repositoryId The given repository id
      *
-     * @return array|null
+     * @return array|null The repository from the developer.overheid source.
      * @throws \Exception
      */
     public function getRepositoryFromSource(Source $source, string $endpoint, string $repositoryId): ?array
