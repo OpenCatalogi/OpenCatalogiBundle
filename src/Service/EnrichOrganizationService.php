@@ -397,24 +397,18 @@ class EnrichOrganizationService
      *
      * @param ObjectEntity $organization      Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      * @param Source       $source            The github/gitlab source.
-     * @param array        $organizationArray The organization array.
-     * @param string       $opencatalogiRepo  The opencatalogiRepo url.
+     * @param array        $organizationArray The data array with keys organizationArray and opencatalogiRepo.
      *
      * @return ObjectEntity The updated organization object.
      * @throws Exception
      */
-    public function enrichFromOpenCatalogiRepo(ObjectEntity $organization, Source $source, array $organizationArray, string $opencatalogiRepo): ObjectEntity
+    public function enrichFromOpenCatalogiRepo(ObjectEntity $organization, Source $source, array $dataArray): ObjectEntity
     {
         if ($source->getReference() === $this->configuration['githubSource']) {
             // Get the opencatalogi file from the opencatalogiRepo property.
             $this->githubApiService->setConfiguration($this->configuration);
             $opencatalogi = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
         }
-
-        $dataArray = [
-            'opencatalogiRepo'  => $opencatalogiRepo,
-            'organizationArray' => $organizationArray,
-        ];
 
         if ($source->getReference() === $this->configuration['gitlabSource']) {
             $opencatalogi = $this->getGitlabOpenCatalogiFile($source, $dataArray);
@@ -460,7 +454,11 @@ class EnrichOrganizationService
         $opencatalogiRepo = $organization->getValue('opencatalogiRepo');
         // $opencatalogiRepo = 'https://gitlab.com/api/v4/projects/33855802/repository/files/publiccode.yml?ref=master';
         if ($opencatalogiRepo !== null) {
-            return $this->enrichFromOpenCatalogiRepo($organization, $source, $organizationArray, $opencatalogiRepo);
+            $dataArray = [
+                'opencatalogiRepo'  => $opencatalogiRepo,
+                'organizationArray' => $organizationArray,
+            ];
+            return $this->enrichFromOpenCatalogiRepo($organization, $source, $dataArray);
         }//end if
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
