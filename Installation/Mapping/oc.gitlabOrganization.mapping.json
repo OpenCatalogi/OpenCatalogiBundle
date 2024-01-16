@@ -2,7 +2,7 @@
   "title": "GitlabApiOrganizationToOrganization",
   "$id": "https://api.github.com/oc.gitlabOrganization.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "passTrough": false,
   "mapping": {
     "name": "path",
