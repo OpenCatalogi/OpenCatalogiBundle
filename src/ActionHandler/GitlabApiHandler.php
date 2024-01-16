@@ -3,25 +3,24 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\FormInputService;
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService;
+use OpenCatalogi\OpenCatalogiBundle\Service\GitlabApiService;
 
 /**
- * ...
+ * Haalt alle repositories op die een opencatalogi en/of publiccode file hebben.
  */
-class FormInputHandler implements ActionHandlerInterface
+class GitlabApiHandler implements ActionHandlerInterface
 {
 
     /**
-     * @var FormInputService
+     * @var GithubApiService
      */
-    private FormInputService $service;
+    private GitlabApiService $service;
 
 
     /**
-     * @param FormInputService $service The FormInputService
+     * @param GitlabApiService $service The  GitlabApiService
      */
-    public function __construct(FormInputService $service)
+    public function __construct(GitlabApiService $service)
     {
         $this->service = $service;
 
@@ -33,15 +32,14 @@ class FormInputHandler implements ActionHandlerInterface
      *
      * @return array a [json-schema](https://json-schema.org/) that this  action should comply to
      */
-    public function getConfiguration()
+    public function getConfiguration(): array
     {
         return [
-            '$id'         => 'https://opencatalogi.nl/ActionHandler/FormInputHandler.ActionHandler.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubApiHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'FormInputHandler',
-            'description' => 'This handler gets the form input and creates or updates the repository',
+            'title'       => 'GitlabApiHandler',
+            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
             'required'    => [
-                'githubSource',
                 'gitlabSource',
                 'usercontentSource',
                 'repositorySchema',
@@ -52,17 +50,8 @@ class FormInputHandler implements ActionHandlerInterface
                 'publiccodeMapping',
                 'opencatalogiMapping',
                 'applicationSchema',
-                'ratingSchema',
-                'ratingMapping'
             ],
             'properties'  => [
-                'githubSource'        => [
-                    'type'        => 'string',
-                    'description' => 'The source of the github api.',
-                    'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-                    'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
-                    'required'    => true,
-                ],
                 'gitlabSource'        => [
                     'type'        => 'string',
                     'description' => 'The source of the gitlab api.',
@@ -133,20 +122,6 @@ class FormInputHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
-                'ratingSchema'    => [
-                    'type'        => 'string',
-                    'description' => 'The rating schema.',
-                    'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
-                    'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
-                    'required'    => true,
-                ],
-                'ratingMapping'   => [
-                    'type'        => 'string',
-                    'description' => 'The rating mapping.',
-                    'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
-                    'reference'   => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
-                    'required'    => true,
-                ],
             ],
         ];
 
@@ -154,16 +129,17 @@ class FormInputHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the email service plugin.
+     * This function runs the application to gateway service plugin.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
      *
      * @return array
+     * @throws \Exception
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->updateRepositoryWithFormInput($data, $configuration);
+        return $this->service->getGitlabRepository($data, $configuration);
 
     }//end run()
 

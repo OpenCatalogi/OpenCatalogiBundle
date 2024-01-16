@@ -2,7 +2,7 @@
   "title": "PubliccodeToComponent",
   "$id": "https://api.github.com/oc.githubPubliccodeComponent.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "passTrough": false,
   "mapping": {
     "publiccodeYmlVersion": "publiccodeYmlVersion",
@@ -92,6 +92,7 @@
     "dependsOn.open": "keyCantBeValue",
     "dependsOn.proprietary": "keyCantBeValue",
     "dependsOn.hardware": "keyCantBeValue",
+    "dependsOn": "unsetIfValue==",
     "nl.countryExtensionVersion": "keyCantBeValue",
     "nl.commonground.intendedOrganisations": "keyCantBeValue",
     "nl.commonground.installationType": "keyCantBeValue",

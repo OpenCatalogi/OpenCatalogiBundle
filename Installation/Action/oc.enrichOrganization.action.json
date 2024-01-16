@@ -2,7 +2,7 @@
   "title": "Enrich Organization Action",
   "$id": "https://opencatalogi.nl/action/oc.enrichOrganization.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "async": true,
   "priority": 2,
   "listens": ["opencatalogi.enrich.organization"],
@@ -15,6 +15,7 @@
   },
   "configuration": {
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "gitlabSource": "https://opencatalogi.nl/source/oc.GitlabAPI.source.json",
     "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
