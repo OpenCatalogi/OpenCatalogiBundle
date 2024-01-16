@@ -464,6 +464,34 @@ class EnrichOrganizationService
 
 
     /**
+     * Gets the organization id from the response.
+     *
+     * @return string|null The organization id from the response.
+     */
+    public function getOrganizationId(): ?string
+    {
+        try {
+            $this->data['response'] = \Safe\json_decode($this->data['response']->getContent(), true);
+        } catch (\Exception $exception) {
+            $this->pluginLogger->warning('Cannot get the content of the response.');
+        }
+
+        // This comes from the GithubEvent or FormInput action.
+        // We hava an organization in the response.
+        $organizationId = null;
+        if (key_exists('response', $this->data) === true
+            && key_exists('_self', $this->data['response']) === true
+            && key_exists('id', $this->data['response']['_self']) === true
+        ) {
+            $organizationId = $this->data['response']['_self']['id'];
+        }//end if
+
+        return $organizationId;
+
+    }//end getOrganizationId()
+
+
+    /**
      * Makes sure the action the action can actually runs and then executes functions to update an organization with fetched opencatalogi.yaml info.
      *
      * @param ?array $data          data set at the start of the handler
@@ -473,12 +501,13 @@ class EnrichOrganizationService
      *
      * @return array|null dataset at the end of the handler
      */
-    public function enrichOrganizationHandler(?array $data=[], ?array $configuration=[], ?string $organizationId=null): ?array
+    public function enrichOrganizationHandler(?array $data=[], ?array $configuration=[]): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;
 
         // If there is an organization in the response.
+        $organizationId = $this->getOrganizationId();
         if ($organizationId !== null) {
             $organization = $this->getOrganization($organizationId);
 

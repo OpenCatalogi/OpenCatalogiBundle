@@ -501,7 +501,7 @@ class GithubApiService
 
                 // Handle the opencatalogi file.
                 $this->openCatalogiService->setConfiguration($this->configuration);
-                $repository = $this->openCatalogiService->handleOpencatalogiFile($item, $source, $repository, $data, $repositoryArray['owner']);
+                $repository = $this->openCatalogiService->handleOpencatalogiFile($source, $repository, $data, $repositoryArray['owner']);
 
                 continue;
             }//end if
@@ -513,6 +513,9 @@ class GithubApiService
 
                 // Import the publiccode file and get the needed data. With the keys: publiccode/sourceId/sha.
                 $data = $this->importPubliccodeFile($item);
+                if ($data === null) {
+                    continue;
+                }
 
                 // Handle the publiccode file.
                 $this->publiccodeService->setConfiguration($this->configuration);

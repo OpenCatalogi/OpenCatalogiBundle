@@ -165,24 +165,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        $this->data = $data;
-
-        try {
-            $this->data['response'] = \Safe\json_decode($data['response']->getContent(), true);
-        } catch (\Exception $exception) {
-        }
-
-        // This comes from the GithubEvent or FormInput action.
-        // We hava an organization in the response.
-        $organizationId = null;
-        if (key_exists('response', $this->data) === true
-            && key_exists('_self', $this->data['response']) === true
-            && key_exists('id', $this->data['response']['_self']) === true
-        ) {
-            $organizationId = $this->data['response']['_self']['id'];
-        }//end if
-
-        return $this->service->enrichOrganizationHandler($this->data, $configuration, $organizationId);
+        return $this->service->enrichOrganizationHandler($data, $configuration);
 
     }//end run()
 
