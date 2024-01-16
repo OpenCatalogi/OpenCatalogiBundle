@@ -209,7 +209,6 @@ class GitlabApiService
             if (in_array($directory['name'], $publiccodeNames) === true
                 && $directory['type'] === 'blob'
             ) {
-                var_dump('The item is a publiccode file. Directory id is: '.$directory['id']);
                 $this->pluginLogger->info('The item is a publiccode file. Directory id is: '.$directory['id'], ['open-catalogi/open-catalogi-bundle']);
 
                 // Get the publiccode file from the repository directory.
@@ -546,9 +545,6 @@ class GitlabApiService
      */
     public function enrichRepository(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
-        var_dump($repositoryArray['namespace']);
-        die();
-
         // If there is no organization create one.
         if ($repository->getValue('organisation') === false) {
             $repository = $this->enrichWithOrganization($repository, $repositoryArray, $source);
