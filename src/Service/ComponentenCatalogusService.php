@@ -85,7 +85,7 @@ class ComponentenCatalogusService
      * @param LoggerInterface        $pluginLogger     The Plugin logger.
      * @param SynchronizationService $syncService      The Synchronization Service.
      * @param GithubApiService       $githubApiService The Github API Service.
-     * @param GitlabApiService $gitlabApiService The Gitlab API Service.
+     * @param GitlabApiService       $gitlabApiService The Gitlab API Service.
      */
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -114,8 +114,8 @@ class ComponentenCatalogusService
     /**
      * Get all applications or one application through the products of https://componentencatalogus.commonground.nl/api/products.
      *
-     * @param array|null $data The data array from the request
-     * @param array|null $configuration The configuration array from the request
+     * @param array|null  $data          The data array from the request
+     * @param array|null  $configuration The configuration array from the request
      * @param string|null $applicationId The given application id
      *
      * @throws \Exception
@@ -147,9 +147,9 @@ class ComponentenCatalogusService
     /**
      * Get all applications of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param array $configuration The configuration array
+     * @param Source $source        The given source
+     * @param string $endpoint      The endpoint of the source
+     * @param array  $configuration The configuration array
      *
      * @return array|null The applications as array.
      * @throws \Exception
@@ -224,11 +224,11 @@ class ComponentenCatalogusService
         $source             = $this->resourceService->getSource($configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $schema             = $this->resourceService->getSchema($configuration['applicationSchema'], 'open-catalogi/open-catalogi-bundle');
         $mapping            = $this->resourceService->getMapping($configuration['applicationMapping'], 'open-catalogi/open-catalogi-bundle');
-        if ($source instanceOf Source === false
-            || $schema instanceOf Entity === false
-            || $mapping instanceOf Mapping === false
-            || $organizationSchema instanceOf Entity === false
-            || $githubSource instanceOf Source === false
+        if ($source instanceof Source === false
+            || $schema instanceof Entity === false
+            || $mapping instanceof Mapping === false
+            || $organizationSchema instanceof Entity === false
+            || $githubSource instanceof Source === false
         ) {
             return null;
         }
@@ -320,9 +320,9 @@ class ComponentenCatalogusService
     /**
      * Get all components of the given source.
      *
-     * @param ObjectEntity $repository The repository object
-     * @param array  $componentArray The component array
-     * @param Source $source         The given source
+     * @param ObjectEntity $repository     The repository object
+     * @param array        $componentArray The component array
+     * @param Source       $source         The given source
      *
      * @return ObjectEntity|null The created component as object.
      * @throws \Exception
@@ -332,12 +332,13 @@ class ComponentenCatalogusService
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
-        if ($componentSchema instanceOf Entity === false
-            || $componentMapping instanceOf Mapping === false
-            || $organizationSchema instanceOf Entity === false
+        if ($componentSchema instanceof Entity === false
+            || $componentMapping instanceof Mapping === false
+            || $organizationSchema instanceof Entity === false
         ) {
             return null;
         }
+
         // Add values from the componenten catalogus array.
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $componentArray['repositoryUrl']);
         $componentSync->setMapping($componentMapping);
@@ -367,9 +368,9 @@ class ComponentenCatalogusService
     /**
      * Get all components of the given source.
      *
-     * @param ObjectEntity $component The component object
-     * @param array  $componentArray The component array
-     * @param Source $source         The given source
+     * @param ObjectEntity $component      The component object
+     * @param array        $componentArray The component array
+     * @param Source       $source         The given source
      *
      * @return ObjectEntity|null The updated component as object.
      * @throws \Exception
@@ -378,11 +379,12 @@ class ComponentenCatalogusService
     {
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
-        if ($componentMapping instanceOf Mapping === false
-            || $organizationSchema instanceOf Entity === false
+        if ($componentMapping instanceof Mapping === false
+            || $organizationSchema instanceof Entity === false
         ) {
             return null;
         }
+
         // Map the componenten catalogus data.
         $dataArray = $this->mappingService->mapping($componentMapping, $componentArray);
 
@@ -408,23 +410,25 @@ class ComponentenCatalogusService
 
     }//end updateComponentWithData()
 
+
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The github/gitlab source.
-     * @param array $componentArray The component array
-     * @param string $domain The domain of the repository url.
+     * @param  Source $source         The github/gitlab source.
+     * @param  array  $componentArray The component array
+     * @param  string $domain         The domain of the repository url.
      * @return ObjectEntity|null The repository as object.
      * @throws \Exception
      */
     public function getRepositoryFromSync(Source $source, array $componentArray, string $domain): ?ObjectEntity
     {
-        $repositorySchema   = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         if ($repositorySchema instanceof Entity === false) {
             return null;
         }
+
         // Find the repository sync by source.
-        $repositorySync     = $this->syncService->findSyncBySource($source, $repositorySchema, $componentArray['repositoryUrl']);
+        $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $componentArray['repositoryUrl']);
 
         // If the repository has a object don't get the repository from github.
         if ($repositorySync->getObject() !== null) {
@@ -448,17 +452,17 @@ class ComponentenCatalogusService
         }
 
         return $repository;
-    }//end handleGithubComponentRepo()
 
+    }//end getRepositoryFromSync()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $defaultSource         The componenten catalogus source
-     * @param array  $componentArray The component array
-     * @param ObjectEntity $repository The repository object
-     * @param Source $source         The given source
+     * @param Source       $defaultSource  The componenten catalogus source
+     * @param array        $componentArray The component array
+     * @param ObjectEntity $repository     The repository object
+     * @param Source       $source         The given source
      *
      * @return ObjectEntity|null The repository with the created/updated component(s).
      * @throws \Exception
@@ -466,7 +470,7 @@ class ComponentenCatalogusService
     public function handleComponentRepo(Source $defaultSource, array $componentArray, ObjectEntity $repository, Source $source): ?ObjectEntity
     {
         // Get the github api source.
-        $componentSchema    = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
         if ($componentSchema instanceof Entity === false) {
             return null;
         }
@@ -501,14 +505,14 @@ class ComponentenCatalogusService
 
         return $repository;
 
-    }//end handleGithubComponentRepo()
+    }//end handleComponentRepo()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $defaultSource The (default source) componenten catalogus.
-     * @param array $componentArray The component array
+     * @param Source $defaultSource  The (default source) componenten catalogus.
+     * @param array  $componentArray The component array
      *
      * @return ObjectEntity|null
      * @throws \Exception
@@ -523,19 +527,19 @@ class ComponentenCatalogusService
         // Get the domain of the repository url.
         $domain = $parsedUrl['host'];
 
-        switch ($domain){
+        switch ($domain) {
             // If the domain is from github get the github source.
-            case 'github.com':
-                $source       = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-                break;
+        case 'github.com':
+            $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+            break;
             // If the domain is from gitlab get the gitlab source.
-            case 'gitlab.com':
-                $source       = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
-                break;
-            default:
-                $source = null;
-                $this->pluginLogger->info('We don\'t support this repository with domain: '.$domain);
-                break;
+        case 'gitlab.com':
+            $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
+            break;
+        default:
+            $source = null;
+            $this->pluginLogger->info('We don\'t support this repository with domain: '.$domain);
+            break;
         }
 
         if ($source instanceof Source === false) {
@@ -553,15 +557,16 @@ class ComponentenCatalogusService
 
         // Handle the component of the repository.
         return $this->handleComponentRepo($defaultSource, $componentArray, $repository, $source);
+
     }//end handleComponent()
 
 
     /**
      * Get all components of the given source.
      *
-     * @param Source $source The given source
-     * @param string $endpoint The endpoint of the source
-     * @param string $componentId The component id.
+     * @param  Source $source      The given source
+     * @param  string $endpoint    The endpoint of the source
+     * @param  string $componentId The component id.
      * @return array|null The components of the repository.
      * @throws \Exception
      */
