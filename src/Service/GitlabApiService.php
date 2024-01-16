@@ -155,10 +155,10 @@ class GitlabApiService
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
-     * @param Source $source The source to sync from.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $repositoryArray The repository array.
-     * @param array $tree The tree of the repository.
+     * @param Source       $source          The source to sync from.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $repositoryArray The repository array.
+     * @param array        $tree            The tree of the repository.
      *
      * @return ObjectEntity|null The updated repositories with the opencatalogi and publiccode file
      */
@@ -236,9 +236,9 @@ class GitlabApiService
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
-     * @param  Source $source          The source to sync from.
-     * @param  array  $repositoryArray The repository array.
-     * @param  array  $directory The directory where the file is located.
+     * @param Source $source          The source to sync from.
+     * @param array  $repositoryArray The repository array.
+     * @param array  $directory       The directory where the file is located.
      *
      * @return array|null The file content.
      */
@@ -270,8 +270,8 @@ class GitlabApiService
     /**
      * Get the tree of the repository. /projects/{organization}/{repository}
      *
-     * @param  Source       $source          The source to sync from.
-     * @param  array        $repositoryArray The repository array.
+     * @param Source $source          The source to sync from.
+     * @param array  $repositoryArray The repository array.
 
      * @return array|null The tree of the repository.
      */
@@ -296,7 +296,7 @@ class GitlabApiService
     /**
      * Get the given gitlab repository from the /api/v4/projects/{path} endpoint.
      *
-     * @param Source $source The source to sync from.
+     * @param Source $source        The source to sync from.
      * @param string $repositoryUrl The repository url.
      *
      * @return array|null The repository from gitlab.
@@ -324,6 +324,7 @@ class GitlabApiService
         return $this->callService->decodeResponse($source, $response);
 
     }//end getGitlabRepoFromSource()
+
 
     /**
      * This function does a cleanup for the repository.
@@ -353,6 +354,7 @@ class GitlabApiService
         return $repository;
 
     }//end cleanupRepository()
+
 
     /**
      * This function enriches the repository with an organization.
