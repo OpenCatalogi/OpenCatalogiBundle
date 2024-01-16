@@ -25,57 +25,57 @@ class GitlabApiService
 {
 
     /**
-     * @var EntityManagerInterface
+     * @var EntityManagerInterface $entityManager
      */
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var CallService
+     * @var CallService $callService
      */
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
+     * @var SynchronizationService $syncService
      */
     private SynchronizationService $syncService;
 
     /**
-     * @var MappingService
+     * @var MappingService $mappingService
      */
     private MappingService $mappingService;
 
     /**
-     * @var RatingService
+     * @var RatingService $ratingService
      */
     private RatingService $ratingService;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface $pluginLogger
      */
     private LoggerInterface $pluginLogger;
 
     /**
-     * @var GatewayResourceService
+     * @var GatewayResourceService $resourceService
      */
     private GatewayResourceService $resourceService;
 
     /**
-     * @var PubliccodeService
+     * @var PubliccodeService $publiccodeService
      */
     private PubliccodeService $publiccodeService;
 
     /**
-     * @var OpenCatalogiService
+     * @var OpenCatalogiService $openCatalogiService
      */
     private OpenCatalogiService $openCatalogiService;
 
     /**
-     * @var array
+     * @var array $configuration
      */
     private array $configuration;
 
     /**
-     * @var array
+     * @var array $data
      */
     private array $data;
 
@@ -155,10 +155,12 @@ class GitlabApiService
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
-     * @param  Source $source          The source to sync from.
-     * @param  array  $repositoryArray
-     * @param  array  $tree
-     * @return ObjectEntity|null The repositories that where found.
+     * @param Source $source The source to sync from.
+     * @param ObjectEntity $repository The repository object.
+     * @param array $repositoryArray The repository array.
+     * @param array $tree The tree of the repository.
+     *
+     * @return ObjectEntity|null The updated repositories with the opencatalogi and publiccode file
      */
     public function importRepoFiles(Source $source, ObjectEntity $repository, array $repositoryArray, array $tree): ?ObjectEntity
     {
@@ -235,9 +237,10 @@ class GitlabApiService
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
      * @param  Source $source          The source to sync from.
-     * @param  array  $repositoryArray
-     * @param  array  $directory
-     * @return array|null The repositories that where found.
+     * @param  array  $repositoryArray The repository array.
+     * @param  array  $directory The directory where the file is located.
+     *
+     * @return array|null The file content.
      */
     public function getTheFileContent(Source $source, array $repositoryArray, array $directory): ?array
     {
@@ -265,15 +268,14 @@ class GitlabApiService
 
 
     /**
-     * Get the given gitlab repository from the /api/v4/search endpoint.
+     * Get the tree of the repository. /projects/{organization}/{repository}
      *
      * @param  Source       $source          The source to sync from.
-     * @param  array        $repositoryArray
-     * @param  ObjectEntity $repository
-     * @param  string       $monoRepoUrl
-     * @return array|null The updated repository.
+     * @param  array        $repositoryArray The repository array.
+
+     * @return array|null The tree of the repository.
      */
-    public function getRepoTreeFromGitlabApi(Source $source, array $repositoryArray, ObjectEntity $repository, string $monoRepoUrl): ?array
+    public function getRepoTreeFromGitlabApi(Source $source, array $repositoryArray): ?array
     {
         // Find the gitlab repository from the /projects/{organization}/{repository} endpoint.
         try {
@@ -292,11 +294,12 @@ class GitlabApiService
 
 
     /**
-     * Get the given gitlab repository from the /api/v4/search endpoint.
+     * Get the given gitlab repository from the /api/v4/projects/{path} endpoint.
      *
-     * @param  Source $source The source to sync from.
-     * @param  string $path
-     * @return array|null The repositories that where found.
+     * @param Source $source The source to sync from.
+     * @param string $repositoryUrl The repository url.
+     *
+     * @return array|null The repository from gitlab.
      */
     public function getGitlabRepoFromSource(Source $source, string $repositoryUrl): ?array
     {
@@ -322,106 +325,12 @@ class GitlabApiService
 
     }//end getGitlabRepoFromSource()
 
-
-    /**
-     * This function handles the logo.
-     *
-     * The logo can be given in multiple ways. (what we have seen)
-     * 1. An url to the logo. Here we don't validate the avatar url. TODO: validate the given avatar url. (https://gitlab.com/uploads/-/system/project/avatar/33855802/760205.png)
-     * 2. TODO: Check if there is a raw gitlab ur. A raw gitlab url of the logo. (....)
-     * 3. A gitlab url to where the logo is placed in a repository. (https://gitlab.com/discipl/RON/regels.overheid.nl/-/blob/master/images/WORK_PACKAGE_ISSUE.png)
-     * 4. A gitlab url to where the logo is placed in a repository as permalink. (https://gitlab.com/discipl/RON/regels.overheid.nl/-/blob/15445d8381ab5218d1b7b7e232be829bf037e4e5/images/WORK_PACKAGE_ISSUE.png)
-     * 5. A relative path. From the root of the repository to the image. (/images/WORK_PACKAGE_ISSUE.png)
-     *
-     * @param array        $publiccodeArray The mapped publiccode array from the github api.
-     * @param Source       $source          The github api source.
-     * @param ObjectEntity $repository      The repository object.
-     *
-     * @return string|null The logo from the publiccode
-     */
-    public function handleLogo(array $publiccodeArray, Source $source, ObjectEntity $repository): ?string
-    {
-        // Parse url to get the path (organization and repository) from the repository url.
-        // The repositoryName is used for option 2, 3 and 4.
-        $repositoryName = \Safe\parse_url($repository->getValue('url'))['path'];
-
-        // The logo can be given in multiple ways. (what we have seen). Check the function tekst for explanation about the types we handle.
-        // Check if the logo is a valid url.
-        if (filter_var($publiccodeArray['logo'], FILTER_VALIDATE_URL) !== false) {
-            $this->pluginLogger->info('The logo is a valid url. Check whether the logo comes from source https://avatars.githubusercontent.com or whether the logo must be retrieved from the github api with the given logo URL.');
-
-            // Parse url to get the host and path of the logo url.
-            $parsedLogo = \Safe\parse_url($publiccodeArray['logo']);
-
-            // There should always be a host because we checked if it is a valid url.
-            $domain = $parsedLogo['host'];
-            switch ($domain) {
-                // Check if the logo is as option 2, a logo from https://raw.githubusercontent.com.
-                // Check if the domain is https://raw.githubusercontent.com. If so, the user content source must be called with the path of the given logo URL as endpoint.
-            case 'raw.githubusercontent.com':
-                // Get the usercontent source.
-                $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
-                // Check if the given source is not an instance of a Source return null and create a log.
-                if ($usercontentSource instanceof Source === false) {
-                    $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
-
-                    // Cannot validate the raw usercontent url if the source cannot be found.
-                    return null;
-                }
-
-                // Handle the logo if the logo is as option 2, the raw github link for the logo.
-                return $this->handleRawLogo($publiccodeArray, $usercontentSource, 'raw');
-                    break;
-                // Check if the domain is https://github.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
-                // If so we need to get an url that the frontend can use.
-            case 'gitlab.com':
-                // TODO: 3 types are needed to be validated. Option 1, 3 and 4.
-                if (key_exists('path', $parsedLogo) === true
-                    && $parsedLogo['path'] !== null
-                ) {
-                    // The beginning of the path of gitlab is /uploads/. TODO: check if it always starts with uploads.
-                    // TODO: Handle gitlab avatar url.
-                    // For option 3 and 4:
-                    // Get the path after the /-/. TODO: check if this is always the format of the urls.
-                    // TODO: Handle the gitlab url. Do a call with the path after /-/.
-                    // Handle the logo if the logo is as option 3 or 4, the file fom github where the image can be found.
-                    return $this->handleLogoFromGithub($publiccodeArray, $source, $parsedLogo, $repositoryName);
-                }
-                break;
-            default:
-                $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
-            }//end switch
-        }//end if
-
-        // Check if the logo is not a valid url. The logo is as option 5 a relative path.
-        // A relative path of the logo should start from the root of the repository from github.
-        if (filter_var($publiccodeArray['logo'], FILTER_VALIDATE_URL) === false) {
-            if (str_contains($publiccodeArray['logo'], '/uploads/') === true) {
-                $this->pluginLogger->info('The logo is a gitlab uploads logo: '.$publiccodeArray['logo'], ['open-catalogi/open-catalogi-bundle']);
-
-                return 'https://gitlab.com'.$publiccodeArray['logo'];
-            }
-
-            // Set the type param to relative so that the correct error log is created.
-            return $this->getLogoFileContent($publiccodeArray, $source, '/repos'.$repositoryName.'/contents'.$publiccodeArray['logo'], 'relative');
-        }
-
-        // Got an other type of url. If the url comes here we need to check if we handle all the ways we want to validate.
-        $this->pluginLogger->warning('the logo is checked in 4 different ways. The specified logo does not match the 5 ways. Check if we need to add an extra option.', ['open-catalogi/open-catalogi-bundle']);
-
-        // Return null, because the given url is not from avatars.githubusercontent.com/raw.githubusercontent.com or github.com.
-        // Or the given url isn't a valid relative url.
-        return null;
-
-    }//end handleLogo()
-
-
     /**
      * This function does a cleanup for the repository.
      *
      * @param ObjectEntity $repository The repository object.
      *
-     * @return ObjectEntity|null Return the repository
+     * @return ObjectEntity|null The (updated) repository object
      */
     public function cleanupRepository(ObjectEntity $repository): ?ObjectEntity
     {
@@ -445,15 +354,14 @@ class GitlabApiService
 
     }//end cleanupRepository()
 
-
     /**
-     * This function enriches the repository with a organization.
+     * This function enriches the repository with an organization.
      *
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array from the github api.
      * @param Source       $source          The github api source.
      *
-     * @return ObjectEntity
+     * @return ObjectEntity The updated repository with an organization.
      */
     public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
@@ -502,7 +410,7 @@ class GitlabApiService
      *
      * @throws GuzzleException
      *
-     * @return ObjectEntity
+     * @return ObjectEntity The updated repository with a component.
      */
     public function enrichWithComponent(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
@@ -540,7 +448,8 @@ class GitlabApiService
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array from the github api call.
      *
-     * @return ObjectEntity The repository object
+     * @return ObjectEntity The updated repository object.
+     *
      * @throws GuzzleException
      */
     public function enrichRepository(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
@@ -564,11 +473,9 @@ class GitlabApiService
     /**
      * This function cleans the gitlab url.
      *
-     * @param string     $repositoryUrl   The url of the repository
-     * @param array|null $repositoryArray The repository array from the gitlab api.
+     * @param string $repositoryUrl The url of the repository
      *
-     * @return string|null
-     * @throws Exception
+     * @return string|null The clean repository url.
      */
     public function cleanUrl(string $repositoryUrl): ?string
     {
@@ -609,7 +516,7 @@ class GitlabApiService
      * @param string     $repositoryUrl   The url of the repository
      * @param array|null $repositoryArray The repository array from the gitlab api.
      *
-     * @return ObjectEntity|null
+     * @return ObjectEntity|null The gitlab repository.
      * @throws Exception
      */
     public function getGitlabRepository(string $repositoryUrl, ?array $repositoryArray=null): ?ObjectEntity
@@ -660,7 +567,7 @@ class GitlabApiService
         $repository = $repositorySync->getObject();
 
         // Get the tree of the repository. (all the files and directories from the root of the repo)
-        $tree = $this->getRepoTreeFromGitlabApi($source, $repositoryArray, $repository, $repositoryUrl);
+        $tree = $this->getRepoTreeFromGitlabApi($source, $repositoryArray);
 
         // Check in the tree if there is a publiccode file.
         // TODO: now only checks in the root of the repo. Also check if there are multiple files.
@@ -681,12 +588,12 @@ class GitlabApiService
 
 
     /**
-     * Get a organization with type Organization from the github api.
+     * Get an organization with type Organization from the gitlab api.
      *
      * @param string $name   The id of the organization.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported organization as array.
+     * @return array|null The imported organization from gitlab as array.
      */
     public function getOrganization(string $name, Source $source): ?array
     {
@@ -715,12 +622,12 @@ class GitlabApiService
 
 
     /**
-     * Get a organization with type Organization from the github api.
+     * Get an user with type User from the gitlab api.
      *
      * @param string $name   The name of the organization.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported organization as array.
+     * @return array|null The imported organization from gitlab as array.
      */
     public function getUser(string $name, Source $source): ?array
     {
