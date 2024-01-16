@@ -258,7 +258,6 @@ class OpenCatalogiService
         $organizationSync = $this->syncService->synchronize($organizationSync, $opencatalogi);
 
         // Persist the organization sync and organization objects.
-        $this->entityManager->persist($organizationSync);
         $this->entityManager->persist($organizationSync->getObject());
 
         // Set the organization to the repository object and persist the repository.
