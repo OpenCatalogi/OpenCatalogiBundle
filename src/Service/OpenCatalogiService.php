@@ -156,8 +156,9 @@ class OpenCatalogiService
         if (key_exists('logo', $opencatalogi) === false) {
             return $organizationArray['avatar_url'];
         }
-        
+
         return null;
+
     }//end enrichLogo()
 
 
@@ -178,7 +179,7 @@ class OpenCatalogiService
             || key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === null
         ) {
-           return null;
+            return null;
         }
 
         // If we get an empty string we set the description from the github api.
@@ -192,8 +193,9 @@ class OpenCatalogiService
         if (key_exists('description', $opencatalogi) === false) {
             return $organizationArray['description'];
         }
-        
+
         return null;
+
     }//end enrichDescription()
 
 
