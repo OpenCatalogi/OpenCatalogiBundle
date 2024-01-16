@@ -129,12 +129,11 @@ class EnrichOrganizationService
     {
         $softwareComponents = [];
         foreach ($opencatalogi[$type] as $item) {
-
             if ($type === 'softwareSupported') {
                 if (is_array($item) === true && key_exists('software', $item) === false) {
                     continue;
                 }
-                
+
                 $item = $item['software'];
             }
 
@@ -174,7 +173,8 @@ class EnrichOrganizationService
 
         return $softwareComponents;
 
-    }//end getSoftwareOwned()
+    }//end getSoftware()
+
 
     /**
      * This function gets the members in the opencatalogi file.
@@ -361,7 +361,6 @@ class EnrichOrganizationService
     }//end enrichGithubOrganization()
 
 
-
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -414,7 +413,7 @@ class EnrichOrganizationService
 
             // Get the id and path from the parsed url path.
             $repositoryArray['id'] = $explodedPath[0];
-            $directory['path'] = $explodedPath[1];
+            $directory['path']     = $explodedPath[1];
 
             // Get the opencatalogi file from the opencatalogiRepo property.
             $this->gitlabApiService->setConfiguration($this->configuration);
@@ -438,7 +437,7 @@ class EnrichOrganizationService
             $this->entityManager->flush();
 
             return $organization;
-        }
+        }//end if
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
         // Set the logo and description if null.
@@ -457,7 +456,7 @@ class EnrichOrganizationService
 
         return $organization;
 
-    }//end enrichOrganization()
+    }//end enrichGitlabOrganization()
 
 
     /**
