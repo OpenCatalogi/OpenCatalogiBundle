@@ -407,7 +407,7 @@ class EnrichOrganizationService
             $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with the opencatalogi file.');
 
             return $organization;
-        }
+        }//end if
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
         // Set the logo and description if null.
@@ -427,7 +427,7 @@ class EnrichOrganizationService
         return $organization;
 
     }//end enrichGithubOrganization()
-    
+
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
@@ -462,9 +462,10 @@ class EnrichOrganizationService
 
     }//end getOrganization()
 
+
     /**
      * Gets the organization id from the response.
-     * 
+     *
      * @return string|null The organization id from the response.
      */
     public function getOrganizationId(): ?string
@@ -486,7 +487,8 @@ class EnrichOrganizationService
         }//end if
 
         return $organizationId;
-    }
+
+    }//end getOrganizationId()
 
 
     /**
