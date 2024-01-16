@@ -122,6 +122,20 @@ class GithubApiHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
+                'ratingSchema'        => [
+                    'type'        => 'string',
+                    'description' => 'The rating schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'required'    => true,
+                ],
+                'ratingMapping'       => [
+                    'type'        => 'string',
+                    'description' => 'The rating mapping.',
+                    'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'reference'   => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'required'    => true,
+                ],
             ],
         ];
 

@@ -2,7 +2,7 @@
   "title": "GithubApiToRepository",
   "$id": "https://api.github.com/oc.githubRepository.mapping.json",
   "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "passTrough": false,
   "mapping": {
     "name": "name",
@@ -22,7 +22,6 @@
     "stars": "unsetIfValue==stargazers_count",
     "fork_count": "unsetIfValue==forks_count",
     "issue_open_count": "unsetIfValue==open_issues_count",
-    "source": "unsetIfValue==github",
     "forked_from": "unsetIfValue==",
     "archived": "boolean"
   }

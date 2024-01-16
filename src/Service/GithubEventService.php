@@ -98,7 +98,7 @@ class GithubEventService
         $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
 
         if ($repository === null) {
-            $this->data['response'] = new Response('Repository is not created.', 404, ['Content-Type' => 'application/json']);
+            $this->data['response'] = new Response('Repository is not created. See logs for more detail.', 404, ['Content-Type' => 'application/json']);
 
             return $this->data;
         }
