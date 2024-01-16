@@ -466,10 +466,10 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $dataArray An array with publiccode/opencatalogi files.
-     * @param Source $source The github api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $repositoryArray The repository array.
+     * @param array        $dataArray       An array with publiccode/opencatalogi files.
+     * @param Source       $source          The github api source.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $repositoryArray The repository array.
      *
      * @return ObjectEntity|null The updated repository with organization and/or component with the opencatalogi and/or publiccode file(s).
      * @throws Exception

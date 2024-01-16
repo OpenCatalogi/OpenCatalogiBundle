@@ -214,10 +214,10 @@ class OpenCatalogiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param Source $source The github api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $data The data array with keys opencatalogi/sourceId/sha.
-     * @param array|null $organizationArray The organization array.
+     * @param Source       $source            The github api source.
+     * @param ObjectEntity $repository        The repository object.
+     * @param array        $data              The data array with keys opencatalogi/sourceId/sha.
+     * @param array|null   $organizationArray The organization array.
      *
      * @return ObjectEntity|null The repository with the updated organization object
      */
