@@ -230,10 +230,6 @@ class EnrichOrganizationService
             return $organization;
         }
 
-        $opencatalogi['softwareSupported'][]['software'] = 'https://gitlab.com/appsemble/appsemble';
-
-        var_dump($opencatalogi['softwareSupported']);
-
         // Get the softwareOwned repositories and set it to the array.
         $ownedComponents = [];
         if (key_exists('softwareOwned', $opencatalogi) === true) {
