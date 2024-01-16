@@ -141,10 +141,12 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
+        $this->data = $data;
 
         try {
             $this->data['response'] = \Safe\json_decode($data['response']->getContent(), true);
         } catch (\Exception $exception) {
+            //
         }
 
         // This comes from the GithubEvent or FormInput action.
@@ -157,7 +159,8 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
             $organizationId = $this->data['response']['_self']['id'];
         }//end if
 
-        return $this->service->enrichOrganizationHandler($data, $configuration, $organizationId);
+
+        return $this->service->enrichOrganizationHandler($this->data, $configuration, $organizationId);
 
     }//end run()
 

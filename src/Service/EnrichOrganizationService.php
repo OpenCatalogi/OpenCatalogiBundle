@@ -394,9 +394,12 @@ class EnrichOrganizationService
             $organization = $this->getConnectedComponents($organization, $opencatalogi, $source);
 
             // Enrich the opencatalogi organization with a logo and description.
-            $organization = $this->openCatalogiService->enrichLogo($organizationArray, $opencatalogi, $organization);
-            $organization = $this->openCatalogiService->enrichDescription($organizationArray, $opencatalogi, $organization);
+            $logo = $this->openCatalogiService->enrichLogo($organizationArray, $opencatalogi, $organization);
+            $description = $this->openCatalogiService->enrichDescription($organizationArray, $opencatalogi, $organization);
 
+            // Hydrate the logo and description.
+            $organization->hydrate(['logo' => $logo, 'description' => $description]);
+            $this->entityManager->persist($organization);
             $this->entityManager->flush();
 
             $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with the opencatalogi file.');
@@ -422,7 +425,7 @@ class EnrichOrganizationService
         return $organization;
 
     }//end enrichGithubOrganization()
-
+    
 
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
