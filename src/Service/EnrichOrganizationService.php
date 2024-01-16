@@ -388,7 +388,6 @@ class EnrichOrganizationService
         // If the opencatalogiRepo is not null get the file and update the organization.
         if ($opencatalogiRepo !== null) {
             // Get the opencatalogi file from the opencatalogiRepo property.
-
             $this->githubApiService->setConfiguration($this->configuration);
             $opencatalogi = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
 
@@ -408,7 +407,7 @@ class EnrichOrganizationService
             $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with the opencatalogi file.');
 
             return $organization;
-        }
+        }//end if
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
         // Set the logo and description if null.

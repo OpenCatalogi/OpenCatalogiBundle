@@ -55,7 +55,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                 'opencatalogiMapping',
                 'applicationSchema',
                 'ratingSchema',
-                'ratingMapping'
+                'ratingMapping',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -135,14 +135,14 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
-                'ratingSchema'    => [
+                'ratingSchema'        => [
                     'type'        => 'string',
                     'description' => 'The rating schema.',
                     'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
                     'required'    => true,
                 ],
-                'ratingMapping'   => [
+                'ratingMapping'       => [
                     'type'        => 'string',
                     'description' => 'The rating mapping.',
                     'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
@@ -170,7 +170,6 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
         try {
             $this->data['response'] = \Safe\json_decode($data['response']->getContent(), true);
         } catch (\Exception $exception) {
-            //
         }
 
         // This comes from the GithubEvent or FormInput action.
@@ -182,7 +181,6 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
         ) {
             $organizationId = $this->data['response']['_self']['id'];
         }//end if
-
 
         return $this->service->enrichOrganizationHandler($this->data, $configuration, $organizationId);
 

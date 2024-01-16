@@ -826,14 +826,15 @@ class PubliccodeService
 
     }//end handleLogo()
 
+
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param Synchronization $componentSync The component sync object.
-     * @param array $componentArray The component array.
-     * @param Source $source The github or gitlab api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array|null $repositoryArray The repository array.
+     * @param Synchronization $componentSync   The component sync object.
+     * @param array           $componentArray  The component array.
+     * @param Source          $source          The github or gitlab api source.
+     * @param ObjectEntity    $repository      The repository object.
+     * @param array|null      $repositoryArray The repository array.
      *
      * @return ObjectEntity|null The repository object with updated publiccode component.
      */
@@ -856,13 +857,15 @@ class PubliccodeService
 
         // Find the sync with the source and publiccode url.
         return $this->syncService->synchronize($componentSync, $componentArray, true);
-    }
+
+    }//end syncPubliccodeFile()
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $publiccode The publiccode file.
-     * @param ObjectEntity $repository The repository object.
+     * @param  array        $publiccode The publiccode file.
+     * @param  ObjectEntity $repository The repository object.
      * @return array|null The publiccode array
      */
     public function setPubliccodeProperties(array $publiccode, ObjectEntity $repository): ?array
@@ -880,7 +883,8 @@ class PubliccodeService
         }
 
         return $publiccode;
-    }
+
+    }//end setPubliccodeProperties()
 
 
     /**
