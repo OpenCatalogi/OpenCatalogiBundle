@@ -42,6 +42,7 @@ class FormInputHandler implements ActionHandlerInterface
             'description' => 'This handler gets the form input and creates or updates the repository',
             'required'    => [
                 'githubSource',
+                'gitlabSource',
                 'usercontentSource',
                 'repositorySchema',
                 'repositoryMapping',
@@ -51,6 +52,8 @@ class FormInputHandler implements ActionHandlerInterface
                 'publiccodeMapping',
                 'opencatalogiMapping',
                 'applicationSchema',
+                'ratingSchema',
+                'ratingMapping'
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -58,6 +61,13 @@ class FormInputHandler implements ActionHandlerInterface
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'gitlabSource'        => [
+                    'type'        => 'string',
+                    'description' => 'The source of the gitlab api.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
                     'required'    => true,
                 ],
                 'usercontentSource'   => [
@@ -121,6 +131,20 @@ class FormInputHandler implements ActionHandlerInterface
                     'description' => 'The application schema.',
                     'example'     => 'https://opencatalogi.nl/oc.application.schema.json',
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
+                    'required'    => true,
+                ],
+                'ratingSchema'    => [
+                    'type'        => 'string',
+                    'description' => 'The rating schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'required'    => true,
+                ],
+                'ratingMapping'   => [
+                    'type'        => 'string',
+                    'description' => 'The rating mapping.',
+                    'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'reference'   => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
                     'required'    => true,
                 ],
             ],

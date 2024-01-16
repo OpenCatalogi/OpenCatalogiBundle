@@ -5,6 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
+use App\Entity\Synchronization;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
@@ -825,6 +826,62 @@ class PubliccodeService
 
     }//end handleLogo()
 
+    /**
+     * This function loops through the array with publiccode/opencatalogi files.
+     *
+     * @param Synchronization $componentSync The component sync object.
+     * @param array $componentArray The component array.
+     * @param Source $source The github or gitlab api source.
+     * @param ObjectEntity $repository The repository object.
+     * @param array|null $repositoryArray The repository array.
+     *
+     * @return ObjectEntity|null The repository object with updated publiccode component.
+     */
+    public function syncPubliccodeFile(Synchronization $componentSync, array $componentArray, Source $source, ObjectEntity $repository, ?array $repositoryArray=[]): ?Synchronization
+    {
+        // Check if the logo property is set and is not null.
+        if (key_exists('logo', $componentArray) === true
+            && $componentArray['logo'] !== null
+        ) {
+            $this->pluginLogger->info($componentArray['logo'].' is being handled.', ['open-catalogi/open-catalogi-bundle']);
+
+            $componentArray['logo'] = $this->handleLogo($componentArray, $source, $repository->getValue('url'), $repositoryArray['id']);
+        }
+
+        // Unset these values so we don't make duplicates.
+        // The objects will be set in the handlePubliccodeSubObjects function.
+        unset($componentArray['legal']['repoOwner']);
+        unset($componentArray['legal']['mainCopyrightOwner']);
+        unset($componentArray['applicationSuite']);
+
+        // Find the sync with the source and publiccode url.
+        return $this->syncService->synchronize($componentSync, $componentArray, true);
+    }
+
+    /**
+     * This function loops through the array with publiccode/opencatalogi files.
+     *
+     * @param array $publiccode The publiccode file.
+     * @param ObjectEntity $repository The repository object.
+     * @return array|null The publiccode array
+     */
+    public function setPubliccodeProperties(array $publiccode, ObjectEntity $repository): ?array
+    {
+        // Get the forked_from from the repository.
+        $forkedFrom = $repository->getValue('forked_from');
+        // Set the isBasedOn.
+        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
+            $publiccode['isBasedOn'] = $forkedFrom;
+        }
+
+        // Set developmentStatus obsolete when repository is archived.
+        if ($repository->getValue('archived') === true) {
+            $publiccode['developmentStatus'] = 'obsolete';
+        }
+
+        return $publiccode;
+    }
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
@@ -851,28 +908,11 @@ class PubliccodeService
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
-        if ($publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
-            return $repository;
-        }
-
-        // Get the forked_from from the repository.
-        $forkedFrom = $repository->getValue('forked_from');
-        // Set the isBasedOn.
-        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
-            $publiccode['isBasedOn'] = $forkedFrom;
-        }
-
-        // Set developmentStatus obsolete when repository is archived.
-        if ($repository->getValue('archived') === true) {
-            $publiccode['developmentStatus'] = 'obsolete';
-        }
-
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $sourceId);
 
         // Check the sha of the sync with the sha in the array.
         if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
             $componentSync->getObject()->hydrate(['url' => $repository]);
-
             $this->entityManager->persist($componentSync->getObject());
             $this->entityManager->flush();
 
@@ -881,28 +921,17 @@ class PubliccodeService
             return $repository;
         }
 
+        // Set the publiccode properties isBasedOn and developmentStatus.
+        $publiccode = $this->setPubliccodeProperties($publiccode, $repository);
+
         // Map the publiccode file.
         $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
 
-        // Check if the logo property is set and is not null.
-        if (key_exists('logo', $componentArray) === true
-            && $componentArray['logo'] !== null
-        ) {
-            $this->pluginLogger->info($componentArray['logo'].' is being handled.', ['open-catalogi/open-catalogi-bundle']);
+        // Update componentArray (unset object values to prevent duplicates).
+        // Sync the component with the publiccode values.
+        $componentSync = $this->syncPubliccodeFile($componentSync, $componentArray, $source, $repository, $repositoryArray);
 
-            $componentArray['logo'] = $this->handleLogo($componentArray, $source, $repository->getValue('url'), $repositoryArray['id']);
-        }
-
-        // Unset these values so we don't make duplicates.
-        // The objects will be set in the handlePubliccodeSubObjects function.
-        unset($componentArray['legal']['repoOwner']);
-        unset($componentArray['legal']['mainCopyrightOwner']);
-        unset($componentArray['applicationSuite']);
-
-        // Find the sync with the source and publiccode url.
-        $componentSync = $this->syncService->synchronize($componentSync, $componentArray, true);
-
-        // Handle the sub objects of the array.
+        // Handle the sub objects of the array (the values that were unset in de componetArray).
         $component = $this->handlePubliccodeSubObjects($dataArray, $source, $componentSync->getObject(), $publiccode);
 
         // Set the repository and publiccodeUrl to the component object.
