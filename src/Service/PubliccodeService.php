@@ -5,6 +5,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Service;
 use App\Entity\Entity;
 use App\Entity\Gateway as Source;
 use App\Entity\Mapping;
+use App\Entity\Synchronization;
 use App\Entity\ObjectEntity;
 use CommonGateway\CoreBundle\Service\CacheService;
 use CommonGateway\CoreBundle\Service\CallService;
@@ -146,7 +147,7 @@ class PubliccodeService
 
         // Create a maintenance object if $maintenance is false.
         if ($maintenance === false) {
-            $maintenance       = new ObjectEntity($maintenanceSchema);
+            $maintenance = new ObjectEntity($maintenanceSchema);
         }
 
         // Set the given value with the given array to the maintenance object.
@@ -274,8 +275,8 @@ class PubliccodeService
     /**
      * This function handles the legal repoOwner and mainCopyrightOwner objects and sets it to the component
      *
-     * @param Source       $source     The github api source.
-     * @param ObjectEntity $component  The component object.
+     * @param Source       $source          The github api source.
+     * @param ObjectEntity $component       The component object.
      * @param array        $publiccodeArray The publiccode array.
      *
      * @return ObjectEntity The updated component object.
@@ -309,7 +310,8 @@ class PubliccodeService
 
         return $component;
 
-    }//end handleContacts()
+    }//end handleLegal()
+
 
     /**
      * This function loops through the array with publiccode/opencatalogi files.
@@ -363,15 +365,16 @@ class PubliccodeService
 
     }//end handlePubliccodeSubObjects()
 
+
     /**
      * This function checks if that the rate limit is reached, the $errorCode should be 403.
      * And checks if the call is unauthorized. The github/gitlab api key is probably not valid anymore.
      *
-     * @param Source $source The given source.
-     * @param array $publiccodeArray The mapped publiccode array from the github api.
-     * @param int $errorCode The error code of the response
-     * @param string $type The type of the logo url.
-     * @param string $endpoint The endpoint to the call of the logo.
+     * @param Source $source          The given source.
+     * @param array  $publiccodeArray The mapped publiccode array from the github api.
+     * @param int    $errorCode       The error code of the response
+     * @param string $type            The type of the logo url.
+     * @param string $endpoint        The endpoint to the call of the logo.
      *
      * @return string|null With type raw the logo from the publiccode file if valid, if not null is returned. With type url and relative the download_url from the reponse of the call.
      */
@@ -380,7 +383,6 @@ class PubliccodeService
         // Check if that the rate limit is reached, the $errorCode should be 403.
         // And check if the call is unauthorized. The github api key is probably not valid anymore.
         // TODO: How do we handle both errors? If the file cannot be found the image is probably removed. Or that the assumption of the structure of the path we make the call with is wrong.
-
         if ($errorCode === 401) {
             $this->pluginLogger->warning('Cannot find the logo: '.$publiccodeArray['logo'].' because the call to the github api is unauthorized (status code: 401), the key is probabbly invalid. Return null.');
 
@@ -400,7 +402,6 @@ class PubliccodeService
         }
 
         // TODO: The logo will only be updated again if the publiccode file is being changed. Trigger an action to update the url if something went wrong. This should be a seperate action.
-
         // Check if the file cannot be found, the $errorCode should be 404.
         // TODO: If there is made an assumption with the structure of the path we do a call with, then the code must be adjusted. (This is only relevant for option 3, the github url)
         if ($errorCode == 404) {
@@ -417,17 +418,20 @@ class PubliccodeService
 
             // Return null because the given url or path is not valid.
         }
+
         return null;
-    }
+
+    }//end getError()
+
 
     /**
      * This function checks if that the rate limit is reached, the $errorCode should be 403.
      * And checks if the call is unauthorized. The github/gitlab api key is probably not valid anymore.
      *
      * @param Response $response The response.
-     * @param Source $source The given source.
-     * @param string $logoUrl The logo url.
-     * @param string $type The type of the url.
+     * @param Source   $source   The given source.
+     * @param string   $logoUrl  The logo url.
+     * @param string   $type     The type of the url.
      *
      * @return string|null With type raw the logo from the publiccode file if valid, if not null is returned. With type url and relative the download_url from the reponse of the call.
      */
@@ -462,7 +466,8 @@ class PubliccodeService
 
         // Return null if the logo cannot be decoded.
         return null;
-    }
+
+    }//end getResponse()
 
 
     /**
@@ -507,6 +512,7 @@ class PubliccodeService
 
         // If the code comes here the logo is not found, so null can be returned.
         return null;
+
     }//end getLogoFileContent()
 
 
@@ -565,11 +571,11 @@ class PubliccodeService
      * or the upload gitlab url (https://gitlab.com/uploads/-/system/project/avatar/33855802/760205.png)
      * Option 2 and 3 of the handleLogo() function.
      *
-     * @param array $componentArray The component array.
-     * @param Source $source The github api source.
-     * @param array $parsedLogo The parsed logo that was given in the publiccode file. \Safe\parse_url($publiccodeArray['logo']);
+     * @param array  $componentArray The component array.
+     * @param Source $source         The github api source.
+     * @param array  $parsedLogo     The parsed logo that was given in the publiccode file. \Safe\parse_url($publiccodeArray['logo']);
      * @param string $repositoryName The fullname of the repository. /{owner}/{repository}
-     * @param string $repositoryId The repository id.
+     * @param string $repositoryId   The repository id.
      *
      * @return string|null The updated logo with the download_url of the file contents with the path or null if not valid.
      */
@@ -673,15 +679,16 @@ class PubliccodeService
 
     }//end handleRawLogo()
 
+
     /**
      * This function switch between the possible logo's.
      *
      * GITHUB: Case 1, 2, 3 and 4 of the handleLogo function (see function description).
      * GITLAB: Case 1, 2, 3 and 4 of the handleLogo function (see function description).
      *
-     * @param array $componentArray The component array.
-     * @param Source $source The github api source.
-     * @param string $repositoryId The repository id.
+     * @param array  $componentArray The component array.
+     * @param Source $source         The github api source.
+     * @param string $repositoryId   The repository id.
      * @param string $repositoryName The repository name.
      *
      * @return string|null The logo from the publiccode
@@ -698,63 +705,64 @@ class PubliccodeService
         switch ($domain) {
             // Check if the logo is as option 1, a logo from https://avatars.githubusercontent.com.
             // Check if the domain is https://avatars.githubusercontent.com. If so we don't have to do anything and return the publiccodeArray logo.
-            case 'avatars.githubusercontent.com':
-                // TODO: Validate the avatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
-                $this->pluginLogger->info('The logo from the publiccode file is from https://avatars.githubusercontent.com. Do nothing and return the url.');
+        case 'avatars.githubusercontent.com':
+            // TODO: Validate the avatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
+            $this->pluginLogger->info('The logo from the publiccode file is from https://avatars.githubusercontent.com. Do nothing and return the url.');
 
-                // Return the given avatar logo url.
-                return $componentArray['logo'];
+            // Return the given avatar logo url.
+            return $componentArray['logo'];
             // Check if the logo is as option 2, a logo from https://raw.githubusercontent.com.
             // Check if the domain is https://raw.githubusercontent.com. If so, the user content source must be called with the path of the given logo URL as endpoint.
-            case 'raw.githubusercontent.com':
-                // Get the usercontent source.
-                $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
-                // Check if the given source is not an instance of a Source return null and create a log.
-                if ($usercontentSource instanceof Source === false) {
-                    $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
+        case 'raw.githubusercontent.com':
+            // Get the usercontent source.
+            $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+            // Check if the given source is not an instance of a Source return null and create a log.
+            if ($usercontentSource instanceof Source === false) {
+                $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
 
-                    // Cannot validate the raw usercontent url if the source cannot be found.
-                    break;
-                }
+                // Cannot validate the raw usercontent url if the source cannot be found.
+                break;
+            }
 
-                // Handle the logo if the logo is as option 2, the raw github link for the logo.
-                return $this->handleRawLogo($componentArray, $usercontentSource, 'raw');
+            // Handle the logo if the logo is as option 2, the raw github link for the logo.
+            return $this->handleRawLogo($componentArray, $usercontentSource, 'raw');
             // Check if the domain is https://github.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
             // If so we need to get an url that the frontend can use.
-            case 'github.com':
-                if (key_exists('path', $parsedLogo) === true
-                    && $parsedLogo['path'] !== null
-                ) {
-                    // Handle the logo if the logo is as option 3, the file fom github where the image can be found.
-                    return $this->handleLogoFromGithub($componentArray, $source, $parsedLogo, $repositoryName);
-                }
-                break;
+        case 'github.com':
+            if (key_exists('path', $parsedLogo) === true
+                && $parsedLogo['path'] !== null
+            ) {
+                // Handle the logo if the logo is as option 3, the file fom github where the image can be found.
+                return $this->handleLogoFromGithub($componentArray, $source, $parsedLogo, $repositoryName);
+            }
+            break;
             // Check if the logo is as option 5, a logo from https://www.gravatar.com.
             // Check if the domain is https://www.gravatar.com. If so we don't have to do anything and return the publiccodeArray logo.
-            case 'www.gravatar.com':
-                // TODO: Validate the gravatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
-                $this->pluginLogger->info('The logo from the publiccode file is from https://www.gravatar.com. Do nothing and return the url.');
+        case 'www.gravatar.com':
+            // TODO: Validate the gravatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
+            $this->pluginLogger->info('The logo from the publiccode file is from https://www.gravatar.com. Do nothing and return the url.');
 
-                // Return the given gravatar logo url.
-                return $componentArray['logo'];
+            // Return the given gravatar logo url.
+            return $componentArray['logo'];
             // Check if the domain is https://gitlab.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
             // If so we need to get an url that the frontend can use.
-            case 'gitlab.com':
-                if (key_exists('path', $parsedLogo) === true
-                    && $parsedLogo['path'] !== null
-                ) {
-                    // For option 6 and 7:
-                    // Handle the logo if the logo is as option 6 or 7, the file fom gitlab where the image can be found.
-                    return $this->handleLogoFromGitlab($componentArray, $source, $parsedLogo, $repositoryName, $repositoryId);
-                }
-                break;
-            default:
-                $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
-                break;
+        case 'gitlab.com':
+            if (key_exists('path', $parsedLogo) === true
+                && $parsedLogo['path'] !== null
+            ) {
+                // For option 6 and 7:
+                // Handle the logo if the logo is as option 6 or 7, the file fom gitlab where the image can be found.
+                return $this->handleLogoFromGitlab($componentArray, $source, $parsedLogo, $repositoryName, $repositoryId);
+            }
+            break;
+        default:
+            $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
+            break;
         }//end switch
 
         return null;
-    }
+
+    }//end switchLogo()
 
 
     /**
@@ -772,10 +780,10 @@ class PubliccodeService
      * 7. A github url to where the logo is placed in a repository. (https://gitlab.com/discipl/RON/regels.overheid.nl/-/blob/master/images/WORK_PACKAGE_ISSUE.png)
      * 8. A relative path. From the root of the repository to the image. (/images/WORK_PACKAGE_ISSUE.png)
      *
-     * @param array $componentArray The component array.
-     * @param Source $source The github api source.
-     * @param string $url The url of the repository or organization object.
-     * @param string $repositoryId The repository id.
+     * @param  array  $componentArray The component array.
+     * @param  Source $source         The github api source.
+     * @param  string $url            The url of the repository or organization object.
+     * @param  string $repositoryId   The repository id.
      * @return string|null The logo from the publiccode
      */
     public function handleLogo(array $componentArray, Source $source, string $url, string $repositoryId): ?string
@@ -788,7 +796,6 @@ class PubliccodeService
         // Check if the logo is a valid url.
         if (filter_var($componentArray['logo'], FILTER_VALIDATE_URL) !== false) {
             return $this->switchLogo($componentArray, $source, $repositoryId, $repositoryName);
-
         }//end if
 
         // Check if the logo is not a valid url. The logo is as option 4 a relative path.
@@ -823,11 +830,71 @@ class PubliccodeService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $publiccodeArray The publiccode array from the github api.
-     * @param Source $source The github or gitlab api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $data The data array with keys publiccode/sourceId/sha.
-     * @param array|null $repositoryArray The repository array.
+     * @param Synchronization $componentSync   The component sync object.
+     * @param array           $componentArray  The component array.
+     * @param Source          $source          The github or gitlab api source.
+     * @param ObjectEntity    $repository      The repository object.
+     * @param array|null      $repositoryArray The repository array.
+     *
+     * @return ObjectEntity|null The repository object with updated publiccode component.
+     */
+    public function syncPubliccodeFile(Synchronization $componentSync, array $componentArray, Source $source, ObjectEntity $repository, ?array $repositoryArray=[]): ?Synchronization
+    {
+        // Check if the logo property is set and is not null.
+        if (key_exists('logo', $componentArray) === true
+            && $componentArray['logo'] !== null
+        ) {
+            $this->pluginLogger->info($componentArray['logo'].' is being handled.', ['open-catalogi/open-catalogi-bundle']);
+
+            $componentArray['logo'] = $this->handleLogo($componentArray, $source, $repository->getValue('url'), $repositoryArray['id']);
+        }
+
+        // Unset these values so we don't make duplicates.
+        // The objects will be set in the handlePubliccodeSubObjects function.
+        unset($componentArray['legal']['repoOwner']);
+        unset($componentArray['legal']['mainCopyrightOwner']);
+        unset($componentArray['applicationSuite']);
+
+        // Find the sync with the source and publiccode url.
+        return $this->syncService->synchronize($componentSync, $componentArray, true);
+
+    }//end syncPubliccodeFile()
+
+
+    /**
+     * This function loops through the array with publiccode/opencatalogi files.
+     *
+     * @param  array        $publiccode The publiccode file.
+     * @param  ObjectEntity $repository The repository object.
+     * @return array|null The publiccode array
+     */
+    public function setPubliccodeProperties(array $publiccode, ObjectEntity $repository): ?array
+    {
+        // Get the forked_from from the repository.
+        $forkedFrom = $repository->getValue('forked_from');
+        // Set the isBasedOn.
+        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
+            $publiccode['isBasedOn'] = $forkedFrom;
+        }
+
+        // Set developmentStatus obsolete when repository is archived.
+        if ($repository->getValue('archived') === true) {
+            $publiccode['developmentStatus'] = 'obsolete';
+        }
+
+        return $publiccode;
+
+    }//end setPubliccodeProperties()
+
+
+    /**
+     * This function loops through the array with publiccode/opencatalogi files.
+     *
+     * @param array        $publiccodeArray The publiccode array from the github api.
+     * @param Source       $source          The github or gitlab api source.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $data            The data array with keys publiccode/sourceId/sha.
+     * @param array|null   $repositoryArray The repository array.
      *
      * @return ObjectEntity|null The repository object with updated publiccode component.
      */
@@ -845,28 +912,11 @@ class PubliccodeService
 
         $this->pluginLogger->info('Map the publiccode file with path: '.$publiccodeArray['path'].' and source id: '.$sourceId);
 
-        if ($publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
-            return $repository;
-        }
-
-        // Get the forked_from from the repository.
-        $forkedFrom = $repository->getValue('forked_from');
-        // Set the isBasedOn.
-        if ($forkedFrom !== null && isset($publiccode['isBasedOn']) === false) {
-            $publiccode['isBasedOn'] = $forkedFrom;
-        }
-
-        // Set developmentStatus obsolete when repository is archived.
-        if ($repository->getValue('archived') === true) {
-            $publiccode['developmentStatus'] = 'obsolete';
-        }
-
         $componentSync = $this->syncService->findSyncBySource($source, $componentSchema, $sourceId);
 
         // Check the sha of the sync with the sha in the array.
         if ($this->syncService->doesShaMatch($componentSync, $sha) === true) {
             $componentSync->getObject()->hydrate(['url' => $repository]);
-
             $this->entityManager->persist($componentSync->getObject());
             $this->entityManager->flush();
 
@@ -875,28 +925,17 @@ class PubliccodeService
             return $repository;
         }
 
+        // Set the publiccode properties isBasedOn and developmentStatus.
+        $publiccode = $this->setPubliccodeProperties($publiccode, $repository);
+
         // Map the publiccode file.
         $componentArray = $dataArray = $this->mappingService->mapping($publiccodeMapping, $publiccode);
 
-        // Check if the logo property is set and is not null.
-        if (key_exists('logo', $componentArray) === true
-            && $componentArray['logo'] !== null
-        ) {
-            $this->pluginLogger->info($componentArray['logo'].' is being handled.', ['open-catalogi/open-catalogi-bundle']);
+        // Update componentArray (unset object values to prevent duplicates).
+        // Sync the component with the publiccode values.
+        $componentSync = $this->syncPubliccodeFile($componentSync, $componentArray, $source, $repository, $repositoryArray);
 
-            $componentArray['logo'] = $this->handleLogo($componentArray, $source, $repository->getValue('url'), $repositoryArray['id']);
-        }
-
-        // Unset these values so we don't make duplicates.
-        // The objects will be set in the handlePubliccodeSubObjects function.
-        unset($componentArray['legal']['repoOwner']);
-        unset($componentArray['legal']['mainCopyrightOwner']);
-        unset($componentArray['applicationSuite']);
-
-        // Find the sync with the source and publiccode url.
-        $componentSync = $this->syncService->synchronize($componentSync, $componentArray, true);
-
-        // Handle the sub objects of the array.
+        // Handle the sub objects of the array (the values that were unset in de componetArray).
         $component = $this->handlePubliccodeSubObjects($dataArray, $source, $componentSync->getObject(), $publiccode);
 
         // Set the repository and publiccodeUrl to the component object.

@@ -132,9 +132,9 @@ class OpenCatalogiService
      * @param array        $opencatalogi      The opencatalogi file as array.
      * @param ObjectEntity $organization      The organization object.
      *
-     * @return ObjectEntity The organization object with updated logo.
+     * @return string|null The logo.
      */
-    public function enrichLogo(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ObjectEntity
+    public function enrichLogo(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ?string
     {
         // If the opencatalogi logo is set to null or false we set the organization logo to null.
         if (key_exists('logo', $opencatalogi) === true
@@ -142,28 +142,22 @@ class OpenCatalogiService
             || key_exists('logo', $opencatalogi) === true
             && $opencatalogi['logo'] === null
         ) {
-            $logo = null;
+            return null;
         }
 
         // If we get an empty string we set the logo from the github api.
         if (key_exists('logo', $opencatalogi) === true
             && $opencatalogi['logo'] === ''
         ) {
-            $logo = $organizationArray['avatar_url'];
+            return $organizationArray['avatar_url'];
         }
 
         // If we don't get a opencatalogi logo we set the logo from the github api.
         if (key_exists('logo', $opencatalogi) === false) {
-            $logo = $organizationArray['avatar_url'];
+            return $organizationArray['avatar_url'];
         }
 
-        // If the logo is set hydrate the logo.
-        if (isset($logo) === true) {
-            $organization->hydrate(['logo' => $logo]);
-            $this->entityManager->persist($organization);
-        }
-
-        return $organization;
+        return null;
 
     }//end enrichLogo()
 
@@ -175,9 +169,9 @@ class OpenCatalogiService
      * @param array        $opencatalogi      The opencatalogi file as array.
      * @param ObjectEntity $organization      The organization object.
      *
-     * @return ObjectEntity The organization object with updated logo.
+     * @return string|null The description.
      */
-    public function enrichDescription(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ObjectEntity
+    public function enrichDescription(array $organizationArray, array $opencatalogi, ObjectEntity $organization): ?string
     {
         // If the opencatalogi description is set to null or false we set the organization description to null.
         if (key_exists('description', $opencatalogi) === true
@@ -185,28 +179,22 @@ class OpenCatalogiService
             || key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === null
         ) {
-            $description = null;
+            return null;
         }
 
         // If we get an empty string we set the description from the github api.
         if (key_exists('description', $opencatalogi) === true
             && $opencatalogi['description'] === ''
         ) {
-            $description = $organizationArray['description'];
+            return $organizationArray['description'];
         }
 
         // If we don't get a opencatalogi description we set the description from the github api.
         if (key_exists('description', $opencatalogi) === false) {
-            $description = $organizationArray['description'];
+            return $organizationArray['description'];
         }
 
-        // If the description is set hydrate the description.
-        if (isset($description) === true) {
-            $organization->hydrate(['description' => $description]);
-            $this->entityManager->persist($organization);
-        }
-
-        return $organization;
+        return null;
 
     }//end enrichDescription()
 
@@ -214,10 +202,10 @@ class OpenCatalogiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param Source $source The github api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $data The data array with keys opencatalogi/sourceId/sha.
-     * @param array|null $organizationArray The organization array.
+     * @param Source       $source            The github api source.
+     * @param ObjectEntity $repository        The repository object.
+     * @param array        $data              The data array with keys opencatalogi/sourceId/sha.
+     * @param array|null   $organizationArray The organization array.
      *
      * @return ObjectEntity|null The repository with the updated organization object
      */

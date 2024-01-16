@@ -144,7 +144,7 @@ class EnrichOrganizationService
                 $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
             }
 
-            if (isset($repository) && $repository instanceof  ObjectEntity === false){
+            if (isset($repository) && $repository instanceof ObjectEntity === false) {
                 continue;
             }
 
@@ -192,7 +192,7 @@ class EnrichOrganizationService
                 $repository = $this->githubApiService->getGithubRepository($supports['software']);
             }
 
-            if (isset($repository) && $repository instanceof  ObjectEntity === false){
+            if (isset($repository) && $repository instanceof ObjectEntity === false) {
                 continue;
             }
 
@@ -211,8 +211,8 @@ class EnrichOrganizationService
      * This function gets the softwareUsed repositories in the opencatalogi file.
      *
      * @param Entity $repositorySchema The repository schema.
-     * @param array $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source $source The github api source.
+     * @param array  $opencatalogi     opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source           The github api source.
      *
      * @return array The software used components
      * @throws Exception
@@ -236,7 +236,7 @@ class EnrichOrganizationService
                 $repository = $this->githubApiService->getGithubRepository($repositoryUrl);
             }
 
-            if (isset($repository) && $repository instanceof  ObjectEntity === false){
+            if (isset($repository) && $repository instanceof ObjectEntity === false) {
                 continue;
             }
 
@@ -254,8 +254,8 @@ class EnrichOrganizationService
     /**
      * This function gets the members in the opencatalogi file.
      *
-     * @param array $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source $source The github api source.
+     * @param array  $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source $source       The github api source.
      *
      * @return array The organization objects as array.
      */
@@ -292,8 +292,8 @@ class EnrichOrganizationService
      * This function enriches the repository with a organization and/or component.
      *
      * @param ObjectEntity $organization The organization object.
-     * @param array $opencatalogi opencatalogi file array from the github usercontent/github api call.
-     * @param Source $source The github api source.
+     * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
+     * @param Source       $source       The github api source.
      *
      * @return ObjectEntity|null The updated organization object
      * @throws Exception
@@ -304,6 +304,7 @@ class EnrichOrganizationService
         if ($repositorySchema instanceof Entity === false) {
             return $organization;
         }
+
         // Get the softwareOwned repositories and set it to the array.
         $ownedComponents = [];
         if (key_exists('softwareOwned', $opencatalogi) === true) {
@@ -387,21 +388,26 @@ class EnrichOrganizationService
         // If the opencatalogiRepo is not null get the file and update the organization.
         if ($opencatalogiRepo !== null) {
             // Get the opencatalogi file from the opencatalogiRepo property.
+            $this->githubApiService->setConfiguration($this->configuration);
             $opencatalogi = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
 
             // Get the softwareSupported/softwareOwned/softwareUsed repositories.
             $organization = $this->getConnectedComponents($organization, $opencatalogi, $source);
 
             // Enrich the opencatalogi organization with a logo and description.
-            $organization = $this->openCatalogiService->enrichLogo($organizationArray, $opencatalogi, $organization);
-            $organization = $this->openCatalogiService->enrichDescription($organizationArray, $opencatalogi, $organization);
+            $this->openCatalogiService->setConfiguration($this->configuration);
+            $logo        = $this->openCatalogiService->enrichLogo($organizationArray, $opencatalogi, $organization);
+            $description = $this->openCatalogiService->enrichDescription($organizationArray, $opencatalogi, $organization);
 
+            // Hydrate the logo and description.
+            $organization->hydrate(['logo' => $logo, 'description' => $description]);
+            $this->entityManager->persist($organization);
             $this->entityManager->flush();
 
             $this->pluginLogger->info($organization->getValue('name').' succesfully updated the organization with the opencatalogi file.');
 
             return $organization;
-        }
+        }//end if
 
         // If the opencatalogiRepo is null update the logo and description with the organization array.
         // Set the logo and description if null.
@@ -487,7 +493,7 @@ class EnrichOrganizationService
             return $this->data;
         }
 
-        $organizations      = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
+        $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
         foreach ($organizations as $organization) {
             // Check if the name and github is not null.
             if ($organization instanceof ObjectEntity === true

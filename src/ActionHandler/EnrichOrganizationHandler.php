@@ -44,6 +44,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
             'description' => 'This handler enriches the organizations',
             'required'    => [
                 'githubSource',
+                'gitlabSource',
                 'usercontentSource',
                 'repositorySchema',
                 'repositoryMapping',
@@ -53,6 +54,8 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                 'publiccodeMapping',
                 'opencatalogiMapping',
                 'applicationSchema',
+                'ratingSchema',
+                'ratingMapping',
             ],
             'properties'  => [
                 'githubSource'        => [
@@ -60,6 +63,13 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'gitlabSource'        => [
+                    'type'        => 'string',
+                    'description' => 'The source of the gitlab api.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
                     'required'    => true,
                 ],
                 'usercontentSource'   => [
@@ -125,6 +135,20 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
                     'reference'   => 'https://opencatalogi.nl/oc.application.schema.json',
                     'required'    => true,
                 ],
+                'ratingSchema'        => [
+                    'type'        => 'string',
+                    'description' => 'The rating schema.',
+                    'example'     => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'reference'   => 'https://opencatalogi.nl/oc.rating.schema.json',
+                    'required'    => true,
+                ],
+                'ratingMapping'       => [
+                    'type'        => 'string',
+                    'description' => 'The rating mapping.',
+                    'example'     => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'reference'   => 'https://opencatalogi.nl/api/oc.rateComponent.mapping.json',
+                    'required'    => true,
+                ],
             ],
         ];
 
@@ -141,6 +165,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
+        $this->data = $data;
 
         try {
             $this->data['response'] = \Safe\json_decode($data['response']->getContent(), true);
@@ -157,7 +182,7 @@ class EnrichOrganizationHandler implements ActionHandlerInterface
             $organizationId = $this->data['response']['_self']['id'];
         }//end if
 
-        return $this->service->enrichOrganizationHandler($data, $configuration, $organizationId);
+        return $this->service->enrichOrganizationHandler($this->data, $configuration, $organizationId);
 
     }//end run()
 

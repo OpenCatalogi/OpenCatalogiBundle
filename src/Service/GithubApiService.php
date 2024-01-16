@@ -368,7 +368,7 @@ class GithubApiService
         }
 
         // If there is no component create one.
-        if ($repository->getValue('components') === false) {
+        if ($repository->getValue('components')->count() === 0) {
             $repository = $this->enrichWithComponent($repository, $repositoryArray, $source);
         }
 
@@ -450,7 +450,7 @@ class GithubApiService
         // Get the file from the usercontent or github api source
         // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
         $publiccode = $this->getFileFromRawUserContent($publiccodeUrl, $item['git_url']);
-        if ($publiccode === null) {
+        if ($publiccode === null || $publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
             return null;
         }
 
@@ -466,10 +466,10 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array $dataArray An array with publiccode/opencatalogi files.
-     * @param Source $source The github api source.
-     * @param ObjectEntity $repository The repository object.
-     * @param array $repositoryArray The repository array.
+     * @param array        $dataArray       An array with publiccode/opencatalogi files.
+     * @param Source       $source          The github api source.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $repositoryArray The repository array.
      *
      * @return ObjectEntity|null The updated repository with organization and/or component with the opencatalogi and/or publiccode file(s).
      * @throws Exception
