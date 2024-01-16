@@ -21,51 +21,60 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 
+/**
+ *  This class handles the opencatalogi file.
+ *
+ * @Author Sarai Misidjan <sarai@conduction.nl>
+ *
+ * @license EUPL <https://github.com/ConductionNL/contactcatalogus/blob/master/LICENSE.md>
+ *
+ * @category Service
+ */
 class OpenCatalogiService
 {
 
     /**
-     * @var EntityManagerInterface
+     * @var EntityManagerInterface $entityManager
      */
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var CallService
+     * @var CallService $callService
      */
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
+     * @var SynchronizationService $syncService
      */
     private SynchronizationService $syncService;
 
     /**
-     * @var MappingService
+     * @var MappingService $mappingService
      */
     private MappingService $mappingService;
 
     /**
-     * @var RatingService
+     * @var RatingService $ratingService
      */
     private RatingService $ratingService;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface $pluginLogger
      */
     private LoggerInterface $pluginLogger;
 
     /**
-     * @var GatewayResourceService
+     * @var GatewayResourceService $resourceService
      */
     private GatewayResourceService $resourceService;
 
     /**
-     * @var array
+     * @var array $configuration
      */
     private array $configuration;
 
     /**
-     * @var array
+     * @var array $data
      */
     private array $data;
 
@@ -117,7 +126,7 @@ class OpenCatalogiService
 
 
     /**
-     * This function enriches the opencatalogi file organization.
+     * This function enriches the logo of the organization
      *
      * @param array        $organizationArray The organization from the github api.
      * @param array        $opencatalogi      The opencatalogi file as array.
@@ -160,7 +169,7 @@ class OpenCatalogiService
 
 
     /**
-     * This function enriches the opencatalogi file organization.
+     * This function enriches the description of the organization
      *
      * @param array        $organizationArray The organization from the github api.
      * @param array        $opencatalogi      The opencatalogi file as array.
@@ -205,14 +214,14 @@ class OpenCatalogiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array        $opencatalogiArray The opencatalogi array from the github api.
-     * @param Source       $source            The github api source.
-     * @param ObjectEntity $repository        The repository object.
+     * @param Source $source The github api source.
+     * @param ObjectEntity $repository The repository object.
+     * @param array $data The data array with keys opencatalogi/sourceId/sha.
+     * @param array|null $organizationArray The organization array.
      *
      * @return ObjectEntity|null The repository with the updated organization object
-     * @throws Exception
      */
-    public function handleOpencatalogiFile(array $opencatalogiArray, Source $source, ObjectEntity $repository, array $data, ?array $organizationArray=[]): ?ObjectEntity
+    public function handleOpencatalogiFile(Source $source, ObjectEntity $repository, array $data, ?array $organizationArray=[]): ?ObjectEntity
     {
         $opencatalogiMapping = $this->resourceService->getMapping($this->configuration['opencatalogiMapping'], 'open-catalogi/open-catalogi-bundle');
         $organizationSchema  = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');

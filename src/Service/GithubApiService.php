@@ -34,62 +34,62 @@ class GithubApiService
 {
 
     /**
-     * @var EntityManagerInterface
+     * @var EntityManagerInterface $entityManager
      */
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var CallService
+     * @var CallService $callService
      */
     private CallService $callService;
 
     /**
-     * @var SynchronizationService
+     * @var SynchronizationService $syncService
      */
     private SynchronizationService $syncService;
 
     /**
-     * @var MappingService
+     * @var MappingService $mappingService
      */
     private MappingService $mappingService;
 
     /**
-     * @var RatingService
+     * @var RatingService $ratingService
      */
     private RatingService $ratingService;
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface $pluginLogger
      */
     private LoggerInterface $pluginLogger;
 
     /**
-     * @var GatewayResourceService
+     * @var GatewayResourceService $resourceService
      */
     private GatewayResourceService $resourceService;
 
     /**
-     * @var GitlabApiService
+     * @var GitlabApiService $gitlabApiService
      */
     private GitlabApiService $gitlabApiService;
 
     /**
-     * @var PubliccodeService
+     * @var PubliccodeService $publiccodeService
      */
     private PubliccodeService $publiccodeService;
 
     /**
-     * @var OpenCatalogiService
+     * @var OpenCatalogiService $openCatalogiService
      */
     private OpenCatalogiService $openCatalogiService;
 
     /**
-     * @var array
+     * @var array $configuration
      */
     private array $configuration;
 
     /**
-     * @var array
+     * @var array $data
      */
     private array $data;
 
@@ -174,7 +174,7 @@ class GithubApiService
      * @param string     $repositoryUrl   The url of the repository
      * @param array|null $repositoryArray The repository array from the github api.
      *
-     * @return ObjectEntity|null
+     * @return ObjectEntity|null The imported github repository.
      * @throws Exception
      */
     public function getGithubRepository(string $repositoryUrl, ?array $repositoryArray=null): ?ObjectEntity
@@ -184,7 +184,7 @@ class GithubApiService
         if ($repositorySchema instanceof Entity === false
             || $repositoryMapping instanceof Mapping === false
         ) {
-            return $this->data;
+            return null;
         }//end if
 
         $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
@@ -279,11 +279,14 @@ class GithubApiService
      * @param array        $repositoryArray The repository array from the github api.
      * @param Source       $source          The github api source.
      *
-     * @return ObjectEntity
+     * @return ObjectEntity The updated repository with organization.
      */
     public function enrichWithOrganization(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($organizationSchema instanceof Entity === false) {
+            return $repository;
+        }
 
         $organizationSync = $this->syncService->findSyncBySource($source, $organizationSchema, $repositoryArray['owner']['html_url']);
 
@@ -313,11 +316,14 @@ class GithubApiService
      *
      * @throws GuzzleException
      *
-     * @return ObjectEntity
+     * @return ObjectEntity The updated repository with component.
      */
     public function enrichWithComponent(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
     {
         $componentSchema = $this->resourceService->getSchema($this->configuration['componentSchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($componentSchema instanceof Entity === false) {
+            return $repository;
+        }
 
         $forkedFrom = $repository->getValue('forked_from');
         // Set the isBasedOn.
@@ -351,7 +357,7 @@ class GithubApiService
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array from the github api call.
      *
-     * @return ObjectEntity The repository object
+     * @return ObjectEntity The updated repository object with organization and component.
      * @throws GuzzleException
      */
     public function enrichRepository(ObjectEntity $repository, array $repositoryArray, Source $source): ObjectEntity
@@ -422,11 +428,9 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array  $dataArray An array with publiccode/opencatalogi files.
-     * @param Source $source    The github api source.
+     * @param array $item An array with opencatalogi file.
      *
      * @return array|null An array with the publiccode => imported publiccode file /sourceId => The sourceId /sha => The sha
-     * @throws Exception
      */
     public function importPubliccodeFile(array $item): ?array
     {
@@ -462,11 +466,12 @@ class GithubApiService
     /**
      * This function loops through the array with publiccode/opencatalogi files.
      *
-     * @param array        $dataArray  An array with publiccode/opencatalogi files.
-     * @param Source       $source     The github api source.
+     * @param array $dataArray An array with publiccode/opencatalogi files.
+     * @param Source $source The github api source.
      * @param ObjectEntity $repository The repository object.
+     * @param array $repositoryArray The repository array.
      *
-     * @return ObjectEntity|null
+     * @return ObjectEntity|null The updated repository with organization and/or component with the opencatalogi and/or publiccode file(s).
      * @throws Exception
      */
     public function importRepoFiles(array $dataArray, Source $source, ObjectEntity $repository, array $repositoryArray): ?ObjectEntity
@@ -525,7 +530,7 @@ class GithubApiService
      *
      * @param string $gitUrl The git url of the repository
      *
-     * @return array|null
+     * @return array|null The file content of the github api.
      */
     public function getFileFromGithubApi(string $gitUrl): ?array
     {
@@ -578,7 +583,7 @@ class GithubApiService
      * @param string      $repositoryUrl The url of the repository
      * @param string|null $gitUrl        The git url of the repository
      *
-     * @return array|null
+     * @return array|null The opencatalogi or publiccode file from the raw.usercontent or github api source.
      * @throws GuzzleException
      */
     public function getFileFromRawUserContent(string $repositoryUrl, ?string $gitUrl=null): ?array
@@ -778,7 +783,7 @@ class GithubApiService
      * @param string $name   The name of the repository.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported repository as array.
+     * @return array|null The imported organization repositories as array.
      */
     public function getOrganizationRepos(string $name, Source $source): ?array
     {
@@ -815,7 +820,7 @@ class GithubApiService
      * @param string $name   The name of the organization.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported organization as array.
+     * @return array|null The imported user as array.
      */
     public function getUser(string $name, Source $source): ?array
     {
@@ -850,7 +855,7 @@ class GithubApiService
      * @param string $name   The name of the repository.
      * @param Source $source The source to sync from.
      *
-     * @return array|null The imported repository as array.
+     * @return array|null The imported user repositories as array.
      */
     public function getUserRepos(string $name, Source $source): ?array
     {
@@ -898,6 +903,9 @@ class GithubApiService
 
         $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($source instanceof Source === false && $repositorySchema instanceof Entity === false) {
+            return $this->data;
+        }
 
         // If we have one repository.
         if ($repositoryId !== null) {
