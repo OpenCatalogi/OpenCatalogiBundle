@@ -150,7 +150,10 @@ class DeveloperOverheidService
     public function getRepositoryFromSync(Source $source, array $repositoryArray, string $domain): ?ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-
+        if ($repositorySchema instanceof Entity === false) {
+            return null;
+        }
+        
         // Find the repository sync by source.
         $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
 
@@ -192,7 +195,10 @@ class DeveloperOverheidService
     public function handleRepository(Source $source, array $repositoryArray): ?ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-
+        if ($repositorySchema instanceof Entity === false) {
+            return null;
+        }
+        
         $parsedUrl = \Safe\parse_url($repositoryArray['url']);
         if (key_exists('host', $parsedUrl) === false) {
             return null;

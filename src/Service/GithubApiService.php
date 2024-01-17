@@ -899,7 +899,7 @@ class GithubApiService
      * @return array|null dataset at the end of the handler
      * @throws Exception
      */
-    public function findGithubRepositories(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
+    public function githubApiHandler(?array $data=[], ?array $configuration=[], ?string $repositoryId=null): ?array
     {
         $this->configuration = $configuration;
         $this->data          = $data;

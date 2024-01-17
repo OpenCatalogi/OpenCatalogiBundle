@@ -302,9 +302,7 @@ class ComponentenCatalogusService
         $source   = $this->resourceService->getSource($this->configuration['source'], 'open-catalogi/open-catalogi-bundle');
         $endpoint = $this->configuration['endpoint'];
 
-        if ($source === null
-            && $endpoint === null
-        ) {
+        if ($source === null && $endpoint === null) {
             return $this->data;
         }
 
@@ -379,9 +377,7 @@ class ComponentenCatalogusService
     {
         $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
         $componentMapping   = $this->resourceService->getMapping($this->configuration['componentencatalogusMapping'], 'open-catalogi/open-catalogi-bundle');
-        if ($componentMapping instanceof Mapping === false
-            || $organizationSchema instanceof Entity === false
-        ) {
+        if ($componentMapping instanceof Mapping === false || $organizationSchema instanceof Entity === false) {
             return null;
         }
 
@@ -486,9 +482,7 @@ class ComponentenCatalogusService
 
         // If there is no publiccode file found enrich the component with the componenten catalogus data.
         // Check if there is a publiccode file through the property publiccodeUrl.
-        if ($components->count() === 1
-            && $components[0] !== null
-            && $components[0]->getValue('publiccodeUrl') === null
+        if ($components->count() === 1 && $components[0] !== null && $components[0]->getValue('publiccodeUrl') === null
         ) {
             $component = $this->updateComponentWithData($components[0], $componentArray, $source);
         }

@@ -38,7 +38,7 @@ class GitlabApiHandler implements ActionHandlerInterface
             '$id'         => 'https://opencatalogi.nl/ActionHandler/GithubApiHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
             'title'       => 'GitlabApiHandler',
-            'description' => 'This is a action to create objects from the fetched applications from the componenten catalogus.',
+            'description' => 'This is a action thats searches for all gitlab repositories with a publiccode and/or opencatalogi file',
             'required'    => [
                 'gitlabSource',
                 'usercontentSource',
@@ -129,7 +129,7 @@ class GitlabApiHandler implements ActionHandlerInterface
 
 
     /**
-     * This function runs the application to gateway service plugin.
+     * This function runs the gitlabApiHandler function thats searches for all repositories with a publiccode and/or opencatalogi file.
      *
      * @param array $data          The data from the call
      * @param array $configuration The configuration of the action
@@ -139,7 +139,8 @@ class GitlabApiHandler implements ActionHandlerInterface
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->getGitlabRepository($data, $configuration);
+        // TODO: Search for all gitlab repositories with a publiccode and/or opencatalogi file (OP-162).
+        return [];
 
     }//end run()
 
