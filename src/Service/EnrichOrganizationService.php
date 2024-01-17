@@ -307,8 +307,8 @@ class EnrichOrganizationService
         $explodedPath = explode('/repository/files/', $explodedPath);
 
         // Get the id and path from the parsed url path.
-        $data['id'] = $explodedPath[0];
-        $data['path']     = $explodedPath[1];
+        $data['id']   = $explodedPath[0];
+        $data['path'] = $explodedPath[1];
 
         // Get the opencatalogi file from the opencatalogiRepo property.
         $this->gitlabApiService->setConfiguration($this->configuration);
@@ -358,7 +358,7 @@ class EnrichOrganizationService
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      * @param Source       $source       The github/gitlab source.
-     * @param array $dataArray The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
+     * @param array        $dataArray    The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
      *
      * @throws GuzzleException|Exception
      *
@@ -390,8 +390,8 @@ class EnrichOrganizationService
      * This function enriches the organization with the opencatalogiRepo url.
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
-     * @param Source $source The github/gitlab source.
-     * @param array $dataArray The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
+     * @param Source       $source       The github/gitlab source.
+     * @param array        $dataArray    The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
      *
      * @return ObjectEntity The updated organization object.
      * @throws Exception
@@ -554,6 +554,7 @@ class EnrichOrganizationService
 
     }//end getOrganizationId()
 
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -572,7 +573,6 @@ class EnrichOrganizationService
 
         $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
         foreach ($organizations as $organization) {
-
             if ($organization instanceof ObjectEntity === false) {
                 continue;
             }
@@ -603,11 +603,11 @@ class EnrichOrganizationService
                 // Enrich the organization object.
                 $this->data['response'] = $this->enrichOrganization($organization, $source);
             }
-
         }//end foreach
 
         return $this->data;
-    }
+
+    }//end getAllOrganizations()
 
 
     /**
@@ -637,7 +637,6 @@ class EnrichOrganizationService
 
         // If there is no organization we get all the organizations and enrich it.
         $this->getAllOrganizations();
-
 
         return $this->data;
 

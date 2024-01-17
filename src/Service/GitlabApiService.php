@@ -151,6 +151,7 @@ class GitlabApiService
 
     }//end setConfiguration()
 
+
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
@@ -181,7 +182,9 @@ class GitlabApiService
         $opencatalogi['opencatalogiRepo'] = $source->getLocation().'/api/v4/projects/'.$repositoryArray['id'].'/repository/files/'.$directory['path'].'?ref='.$repositoryArray['default_branch'];
 
         return $opencatalogi;
-    }
+
+    }//end importOpenCatalogiFile()
+
 
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
@@ -189,7 +192,7 @@ class GitlabApiService
      * @param Source       $source          The source to sync from.
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array.
-     * @param array        $directory            The directory of the repository.
+     * @param array        $directory       The directory of the repository.
      *
      * @return ObjectEntity The updated repositories with the opencatalogi and publiccode file
      */
@@ -213,7 +216,11 @@ class GitlabApiService
             $opencatalogi = $this->importOpenCatalogiFile($source, $repository, $repositoryArray, $directory);
 
             // Set the data array with publiccode, sourceId and sha.
-            $data = ['publiccode' => $opencatalogi, 'sourceId' => $directory['id'], 'sha' => $directory['id']];
+            $data = [
+                'publiccode' => $opencatalogi,
+                'sourceId'   => $directory['id'],
+                'sha'        => $directory['id'],
+            ];
 
             // Handle the opencatalogi file.
             $this->openCatalogiService->setConfiguration($this->configuration);
@@ -236,8 +243,8 @@ class GitlabApiService
 
             $data = [
                 'publiccode' => $publiccode,
-                'sourceId' => $directory['id'],
-                'sha' => $directory['id']
+                'sourceId'   => $directory['id'],
+                'sha'        => $directory['id'],
             ];
 
             // TODO: Get sha from directory.
@@ -466,7 +473,7 @@ class GitlabApiService
      *
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array from the github api call.
-     * @param Source $source The given gitlab or github source.
+     * @param Source       $source          The given gitlab or github source.
      *
      * @return ObjectEntity The updated repository object.
      *
@@ -538,7 +545,7 @@ class GitlabApiService
      * @return ObjectEntity|null The gitlab repository.
      * @throws Exception
      */
-    public function getGitlabRepository(string $repositoryUrl, ?array $repositoryArray = null): ?ObjectEntity
+    public function getGitlabRepository(string $repositoryUrl, ?array $repositoryArray=null): ?ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         // $repositoryMapping = $this->resourceService->getMapping($this->configuration['gitlabRepository'], 'open-catalogi/open-catalogi-bundle');

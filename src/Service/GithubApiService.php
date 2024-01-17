@@ -888,10 +888,11 @@ class GithubApiService
 
     }//end getUserRepos()
 
+
     /**
      * This function searches for all repositories with a publiccode or opencatlogi file.
      *
-     * @param array $repositories
+     * @param  array $repositories
      * @return array
      * @throws Exception
      */
@@ -928,8 +929,8 @@ class GithubApiService
         }//end foreach
 
         return $response;
-    }
 
+    }//end getAllRepositories()
 
 
     /**
@@ -948,7 +949,8 @@ class GithubApiService
         $this->data          = $data;
 
         // If we have one repository.
-        if ($repositoryId !== null) {}
+        if ($repositoryId !== null) {
+        }
 
         // If we have all repositories.
         if ($repositoryId === null) {
