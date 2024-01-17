@@ -246,13 +246,13 @@ class EnrichOrganizationService
             $members = $this->getMembers($opencatalogi, $source);
         }//end if
 
-
         return [
             'owns'     => $ownedComponents,
             'supports' => $supportedComponents,
             'uses'     => $usedComponents,
             'members'  => $members,
         ];
+
     }//end getConnectedComponents()
 
 

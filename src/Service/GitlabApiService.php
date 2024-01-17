@@ -665,8 +665,9 @@ class GitlabApiService
 
         // The user is found multiple times.
         $this->pluginLogger->debug('The user with name: '.$name.' is found multiple times ('.count($users).') with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        
+
         return null;
+
     }//end getUser()
 
 
