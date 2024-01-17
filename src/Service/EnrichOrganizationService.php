@@ -224,19 +224,19 @@ class EnrichOrganizationService
 
         // Get the softwareOwned repositories and set it to the array.
         $ownedComponents = [];
-        if (key_exists('softwareOwned', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
+        if (key_exists('softwareOwned', $opencatalogi) === true && is_array($opencatalogi['softwareOwned']) === true) {
             $ownedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareOwned');
         }//end if
 
         // Get the softwareSupported repositories and set it to the array.
         $supportedComponents = [];
-        if (key_exists('softwareSupported', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
+        if (key_exists('softwareSupported', $opencatalogi) === true && is_array($opencatalogi['softwareOwned']) === true) {
             $supportedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareSupported');
         }
 
         // Get the softwareUsed repositories and set it to the array.
         $usedComponents = [];
-        if (key_exists('softwareUsed', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
+        if (key_exists('softwareUsed', $opencatalogi) === true && is_array($opencatalogi['softwareOwned']) === true) {
             $usedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareUsed');
         }
 
@@ -299,20 +299,21 @@ class EnrichOrganizationService
     {
         $parsedUrl = \Safe\parse_url($dataArray['opencatalogiRepo']);
 
+        $data = [];
         // Get the default_branch from the parsed url query.
-        $repositoryArray['default_branch'] = explode('ref=', $parsedUrl['query'])[1];
+        $data['default_branch'] = explode('ref=', $parsedUrl['query'])[1];
 
         $explodedPath = explode('/api/v4/projects/', $parsedUrl['path'])[1];
         $explodedPath = explode('/repository/files/', $explodedPath);
 
         // Get the id and path from the parsed url path.
-        $repositoryArray['id'] = $explodedPath[0];
-        $directory['path']     = $explodedPath[1];
+        $data['id'] = $explodedPath[0];
+        $data['path']     = $explodedPath[1];
 
         // Get the opencatalogi file from the opencatalogiRepo property.
         $this->gitlabApiService->setConfiguration($this->configuration);
 
-        return $this->gitlabApiService->getTheFileContent($source, $repositoryArray, $directory);
+        return $this->gitlabApiService->getTheFileContent($source, $data, $data);
 
     }//end getGitlabOpenCatalogiFile()
 
@@ -357,6 +358,7 @@ class EnrichOrganizationService
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      * @param Source       $source       The github/gitlab source.
+     * @param array $dataArray The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
      *
      * @throws GuzzleException|Exception
      *
@@ -387,9 +389,9 @@ class EnrichOrganizationService
     /**
      * This function enriches the organization with the opencatalogiRepo url.
      *
-     * @param ObjectEntity $organization      Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
-     * @param Source       $source            The github/gitlab source.
-     * @param array        $organizationArray The data array with keys organizationArray and opencatalogiRepo.
+     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
+     * @param Source $source The github/gitlab source.
+     * @param array $dataArray The dataArray with keys opencatalogi/organizationArray/opencatalogiRepo
      *
      * @return ObjectEntity The updated organization object.
      * @throws Exception
@@ -459,7 +461,7 @@ class EnrichOrganizationService
         }
 
         // The description only exist for organizations and not for users.
-        if ($organization->getValue('description') === null && key_exists('description', $organizationArray)) {
+        if ($organization->getValue('description') === null && key_exists('description', $organizationArray) === true) {
             $organization->setValue('description', $organizationArray['description']);
         }
 
@@ -487,41 +489,40 @@ class EnrichOrganizationService
         // Get the organization object.
         $organization = $this->entityManager->find('App:ObjectEntity', $organizationId);
 
-        // Check if the name and github is not null.
-        if ($organization instanceof ObjectEntity === true
-            && $organization->getValue('name') !== null
-            && $organization->getValue('github') !== null
-        ) {
+        if ($organization instanceof ObjectEntity === false) {
+            $this->pluginLogger->error('Could not find given organization', ['open-catalogi/open-catalogi-bundle']);
+
+            return $organization;
+        }
+
+        $name = $organization->getValue('name');
+        if ($name === null) {
+            $this->pluginLogger->debug('The name of the organization is null.', ['open-catalogi/open-catalogi-bundle']);
+            return $organization;
+        }
+
+        // Check if github is not null.
+        if ($organization->getValue('github') !== null) {
             $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
             if ($source instanceof Source === false || $this->githubApiService->checkGithubAuth($source) === false) {
                 return $organization;
             }
-
-            // Enrich the organization object.
-            return $this->enrichOrganization($organization, $source);
         }//end if
 
         // Check if the name and gitlab is not null.
-        if ($organization instanceof ObjectEntity === true
-            && $organization->getValue('name') !== null
-            && $organization->getValue('gitlab') !== null
-        ) {
+        if ($organization->getValue('gitlab') !== null) {
             $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
             if ($source instanceof Source === false || $this->gitlabApiService->checkGitlabAuth($source) === false) {
                 return $organization;
             }
-
-            // Enrich the organization object.
-            return $this->enrichOrganization($organization, $source);
         }//end if
 
-        if ($organization instanceof ObjectEntity === false) {
-            $this->pluginLogger->error('Could not find given organization');
-
+        if (isset($source) === false) {
             return $organization;
-        }//end if
+        }
 
-        return $organization;
+        // Enrich the organization object.
+        return $this->enrichOrganization($organization, $source);
 
     }//end getOrganization()
 
@@ -553,6 +554,61 @@ class EnrichOrganizationService
 
     }//end getOrganizationId()
 
+    /**
+     * This function gets all the repositories from the given organization and sets it to the owns of the organization.
+     *
+     * @param string $organizationId The id of the organization in the response.
+     *
+     * @throws GuzzleException|Exception
+     *
+     * @return ObjectEntity The updated github or gitlab organization.
+     */
+    public function getAllOrganizations(): array
+    {
+        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($organizationSchema instanceof Entity === false) {
+            return $this->data;
+        }
+
+        $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
+        foreach ($organizations as $organization) {
+
+            if ($organization instanceof ObjectEntity === false) {
+                continue;
+            }
+
+            // Check if the name is null, without the name the organization cannot be found.
+            $name = $organization->getValue('name');
+            if ($name === null) {
+                continue;
+            }
+
+            // Check if github is not null.
+            if ($organization->getValue('github') !== null) {
+                $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+                if ($source instanceof Source === false || $this->githubApiService->checkGithubAuth($source) === false) {
+                    return $this->data;
+                }
+            }//end if
+
+            // Check if gitlab is not null.
+            if ($organization->getValue('gitlab') !== null) {
+                $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
+                if ($source instanceof Source === false || $this->gitlabApiService->checkGitlabAuth($source) === false) {
+                    return $this->data;
+                }
+            }//end if
+
+            if (isset($source) === true) {
+                // Enrich the organization object.
+                $this->data['response'] = $this->enrichOrganization($organization, $source);
+            }
+
+        }//end foreach
+
+        return $this->data;
+    }
+
 
     /**
      * Makes sure the action can actually runs and then executes functions to update an organization with fetched opencatalogi.yaml info.
@@ -580,41 +636,8 @@ class EnrichOrganizationService
         }
 
         // If there is no organization we get all the organizations and enrich it.
-        $organizationSchema = $this->resourceService->getSchema($this->configuration['organizationSchema'], 'open-catalogi/open-catalogi-bundle');
-        if ($organizationSchema instanceof Entity === false) {
-            return $this->data;
-        }
+        $this->getAllOrganizations();
 
-        $organizations = $this->entityManager->getRepository('App:ObjectEntity')->findBy(['entity' => $organizationSchema]);
-        foreach ($organizations as $organization) {
-            // Check if the name and github is not null.
-            if ($organization instanceof ObjectEntity === true
-                && $organization->getValue('name') !== null
-                && $organization->getValue('github') !== null
-            ) {
-                $source = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-                if ($source instanceof Source === false || $this->githubApiService->checkGithubAuth($source) === false) {
-                    return $this->data;
-                }
-
-                // Enrich the organization object.
-                $this->enrichOrganization($organization, $source);
-            }//end if
-
-            // Check if the name and gitlab is not null.
-            if ($organization instanceof ObjectEntity === true
-                && $organization->getValue('name') !== null
-                && $organization->getValue('gitlab') !== null
-            ) {
-                $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
-                if ($source instanceof Source === false || $this->gitlabApiService->checkGitlabAuth($source) === false) {
-                    return $this->data;
-                }
-
-                // Enrich the organization object.
-                $this->enrichOrganization($organization, $source);
-            }//end if
-        }//end foreach
 
         return $this->data;
 

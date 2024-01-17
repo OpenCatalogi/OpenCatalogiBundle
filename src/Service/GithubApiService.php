@@ -888,6 +888,49 @@ class GithubApiService
 
     }//end getUserRepos()
 
+    /**
+     * This function searches for all repositories with a publiccode or opencatlogi file.
+     *
+     * @param array $repositories
+     * @return array
+     * @throws Exception
+     */
+    public function getAllRepositories(array $repositories): array
+    {
+        $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
+        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
+        if ($source instanceof Source === false && $repositorySchema instanceof Entity === false) {
+            return $this->data;
+        }
+
+        $response = [];
+        foreach ($repositories as $repositoryArray) {
+            if (key_exists('repository', $repositoryArray) === false || key_exists('html_url', $repositoryArray['repository']) === false
+            ) {
+                continue;
+            }
+
+            $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
+
+            if ($repositorySync->getObject() !== null) {
+                $repository = $repositorySync->getObject();
+            }
+
+            if ($repositorySync->getObject() === null) {
+                $this->entityManager->remove($repositorySync);
+                $this->entityManager->flush();
+                $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
+            }
+
+            if (isset($repository) === true) {
+                $response[] = $repository->toArray();
+            }
+        }//end foreach
+
+        return $response;
+    }
+
+
 
     /**
      * This function searches for all repositories with a publiccode or one repository
@@ -904,50 +947,20 @@ class GithubApiService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        $source           = $this->resourceService->getSource($this->configuration['githubSource'], 'open-catalogi/open-catalogi-bundle');
-        $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
-        if ($source instanceof Source === false && $repositorySchema instanceof Entity === false) {
-            return $this->data;
-        }
-
         // If we have one repository.
-        if ($repositoryId !== null) {
-        }
+        if ($repositoryId !== null) {}
 
         // If we have all repositories.
         if ($repositoryId === null) {
             // Get all the repositories with a publiccode/opencatalogi file.
             $repositories = $this->getGithubFiles();
 
-            $response = [];
-            foreach ($repositories as $repositoryArray) {
-                if (key_exists('repository', $repositoryArray) === false
-                    || key_exists('html_url', $repositoryArray['repository']) === false
-                ) {
-                    continue;
-                }
-
-                $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['repository']['html_url']);
-
-                if ($repositorySync->getObject() !== null) {
-                    $repository = $repositorySync->getObject();
-                }
-
-                if ($repositorySync->getObject() === null) {
-                    $this->entityManager->remove($repositorySync);
-                    $this->entityManager->flush();
-                    $repository = $this->getGithubRepository($repositoryArray['repository']['html_url'], $repositoryArray['repository']);
-                }
-
-                if ($repository !== null) {
-                    $response[] = $repository->toArray();
-                }
-            }//end foreach
-
-            if (isset($response) === true) {
-                $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
-            }
+            $response = $this->getAllRepositories($repositories);
         }//end if
+
+        if (empty($response) === false) {
+            $this->data['response'] = new Response(json_encode($response), 200, ['Content-Type' => 'application/json']);
+        }
 
         return $this->data;
 

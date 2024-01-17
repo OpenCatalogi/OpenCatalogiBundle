@@ -151,7 +151,6 @@ class GitlabApiService
 
     }//end setConfiguration()
 
-
     /**
      * Get the given gitlab repository from the /api/v4/search endpoint.
      *
@@ -162,7 +161,39 @@ class GitlabApiService
      *
      * @return ObjectEntity|null The updated repositories with the opencatalogi and publiccode file
      */
-    public function importRepoFiles(Source $source, ObjectEntity $repository, array $repositoryArray, array $tree): ?ObjectEntity
+    public function importOpenCatalogiFile(Source $source, ObjectEntity $repository, array $repositoryArray, array $directory): ?array
+    {
+        $this->pluginLogger->info('The item is a opencatalogi file.', ['open-catalogi/open-catalogi-bundle']);
+
+        // Get the opencatalogi file from the repository directory.
+        $opencatalogi = $this->getTheFileContent($source, $repositoryArray, $directory);
+
+        // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
+        if ($opencatalogi === null
+            || $opencatalogi !== null
+            && key_exists('publiccodeYmlVersion', $opencatalogi) === false
+        ) {
+            return $repository;
+        }
+
+        // TODO: Get sha from directory.
+        // Set the endpoint of the getTheFileContent function as opencatalogiRepo, so it can be found in the enrichOrganizationService.
+        $opencatalogi['opencatalogiRepo'] = $source->getLocation().'/api/v4/projects/'.$repositoryArray['id'].'/repository/files/'.$directory['path'].'?ref='.$repositoryArray['default_branch'];
+
+        return $opencatalogi;
+    }
+
+    /**
+     * Get the given gitlab repository from the /api/v4/search endpoint.
+     *
+     * @param Source       $source          The source to sync from.
+     * @param ObjectEntity $repository      The repository object.
+     * @param array        $repositoryArray The repository array.
+     * @param array        $directory            The directory of the repository.
+     *
+     * @return ObjectEntity The updated repositories with the opencatalogi and publiccode file
+     */
+    public function importRepoFiles(Source $source, ObjectEntity $repository, array $repositoryArray, array $directory): ObjectEntity
     {
         $opencatalogiNames = [
             'opencatalogi.yaml',
@@ -174,59 +205,45 @@ class GitlabApiService
             'publiccode.yaml',
         ];
 
-        // TODO: Check if there are multiple files in a other directory.
-        // The params source and repositoryArray will be needed
-        foreach ($tree as $directory) {
-            // TODO: Check if the opencatalogi file is in the root of the tree.
-            // If so go the the function for the opencatalogi file.
-            if (in_array($directory['name'], $opencatalogiNames) === true
-                && $directory['type'] === 'blob'
-            ) {
-                $this->pluginLogger->info('The item is a opencatalogi file.', ['open-catalogi/open-catalogi-bundle']);
+        // If so go the the function for the opencatalogi file.
+        if (in_array($directory['name'], $opencatalogiNames) === true
+            && $directory['type'] === 'blob'
+        ) {
+            // Get the opencatalogi file and set the opencatalogiRepo.
+            $opencatalogi = $this->importOpenCatalogiFile($source, $repository, $repositoryArray, $directory);
 
-                // Get the opencatalogi file from the repository directory.
-                $opencatalogi = $this->getTheFileContent($source, $repositoryArray, $directory);
+            // Set the data array with publiccode, sourceId and sha.
+            $data = ['publiccode' => $opencatalogi, 'sourceId' => $directory['id'], 'sha' => $directory['id']];
 
-                // Check if the publiccodeYmlVersion is set otherwise this is not a valid file.
-                if ($opencatalogi === null
-                    || $opencatalogi !== null
-                    && key_exists('publiccodeYmlVersion', $opencatalogi) === false
-                ) {
-                    return $repository;
-                }
+            // Handle the opencatalogi file.
+            $this->openCatalogiService->setConfiguration($this->configuration);
+            $repository = $this->openCatalogiService->handleOpencatalogiFile($source, $repository, $data, $repositoryArray['namespace']);
+        }//end if
 
-                $data['publiccode'] = $opencatalogi;
-                $data['sourceId']   = $directory['id'];
-                $data['sha']        = $directory['id'];
-                // TODO: Get sha from directory.
-                // Set the endpoint of the getTheFileContent function as opencatalogiRepo, so it can be found in the enrichOrganizationService.
-                $opencatalogi['opencatalogiRepo'] = $source->getLocation().'/api/v4/projects/'.$repositoryArray['id'].'/repository/files/'.$directory['path'].'?ref='.$repositoryArray['default_branch'];
+        // TODO: now only checks in the root of the repo. Also check if there are multiple files.
+        // Check if the publiccode file is in the root of the tree.
+        // If so go the the function for the publiccode file.
+        if (in_array($directory['name'], $publiccodeNames) === true
+            && $directory['type'] === 'blob'
+        ) {
+            $this->pluginLogger->info('The item is a publiccode file. Directory id is: '.$directory['id'], ['open-catalogi/open-catalogi-bundle']);
 
-                $this->openCatalogiService->setConfiguration($this->configuration);
-                $repository = $this->openCatalogiService->handleOpencatalogiFile($source, $repository, $data, $repositoryArray['namespace']);
-            }//end if
-
-            // Check if the publiccode file is in the root of the tree.
-            // If so go the the function for the publiccode file.
-            if (in_array($directory['name'], $publiccodeNames) === true
-                && $directory['type'] === 'blob'
-            ) {
-                $this->pluginLogger->info('The item is a publiccode file. Directory id is: '.$directory['id'], ['open-catalogi/open-catalogi-bundle']);
-
-                // Get the publiccode file from the repository directory.
-                $publiccode = $this->getTheFileContent($source, $repositoryArray, $directory);
-                if ($publiccode === null && $publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
-                    continue;
-                }
-
-                $data['publiccode'] = $publiccode;
-                $data['sourceId']   = $directory['id'];
-                $data['sha']        = $directory['id'];
-                // TODO: Get sha from directory.
-                $this->publiccodeService->setConfiguration($this->configuration);
-                $repository = $this->publiccodeService->handlePubliccodeFile($directory, $source, $repository, $data, $repositoryArray);
+            // Get the publiccode file from the repository directory.
+            $publiccode = $this->getTheFileContent($source, $repositoryArray, $directory);
+            if ($publiccode === null && $publiccode !== null && key_exists('publiccodeYmlVersion', $publiccode) === false) {
+                return $repository;
             }
-        }//end foreach
+
+            $data = [
+                'publiccode' => $publiccode,
+                'sourceId' => $directory['id'],
+                'sha' => $directory['id']
+            ];
+
+            // TODO: Get sha from directory.
+            $this->publiccodeService->setConfiguration($this->configuration);
+            $repository = $this->publiccodeService->handlePubliccodeFile($directory, $source, $repository, $data, $repositoryArray);
+        }
 
         return $repository;
 
@@ -248,7 +265,7 @@ class GitlabApiService
         try {
             $response = $this->callService->call($source, '/projects/'.$repositoryArray['id'].'/repository/files/'.$directory['path'], 'GET', $queryConfig);
         } catch (Exception $exception) {
-            $this->pluginLogger->error('Error found trying to fetch '.$source->getLocation().'/projects/'.$repositoryArray['id'].'/repository/files/'.$directory['path'].' '.$exception->getMessage());
+            $this->pluginLogger->error("Error found trying to fetch {$source->getLocation()}/projects/{$repositoryArray['id']}/repository/files/{$directory['path']}. {$exception->getMessage()}");
         }
 
         if (isset($response) === false) {
@@ -449,6 +466,7 @@ class GitlabApiService
      *
      * @param ObjectEntity $repository      The repository object.
      * @param array        $repositoryArray The repository array from the github api call.
+     * @param Source $source The given gitlab or github source.
      *
      * @return ObjectEntity The updated repository object.
      *
@@ -466,7 +484,6 @@ class GitlabApiService
             $repository = $this->enrichWithComponent($repository, $repositoryArray, $source);
         }
 
-        // @TODO: enrich the null values with what we have.
         return $repository;
 
     }//end enrichRepository()
@@ -521,22 +538,18 @@ class GitlabApiService
      * @return ObjectEntity|null The gitlab repository.
      * @throws Exception
      */
-    public function getGitlabRepository(string $repositoryUrl, ?array $repositoryArray=null): ?ObjectEntity
+    public function getGitlabRepository(string $repositoryUrl, ?array $repositoryArray = null): ?ObjectEntity
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         // $repositoryMapping = $this->resourceService->getMapping($this->configuration['gitlabRepository'], 'open-catalogi/open-catalogi-bundle');
         $repositoryMapping = $this->resourceService->getMapping('https://api.github.com/oc.gitlabRepository.mapping.json', 'open-catalogi/open-catalogi-bundle');
-        if ($repositorySchema instanceof Entity === false
-            || $repositoryMapping instanceof Mapping === false
-        ) {
+        if ($repositorySchema instanceof Entity === false || $repositoryMapping instanceof Mapping === false) {
             return null;
         }//end if
 
-        // TODO: Set the gitlab source to the configuration.
-        // $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
-        $source = $this->resourceService->getSource('https://opencatalogi.nl/source/oc.GitlabAPI.source.json', 'open-catalogi/open-catalogi-bundle');
+         $source = $this->resourceService->getSource($this->configuration['gitlabSource'], 'open-catalogi/open-catalogi-bundle');
         // Do we have the api key set of the source.
-        if ($this->checkGitlabAuth($source) === false) {
+        if ($source instanceof Source === false || $this->checkGitlabAuth($source) === false) {
             return null;
         }//end if
 
@@ -574,8 +587,10 @@ class GitlabApiService
         // Tree must be not null for importing the publiccode and/or opencatalogi files.
         if ($tree !== null) {
             // Check in the tree if there is a publiccode file.
-            // TODO: now only checks in the root of the repo. Also check if there are multiple files.
-            $repository = $this->importRepoFiles($source, $repository, $repositoryArray, $tree);
+            // The params source and repositoryArray will be needed
+            foreach ($tree as $directory) {
+                $repository = $this->importRepoFiles($source, $repository, $repositoryArray, $directory);
+            }//end foreach
         }
 
         // Cleanup the repository.
@@ -584,7 +599,6 @@ class GitlabApiService
         // Enrich the repository with component and/or organization.
         $repository = $this->enrichRepository($repository, $repositoryArray, $source);
 
-        // TODO: Rate the component(s) of the repository.
         // Return the repository object.
         $this->ratingService->setConfiguration($this->configuration);
         return $this->ratingService->rateRepoComponents($repository, $source, $repositoryArray);
