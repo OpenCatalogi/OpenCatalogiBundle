@@ -951,7 +951,7 @@ class GithubApiService
 
         return $this->data;
 
-    }//end findGithubRepositories()
+    }//end githubApiHandler()
 
 
 }//end class

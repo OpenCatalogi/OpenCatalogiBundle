@@ -153,7 +153,7 @@ class DeveloperOverheidService
         if ($repositorySchema instanceof Entity === false) {
             return null;
         }
-        
+
         // Find the repository sync by source.
         $repositorySync = $this->syncService->findSyncBySource($source, $repositorySchema, $repositoryArray['url']);
 
@@ -198,7 +198,7 @@ class DeveloperOverheidService
         if ($repositorySchema instanceof Entity === false) {
             return null;
         }
-        
+
         $parsedUrl = \Safe\parse_url($repositoryArray['url']);
         if (key_exists('host', $parsedUrl) === false) {
             return null;
