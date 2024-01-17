@@ -399,7 +399,7 @@ class EnrichOrganizationService
         if ($source->getReference() === $this->configuration['githubSource']) {
             // Get the opencatalogi file from the opencatalogiRepo property.
             $this->githubApiService->setConfiguration($this->configuration);
-            $opencatalogi = $this->githubApiService->getFileFromRawUserContent($opencatalogiRepo);
+            $opencatalogi = $this->githubApiService->getFileFromRawUserContent($dataArray['opencatalogiRepo']);
         }
 
         if ($source->getReference() === $this->configuration['gitlabSource']) {
