@@ -212,10 +212,10 @@ class EnrichOrganizationService
      * @param array        $opencatalogi opencatalogi file array from the github usercontent/github api call.
      * @param Source       $source       The github api source.
      *
-     * @return ObjectEntity|null The updated organization object
+     * @return array|null The data for updating the organization
      * @throws Exception
      */
-    public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ?ObjectEntity
+    public function getConnectedComponents(ObjectEntity $organization, array $opencatalogi, Source $source): ?array
     {
         $repositorySchema = $this->resourceService->getSchema($this->configuration['repositorySchema'], 'open-catalogi/open-catalogi-bundle');
         if ($repositorySchema instanceof Entity === false) {
@@ -224,19 +224,19 @@ class EnrichOrganizationService
 
         // Get the softwareOwned repositories and set it to the array.
         $ownedComponents = [];
-        if (key_exists('softwareOwned', $opencatalogi) === true) {
+        if (key_exists('softwareOwned', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
             $ownedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareOwned');
         }//end if
 
         // Get the softwareSupported repositories and set it to the array.
         $supportedComponents = [];
-        if (key_exists('softwareSupported', $opencatalogi) === true) {
+        if (key_exists('softwareSupported', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
             $supportedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareSupported');
         }
 
         // Get the softwareUsed repositories and set it to the array.
         $usedComponents = [];
-        if (key_exists('softwareUsed', $opencatalogi) === true) {
+        if (key_exists('softwareUsed', $opencatalogi) === true && is_array($opencatalogi['softwareOwned'])) {
             $usedComponents = $this->getSoftware($repositorySchema, $opencatalogi, $source, 'softwareUsed');
         }
 
@@ -246,21 +246,13 @@ class EnrichOrganizationService
             $members = $this->getMembers($opencatalogi, $source);
         }//end if
 
-        // Hydrate the organization with the arrays.
-        $organization->hydrate(
-            [
-                'owns'     => $ownedComponents,
-                'supports' => $supportedComponents,
-                'uses'     => $usedComponents,
-                'members'  => $members,
-            ]
-        );
 
-        $this->entityManager->persist($organization);
-        $this->entityManager->flush();
-
-        return $organization;
-
+        return [
+            'owns'     => $ownedComponents,
+            'supports' => $supportedComponents,
+            'uses'     => $usedComponents,
+            'members'  => $members,
+        ];
     }//end getConnectedComponents()
 
 
@@ -349,8 +341,8 @@ class EnrichOrganizationService
             $organizationArray = $this->gitlabApiService->getOrganization($gitlabPath, $source);
         }
 
-        // TODO: Test this case.
         if ($organization->getValue('type') === 'User') {
+            $gitlabPath = explode('/', $gitlabPath)[1];
             // Get the user from the gitlab api.
             $organizationArray = $this->gitlabApiService->getUser($gitlabPath, $source);
         }
@@ -373,15 +365,15 @@ class EnrichOrganizationService
     public function enrichOrganizationProps(ObjectEntity $organization, Source $source, array $dataArray): ObjectEntity
     {
         // Get the softwareSupported/softwareOwned/softwareUsed repositories.
-        $organization = $this->getConnectedComponents($organization, $dataArray['opencatalogi'], $source);
+        $orgData = $this->getConnectedComponents($organization, $dataArray['opencatalogi'], $source);
 
         // Enrich the opencatalogi organization with a logo and description.
         $this->openCatalogiService->setConfiguration($this->configuration);
-        $logo        = $this->openCatalogiService->enrichLogo($dataArray['organizationArray'], $dataArray['opencatalogi'], $organization);
-        $description = $this->openCatalogiService->enrichDescription($dataArray['organizationArray'], $dataArray['opencatalogi'], $organization);
+        $orgData['logo']        = $this->openCatalogiService->enrichLogo($dataArray['organizationArray'], $dataArray['opencatalogi'], $organization);
+        $orgData['description'] = $this->openCatalogiService->enrichDescription($dataArray['organizationArray'], $dataArray['opencatalogi'], $organization);
 
-        // Hydrate the logo and description.
-        $organization->hydrate(['logo' => $logo, 'description' => $description]);
+        // Hydrate the organization with the softwareSupported/softwareOwned/softwareUsed/members/logo/description.
+        $organization->hydrate($orgData);
         $this->entityManager->persist($organization);
         $this->entityManager->flush();
 
@@ -418,7 +410,7 @@ class EnrichOrganizationService
             return $organization;
         }
 
-        $dataArray['opencatalogi'] = $dataArray;
+        $dataArray['opencatalogi'] = $opencatalogi;
 
         return $this->enrichOrganizationProps($organization, $source, $dataArray);
 
@@ -452,7 +444,6 @@ class EnrichOrganizationService
 
         // Update the organization with the opencatalogi file.
         $opencatalogiRepo = $organization->getValue('opencatalogiRepo');
-        // $opencatalogiRepo = 'https://gitlab.com/api/v4/projects/33855802/repository/files/publiccode.yml?ref=master';
         if ($opencatalogiRepo !== null) {
             $dataArray = [
                 'opencatalogiRepo'  => $opencatalogiRepo,
@@ -467,7 +458,8 @@ class EnrichOrganizationService
             $organization->setValue('logo', $organizationArray['avatar_url']);
         }
 
-        if ($organization->getValue('description') === null) {
+        // The description only exist for organizations and not for users.
+        if ($organization->getValue('description') === null && key_exists('description', $organizationArray)) {
             $organization->setValue('description', $organizationArray['description']);
         }
 

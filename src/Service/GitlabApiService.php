@@ -571,9 +571,12 @@ class GitlabApiService
         // Get the tree of the repository. (all the files and directories from the root of the repo)
         $tree = $this->getRepoTreeFromGitlabApi($source, $repositoryArray);
 
-        // Check in the tree if there is a publiccode file.
-        // TODO: now only checks in the root of the repo. Also check if there are multiple files.
-        $repository = $this->importRepoFiles($source, $repository, $repositoryArray, $tree);
+        // Tree must be not null for importing the publiccode and/or opencatalogi files.
+        if ($tree !== null) {
+            // Check in the tree if there is a publiccode file.
+            // TODO: now only checks in the root of the repo. Also check if there are multiple files.
+            $repository = $this->importRepoFiles($source, $repository, $repositoryArray, $tree);
+        }
 
         // Cleanup the repository.
         $repository = $this->cleanupRepository($repository);
@@ -635,8 +638,10 @@ class GitlabApiService
     {
         $this->pluginLogger->debug('Getting user '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
+        // Use query username to search the user: ?username=:username
+        $queryConfig['query'] = ['username' => $name];
         try {
-            $response = $this->callService->call($source, '/users/'.$name);
+            $response = $this->callService->call($source, '/users', 'GET', $queryConfig);
         } catch (ClientException $exception) {
             $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
@@ -645,16 +650,23 @@ class GitlabApiService
             return null;
         }
 
-        $organization = \Safe\json_decode($response->getBody()->getContents(), true);
+        $users = \Safe\json_decode($response->getBody()->getContents(), true);
 
-        if ($organization === null) {
+        if ($users === null) {
             $this->pluginLogger->error('Could not find a user with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
 
             return null;
         }//end if
 
-        return $organization;
+        // Check if the users is an array and if there is one item.
+        if (count($users) === 1) {
+            return $users[0];
+        }
 
+        // The user is found multiple times.
+        $this->pluginLogger->debug('The user with name: '.$name.' is found multiple times ('.count($users).') with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        
+        return null;
     }//end getUser()
 
 
