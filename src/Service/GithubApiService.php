@@ -906,8 +906,7 @@ class GithubApiService
 
         $response = [];
         foreach ($repositories as $repositoryArray) {
-            if (key_exists('repository', $repositoryArray) === false || key_exists('html_url', $repositoryArray['repository']) === false
-            ) {
+            if (key_exists('repository', $repositoryArray) === false || key_exists('html_url', $repositoryArray['repository']) === false) {
                 continue;
             }
 
@@ -948,9 +947,7 @@ class GithubApiService
         $this->configuration = $configuration;
         $this->data          = $data;
 
-        // If we have one repository.
-        if ($repositoryId !== null) {
-        }
+        // If we have one repository (this has to be implemented).
 
         // If we have all repositories.
         if ($repositoryId === null) {
