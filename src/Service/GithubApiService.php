@@ -948,7 +948,6 @@ class GithubApiService
         $this->data          = $data;
 
         // If we have one repository (this has to be implemented).
-
         // If we have all repositories.
         if ($repositoryId === null) {
             // Get all the repositories with a publiccode/opencatalogi file.
