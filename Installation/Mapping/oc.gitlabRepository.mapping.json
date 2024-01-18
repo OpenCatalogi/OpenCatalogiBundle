@@ -1,0 +1,33 @@
+{
+  "title": "GitlabApiToRepository",
+  "$id": "https://api.github.com/oc.gitlabRepository.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "name": "name",
+    "url": "web_url",
+    "avatar_url": "avatar_url",
+    "last_change": "updated_at",
+    "stars": "star_count",
+    "fork_count": "forks_count",
+    "issue_open_count": "open_issues_count",
+    "topics": "topics",
+    "source": "gitlab",
+    "forked_from": "{% if fork|default %}{% if fork == true and parent.html_url|default %}{{ parent.html_url }}{% endif %}{% endif %}",
+    "archived": "{% if archived|default %}{{ archived }}{% else %}false{% endif %}"
+  },
+  "cast": {
+    "name": "keyCantBeValue",
+    "url": "unsetIfValue==web_url",
+    "avatar_url": "keyCantBeValue",
+    "last_change": "unsetIfValue==updated_at",
+    "stars": "unsetIfValue==star_count",
+    "fork_count": "unsetIfValue==forks_count",
+    "issue_open_count": "unsetIfValue==open_issues_count",
+    "topics": "keyCantBeValue",
+    "forked_from": "unsetIfValue==",
+    "archived": "boolean"
+  }
+}
+

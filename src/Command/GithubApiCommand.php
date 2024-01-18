@@ -76,13 +76,13 @@ class GithubApiCommand extends Command
         $repositoryId = $input->getOption('repository', false);
 
         if ($repositoryId === null) {
-            if ($this->githubService->findGithubRepositories([], $configuration) === false) {
+            if ($this->githubService->githubApiHandler([], $configuration) === false) {
                 return Command::FAILURE;
             }
         }
 
         if ($repositoryId !== null
-            && $this->githubService->findGithubRepositories([], $configuration, $repositoryId) === null
+            && $this->githubService->githubApiHandler([], $configuration, $repositoryId) === null
         ) {
             return Command::FAILURE;
         }

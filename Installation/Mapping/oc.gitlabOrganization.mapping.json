@@ -1,0 +1,21 @@
+{
+  "title": "GitlabApiOrganizationToOrganization",
+  "$id": "https://api.github.com/oc.gitlabOrganization.mapping.json",
+  "$schema": "https://docs.commongateway.nl/schemas/Mapping.schema.json",
+  "version": "0.0.1",
+  "passTrough": false,
+  "mapping": {
+    "name": "path",
+    "description": "description",
+    "logo": "avatar_url",
+    "gitlab": "web_url",
+    "source": "gitlab"
+  },
+  "cast": {
+    "name": "keyCantBeValue",
+    "description": "keyCantBeValue",
+    "logo": "unsetIfValue==avatar_url",
+    "gitlab": "unsetIfValue==web_url",
+    "type": "keyCantBeValue"
+  }
+}

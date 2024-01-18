@@ -40,6 +40,11 @@ class FormInputService
     private GithubApiService $githubApiService;
 
     /**
+     * @var GitlabApiService
+     */
+    private GitlabApiService $gitlabApiService;
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $pluginLogger;
@@ -57,13 +62,16 @@ class FormInputService
 
     /**
      * @param GithubApiService $githubApiService The Github Api Service.
-     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface
+     * @param GitlabApiService $gitlabApiService The Gitlab Api Service.
+     * @param LoggerInterface  $pluginLogger     The plugin version of the logger interface.
      */
     public function __construct(
         GithubApiService $githubApiService,
+        GitlabApiService $gitlabApiService,
         LoggerInterface $pluginLogger
     ) {
         $this->githubApiService = $githubApiService;
+        $this->gitlabApiService = $gitlabApiService;
         $this->pluginLogger     = $pluginLogger;
         $this->configuration    = [];
         $this->data             = [];
@@ -106,6 +114,9 @@ class FormInputService
             $repository = $this->githubApiService->getGithubRepository($formInput['repository']['html_url']);
             break;
         case 'gitlab.com':
+            $this->gitlabApiService->setConfiguration($this->configuration);
+            $repository = $this->gitlabApiService->getGitlabRepository($formInput['repository']['html_url']);
+            break;
         default:
             break;
         }

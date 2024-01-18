@@ -1,0 +1,13 @@
+{
+    "title": "Gitlab API",
+    "$id": "https://opencatalogi.nl/source/oc.GitlabAPI.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "Gitlab API",
+    "location": "https://gitlab.com/api/v4",
+    "headers": {
+        "Accept" : "application/vnd.github+json"
+    },
+    "auth": "apikey",
+    "apiKey": "!ChangeMe!"
+}
