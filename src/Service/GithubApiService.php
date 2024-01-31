@@ -744,32 +744,33 @@ class GithubApiService
 
     }//end getGithubFiles()
 
+
     /**
      * Call the source with the endpoint and decode the body contents of the response.
      *
-     * @param Source $source The source for the call.
-     * @param string $endpoint The endpoint for the source.
-     * @param array $pluginMessages An array with keys debug and error for the logger message.
+     * @param Source $source         The source for the call.
+     * @param string $endpoint       The endpoint for the source.
+     * @param array  $pluginMessages An array with keys debug and error for the logger message.
      *
      * @return array|null The decoded response from the given source and endpoint.
      */
     public function callAndDecode(Source $source, string $endpoint, array $pluginMessages): ?array
     {
-       if (key_exists('debug', $pluginMessages) === true) {
+        if (key_exists('debug', $pluginMessages) === true) {
             $this->pluginLogger->debug($pluginMessages['debug'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
-       $parsedUrl = \Safe\parse_url($endpoint);
+        $parsedUrl = \Safe\parse_url($endpoint);
 
         $config = [];
-       if (key_exists('query', $parsedUrl) === true) {
-           $explodeQuery = explode('=', $parsedUrl['query']);
-           $config = [
-               'query' => [$explodeQuery[0] => $explodeQuery[1]]
-           ];
-       }
+        if (key_exists('query', $parsedUrl) === true) {
+            $explodeQuery = explode('=', $parsedUrl['query']);
+            $config       = [
+                'query' => [$explodeQuery[0] => $explodeQuery[1]],
+            ];
+        }
 
-       $endpoint = $parsedUrl['path'];
+        $endpoint = $parsedUrl['path'];
 
         try {
             $response = $this->callService->call($source, $endpoint, 'GET', $config);
@@ -787,13 +788,12 @@ class GithubApiService
 
         // Return null and throw error log if the decoded response is empty.
         if (empty($items) === true) {
-
             // Set a default error message.
             $errorMessage = 'The decoded response of source: '.$source->getName().' with enpoint: '.$endpoint['path'].' is empty.';
 
             // If the $pluginMessages error key is given override the $errorMessage.
             if (key_exists('error', $pluginMessages) === true) {
-              $errorMessage = $pluginMessages['error'];
+                $errorMessage = $pluginMessages['error'];
             }
 
             $this->pluginLogger->error($errorMessage, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
@@ -803,7 +803,7 @@ class GithubApiService
         // Return the decoded response.
         return $items;
 
-    }//end getUserRepos()
+    }//end callAndDecode()
 
 
     /**
@@ -865,7 +865,6 @@ class GithubApiService
         $this->data          = $data;
 
         // If we have one repository (this has to be implemented).
-
         // If we have all repositories.
         if ($repositoryId === null) {
             // Get all the repositories with a publiccode/opencatalogi file.

@@ -255,6 +255,7 @@ class EnrichOrganizationService
 
     }//end getConnectedComponents()
 
+
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -308,7 +309,6 @@ class EnrichOrganizationService
             if ($organization->getValue('type') === 'User') {
                 return '/users/'.trim($urlPath, '/');
             }
-
         }
 
         if ($type === 'gitlab') {
@@ -399,7 +399,7 @@ class EnrichOrganizationService
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      * @param Source       $source       The github/gitlab source.
-     * @param string $type The type: github/gitlab
+     * @param string       $type         The type: github/gitlab
      *
      * @throws GuzzleException|Exception
      *
@@ -418,7 +418,7 @@ class EnrichOrganizationService
         // Set the debug and error messages.
         $pluginMessages = [
             'debug' => 'Getting '.strtolower($organization->getValue('type')).' with '.$type.' url '.$organization->getValue($type).'.',
-            'error' => 'Could not find the '.strtolower($organization->getValue('type')).' with name: '.trim($urlPath, '/').' and with source: '.$source->getName().'.'
+            'error' => 'Could not find the '.strtolower($organization->getValue('type')).' with name: '.trim($urlPath, '/').' and with source: '.$source->getName().'.',
         ];
 
         // Get the repositories of the organization/user from the github/gitlab api.
