@@ -746,147 +746,64 @@ class GithubApiService
 
 
     /**
-     * Get a organization with type Organization from the github api.
+     * Call the source with the endpoint and decode the body contents of the response.
      *
-     * @param string $name   The name of the organization.
-     * @param Source $source The source to sync from.
+     * @param Source $source         The source for the call.
+     * @param string $endpoint       The endpoint for the source.
+     * @param array  $pluginMessages An array with keys debug and error for the logger message.
      *
-     * @return array|null The imported organization as array.
+     * @return array|null The decoded response from the given source and endpoint.
      */
-    public function getOrganization(string $name, Source $source): ?array
+    public function callAndDecode(Source $source, string $endpoint, array $pluginMessages): ?array
     {
-        $this->pluginLogger->debug('Getting organization '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        if (key_exists('debug', $pluginMessages) === true) {
+            $this->pluginLogger->debug($pluginMessages['debug'], ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        }
+
+        $parsedUrl = \Safe\parse_url($endpoint);
+
+        $config = [];
+        if (key_exists('query', $parsedUrl) === true) {
+            $explodeQuery = explode('=', $parsedUrl['query']);
+            $config       = [
+                'query' => [$explodeQuery[0] => $explodeQuery[1]],
+            ];
+        }
+
+        $endpoint = $parsedUrl['path'];
 
         try {
-            $response = $this->callService->call($source, '/orgs/'.$name);
+            $response = $this->callService->call($source, $endpoint, 'GET', $config);
         } catch (ClientException $exception) {
             $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
         }
 
+        // Check if the response is set.
         if (isset($response) === false) {
             return null;
         }
 
-        $organization = \Safe\json_decode($response->getBody()->getContents(), true);
+        // Decode the response with the callService.
+        $items = $this->callService->decodeResponse($source, $response);
 
-        if ($organization === null) {
-            $this->pluginLogger->error('Could not find a organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
+        // Return null and throw error log if the decoded response is empty.
+        if (empty($items) === true) {
+            // Set a default error message.
+            $errorMessage = 'The decoded response of source: '.$source->getName().' with enpoint: '.$endpoint['path'].' is empty.';
 
+            // If the $pluginMessages error key is given override the $errorMessage.
+            if (key_exists('error', $pluginMessages) === true) {
+                $errorMessage = $pluginMessages['error'];
+            }
+
+            $this->pluginLogger->error($errorMessage, ['plugin' => 'open-catalogi/open-catalogi-bundle']);
             return null;
         }//end if
 
-        return $organization;
+        // Return the decoded response.
+        return $items;
 
-    }//end getOrganization()
-
-
-    /**
-     * Get a repositories of the organization from the github api.
-     *
-     * @param string $name   The name of the repository.
-     * @param Source $source The source to sync from.
-     *
-     * @return array|null The imported organization repositories as array.
-     */
-    public function getOrganizationRepos(string $name, Source $source): ?array
-    {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        try {
-            $response = $this->callService->call($source, '/orgs'.$name.'/repos');
-        } catch (ClientException $exception) {
-            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        }
-
-        if (isset($response) === false) {
-            return null;
-        }
-
-        $repositories = \Safe\json_decode($response->getBody()->getContents(), true);
-
-        if (empty($repositories) === true
-            || $repositories === null
-        ) {
-            $this->pluginLogger->error('Could not find the repositories of the organization with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        return $repositories;
-
-    }//end getOrganizationRepos()
-
-
-    /**
-     * Get a organization with type Organization from the github api.
-     *
-     * @param string $name   The name of the organization.
-     * @param Source $source The source to sync from.
-     *
-     * @return array|null The imported user as array.
-     */
-    public function getUser(string $name, Source $source): ?array
-    {
-        $this->pluginLogger->debug('Getting user '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        try {
-            $response = $this->callService->call($source, '/users/'.$name);
-        } catch (ClientException $exception) {
-            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        }
-
-        if (isset($response) === false) {
-            return null;
-        }
-
-        $organization = \Safe\json_decode($response->getBody()->getContents(), true);
-
-        if ($organization === null) {
-            $this->pluginLogger->error('Could not find a user with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        return $organization;
-
-    }//end getUser()
-
-
-    /**
-     * Get a repositories of the organization with type user from the github api.
-     *
-     * @param string $name   The name of the repository.
-     * @param Source $source The source to sync from.
-     *
-     * @return array|null The imported user repositories as array.
-     */
-    public function getUserRepos(string $name, Source $source): ?array
-    {
-        $this->pluginLogger->debug('Getting repository '.$name.'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-        try {
-            $response = $this->callService->call($source, '/users'.$name.'/repos');
-        } catch (ClientException $exception) {
-            $this->pluginLogger->error($exception->getMessage(), ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-        }
-
-        if (isset($response) === false) {
-            return null;
-        }
-
-        $repositories = \Safe\json_decode($response->getBody()->getContents(), true);
-
-        if (empty($repositories) === true
-            || $repositories === null
-        ) {
-            $this->pluginLogger->error('Could not find the repositories of the user with name: '.$name.' and with source: '.$source->getName().'.', ['plugin' => 'open-catalogi/open-catalogi-bundle']);
-
-            return null;
-        }//end if
-
-        return $repositories;
-
-    }//end getUserRepos()
+    }//end callAndDecode()
 
 
     /**

@@ -1,10 +1,10 @@
 {
-  "title": "Find Github Repository Through Organization Action",
-  "$id": "https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json",
+  "title": "Find Repository Through Organization Action",
+  "$id": "https://opencatalogi.nl/action/oc.FindRepositoryThroughOrganizationAction.action.json",
   "$schema": "https://docs.commongateway.nl/schemas/Action.schema.json",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "listens": ["opencatalogi.default.listens"],
-  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindGithubRepositoryThroughOrganizationHandler",
+  "class": "OpenCatalogi\\OpenCatalogiBundle\\ActionHandler\\FindRepositoryThroughOrganizationHandler",
   "conditions": {
     "==": [
       1,
@@ -13,6 +13,7 @@
   },
   "configuration": {
     "githubSource": "https://opencatalogi.nl/source/oc.GitHubAPI.source.json",
+    "gitlabSource": "https://opencatalogi.nl/source/oc.GitlabAPI.source.json",
     "usercontentSource": "https://opencatalogi.nl/source/oc.GitHubusercontent.source.json",
     "repositorySchema": "https://opencatalogi.nl/oc.repository.schema.json",
     "repositoryMapping": "https://api.github.com/oc.githubRepository.mapping.json",
