@@ -3,25 +3,25 @@
 namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 
 /**
- * Executes a the FindGithubRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
+ * Executes a the FindRepositoryThroughOrganizationService that loops through organizations (https://opencatalogi.nl/oc.organisation.schema.json)
  * and tries to find a opencatalogi.yaml on github with its organization name to update the organization object with that fetched opencatalogi.yaml data.
  */
-class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInterface
+class FindRepositoryThroughOrganizationHandler implements ActionHandlerInterface
 {
 
     /**
-     * @var FindGithubRepositoryThroughOrganizationService
+     * @var FindRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService $service;
+    private FindRepositoryThroughOrganizationService $service;
 
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $service The findGithubRepositoryThroughOrganizationService
+     * @param FindRepositoryThroughOrganizationService $service The findRepositoryThroughOrganizationService
      */
-    public function __construct(FindGithubRepositoryThroughOrganizationService $service)
+    public function __construct(FindRepositoryThroughOrganizationService $service)
     {
         $this->service = $service;
 
@@ -36,12 +36,13 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
     public function getConfiguration()
     {
         return [
-            '$id'         => 'https://opencatalogi.nl/ActionHandler/FindGithubRepositoryThroughOrganizationHandler.ActionHandler.json',
+            '$id'         => 'https://opencatalogi.nl/ActionHandler/FindRepositoryThroughOrganizationHandler.ActionHandler.json',
             '$schema'     => 'https://docs.commongateway.nl/schemas/ActionHandler.schema.json',
-            'title'       => 'FindGithubRepositoryThroughOrganizationHandler',
-            'description' => 'This handler finds the .github repository through organizations',
+            'title'       => 'FindRepositoryThroughOrganizationHandler',
+            'description' => 'This handler finds the repositories through an organization(s)',
             'required'    => [
                 'githubSource',
+                'gitlabSource',
                 'usercontentSource',
                 'repositorySchema',
                 'repositoryMapping',
@@ -58,6 +59,13 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
                     'description' => 'The source of the github api.',
                     'example'     => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
                     'reference'   => 'https://opencatalogi.nl/source/oc.GitHubAPI.source.json',
+                    'required'    => true,
+                ],
+                'gitlabSource'        => [
+                    'type'        => 'string',
+                    'description' => 'The source of the gitlab api.',
+                    'example'     => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
+                    'reference'   => 'https://opencatalogi.nl/source/oc.GitlabAPI.source.json',
                     'required'    => true,
                 ],
                 'usercontentSource'   => [
@@ -139,7 +147,7 @@ class FindGithubRepositoryThroughOrganizationHandler implements ActionHandlerInt
      */
     public function run(array $data, array $configuration): array
     {
-        return $this->service->findGithubRepositoryThroughOrganizationHandler($data, $configuration);
+        return $this->service->findRepositoryThroughOrganizationHandler($data, $configuration);
 
     }//end run()
 

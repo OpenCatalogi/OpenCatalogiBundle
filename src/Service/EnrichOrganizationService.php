@@ -255,36 +255,6 @@ class EnrichOrganizationService
 
     }//end getConnectedComponents()
 
-
-    /**
-     * This function gets all the repositories from the given organization and sets it to the owns of the organization.
-     *
-     * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
-     * @param Source       $source       The github source.
-     *
-     * @return array|null The organization array from github.
-     */
-    public function enrichGithubOrganization(ObjectEntity $organization, Source $source): ?array
-    {
-        // Get the path of the github url.
-        $githubPath = \Safe\parse_url($organization->getValue('github'))['path'];
-
-        $organizationArray = null;
-        if ($organization->getValue('type') === 'Organization') {
-            // Get the organization from the github api.
-            $organizationArray = $this->githubApiService->getOrganization(trim($githubPath, '/'), $source);
-        }
-
-        if ($organization->getValue('type') === 'User') {
-            // Get the organization from the github api.
-            $organizationArray = $this->githubApiService->getUser(trim($githubPath, '/'), $source);
-        }
-
-        return $organizationArray;
-
-    }//end enrichGithubOrganization()
-
-
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
@@ -326,31 +296,36 @@ class EnrichOrganizationService
      *
      * @throws GuzzleException|Exception
      *
-     * @return array The gitlab organization or user as array.
+     * @return string|null The endpoint to call.
      */
-    public function enrichGitlabOrganization(ObjectEntity $organization, Source $source): array
+    public function getEndpoint(ObjectEntity $organization, Source $source, string $type, string $urlPath): ?string
     {
-        // Get the path of the gitlab url.
-        $gitlabPath = \Safe\parse_url($organization->getValue('gitlab'))['path'];
+        if ($type === 'github') {
+            if ($organization->getValue('type') === 'Organization') {
+                return '/orgs/'.trim($urlPath, '/');
+            }
 
-        $organizationArray = [];
-        if ($organization->getValue('type') === 'Organization') {
-            $gitlabPath = explode('/groups/', $gitlabPath)[1];
-            $gitlabPath = urlencode($gitlabPath);
+            if ($organization->getValue('type') === 'User') {
+                return '/users/'.trim($urlPath, '/');
+            }
 
-            // Get the group from the gitlab api.
-            $organizationArray = $this->gitlabApiService->getOrganization($gitlabPath, $source);
         }
 
-        if ($organization->getValue('type') === 'User') {
-            $gitlabPath = explode('/', $gitlabPath)[1];
-            // Get the user from the gitlab api.
-            $organizationArray = $this->gitlabApiService->getUser($gitlabPath, $source);
+        if ($type === 'gitlab') {
+            if ($organization->getValue('type') === 'Organization') {
+                $urlPath = explode('/groups/', $urlPath)[1];
+                $urlPath = urlencode($urlPath);
+                return '/groups/'.$urlPath;
+            }
+
+            if ($organization->getValue('type') === 'User') {
+                return '/users?username='.trim($urlPath, '/');
+            }
         }
 
-        return $organizationArray;
+        return null;
 
-    }//end enrichGitlabOrganization()
+    }//end getEndpoint()
 
 
     /**
@@ -424,20 +399,33 @@ class EnrichOrganizationService
      *
      * @param ObjectEntity $organization Catalogi organization https://opencatalogi.nl/oc.organisation.schema.json
      * @param Source       $source       The github/gitlab source.
+     * @param string $type The type: github/gitlab
      *
      * @throws GuzzleException|Exception
      *
      * @return ObjectEntity The updated organization object.
      */
-    public function enrichOrganization(ObjectEntity $organization, Source $source): ObjectEntity
+    public function enrichOrganization(ObjectEntity $organization, Source $source, string $type): ObjectEntity
     {
-        $organizationArray = null;
-        if ($source->getReference() === $this->configuration['gitlabSource']) {
-            $organizationArray = $this->enrichGitlabOrganization($organization, $source);
+        // Get the path of the gitlab url.
+        $urlPath = \Safe\parse_url($organization->getValue($type))['path'];
+
+        $endpoint = $this->getEndpoint($organization, $source, $type, $urlPath);
+        if ($endpoint === null) {
+            return $organization;
         }
 
-        if ($source->getReference() === $this->configuration['githubSource']) {
-            $organizationArray = $this->enrichGithubOrganization($organization, $source);
+        // Set the debug and error messages.
+        $pluginMessages = [
+            'debug' => 'Getting '.strtolower($organization->getValue('type')).' with '.$type.' url '.$organization->getValue($type).'.',
+            'error' => 'Could not find the '.strtolower($organization->getValue('type')).' with name: '.trim($urlPath, '/').' and with source: '.$source->getName().'.'
+        ];
+
+        // Get the repositories of the organization/user from the github/gitlab api.
+        $organizationArray = $this->githubApiService->callAndDecode($source, $endpoint, $pluginMessages);
+
+        if ($type === 'gitlab' && $organization->getValue('type') === 'User') {
+            $organizationArray = $organizationArray[0];
         }
 
         if ($organizationArray === null) {
@@ -507,6 +495,8 @@ class EnrichOrganizationService
             if ($source instanceof Source === false || $this->githubApiService->checkGithubAuth($source) === false) {
                 return $organization;
             }
+
+            $type = 'github';
         }//end if
 
         // Check if the name and gitlab is not null.
@@ -515,6 +505,8 @@ class EnrichOrganizationService
             if ($source instanceof Source === false || $this->gitlabApiService->checkGitlabAuth($source) === false) {
                 return $organization;
             }
+
+            $type = 'gitlab';
         }//end if
 
         if (isset($source) === false) {
@@ -522,7 +514,7 @@ class EnrichOrganizationService
         }
 
         // Enrich the organization object.
-        return $this->enrichOrganization($organization, $source);
+        return $this->enrichOrganization($organization, $source, $type);
 
     }//end getOrganization()
 
@@ -558,11 +550,9 @@ class EnrichOrganizationService
     /**
      * This function gets all the repositories from the given organization and sets it to the owns of the organization.
      *
-     * @param string $organizationId The id of the organization in the response.
-     *
      * @throws GuzzleException|Exception
      *
-     * @return ObjectEntity The updated github or gitlab organization.
+     * @return array The updated github or gitlab organization.
      */
     public function getAllOrganizations(): array
     {
@@ -589,6 +579,8 @@ class EnrichOrganizationService
                 if ($source instanceof Source === false || $this->githubApiService->checkGithubAuth($source) === false) {
                     return $this->data;
                 }
+
+                $type = 'github';
             }//end if
 
             // Check if gitlab is not null.
@@ -597,11 +589,13 @@ class EnrichOrganizationService
                 if ($source instanceof Source === false || $this->gitlabApiService->checkGitlabAuth($source) === false) {
                     return $this->data;
                 }
+
+                $type = 'gitlab';
             }//end if
 
             if (isset($source) === true) {
                 // Enrich the organization object.
-                $this->data['response'] = $this->enrichOrganization($organization, $source);
+                $this->data['response'] = $this->enrichOrganization($organization, $source, $type);
             }
         }//end foreach
 
