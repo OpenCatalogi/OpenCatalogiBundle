@@ -6,19 +6,19 @@ De Catalogi Service is een integraal onderdeel van het Open Services Framework, 
 
 ## Kernfunctionaliteiten
 
-- **Centraal Beheer:** Efficiënt beheren van catalogi binnen één centraal systeem.
-- **Flexibele Integratie:** Gemakkelijke koppeling met andere microservices en externe systemen.
-- **Gebruikersvriendelijk:** Intuïtieve interface voor het toevoegen, bewerken en verwijderen van catalogusitems.
-- **API-First Ontwerp:** Gestandaardiseerde API's voor toegang tot catalogusgegevens, in lijn met Common Ground principes.
-- **Veiligheid en Compliance:** Ontworpen met een sterke focus op data-integriteit en privacybescherming.
+* **Centraal Beheer:** Efficiënt beheren van catalogi binnen één centraal systeem.
+* **Flexibele Integratie:** Gemakkelijke koppeling met andere microservices en externe systemen.
+* **Gebruikersvriendelijk:** Intuïtieve interface voor het toevoegen, bewerken en verwijderen van catalogusitems.
+* **API-First Ontwerp:** Gestandaardiseerde API's voor toegang tot catalogusgegevens, in lijn met Common Ground principes.
+* **Veiligheid en Compliance:** Ontworpen met een sterke focus op data-integriteit en privacybescherming.
 
 ## Installatie
 
 ### Vereisten
 
-- PHP 7.4 of hoger
-- Symfony 5 of hoger
-- Docker (voor containerisatie en lokale ontwikkeling)
+* PHP 7.4 of hoger
+* Symfony 5 of hoger
+* Docker (voor containerisatie en lokale ontwikkeling)
 
 ### Stap-voor-stap Installatiegids
 
@@ -29,7 +29,7 @@ De Catalogi Service is een integraal onderdeel van het Open Services Framework, 
 
 ## Gebruik
 
-Na installatie kunt u direct aan de slag met het beheren van uw catalogi. De documentatie op onze website [link naar documentatie] biedt uitgebreide informatie over het configureren en gebruiken van de Catalogi Service binnen uw organisatie.
+Na installatie kunt u direct aan de slag met het beheren van uw catalogi. De documentatie op onze website \[link naar documentatie] biedt uitgebreide informatie over het configureren en gebruiken van de Catalogi Service binnen uw organisatie.
 
 ## Bijdragen
 
@@ -41,4 +41,4 @@ De Catalogi Service is uitgegeven onder de EUPL 1.2 licentie. Voor meer details,
 
 ## Contact
 
-Voor vragen, feedback of meer informatie over hoe u de Catalogi Service kunt implementeren binnen uw organisatie, kunt u contact met ons opnemen via [info@yourorg.com](mailto:info@yourorg.com).
+Voor vragen, feedback of meer informatie over hoe u de Catalogi Service kunt implementeren binnen uw organisatie, kunt u contact met ons opnemen via <info@yourorg.com>.

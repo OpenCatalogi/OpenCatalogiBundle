@@ -9,6 +9,6 @@ Wij waarderen de bijdragen van onze leveranciers aan de doorontwikkeling en supp
 
 ## Vragen?
 
-Heeft u vragen of feedback, neem dan contact op via [info@conduction.nl](mailto:info@conduction.nl).
+Heeft u vragen of feedback, neem dan contact op via <info@conduction.nl>.
 
 Bedankt voor uw interesse in het verbeteren van Open Services!
