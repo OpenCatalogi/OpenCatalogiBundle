@@ -1,5 +1,3 @@
-# Catalogi Service
-
 ## Over Catalogi Service
 
 De Catalogi Service is een integraal onderdeel van het Open Services Framework, gericht op het beheren en beschikbaar stellen van overheidsinformatiecatalogi. Deze service biedt een flexibele, schaalbare oplossing voor het centraal beheren van catalogi, waaronder diensten, producten, en procedures binnen overheidsorganisaties. Gebaseerd op het Symfony framework, ondersteunt het een breed scala aan toepassingen van eenvoudige catalogusbeheer tot complexe integraties met bestaande systemen.
