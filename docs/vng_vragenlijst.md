@@ -2,7 +2,7 @@
 
 ## 1 Wat is de naam van het initiatief dat je wilt aanmelden?
 
-OpenCatalogi
+Catalogi Service
 
 ## 2 Wat voor type product is het initiatief?
 
@@ -18,7 +18,7 @@ Ja, OpenCatalogi is ontworpen om naast bestaande software te functioneren en int
 
 ## 5 Indien een toepassing, pitch je product Waarom zouden anderen moeten mee doen met de ontwikkeling of waarom zouden andere gemeenten jouw product moeten implementeren
 
-OpenCatalogi versnelt de digitale transformatie van gemeenten door de herbruikbaarheid en de uitwisselbaarheid van componenten en services te bevorderen. Het verlaagt ontwikkelkosten en stimuleert innovatie door samenwerking te faciliteren.
+De Catalogi-service stelt de overheid in staat om gemakkelijk additionele externe en interne bronnen toe te voegen aan een Open Index-installatie en deze te ontsluiten op Open Catalogi.
 
 ## 6 In welk domein past het initiatief?
 
@@ -33,18 +33,47 @@ OpenCatalogi versnelt de digitale transformatie van gemeenten door de herbruikba
 
 ## 8 Welke gemeenten zijn aangesloten bij de realisatie van dit initiatief?
 
+* Dimpact
+* Conxillium
 * Rotterdam
 * Roermond
 * Assen
 * Hilversum
-* Haarlemmermeer
+* Haarlememrmeer
 * Enschede
 * Eindhoven
-* Alle gemeenten van Dimpact
+* Conduction
+* Amersfoort
+* Zwolle
+* Hoorn
+* Emmen
+* Harderwijk
+* Leiden
+* Bronckhorst
+* Delft
+* Open Webconcept
 
 ## 9 Welke gemeenten maken gebruik van dit initiatief?
 
-Rotterdam met een eigen installatie
+* Dimpact
+* Conxillium
+* Rotterdam
+* Roermond
+* Assen
+* Hilversum
+* Haarlememrmeer
+* Enschede
+* Eindhoven
+* Conduction
+* Amersfoort
+* Zwolle
+* Hoorn
+* Emmen
+* Harderwijk
+* Leiden
+* Bronckhorst
+* Delft
+* Open Webconcept
 
 ## 10 Welke leveranciers zijn betrokken?
 
@@ -56,7 +85,7 @@ Conxillium, Conduction
 
 ## 12 Wanneer wordt verwacht dat het initiatief ready for use is? Of sinds wanneer is het initiatief ready for use?
 
-01-03-2024
+01-11-2023
 
 ## 13 Welke organisatie wordt aangehouden als contact organisatie?
 
@@ -76,7 +105,7 @@ documentatie.opencatalogi.nl
 
 ## 17 Wat is een korte omschrijving van het product?
 
-OpenCatalogi is een federatieve catalogus ontworpen om de vindbaarheid en herbruikbaarheid van gemeentelijke componenten en services te verbeteren, waardoor gemeenten efficiënter kunnen samenwerken en innovatie kunnen versnellen.
+Ontsluit (externe) bronnen zoals DMC, GitHub en developer.overheid.nl naar Open Index ten behoeve van OpenCatalogi
 
 ## 18 Hoeverre draagt het initiatief volgens jou bij aan de wendbaarheid van gemeenten?
 
