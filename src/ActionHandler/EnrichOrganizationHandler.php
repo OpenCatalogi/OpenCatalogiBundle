@@ -4,7 +4,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\EnrichOrganizationService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
