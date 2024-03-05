@@ -35,7 +35,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
 
     /**
      * @param FindRepositoryThroughOrganizationService $findGitService  find Github Repository Through Organization Service
-     * @param GatewayResourceService                         $resourceService The Gateway Resource Service
+     * @param GatewayResourceService                   $resourceService The Gateway Resource Service
      */
     public function __construct(
         FindRepositoryThroughOrganizationService $findGitService,
