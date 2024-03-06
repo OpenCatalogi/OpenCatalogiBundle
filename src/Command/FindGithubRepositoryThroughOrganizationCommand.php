@@ -4,6 +4,7 @@ namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,7 +39,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      * @param GatewayResourceService                         $resourceService The Gateway Resource Service
      */
     public function __construct(
-        FindGithubRepositoryThroughOrganizationService $findGitService,
+        FindRepositoryThroughOrganizationService $findGitService,
         GatewayResourceService $resourceService
     ) {
         $this->findGitService  = $findGitService;
@@ -76,12 +77,12 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
         $organizationId = $input->getOption('organizationId', false);
 
         if ($organizationId === null) {
-            if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration)) === true) {
+            if (empty($this->findGitService->findRepositoryThroughOrganizationHandler([], $configuration)) === true) {
                 return Command::FAILURE;
             }
         }
 
-        if (empty($this->findGitService->findGithubRepositoryThroughOrganizationHandler([], $configuration, $organizationId)) === true) {
+        if (empty($this->findGitService->findRepositoryThroughOrganizationHandler([], $configuration, $organizationId)) === true) {
             return Command::FAILURE;
         }
 

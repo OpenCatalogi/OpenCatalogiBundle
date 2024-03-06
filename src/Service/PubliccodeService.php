@@ -15,10 +15,10 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use App\Service\SynchronizationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\ClientException;
 use phpDocumentor\Reflection\Types\This;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 
@@ -234,7 +234,7 @@ class PubliccodeService
         $contacts = [];
         foreach ($publiccode['maintenance']['contacts'] as $contact) {
             // The name property is mandatory, so only set the contact if this is given.
-            if (key_exists('name', $contact) === true) {
+            if (is_array($contact) && key_exists('name', $contact) === true) {
                 // $contactSchema = $this->resourceService->getSchema($this->configuration['contactSchema'], 'open-catalogi/open-catalogi-bundle');
                 $contactSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
                 if ($contactSchema instanceof Entity === false) {
