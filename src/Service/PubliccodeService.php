@@ -15,10 +15,10 @@ use CommonGateway\CoreBundle\Service\MappingService;
 use App\Service\SynchronizationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\ClientException;
 use phpDocumentor\Reflection\Types\This;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Encoder\YamlEncoder;
 
@@ -234,7 +234,7 @@ class PubliccodeService
         $contacts = [];
         foreach ($publiccode['maintenance']['contacts'] as $contact) {
             // The name property is mandatory, so only set the contact if this is given.
-            if (key_exists('name', $contact) === true) {
+            if (is_array($contact) && key_exists('name', $contact) === true) {
                 // $contactSchema = $this->resourceService->getSchema($this->configuration['contactSchema'], 'open-catalogi/open-catalogi-bundle');
                 $contactSchema = $this->resourceService->getSchema('https://opencatalogi.nl/oc.contact.schema.json', 'open-catalogi/open-catalogi-bundle');
                 if ($contactSchema instanceof Entity === false) {
@@ -705,59 +705,59 @@ class PubliccodeService
         switch ($domain) {
             // Check if the logo is as option 1, a logo from https://avatars.githubusercontent.com.
             // Check if the domain is https://avatars.githubusercontent.com. If so we don't have to do anything and return the publiccodeArray logo.
-        case 'avatars.githubusercontent.com':
-            // TODO: Validate the avatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
-            $this->pluginLogger->info('The logo from the publiccode file is from https://avatars.githubusercontent.com. Do nothing and return the url.');
+            case 'avatars.githubusercontent.com':
+                // TODO: Validate the avatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
+                $this->pluginLogger->info('The logo from the publiccode file is from https://avatars.githubusercontent.com. Do nothing and return the url.');
 
-            // Return the given avatar logo url.
-            return $componentArray['logo'];
+                // Return the given avatar logo url.
+                return $componentArray['logo'];
             // Check if the logo is as option 2, a logo from https://raw.githubusercontent.com.
             // Check if the domain is https://raw.githubusercontent.com. If so, the user content source must be called with the path of the given logo URL as endpoint.
-        case 'raw.githubusercontent.com':
-            // Get the usercontent source.
-            $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
-            // Check if the given source is not an instance of a Source return null and create a log.
-            if ($usercontentSource instanceof Source === false) {
-                $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
+            case 'raw.githubusercontent.com':
+                // Get the usercontent source.
+                $usercontentSource = $this->resourceService->getSource($this->configuration['usercontentSource'], 'open-catalogi/open-catalogi-bundle');
+                // Check if the given source is not an instance of a Source return null and create a log.
+                if ($usercontentSource instanceof Source === false) {
+                    $this->pluginLogger->error('The source with reference: '.$usercontentSource->getReference().' cannot be found.', ['open-catalogi/open-catalogi-bundle']);
 
-                // Cannot validate the raw usercontent url if the source cannot be found.
-                break;
-            }
+                    // Cannot validate the raw usercontent url if the source cannot be found.
+                    break;
+                }
 
-            // Handle the logo if the logo is as option 2, the raw github link for the logo.
-            return $this->handleRawLogo($componentArray, $usercontentSource, 'raw');
+                // Handle the logo if the logo is as option 2, the raw github link for the logo.
+                return $this->handleRawLogo($componentArray, $usercontentSource, 'raw');
             // Check if the domain is https://github.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
             // If so we need to get an url that the frontend can use.
-        case 'github.com':
-            if (key_exists('path', $parsedLogo) === true
-                && $parsedLogo['path'] !== null
-            ) {
-                // Handle the logo if the logo is as option 3, the file fom github where the image can be found.
-                return $this->handleLogoFromGithub($componentArray, $source, $parsedLogo, $repositoryName);
-            }
-            break;
+            case 'github.com':
+                if (key_exists('path', $parsedLogo) === true
+                    && $parsedLogo['path'] !== null
+                ) {
+                    // Handle the logo if the logo is as option 3, the file fom github where the image can be found.
+                    return $this->handleLogoFromGithub($componentArray, $source, $parsedLogo, $repositoryName);
+                }
+                break;
             // Check if the logo is as option 5, a logo from https://www.gravatar.com.
             // Check if the domain is https://www.gravatar.com. If so we don't have to do anything and return the publiccodeArray logo.
-        case 'www.gravatar.com':
-            // TODO: Validate the gravatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
-            $this->pluginLogger->info('The logo from the publiccode file is from https://www.gravatar.com. Do nothing and return the url.');
+            case 'www.gravatar.com':
+                // TODO: Validate the gravatar url. Call the source with path and check is the status code is 200. The function handleRawLogo can be used for this.
+                $this->pluginLogger->info('The logo from the publiccode file is from https://www.gravatar.com. Do nothing and return the url.');
 
-            // Return the given gravatar logo url.
-            return $componentArray['logo'];
+                // Return the given gravatar logo url.
+                return $componentArray['logo'];
             // Check if the domain is https://gitlab.com, the key path exist in the parsed logo url and if the parsed logo url path is not null.
             // If so we need to get an url that the frontend can use.
-        case 'gitlab.com':
-            if (key_exists('path', $parsedLogo) === true
-                && $parsedLogo['path'] !== null
-            ) {
-                // For option 6 and 7:
-                // Handle the logo if the logo is as option 6 or 7, the file fom gitlab where the image can be found.
-                return $this->handleLogoFromGitlab($componentArray, $source, $parsedLogo, $repositoryName, $repositoryId);
-            }
-            break;
-        default:
-            $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
-            break;
+            case 'gitlab.com':
+                if (key_exists('path', $parsedLogo) === true
+                    && $parsedLogo['path'] !== null
+                ) {
+                    // For option 6 and 7:
+                    // Handle the logo if the logo is as option 6 or 7, the file fom gitlab where the image can be found.
+                    return $this->handleLogoFromGitlab($componentArray, $source, $parsedLogo, $repositoryName, $repositoryId);
+                }
+                break;
+            default:
+                $this->pluginLogger->warning('The domain: '.$domain.' is not valid. The logo url can be from https://avatars.githubusercontent.com, https://raw.githubusercontent.com and https://github.com. It can also be a relative path from the root of the repository from github can be given.', ['open-catalogi/open-catalogi-bundle']);
+                break;
         }//end switch
 
         return null;
