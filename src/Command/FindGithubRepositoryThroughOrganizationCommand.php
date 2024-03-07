@@ -69,7 +69,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $githubRepoAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindGithubRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
+        $githubRepoAction = $this->resourceService->getAction('https://opencatalogi.nl/action/oc.FindRepositoryThroughOrganizationAction.action.json', 'open-catalogi/open-catalogi-bundle');
         $configuration    = $githubRepoAction->getConfiguration();
 
         // Handle the command options
