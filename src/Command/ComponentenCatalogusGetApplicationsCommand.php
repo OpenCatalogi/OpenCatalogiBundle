@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the FindGithubRepositoryThroughOrganizationService.
+ * Command to execute the FindRepositoryThroughOrganizationService.
  */
 class ComponentenCatalogusGetApplicationsCommand extends Command
 {

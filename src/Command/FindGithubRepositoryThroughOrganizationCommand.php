@@ -3,7 +3,7 @@
 namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService;
+use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to execute the FindGithubRepositoryThroughOrganizationService.
+ * Command to execute the FindRepositoryThroughOrganizationService.
  */
 class FindGithubRepositoryThroughOrganizationCommand extends Command
 {
@@ -24,9 +24,9 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected static $defaultName = 'opencatalogi:github:discoverrepository';
 
     /**
-     * @var FindGithubRepositoryThroughOrganizationService
+     * @var FindRepositoryThroughOrganizationService
      */
-    private FindGithubRepositoryThroughOrganizationService $findGitService;
+    private FindRepositoryThroughOrganizationService $findGitService;
 
     /**
      * @var GatewayResourceService
@@ -35,8 +35,8 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
 
 
     /**
-     * @param FindGithubRepositoryThroughOrganizationService $findGitService  find Github Repository Through Organization Service
-     * @param GatewayResourceService                         $resourceService The Gateway Resource Service
+     * @param FindRepositoryThroughOrganizationService $findGitService  find Github Repository Through Organization Service
+     * @param GatewayResourceService                   $resourceService The Gateway Resource Service
      */
     public function __construct(
         FindRepositoryThroughOrganizationService $findGitService,
@@ -55,7 +55,7 @@ class FindGithubRepositoryThroughOrganizationCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('This command triggers OpenCatalogi FindGithubRepositoryThroughOrganizationService')
+            ->setDescription('This command triggers OpenCatalogi FindRepositoryThroughOrganizationService')
             ->setHelp('This command allows you to update create owned repositories from organisation')
             ->addOption('organizationId', 'o', InputOption::VALUE_OPTIONAL, 'Find owned repositories for a specific organisation by id');
 

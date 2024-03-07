@@ -9,7 +9,7 @@ return (object)[
         '\OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeFromGithubUrlService',
         '\OpenCatalogi\OpenCatalogiBundle\Service\EnrichPubliccodeService',
         '\OpenCatalogi\OpenCatalogiBundle\Service\FederalizationService',
-        '\OpenCatalogi\OpenCatalogiBundle\Service\FindGithubRepositoryThroughOrganizationService',
+        '\OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService',
         '\OpenCatalogi\OpenCatalogiBundle\Service\FindOrganizationThroughRepositoriesService',
         '\OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService',
         '\OpenCatalogi\OpenCatalogiBundle\Service\GithubEventService',
