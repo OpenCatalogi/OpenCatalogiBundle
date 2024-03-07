@@ -4,8 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\ActionHandler;
 
 use  CommonGateway\CoreBundle\ActionHandler\ActionHandlerInterface;
 use OpenCatalogi\OpenCatalogiBundle\Service\DownloadObjectService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
-use OpenCatalogi\OpenCatalogiBundle\Service\GithubApiService;
 
 /**
  * Executes a the EnrichOrganizationHandler and gets an organization from the response of the githubEventAction and formInputAction
