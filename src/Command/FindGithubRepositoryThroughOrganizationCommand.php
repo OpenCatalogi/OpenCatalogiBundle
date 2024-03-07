@@ -4,7 +4,6 @@ namespace OpenCatalogi\OpenCatalogiBundle\Command;
 
 use CommonGateway\CoreBundle\Service\GatewayResourceService;
 use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
-use OpenCatalogi\OpenCatalogiBundle\Service\FindRepositoryThroughOrganizationService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
