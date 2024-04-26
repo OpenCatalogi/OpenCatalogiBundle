@@ -1,0 +1,11 @@
+{
+    "title": "componentencatalogus opencatalogi",
+    "$id": "https://opencatalogi.nl/source/oc.componentencatalogus.federated.source.json",
+    "$schema": "https://docs.commongateway.nl/schemas/Gateway.schema.json",
+    "version": "0.0.1",
+    "description": "componentencatalogus opencatalogi",
+    "location": "https://oc-componentencatalogus.test.common-gateway.commonground.nu/api",
+    "headers": {
+        "accept" : "application/json"
+    }
+}
