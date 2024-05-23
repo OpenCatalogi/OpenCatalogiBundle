@@ -30,6 +30,19 @@
       },
       "subItems": [
         {
+          "label": "Architectuur",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/Handleidingen/Architectuur"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "Handleidingen",
+              "fileName": "Architectuur"
+            }
+          }
+        },
+        {
           "label": "Installatie",
           "type": "internalMarkdown",
           "current": {
@@ -41,7 +54,7 @@
               "fileName": "Installatie"
             }
           }
-        } ,
+        },
         {
           "label": "Kosten",
           "type": "internalMarkdown",
@@ -53,8 +66,7 @@
               "fileName": "Kosten"
             }
           }
-        }
-        
+        }        
       ]
     }
   ]
