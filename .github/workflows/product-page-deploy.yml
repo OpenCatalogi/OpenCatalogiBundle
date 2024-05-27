@@ -16,6 +16,9 @@ jobs:
       - name: Deploy Product Github Page
         uses: OpenCatalogi/productpage-action@latest
         with:
+          SLACK_URL: "https://github.com/openwebconcept"
+          READ_THE_DOCS_URL: "false"
+          github_docs_directory_paths: '[{"name": "Documentatie", "location": "/docs"}'
           github_repository_name_as_prefix: false
           github_repository_url: https://github.com/OpenCatalogi/OpenCatalogiBundle
           github_api_base_url: https://api.github.com/repos/OpenCatalogi/OpenCatalogiBundle/contents

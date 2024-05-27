@@ -1,0 +1,72 @@
+[
+    {
+      "label": "Home",
+      "type": "internal",
+  
+      "current": {
+        "pathname": "/"
+      },
+      "handleClick": {
+        "link": "/"
+      }
+    },
+    {
+      "label": "Services",
+      "type": "internalMarkdown",
+      "current": {
+        "pathname": "/Docs/CONTRIBUTING"
+      },
+      "handleClick": {
+        "internalMarkdown": {
+          "directoryName": "Docs",
+          "fileName": "CONTRIBUTING"
+        }
+      }
+    },
+    {
+      "label": "Handleidingen",
+      "current": {
+        "pathname": "/Handleidingen"
+      },
+      "subItems": [
+        {
+          "label": "Architectuur",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/Handleidingen/Architectuur"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "Handleidingen",
+              "fileName": "Architectuur"
+            }
+          }
+        },
+        {
+          "label": "Installatie",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/Handleidingen/Installatie"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "directoryName": "Handleidingen",
+              "fileName": "Installatie"
+            }
+          }
+        },
+        {
+          "label": "Kosten",
+          "type": "internalMarkdown",
+          "current": {
+            "pathname": "/docs/Kosten"
+          },
+          "handleClick": {
+            "internalMarkdown": {
+              "fileName": "Kosten"
+            }
+          }
+        }        
+      ]
+    }
+  ]
