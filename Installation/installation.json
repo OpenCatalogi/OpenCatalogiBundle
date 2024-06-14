@@ -48,6 +48,35 @@
         "methods": ["GET"]
       }
     ],
+    "sources": [
+      {
+        "$id": "https://opencatalogi.nl/endpoints/federation.endpoint.json",
+        "name": "OpenCatalogi Federated endpoint",
+        "description": "Endpoint that does a federated search over multiple OpenCatalogi sources",
+        "path": [
+          "oc",
+          "federation",
+          "{route}"
+        ],
+        "pathRegex": "^oc/federation/?[^.*]*?$",
+        "methods": [
+          "GET"
+        ],
+        "version": "0.0.1",
+        "loggingConfig": {
+          "headers": [
+            "authorization"
+          ]
+        },
+        "operationType": "GET",
+        "defaultContentType": "application/json",
+        "reference": "https://opencatalogi.nl/sources/oc.developeroverheid.federated.source.json",
+        "federationProxies": [
+          "https://opencatalogi.nl/sources/oc.developeroverheid.federated.source.json",
+          "https://opencatalogi.nl/sources/oc.componentencatalogus.federated.source.json"
+        ]
+      }
+    ],
     "schemas": [
       {
         "reference": "https://opencatalogi.nl/oc.component.schema.json",
